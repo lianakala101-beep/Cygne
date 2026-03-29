@@ -1,0 +1,396 @@
+import { useState } from "react";
+import { Icon, Section } from "./components.jsx";
+import { detectActives, analyzeShelf, calcSpending } from "./engine.js";
+import { assessRoutineFit } from "./modals.jsx";
+import { ProductModal } from "./productmodal.jsx";
+import { ProductCard } from "./ritual.jsx";
+
+
+function buildInsights(products, activeMap) {
+  const insights = [];
+  const cats = products.reduce((acc, p) => { acc[p.category] = (acc[p.category] || []); acc[p.category].push(p); return acc; }, {});
+
+  // -- 1. Routine Efficiency --------------------------------------------------
+  const efficiencyItems = [];
+
+  // Duplicate categories
+  Object.entries(cats).forEach(([cat, prods]) => {
+    if (prods.length > 1 && cat !== "Serum") {
+      efficiencyItems.push({
+        text: `You have ${prods.length} ${cat.toLowerCase()}s. Only one is needed per routine.`,
+        severity: "warning",
+      });
+    }
+  });
+
+  // Exfoliant overlap
+  const exfoliants = products.filter(p => {
+    const a = detectActives(p.ingredients);
+    return p.category === "Exfoliant" || a.AHA || a.BHA;
+  });
+  const uniqueExfNames = [...new Set(exfoliants.map(p => p.name))];
+  if (uniqueExfNames.length > 1) {
+    efficiencyItems.push({
+      text: `You have ${uniqueExfNames.length} overlapping exfoliants. Daily use of both compromises barrier recovery.`,
+      severity: "warning",
+    });
+  }
+
+  // Serum count
+  const serums = products.filter(p => p.category === "Serum");
+  if (serums.length > 3) {
+    efficiencyItems.push({
+      text: `${serums.length} serums in rotation. More than 2–3 actives per session reduces each one's absorption.`,
+      severity: "caution",
+    });
+  }
+
+  if (efficiencyItems.length === 0) {
+    efficiencyItems.push({ text: "Ritual structure looks efficient. No redundant steps detected.", severity: "ok" });
+  }
+
+  insights.push({ section: "Ritual Efficiency", icon: "layers", items: efficiencyItems });
+
+  // -- 2. Ingredient Analysis -------------------------------------------------
+  const ingredientItems = [];
+
+  const allIngredients = products.flatMap(p => p.ingredients || []);
+  const ingCounts = allIngredients.reduce((acc, ing) => { acc[ing] = (acc[ing] || 0) + 1; return acc; }, {});
+
+  // Count active presence across products
+  Object.entries(activeMap).forEach(([active, prods]) => {
+    if (prods.length > 1) {
+      ingredientItems.push({
+        text: `${active.charAt(0).toUpperCase() + active.slice(1)} appears in ${prods.length} products. Cumulative concentration may exceed intended levels.`,
+        severity: prods.length >= 3 ? "warning" : "caution",
+        meta: prods.map(p => p.name),
+      });
+    }
+  });
+
+  // Most repeated base ingredient
+  const topIng = Object.entries(ingCounts)
+    .filter(([k]) => k.length > 4 && !["water", "aqua", "glycerin", "alcohol"].includes(k))
+    .sort((a, b) => b[1] - a[1])[0];
+  if (topIng && topIng[1] >= 3) {
+    ingredientItems.push({
+      text: `"${topIng[0]}" is the most repeated ingredient across your vanity — appears in ${topIng[1]} products.`,
+      severity: "neutral",
+    });
+  }
+
+  if (ingredientItems.length === 0) {
+    ingredientItems.push({ text: "No ingredient redundancy detected across current products.", severity: "ok" });
+  }
+
+  insights.push({ section: "Ingredient Analysis", icon: "drop", items: ingredientItems });
+
+  // -- 3. Cost Optimization ---------------------------------------------------
+  const costItems = [];
+  const totalValue = products.reduce((s, p) => s + (p.price || 0), 0);
+
+  // Find products with overlapping categories — cost of redundancy
+  let redundantCost = 0;
+  let redundantCount = 0;
+  Object.entries(cats).forEach(([cat, prods]) => {
+    if (prods.length > 1 && cat !== "Serum") {
+      const sorted = [...prods].sort((a, b) => (b.price || 0) - (a.price || 0));
+      sorted.slice(1).forEach(p => { redundantCost += (p.price || 0); redundantCount++; });
+    }
+  });
+
+  if (redundantCost > 0) {
+    costItems.push({
+      text: `You could remove ${redundantCount} redundant product${redundantCount > 1 ? "s" : ""} and save $${redundantCost.toFixed(0)} in overlapping products.`,
+      severity: "caution",
+    });
+  }
+
+  // Exfoliant redundancy cost
+  if (uniqueExfNames.length > 1) {
+    const exfCost = exfoliants.slice(1).reduce((s, p) => s + (p.price || 0), 0);
+    if (exfCost > 0) {
+      costItems.push({
+        text: `Consolidating to one exfoliant saves approximately $${exfCost.toFixed(0)} per cycle.`,
+        severity: "caution",
+      });
+    }
+  }
+
+  // Most expensive product flag
+  const sorted = [...products].sort((a, b) => (b.price || 0) - (a.price || 0));
+  if (sorted.length > 0 && sorted[0].price > 60) {
+    costItems.push({
+      text: `${sorted[0].name} at $${sorted[0].price.toFixed(0)} is your highest spend. Verify it's serving a unique function not covered by other products.`,
+      severity: "neutral",
+    });
+  }
+
+  if (costItems.length === 0) {
+    costItems.push({ text: `Total vanity value $${totalValue.toFixed(0)}. No obvious cost inefficiencies detected.`, severity: "ok" });
+  }
+
+  insights.push({ section: "Cost Optimization", icon: "spending", items: costItems });
+
+  // -- 4. Replacement Suggestions ---------------------------------------------
+  const replaceItems = [];
+
+  // Multiple serums with overlapping actives → consolidate
+  const serumActives = serums.map(p => ({ p, actives: Object.keys(detectActives(p.ingredients)) }));
+  const overlapping = serumActives.filter(s => serumActives.some(o => o.p.id !== s.p.id && o.actives.some(a => s.actives.includes(a))));
+  if (overlapping.length >= 2) {
+    replaceItems.push({
+      text: `${overlapping.map(s => s.p.name).join(" and ")} share active ingredients. A single multi-active serum could replace both.`,
+      severity: "caution",
+      cygne: true,
+    });
+  }
+
+  // No SPF — suggest adding one
+  if (!cats["SPF"] && !activeMap["SPF"]) {
+    replaceItems.push({
+      text: "No SPF detected. Adding a broad-spectrum SPF 30–50 as the final AM step is the single highest-impact change you can make.",
+      severity: "warning",
+      cygne: true,
+    });
+  }
+
+  // Low-price product in a critical category where better alternatives exist
+  const budget = products.filter(p => ["Moisturizer", "Cleanser"].includes(p.category) && (p.price || 0) < 12 && products.some(other => other.category === p.category && (other.price || 0) > p.price));
+  budget.forEach(p => {
+    replaceItems.push({
+      text: `${p.name} ($${p.price}) is your entry-level ${p.category.toLowerCase()}. If barrier issues persist, a ceramide-rich upgrade may improve tolerance of your actives.`,
+      severity: "neutral",
+      cygne: true,
+    });
+  });
+
+  if (replaceItems.length === 0) {
+    replaceItems.push({ text: "No replacement opportunities flagged. Current product selection is coherent.", severity: "ok" });
+  }
+
+  insights.push({ section: "Replacement Suggestions", icon: "sparkle", items: replaceItems });
+
+  return insights;
+}
+
+function InsightRow({ item }) {
+  const dot = item.severity === "warning" ? "#c06060" : item.severity === "caution" ? "#c49040" : item.severity === "ok" ? "#7a9070" : "var(--clay)";
+  return (
+    <div style={{ display: "flex", gap: 12, padding: "12px 0", borderBottom: "1px solid var(--border)" }}>
+      <div style={{ width: 5, height: 5, borderRadius: "50%", background: dot, flexShrink: 0, marginTop: 6 }} />
+      <div style={{ flex: 1 }}>
+        <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: item.severity === "ok" ? "var(--clay)" : "var(--parchment)", margin: "0 0 4px", lineHeight: 1.6 }}>{item.text}</p>
+        {item.meta && (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 4 }}>
+            {item.meta.map((m, i) => <span key={i} style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", color: "var(--clay)", background: "var(--surface)", padding: "2px 7px", borderRadius: 20, border: "1px solid var(--border)", letterSpacing: "0.04em" }}>{m}</span>)}
+          </div>
+        )}
+        {item.cygne && (
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 5, marginTop: 6, padding: "3px 9px", background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.2)", borderRadius: 20 }}>
+            <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#7a9070" }}>Cygne</span>
+            <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, color: "var(--clay)" }}>recommendations coming soon</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function InsightBlock({ insight }) {
+  const [open, setOpen] = useState(true);
+  return (
+    <div style={{ marginBottom: 2 }}>
+      <button onClick={() => setOpen(o => !o)}
+        style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "14px 0", background: "none", border: "none", borderTop: "1px solid var(--border)", cursor: "pointer" }}>
+        <span style={{ color: "var(--clay)", opacity: 0.55 }}><Icon name={insight.icon} size={13} /></span>
+        <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)", flex: 1, textAlign: "left" }}>{insight.section}</span>
+        <span style={{ color: "var(--clay)", opacity: 0.35, display: "inline-block", transform: open ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>
+          <Icon name="chevron" size={12} />
+        </span>
+      </button>
+      {open && (
+        <div style={{ paddingBottom: 6 }}>
+          {insight.items.map((item, i) => (
+            <InsightRow key={i} item={i === insight.items.length - 1 ? { ...item, _last: true } : item} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ClearAllButton({ onClearAll }) {
+  const [confirming, setConfirming] = useState(false);
+  return (
+    <button
+      onClick={() => {
+        if (confirming) { onClearAll(); setConfirming(false); }
+        else { setConfirming(true); setTimeout(() => setConfirming(false), 3000); }
+      }}
+      style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: confirming ? "#c06060" : "var(--clay)", opacity: confirming ? 1 : 0.35, background: "none", border: "none", cursor: "pointer", paddingTop: 8, transition: "all 0.2s" }}>
+      {confirming ? "Tap again to confirm" : "Clear all"}
+    </button>
+  );
+}
+
+function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo, onClearAll, onSession, waitingRoom = [], onAddFromWaiting, onDismissWaiting, checkIns = [], user = {} }) {
+  const [view, setView] = useState("shelf");
+  const [filter, setFilter] = useState("All");
+  const { activeMap } = analyzeShelf(products);
+  const spending = calcSpending(products);
+  const cats = ["All", ...new Set(products.map(p => p.category))];
+  const filtered = filter === "All" ? products : products.filter(p => p.category === filter);
+  const insights = buildInsights(products, activeMap);
+
+  return (
+    <div>
+      {/* -- Header ----------------------------------------------------------- */}
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+          <h1 style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 42, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: "0 0 4px", lineHeight: 1 }}>Your Vanity</h1>
+          {false && <ClearAllButton onClearAll={onClearAll} />}  {/* hidden — dev only */}
+        </div>
+        <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", margin: 0 }}>
+          {products.length} product{products.length !== 1 ? "s" : ""}{spending.total > 0 ? ` · $${spending.total.toFixed(0)} estimated` : ""}
+        </p>
+      </div>
+
+      {/* -- View Toggle ------------------------------------------------------- */}
+      <div style={{ display: "flex", background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 10, padding: 3, marginBottom: 24 }}>
+        {[{ id: "shelf", label: "Products" }, { id: "insights", label: "Insights" }].map(v => (
+          <button key={v.id} onClick={() => setView(v.id)}
+            style={{ flex: 1, padding: "9px 0", borderRadius: 8, border: "none", background: view === v.id ? "var(--sage)" : "transparent", color: view === v.id ? "#0d0f0d" : "var(--clay)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: view === v.id ? 700 : 400, cursor: "pointer", letterSpacing: "0.12em", textTransform: "uppercase", transition: "all 0.18s" }}>
+            {v.label}
+          </button>
+        ))}
+      </div>
+
+      {/* -- PRODUCTS VIEW ----------------------------------------------------- */}
+      {view === "shelf" && (
+        <>
+          {products.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "60px 0 40px" }}>
+              <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 28, color: "var(--clay)", margin: "0 0 8px" }}>Your vanity is empty.</p>
+              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", opacity: 0.6, margin: "0 0 28px", lineHeight: 1.6 }}>Scan a product to add it, or add one manually.</p>
+              <button onClick={onAdd}
+                style={{ padding: "12px 28px", background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer" }}>
+                + Add Product
+              </button>
+            </div>
+          ) : (
+            <>
+              {/* Category filter */}
+              <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 12, marginBottom: 18, scrollbarWidth: "none" }}>
+                {cats.map(c => <Pill key={c} active={filter === c} onClick={() => setFilter(c)}>{c}</Pill>)}
+              </div>
+
+              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, color: "var(--clay)", letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: 14, opacity: 0.6 }}>
+                {filtered.length} of {products.length} product{products.length !== 1 ? "s" : ""}
+              </p>
+
+              {products.some(p => p.isDemo) && onClearDemo && (
+                <div style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(154,150,136,0.08)", border: "1px solid rgba(154,150,136,0.2)", borderRadius: 12, padding: "12px 14px", marginBottom: 14 }}>
+                  <span style={{ fontSize: 15, flexShrink: 0 }}>✦</span>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 600, color: "var(--parchment)", margin: "0 0 2px" }}>Sample vanity</p>
+                    <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>These are example products to show you how Cygne works. Scan your own to replace them.</p>
+                  </div>
+                  <button onClick={onClearDemo} style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600, background: "transparent", border: "1px solid rgba(154,150,136,0.3)", borderRadius: 8, color: "var(--clay)", padding: "6px 10px", cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}>Clear demo</button>
+                </div>
+              )}
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 10 }}>
+                {filtered.map(p => <ProductCard key={p.id} product={p} onEdit={onEdit} onDelete={onDelete} onToggleRoutine={onToggleRoutine} onSession={onSession} user={user} />)}
+                <button onClick={onAdd}
+                  style={{ border: "1px dashed rgba(122,144,112,0.3)", borderRadius: 14, padding: "26px 16px", background: "rgba(122,144,112,0.04)", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 9, minHeight: 120 }}>
+                  <span style={{ fontSize: 22, color: "var(--sage)", opacity: 0.7 }}>+</span>
+                  <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--sage)" }}>Add Product</span>
+                </button>
+              </div>
+            </>
+          )}
+        </>
+      )}
+
+      {/* -- INSIGHTS VIEW ----------------------------------------------------- */}
+      {view === "insights" && (
+        <div>
+          {products.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "40px 0" }}>
+              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", letterSpacing: "0.06em" }}>Add products to see vanity insights.</p>
+            </div>
+          ) : (
+            <>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginBottom: 28 }}>
+                {[
+                  { label: "Products", value: products.length },
+                  { label: "Categories", value: new Set(products.map(p => p.category)).size },
+                  { label: "Value", value: `$${(spending.total || 0).toFixed(0)}` },
+                ].map(({ label, value }) => (
+                  <div key={label} style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "16px 14px", textAlign: "center" }}>
+                    <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 22, fontWeight: 200, color: "var(--parchment)", margin: "0 0 3px", letterSpacing: "-0.02em" }}>{value}</p>
+                    <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", margin: 0 }}>{label}</p>
+                  </div>
+                ))}
+              </div>
+              <div>{insights.map((insight, i) => <InsightBlock key={i} insight={insight} />)}</div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* -- Waiting Room --------------------------------------------------- */}
+      {waitingRoom.length > 0 && (
+        <div style={{ marginTop: 32 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--clay)", margin: 0 }}>Waiting Room</p>
+            <span style={{ padding: "1px 8px", borderRadius: 10, background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.2)", fontFamily: "Space Grotesk, sans-serif", fontSize: 9, color: "var(--sage)" }}>{waitingRoom.length}</span>
+          </div>
+          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: "0 0 16px", lineHeight: 1.6, opacity: 0.7 }}>Products Cygne suggested holding for now. You'll get a nudge when the timing shifts.</p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {waitingRoom.map((item, idx) => {
+              const tagCfg = DEFER_TAG_CONFIG[item.deferTag] || DEFER_TAG_CONFIG.overlap;
+              const assessment = assessRoutineFit(item.product, products, checkIns, user);
+              const nowReady = assessment.verdict === "add";
+              return (
+                <div key={idx} style={{ background: "var(--surface)", border: `1px solid ${nowReady ? "rgba(122,144,112,0.4)" : "var(--border)"}`, borderRadius: 14, padding: "16px", transition: "border-color 0.3s" }}>
+                  {nowReady && (
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
+                      <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#7a9070" }} />
+                      <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "#7a9070" }}>Ready to introduce</span>
+                    </div>
+                  )}
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+                    <div>
+                      <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, fontWeight: 600, color: "var(--parchment)", margin: "0 0 2px" }}>{item.product.name}</p>
+                      <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>{item.product.brand} · {item.product.category}</p>
+                    </div>
+                    <span style={{ padding: "2px 9px", borderRadius: 20, background: tagCfg.bg, border: `1px solid ${tagCfg.color}40`, fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: tagCfg.color, flexShrink: 0, marginLeft: 10 }}>
+                      {tagCfg.label}
+                    </span>
+                  </div>
+                  <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: "0 0 14px", lineHeight: 1.6, opacity: 0.8 }}>{item.reason}</p>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button onClick={() => onAddFromWaiting(item)}
+                      style={{ flex: 1, padding: "9px 0", background: nowReady ? "#7a9070" : "rgba(122,144,112,0.10)", color: nowReady ? "#0d0f0d" : "var(--sage)", border: `1px solid ${nowReady ? "#7a9070" : "rgba(122,144,112,0.3)"}`, borderRadius: 9, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s" }}>
+                      Add to Ritual
+                    </button>
+                    <button onClick={() => onDismissWaiting(item)}
+                      style={{ padding: "9px 14px", background: "transparent", color: "var(--clay)", border: "1px solid var(--border)", borderRadius: 9, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, cursor: "pointer", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+// --- INTRODUCE SLOWLY --------------------------------------------------------
+
+export { Shelf };
