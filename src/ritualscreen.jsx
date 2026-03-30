@@ -1,8 +1,11 @@
 import { useState } from "react";
-import { Icon, Section } from "./components.jsx";
-import { detectActives, analyzeShelf, buildRoutine, detectConflicts } from "./engine.js";
+import { Icon, Section, FlagCard } from "./components.jsx";
+import { detectActives, analyzeShelf, buildRoutine, detectConflicts, getCurrentSession, isScheduledToday } from "./engine.js";
+import { FREQUENCIES } from "./constants.js";
 import { buildRecommendations, RefinementsCard } from "./intelligence.jsx";
 import { SwanSongCard } from "./ritual.jsx";
+import { getNextUseLabel } from "./constants.js";
+import { getSeason } from "./seasonal.jsx";
 
 const RITUAL_MODES = {
   travel: {

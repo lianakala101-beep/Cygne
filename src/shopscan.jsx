@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
-import { analyzeShelf } from "./engine.js";
+import { Icon } from "./components.jsx";
+import { analyzeShelf, detectActives } from "./engine.js";
 
 function ShopScanModal({ products, user = {}, onClose }) {
   const [phase, setPhase] = useState("prompt"); // prompt | scanning | result

@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Icon, Section } from "./components.jsx";
+import { Icon, Section, Pill } from "./components.jsx";
 import { detectActives, analyzeShelf, calcSpending } from "./engine.js";
-import { assessRoutineFit } from "./modals.jsx";
+import { assessRoutineFit, DEFER_TAG_CONFIG } from "./modals.jsx";
 import { ProductModal } from "./productmodal.jsx";
 import { ProductCard } from "./ritual.jsx";
 

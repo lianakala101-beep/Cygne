@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { Icon, Section, Wordmark } from "./components.jsx";
 import { detectActives, analyzeShelf, buildRoutine } from "./engine.js";
+import { getLockedSession } from "./productmodal.jsx";
+import { getSeasonForUser } from "./seasonal.jsx";
 
 function SessionPicker({ productId, product, initial, onSession }) {
   const [selected, setSelected] = useState((initial && initial !== "auto") ? initial : "am");

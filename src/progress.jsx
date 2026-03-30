@@ -1344,4 +1344,4 @@ function LocationManager({ locationData, setLocationData }) {
   );
 }
 
-export { Progress, CheckInModal, LocationManager };
+export { Progress, CheckInModal, LocationManager, getTreatmentPhase, TreatmentRecoveryCard };

@@ -1,10 +1,13 @@
 import { useState } from "react";
-import { Icon, Section } from "./components.jsx";
-import { analyzeShelf, detectConflicts, buildRoutine, calcSpending } from "./engine.js";
+import { Icon, Section, FlagCard } from "./components.jsx";
+import { analyzeShelf, detectConflicts, buildRoutine, calcSpending, getCurrentSession } from "./engine.js";
 import { SwanSenseCard } from "./swansense.jsx";
 import { SwanSongCard, FlightModeModal } from "./ritual.jsx";
 import { ShopScanModal } from "./shopscan.jsx";
 import { EnvironmentStrip } from "./environment.jsx";
+import { WeekendNudgeCard } from "./weekend.jsx";
+import { SeasonalNudgeCard } from "./seasonal.jsx";
+import { getTreatmentPhase, TreatmentRecoveryCard } from "./progress.jsx";
 
 function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSwanPopup, treatments, locationData, user, theme, notifPermission, onRequestNotif, notifDismissed, onDismissNotif, journals, setCheckIns, onLoadDemo }) {
   const { flags } = analyzeShelf(products);

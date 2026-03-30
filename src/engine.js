@@ -1,4 +1,4 @@
-import { ACTIVE_RULES, CONFLICT_RULES, LAYER_ORDER, isScheduledToday, getNextUseLabel } from "./constants.js";
+import { ACTIVE_RULES, ACTIVE_SESSION, CONFLICT_RULES, LAYER_ORDER, layerIndex, isScheduledToday, getNextUseLabel } from "./constants.js";
 
 // --- TIME-OF-DAY --------------------------------------------------------------
 function getCurrentSession() {

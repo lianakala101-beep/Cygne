@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Icon, Section, FlagCard } from "./components.jsx";
 import { detectActives, analyzeShelf } from "./engine.js";
+import { getSeason } from "./seasonal.jsx";
 
 
 // SCAN MODAL
@@ -429,4 +430,4 @@ const DEFER_TAG_CONFIG = {
 };
 
 
-export { ScanModal, assessRoutineFit };
+export { ScanModal, assessRoutineFit, DEFER_TAG_CONFIG };

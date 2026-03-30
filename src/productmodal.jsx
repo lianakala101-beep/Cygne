@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { Icon, Section } from "./components.jsx";
 import { detectActives, analyzeShelf } from "./engine.js";
+import { CATEGORIES, FREQUENCIES } from "./constants.js";
+import { DEFER_TAG_CONFIG } from "./modals.jsx";
 
 function RoutineFitSheet({ product, assessment, onAddNow, onDefer, onClose }) {
   const isDefer = assessment.verdict === "defer";
@@ -488,4 +490,4 @@ function ProductModal({ product, onSave, onClose, user }) {
 
 // --- SESSION LOCKED BY INGREDIENTS -------------------------------------------
 
-export { RoutineFitSheet, ProductModal, ShelfLifeSection };
+export { RoutineFitSheet, ProductModal, ShelfLifeSection, getLockedSession };

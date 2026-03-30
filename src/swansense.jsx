@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { Icon } from "./components.jsx";
 import { analyzeShelf } from "./engine.js";
+import { getSeason } from "./seasonal.jsx";
 
 // --- SWAN SENSE — PREDICTIVE SKIN ENGINE -------------------------------------
 

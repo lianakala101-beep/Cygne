@@ -170,4 +170,4 @@ function SeasonalNudgeCard({ products, activeMap }) {
 }
 
 
-export { SeasonalNudgeCard };
+export { SeasonalNudgeCard, getSeason, getSeasonForUser };
