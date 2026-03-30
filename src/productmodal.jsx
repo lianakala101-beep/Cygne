@@ -227,6 +227,7 @@ function ProductModal({ product, onSave, onClose, user }) {
       setModalStep("form");
     } catch (err) { console.error(err); setModalStep("form"); }
     setAnalyzing(false);
+  };
 
   const save = () => {
     if (!form.brand || !form.name) return;

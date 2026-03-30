@@ -1,5 +1,3 @@
-import { useState, useRef, useEffect } from "react";
-
 // --- CONSTANTS ----------------------------------------------------------------
 
 const CATEGORIES = ["Cleanser", "Toner", "Toning Pad", "Essence", "Serum", "Eye Cream", "Moisturizer", "Oil", "SPF", "Exfoliant", "Mask", "Mist", "Treatment", "Prescription", "Lip"];
@@ -96,4 +94,4 @@ const SAMPLE_PRODUCTS = [
 ];
 
 
-export { CATEGORIES, FREQUENCIES, LAYER_ORDER, layerIndex, ACTIVE_RULES, ACTIVE_SESSION, CONFLICT_RULES, SAMPLE_PRODUCTS };
+export { CATEGORIES, FREQUENCIES, LAYER_ORDER, layerIndex, ACTIVE_RULES, ACTIVE_SESSION, CONFLICT_RULES, SAMPLE_PRODUCTS, isScheduledToday, getNextUseLabel };
