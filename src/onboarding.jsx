@@ -320,6 +320,8 @@ function OnboardingScreen({ onComplete, setLocationData }) {
 const obEyebrow = { fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 10px" };
 const obHeading = { fontFamily: "Reenie Beanie, cursive", fontSize: 36, fontWeight: 400, color: "var(--parchment)", margin: "0 0 8px", letterSpacing: "0.01em", lineHeight: 1.15 };
 const obSub = { fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "#5a5550", margin: 0, lineHeight: 1.7, opacity: 0.8 };
+const inputSt = { width: "100%", padding: "12px 16px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 14, color: "var(--parchment)", outline: "none" };
+const labelSt = { fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", display: "block", marginBottom: 6 };
 
 
 // --- PRODUCT MODAL ------------------------------------------------------------

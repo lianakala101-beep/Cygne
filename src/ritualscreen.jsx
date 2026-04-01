@@ -3,7 +3,10 @@ import { Icon, Section, FlagCard } from "./components.jsx";
 import { detectActives, analyzeShelf, buildRoutine, detectConflicts, getCurrentSession, isScheduledToday } from "./engine.js";
 import { FREQUENCIES } from "./constants.js";
 import { buildRecommendations, RefinementsCard } from "./intelligence.jsx";
-import { SwanSongCard } from "./ritual.jsx";
+import { SwanSongCard, RoutineStep } from "./ritual.jsx";
+import { RecommendationCard } from "./intelligence.jsx";
+import { CheckInModal } from "./progress.jsx";
+import { getCyclePhase } from "./progress.jsx";
 import { getNextUseLabel } from "./constants.js";
 import { getSeason } from "./seasonal.jsx";
 
