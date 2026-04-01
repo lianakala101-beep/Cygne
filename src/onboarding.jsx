@@ -23,8 +23,6 @@ function OnboardingScreen({ onComplete, setLocationData }) {
 
   // Form state
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [pass, setPass] = useState("");
   const [birthYear, setBirthYear] = useState("");
   const [birthMonth, setBirthMonth] = useState("");
   const [birthDay, setBirthDay] = useState("");
@@ -34,7 +32,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
   const [locationLoading, setLocationLoading] = useState(false);
   const [locationSet, setLocationSet] = useState(false);
 
-  const TOTAL_STEPS = 8;
+  const TOTAL_STEPS = 7;
 
   const advance = (n = 1) => {
     if (animating) return;
@@ -67,7 +65,6 @@ function OnboardingScreen({ onComplete, setLocationData }) {
     const skinAge = getSkinAgeContext(birthYear);
     onComplete({
       name: name || "Friend",
-      email,
       birthYear: birthYear || null,
       birthMonth: birthMonth || null,
       birthDay: birthDay || null,
@@ -103,8 +100,8 @@ function OnboardingScreen({ onComplete, setLocationData }) {
   );
 
   const steps = [
-    // 1 — Name
-    <div key={1} style={slideStyle}>
+    // 0 — Name
+    <div key="name" style={slideStyle}>
       <p style={obEyebrow}>Welcome to Cygne</p>
       <h2 style={obHeading}>What should we call you?</h2>
       <p style={obSub}>Your ritual will be built around you.</p>
@@ -113,19 +110,8 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       </div>
     </div>,
 
-    // 2 — Account
-    <div key={2} style={slideStyle}>
-      <p style={obEyebrow}>Almost there</p>
-      <h2 style={obHeading}>Save your ritual.</h2>
-      <p style={obSub}>Your products, routine, and skin history — always with you.</p>
-      <div style={{ display: "flex", flexDirection: "column", gap: 14, marginTop: 32 }}>
-        <div><label style={labelSt}>Email</label><input style={inputSt} type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="hello@example.com" /></div>
-        <div><label style={labelSt}>Password</label><input style={inputSt} type="password" value={pass} onChange={e => setPass(e.target.value)} placeholder="••••••••" /></div>
-      </div>
-    </div>,
-
-    // 2 — Birthday
-    <div key={2} style={slideStyle}>
+    // 1 — Birthday
+    <div key="birthday" style={slideStyle}>
       <p style={obEyebrow}>Your skin story</p>
       <h2 style={obHeading}>When were you born?</h2>
       <p style={obSub}>Your birth year helps calibrate advice to your skin's life stage. Month and day are optional — for a birthday message.</p>
@@ -147,8 +133,8 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       )}
     </div>,
 
-    // 3 — Skin type
-    <div key={3} style={slideStyle}>
+    // 2 — Skin type
+    <div key="skintype" style={slideStyle}>
       <p style={obEyebrow}>Your skin</p>
       <h2 style={obHeading}>How does your skin behave?</h2>
       <p style={obSub}>Be honest — this is just between you and the swan.</p>
@@ -157,8 +143,8 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       </div>
     </div>,
 
-    // 4 — Concerns
-    <div key={4} style={slideStyle}>
+    // 3 — Concerns
+    <div key="concerns" style={slideStyle}>
       <p style={obEyebrow}>Your skin</p>
       <h2 style={obHeading}>What are you working on?</h2>
       <p style={obSub}>Select everything that applies. Cygne will flag gaps and tailor what it tells you.</p>
@@ -168,8 +154,8 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       </div>
     </div>,
 
-    // 5 — Current actives
-    <div key={5} style={slideStyle}>
+    // 4 — Current actives
+    <div key="actives" style={slideStyle}>
       <p style={obEyebrow}>Your ritual</p>
       <h2 style={obHeading}>Any actives already in your routine?</h2>
       <p style={obSub}>Even if you haven't added them yet. This helps Cygne understand where you're starting from.</p>
@@ -185,8 +171,8 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       </div>
     </div>,
 
-    // 6 — Location
-    <div key={6} style={slideStyle}>
+    // 5 — Location
+    <div key="location" style={slideStyle}>
       <p style={obEyebrow}>Your environment</p>
       <h2 style={obHeading}>Where are you based?</h2>
       <p style={obSub}>Cygne uses local humidity, UV index, and temperature to adjust your daily ritual advice. Your location is never shared.</p>
@@ -217,8 +203,8 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       </div>
     </div>,
 
-    // 7 — All set
-    <div key={7} style={{ ...slideStyle, position: "fixed", inset: 0, background: "#3a4134", display: "flex", flexDirection: "column", justifyContent: "space-between", overflow: "hidden" }}>
+    // 6 — All set
+    <div key="done" style={{ ...slideStyle, position: "fixed", inset: 0, background: "#3a4134", display: "flex", flexDirection: "column", justifyContent: "space-between", overflow: "hidden" }}>
 
       {/* Top — logo + welcome, matching splash layout */}
       <div style={{ padding: "72px 36px 0" }}>
@@ -254,13 +240,12 @@ function OnboardingScreen({ onComplete, setLocationData }) {
 
   const canAdvance = [
     name.trim().length > 0,        // 0 — name
-    email.length > 0,              // 1 — account
-    birthYear.length === 4,        // 2 — birthday
-    skinType.length > 0,           // 3 — skin type
-    true,                          // 4 — concerns — optional
-    true,                          // 5 — actives — optional
-    true,                          // 6 — location — optional
-    true,                          // 7 — all set
+    birthYear.length === 4,        // 1 — birthday
+    skinType.length > 0,           // 2 — skin type
+    true,                          // 3 — concerns — optional
+    true,                          // 4 — actives — optional
+    true,                          // 5 — location — optional
+    true,                          // 6 — all set
   ];
 
   return (
@@ -280,7 +265,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       )}
 
       {/* Back button */}
-      {step > 0 && step < TOTAL_STEPS - 1 && step !== TOTAL_STEPS - 1 && (
+      {step > 0 && step < TOTAL_STEPS - 1 && (
         <button onClick={() => advance(-1)}
           style={{ position: "absolute", top: 52, left: 24, background: "none", border: "none", color: "var(--clay)", cursor: "pointer", fontFamily: "Space Grotesk, sans-serif", fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", display: "flex", alignItems: "center", gap: 6, zIndex: 11 }}>
           <Icon name="chevron" size={12} style={{ transform: "rotate(180deg)" }} /> Back
@@ -288,23 +273,23 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       )}
 
       {/* Step content */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: step === 0 || step === 7 ? "center" : "flex-start", paddingTop: step === 0 ? 0 : 20, maxWidth: 420, width: "100%", margin: "0 auto" }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: step === 0 || step === TOTAL_STEPS - 1 ? "center" : "flex-start", paddingTop: step === 0 ? 0 : 20, maxWidth: 420, width: "100%", margin: "0 auto" }}>
         {steps[step]}
       </div>
 
-      {/* Next button — not shown on location (step 5 has its own) or all-set (step 6) */}
-      {step >= 0 && step < 6 && (
+      {/* Next button — not shown on location (step 5) or all-set (step 6) */}
+      {step >= 0 && step < 5 && (
         <div style={{ position: "sticky", bottom: 0, background: "#f5f2ee", padding: "16px 24px 32px", marginTop: "auto" }}>
           <button onClick={() => canAdvance[step] && advance(1)}
             style={{ width: "100%", padding: "14px 0", background: canAdvance[step] ? "#7a9070" : "#e0dbd5", color: canAdvance[step] ? "#0d0f0d" : "var(--clay)", border: `1px solid ${canAdvance[step] ? "transparent" : "var(--border)"}`, borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: canAdvance[step] ? "pointer" : "default", transition: "all 0.2s", opacity: canAdvance[step] ? 1 : 0.5 }}>
             Continue
           </button>
-          {step === 4 || step === 5 ? (
+          {step === 3 || step === 4 ? (
             <button onClick={() => advance(1)} style={{ width: "100%", marginTop: 10, background: "none", border: "none", fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", cursor: "pointer", padding: "8px 0", opacity: 0.5, letterSpacing: "0.06em" }}>Skip</button>
           ) : null}
         </div>
       )}
-      {step === 6 && (
+      {step === 5 && (
         <div style={{ maxWidth: 420, width: "100%", margin: "24px auto 0" }}>
           <button onClick={() => advance(1)}
             style={{ width: "100%", padding: "14px 0", background: "#7a9070", color: "#0d0f0d", border: "none", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}>
@@ -323,7 +308,5 @@ const obSub = { fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "#
 const inputSt = { width: "100%", padding: "12px 16px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 14, color: "var(--parchment)", outline: "none" };
 const labelSt = { fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", display: "block", marginBottom: 6 };
 
-
-// --- PRODUCT MODAL ------------------------------------------------------------
 
 export { OnboardingScreen };

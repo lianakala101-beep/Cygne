@@ -13,14 +13,21 @@ import { ProductModal, RoutineFitSheet } from "./productmodal.jsx";
 import { SwanWelcomeScreen, useLocalStorage, DEMO_PRODUCTS, DEMO_VERSION } from "./utils.jsx";
 import { WeekendNudgeCard } from "./weekend.jsx";
 import { SeasonalNudgeCard } from "./seasonal.jsx";
+import { AuthScreen } from "./auth.jsx";
+import { supabase } from "./supabase.js";
 
 export default function App() {
+  // -- Auth state --------------------------------------------------------------
+  const [authSession, setAuthSession] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [needsOnboarding, setNeedsOnboarding] = useState(false);
+
   // -- Theme: auto by time, manual override ----------------------------------
   const getAutoTheme = () => {
     const h = new Date().getHours();
     return (h >= 7 && h < 19) ? "light" : "dark";
   };
-  const [themeOverride, setThemeOverride] = useLocalStorage("cygne_theme", null); // null | "light" | "dark"
+  const [themeOverride, setThemeOverride] = useLocalStorage("cygne_theme", null);
   const theme = themeOverride || getAutoTheme();
   const toggleTheme = () => setThemeOverride(t => {
     if (t === null) return getAutoTheme() === "dark" ? "light" : "dark";
@@ -29,7 +36,7 @@ export default function App() {
   });
   const isAuto = themeOverride === null;
 
-  // Ensure fonts load in artifact sandbox
+  // Ensure fonts load
   useEffect(() => {
     const link = document.createElement("link");
     link.rel = "stylesheet";
@@ -38,13 +45,8 @@ export default function App() {
   }, []);
 
   const requestNotifications = () => {
-    // Mark as granted in prototype to show the confirmed state
     setNotifPermission("granted");
     setNotifDismissed(false);
-  };
-
-  const scheduleRoutineReminders = () => {
-    // Notifications scheduled in native app — not available in prototype
   };
 
   const [user, setUser] = useLocalStorage("cygne_user", null);
@@ -55,7 +57,6 @@ export default function App() {
   const [tab, setTab] = useState("dashboard");
   const [products, setProducts] = useLocalStorage("cygne_products", []);
   const [demoVersion, setDemoVersion] = useLocalStorage("cygne_demo_version", null);
- // Vanity starts empty — populated via scan
   const [modal, setModal] = useState(null);
   const [checkIns, setCheckIns] = useLocalStorage("cygne_checkins", []);
   const [journals, setJournals] = useLocalStorage("cygne_journals", []);
@@ -67,10 +68,100 @@ export default function App() {
     setSwanPopupDismissed(true);
   };
   const [treatments, setTreatments] = useLocalStorage("cygne_treatments", []);
-  const [locationData, setLocationData] = useState(null); // { lat, lon, city, country }
+  const [locationData, setLocationData] = useState(null);
   const [profileOpen, setProfileOpen] = useState(false);
   const [waitingRoom, setWaitingRoom] = useLocalStorage("cygne_waitingroom", []);
-  const [fitSheet, setFitSheet] = useState(null); // { product, assessment }
+  const [fitSheet, setFitSheet] = useState(null);
+
+  // -- Check Supabase session on mount ----------------------------------------
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setAuthSession(session);
+      if (session) {
+        loadUserProfile(session.user);
+      }
+      setAuthLoading(false);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setAuthSession(session);
+      if (!session) {
+        setUser(null);
+        setNeedsOnboarding(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Load profile from Supabase user_metadata
+  const loadUserProfile = (authUser) => {
+    const meta = authUser?.user_metadata;
+    if (meta?.onboarding_complete) {
+      setUser({
+        name: meta.name || "Friend",
+        email: authUser.email,
+        birthYear: meta.birthYear || null,
+        birthMonth: meta.birthMonth || null,
+        birthDay: meta.birthDay || null,
+        skinType: meta.skinType || "",
+        concerns: meta.concerns || [],
+        knownActives: meta.knownActives || [],
+        skinAgeBracket: meta.skinAgeBracket || null,
+      });
+      setNeedsOnboarding(false);
+    } else {
+      setUser(null);
+      setNeedsOnboarding(true);
+    }
+  };
+
+  // Save profile to Supabase user_metadata
+  const saveUserProfile = async (profileData) => {
+    await supabase.auth.updateUser({
+      data: { ...profileData, onboarding_complete: true },
+    });
+  };
+
+  // -- Auth callback from AuthScreen ------------------------------------------
+  const handleAuth = (session, authUser, isNewUser) => {
+    setAuthSession(session);
+    if (isNewUser) {
+      setNeedsOnboarding(true);
+      setUser(null);
+    } else {
+      loadUserProfile(authUser);
+    }
+  };
+
+  // -- Logout -----------------------------------------------------------------
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setAuthSession(null);
+    setUser(null);
+    setNeedsOnboarding(false);
+    setProfileOpen(false);
+    setFirstRun(false);
+  };
+
+  // -- Onboarding complete callback -------------------------------------------
+  const handleOnboardingComplete = async (userData) => {
+    const profileWithEmail = { ...userData, email: authSession?.user?.email || "" };
+    setUser(profileWithEmail);
+    setProducts([]);
+    setFirstRun(true);
+    setNeedsOnboarding(false);
+    await saveUserProfile(userData);
+  };
+
+  // -- Update user (also syncs to Supabase) -----------------------------------
+  const updateUser = async (updated) => {
+    setUser(updated);
+    const { email, ...profileData } = updated;
+    await supabase.auth.updateUser({
+      data: { ...profileData, onboarding_complete: true },
+    });
+  };
 
   const tabs = [
     { id: "dashboard", icon: "home",     label: "Home" },
@@ -103,23 +194,33 @@ export default function App() {
 
   const holdRamp = (id) => {
     setProducts(prev => prev.map(p => p.id === id ? { ...p, rampWeek: Math.max(1, (p.rampWeek || 1) + 1) } : p));
-    // Hold = adds a week without advancing to next phase behaviour — same week number + 1 keeps same phase
   };
 
-  const updateUser = (updated) => setUser(updated);
+  // -- Loading state ----------------------------------------------------------
+  if (authLoading) {
+    return (
+      <div style={{ minHeight: "100vh", background: "#3a4134", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ width: 24, height: 24, border: "2px solid rgba(232,227,214,0.3)", borderTopColor: "rgba(232,227,214,0.8)", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
 
-  // demo products defined at module level
+  // -- No session → Auth screen -----------------------------------------------
+  if (!authSession) {
+    return <AuthScreen onAuth={handleAuth} />;
+  }
 
-  const handleOnboardingComplete = (userData) => {
-    setUser(userData);
-    setProducts([]);
-    setFirstRun(true);
-  };
+  // -- Needs onboarding (new signup) ------------------------------------------
+  if (needsOnboarding || (!user && authSession)) {
+    return <OnboardingScreen onComplete={handleOnboardingComplete} setLocationData={setLocationData} />;
+  }
 
+  // -- First run welcome (just completed onboarding) --------------------------
   if (!splashDone) return <SplashScreen onDone={() => setSplashDone(true)} />;
-  if (!user) return <OnboardingScreen onComplete={handleOnboardingComplete} setLocationData={setLocationData} />;
   if (firstRun) return <SwanWelcomeScreen user={user} onDone={() => { setFirstRun(false); setTab("dashboard"); }} />;
 
+  // -- Main app ---------------------------------------------------------------
   return (
     <div className={`theme-${theme}`} style={{ minHeight: "100vh", background: "var(--deep)", paddingBottom: 88, transition: "background 0.4s ease, color 0.4s ease" }}>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -257,7 +358,7 @@ export default function App() {
       </div>
 
       {modal && <ProductModal product={modal === "add" ? null : modal} onSave={saveProduct} onClose={() => setModal(null)} user={user} />}
-      {profileOpen && <ProfileSheet user={user} products={products} locationData={locationData} setLocationData={setLocationData} onUpdateUser={updateUser} onLogout={() => { setUser(null); setProfileOpen(false); }} onClose={() => setProfileOpen(false)} />}
+      {profileOpen && <ProfileSheet user={user} products={products} locationData={locationData} setLocationData={setLocationData} onUpdateUser={updateUser} onLogout={handleLogout} onClose={() => setProfileOpen(false)} />}
       {fitSheet && (
         <RoutineFitSheet
           product={fitSheet.product}
