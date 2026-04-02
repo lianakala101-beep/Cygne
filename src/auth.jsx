@@ -15,14 +15,33 @@ function AuthScreen({ onAuth }) {
     setLoading(true);
     setError(null);
 
-    if (mode === "signup") {
-      const { data, error: err } = await supabase.auth.signUp({ email, password });
-      if (err) { setError(err.message); setLoading(false); return; }
-      onAuth(data.session, data.user, true);
-    } else {
-      const { data, error: err } = await supabase.auth.signInWithPassword({ email, password });
-      if (err) { setError(err.message); setLoading(false); return; }
-      onAuth(data.session, data.user, false);
+    try {
+      if (mode === "signup") {
+        const { data, error: err } = await supabase.auth.signUp({ email, password });
+        if (err) { setError(err.message); setLoading(false); return; }
+
+        // If email confirmation is enabled, session will be null.
+        // Try to sign in immediately — works when confirmation is disabled.
+        if (!data.session) {
+          const { data: loginData, error: loginErr } = await supabase.auth.signInWithPassword({ email, password });
+          if (loginErr) {
+            // Email confirmation is likely required
+            setError("Account created! Check your email to confirm, then sign in.");
+            setLoading(false);
+            setMode("login");
+            return;
+          }
+          onAuth(loginData.session, loginData.user, true);
+        } else {
+          onAuth(data.session, data.user, true);
+        }
+      } else {
+        const { data, error: err } = await supabase.auth.signInWithPassword({ email, password });
+        if (err) { setError(err.message); setLoading(false); return; }
+        onAuth(data.session, data.user, false);
+      }
+    } catch (e) {
+      setError("Connection failed. Check your network and try again.");
     }
     setLoading(false);
   };

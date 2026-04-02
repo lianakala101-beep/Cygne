@@ -126,11 +126,14 @@ export default function App() {
   // -- Auth callback from AuthScreen ------------------------------------------
   const handleAuth = (session, authUser, isNewUser) => {
     setAuthSession(session);
-    if (isNewUser) {
+    // Always check user_metadata — a returning user who signs in
+    // will have onboarding_complete set, a new signup won't.
+    const meta = authUser?.user_metadata;
+    if (meta?.onboarding_complete) {
+      loadUserProfile(authUser);
+    } else {
       setNeedsOnboarding(true);
       setUser(null);
-    } else {
-      loadUserProfile(authUser);
     }
   };
 
