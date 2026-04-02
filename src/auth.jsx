@@ -18,14 +18,19 @@ function AuthScreen({ onAuth }) {
     try {
       if (mode === "signup") {
         const { data, error: err } = await supabase.auth.signUp({ email, password });
-        if (err) { setError(err.message); setLoading(false); return; }
+        if (err) {
+          console.error("[Cygne Auth] signUp error:", err);
+          setError(err.message || JSON.stringify(err));
+          setLoading(false);
+          return;
+        }
 
         // If email confirmation is enabled, session will be null.
         // Try to sign in immediately — works when confirmation is disabled.
         if (!data.session) {
           const { data: loginData, error: loginErr } = await supabase.auth.signInWithPassword({ email, password });
           if (loginErr) {
-            // Email confirmation is likely required
+            console.error("[Cygne Auth] post-signup signIn error:", loginErr);
             setError("Account created! Check your email to confirm, then sign in.");
             setLoading(false);
             setMode("login");
@@ -37,11 +42,17 @@ function AuthScreen({ onAuth }) {
         }
       } else {
         const { data, error: err } = await supabase.auth.signInWithPassword({ email, password });
-        if (err) { setError(err.message); setLoading(false); return; }
+        if (err) {
+          console.error("[Cygne Auth] signIn error:", err);
+          setError(err.message || JSON.stringify(err));
+          setLoading(false);
+          return;
+        }
         onAuth(data.session, data.user, false);
       }
     } catch (e) {
-      setError("Connection failed. Check your network and try again.");
+      console.error("[Cygne Auth] exception:", e);
+      setError(e?.message || "Connection failed. Check your network and try again.");
     }
     setLoading(false);
   };

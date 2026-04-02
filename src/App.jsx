@@ -76,10 +76,14 @@ export default function App() {
   // -- Check Supabase session on mount ----------------------------------------
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log("[Cygne] getSession result:", session ? "active session" : "no session");
       setAuthSession(session);
       if (session) {
         loadUserProfile(session.user);
       }
+      setAuthLoading(false);
+    }).catch((e) => {
+      console.error("[Cygne] getSession failed:", e);
       setAuthLoading(false);
     });
 
