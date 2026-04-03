@@ -277,14 +277,14 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
                                                 );
                                               })()}
 
-                                              {/* Alerts */}
-                                              {allAlerts.length > 0 && (
+                                              {/* Alerts — only when user has logged real products */}
+                                              {allAlerts.length > 0 && products.some(p => !p.isDemo) && (
                                                 <Section title={`${allAlerts.length} alert${allAlerts.length > 1 ? "s" : ""}`} icon="warning">
                                                   {allAlerts.map((f, i) => <FlagCard key={i} f={f} />)}
                                                 </Section>
                                               )}
 
-                                              {allAlerts.length === 0 && products.length > 0 && (
+                                              {allAlerts.length === 0 && products.some(p => !p.isDemo) && (
                                                 <div style={{ display: "flex", gap: 12, padding: "14px 16px", background: "rgba(107,120,95,0.08)", borderRadius: 12, border: "1px solid rgba(107,120,95,0.2)", marginBottom: 24 }}>
                                                   <span style={{ color: "#7a9070" }}><Icon name="check" size={15} /></span>
                                                     <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, color: "var(--parchment)", margin: 0 }}>No conflicts detected. Your ritual is clean.</p>
