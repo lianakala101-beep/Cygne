@@ -58,7 +58,7 @@ function Section({ title, icon, children }) {
 
 function FlagCard({ f }) {
   const variants = {
-    warning: { border: "rgba(180,130,60,0.4)", bg: "rgba(180,130,60,0.06)", dot: "#c49040", text: "var(--parchment)" },
+    warning: { border: "var(--border)", bg: "var(--surface)", dot: "var(--parchment)", text: "var(--parchment)" },
     caution: { border: "var(--border)",         bg: "var(--surface)",         dot: "var(--sage)",    text: "var(--parchment)" },
     missing: { border: "rgba(180,80,80,0.4)",   bg: "rgba(180,80,80,0.05)",  dot: "#c06060",        text: "var(--parchment)" },
   };

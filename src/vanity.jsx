@@ -186,12 +186,6 @@ function InsightRow({ item }) {
             {item.meta.map((m, i) => <span key={i} style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", color: "var(--clay)", background: "var(--surface)", padding: "2px 7px", borderRadius: 20, border: "1px solid var(--border)", letterSpacing: "0.04em" }}>{m}</span>)}
           </div>
         )}
-        {item.cygne && (
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 5, marginTop: 6, padding: "3px 9px", background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.2)", borderRadius: 20 }}>
-            <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#7a9070" }}>Cygne</span>
-            <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, color: "var(--clay)" }}>recommendations coming soon</span>
-          </div>
-        )}
       </div>
     </div>
   );

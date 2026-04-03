@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Icon, Section, FlagCard } from "./components.jsx";
 import { detectActives, analyzeShelf, buildRoutine, detectConflicts, getCurrentSession, isScheduledToday } from "./engine.js";
 import { FREQUENCIES } from "./constants.js";
-import { buildRecommendations, RefinementsCard } from "./intelligence.jsx";
-import { SwanSongCard, RoutineStep } from "./ritual.jsx";
+import { buildRecommendations, buildRefinements } from "./intelligence.jsx";
+import { RoutineStep } from "./ritual.jsx";
 import { RecommendationCard } from "./intelligence.jsx";
 import { CheckInModal } from "./progress.jsx";
 import { getCyclePhase } from "./progress.jsx";
@@ -261,10 +261,11 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
   const sessionIcon  = session === "am" ? "sun" : "moon";
 
   const recs = buildRecommendations(products, activeMap, conflicts, user);
+  const refinements = buildRefinements(products, activeMap, conflicts);
   const additions = recs.filter(r => r.type === "addition");
   const swaps     = recs.filter(r => r.type === "swap");
   const simplifications = recs.filter(r => r.type === "simplify");
-  const totalRecs = recs.length;
+  const totalRecs = recs.length + refinements.length;
 
   const guidingLine = getSwanGuidingLine(products, [], user, cycleDay, ritualKey, session, journals);
 
@@ -401,23 +402,20 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
       )}
 
 
-      {/* -- REFINEMENTS CARD (appears only when triggered) ------------------- */}
-      <RefinementsCard products={products} activeMap={activeMap} conflicts={conflicts} />
-
       {/* Conflicts */}
       {conflicts.length > 0 && (
         <Section title={`${conflicts.length} conflict${conflicts.length > 1 ? "s" : ""} detected`} icon="warning">
           {conflicts.map((c, i) => (
-            <div key={i} style={{ padding: "15px 17px", background: "rgba(180,130,60,0.05)", border: "1px solid rgba(180,130,60,0.28)", borderRadius: 13, marginBottom: 10 }}>
+            <div key={i} style={{ padding: "15px 17px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 13, marginBottom: 10 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 7 }}>
-                <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#c49040", flexShrink: 0 }} />
-                <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 700, color: "#c49040", letterSpacing: "0.13em", textTransform: "uppercase" }}>{c.pair.join(" + ")}</span>
-                <span style={{ marginLeft: "auto", fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.11em", textTransform: "uppercase", color: "#c49040", opacity: 0.65 }}>{c.severity}</span>
+                <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--parchment)", flexShrink: 0, boxShadow: "0 0 6px rgba(232,227,214,0.4)" }} />
+                <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 700, color: "var(--parchment)", letterSpacing: "0.13em", textTransform: "uppercase" }}>{c.pair.join(" + ")}</span>
+                <span style={{ marginLeft: "auto", fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.11em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.65 }}>{c.severity}</span>
               </div>
               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", margin: "0 0 9px", lineHeight: 1.6 }}>{c.reason}</p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                 {[...c.productsA, ...c.productsB].filter((p, i, arr) => arr.findIndex(x => x.id === p.id) === i).map(p => (
-                  <span key={p.id} style={{ fontSize: 10, fontFamily: "Space Grotesk, sans-serif", color: "var(--clay)", background: "var(--surface)", padding: "3px 8px", borderRadius: 20, border: "1px solid rgba(180,130,60,0.18)" }}>{p.name}</span>
+                  <span key={p.id} style={{ fontSize: 10, fontFamily: "Space Grotesk, sans-serif", color: "var(--clay)", background: "var(--surface)", padding: "3px 8px", borderRadius: 20, border: "1px solid var(--border)" }}>{p.name}</span>
                 ))}
               </div>
             </div>
@@ -447,6 +445,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
               { id: "additions", label: "Add",      count: additions.length,      icon: "plus" },
               { id: "swaps",     label: "Swap",     count: swaps.length,          icon: "layers" },
               { id: "simplify",  label: "Simplify", count: simplifications.length, icon: "drop" },
+              { id: "refine",    label: "Refine",   count: refinements.length,    icon: "sparkle" },
             ].filter(t => t.count > 0).map(t => (
               <button key={t.id} onClick={() => setRecTab(t.id)}
                 style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 12px", borderRadius: 20, border: `1px solid ${recTab === t.id ? "#7a9070" : "var(--border)"}`, background: recTab === t.id ? "rgba(122,144,112,0.11)" : "transparent", color: recTab === t.id ? "#7a9070" : "var(--clay)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: recTab === t.id ? 700 : 400, cursor: "pointer", letterSpacing: "0.1em", textTransform: "uppercase", transition: "all 0.16s" }}>
@@ -461,17 +460,23 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
             {recTab === "additions"  && additions.map((r, i) => <RecommendationCard key={i} rec={r} />)}
             {recTab === "swaps"      && swaps.map((r, i) => <RecommendationCard key={i} rec={r} />)}
             {recTab === "simplify"   && simplifications.map((r, i) => <RecommendationCard key={i} rec={r} />)}
+            {recTab === "refine"     && refinements.map((r, i) => (
+              <div key={i} style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "13px 15px", marginBottom: 8 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                  <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", fontWeight: 700, letterSpacing: "0.13em", textTransform: "uppercase", color: "var(--parchment)", opacity: 0.7 }}>{r.verb}</span>
+                  <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--parchment)", margin: 0, flex: 1, fontWeight: 500, lineHeight: 1.3 }}>{r.title}</p>
+                </div>
+                <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.65 }}>{r.body}</p>
+                {r.action && (
+                  <div style={{ display: "flex", gap: 8, padding: "9px 11px", background: "rgba(122,144,112,0.06)", borderRadius: 8, border: "1px solid rgba(122,144,112,0.15)", marginTop: 10 }}>
+                    <span style={{ color: "#7a9070", flexShrink: 0, marginTop: 1 }}><Icon name="check" size={11} /></span>
+                    <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--parchment)", margin: 0, lineHeight: 1.55 }}>{r.action}</p>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
 
-          <div style={{ marginTop: 18, padding: "16px 18px", background: "linear-gradient(135deg, rgba(122,144,112,0.08), rgba(122,144,112,0.03))", borderRadius: 13, border: "1px solid rgba(122,144,112,0.18)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-            <div>
-              <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 22, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: "0 0 2px" }}>Cygne Recommends</p>
-              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.5 }}>Curated products for your exact gaps — launching soon.</p>
-            </div>
-            <div style={{ flexShrink: 0, padding: "7px 13px", borderRadius: 20, border: "1px solid rgba(122,144,112,0.35)", background: "rgba(122,144,112,0.07)" }}>
-              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#7a9070" }}>Soon</span>
-            </div>
-          </div>
         </div>
       )}
 

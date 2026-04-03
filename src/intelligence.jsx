@@ -283,13 +283,6 @@ function RecommendationCard({ rec }) {
               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{rec.note}</p>
             </div>
           )}
-          {rec.cygne && (
-            <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 13px", background: "rgba(122,144,112,0.08)", borderRadius: 9, border: "1px solid rgba(122,144,112,0.2)" }}>
-              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "#7a9070", fontWeight: 600 }}>Cygne</span>
-              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", flex: 1 }}>Curated products for this gap — coming soon.</span>
-              <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.12em", textTransform: "uppercase", color: "#7a9070", opacity: 0.7 }}>→</span>
-            </div>
-          )}
         </div>
       )}
     </div>
@@ -553,13 +546,6 @@ function RefinementItem({ r, vs }) {
             <div style={{ display: "flex", gap: 8, padding: "9px 11px", background: `${vs.color}0d`, borderRadius: 8, border: `1px solid ${vs.color}28` }}>
               <span style={{ color: vs.color, flexShrink: 0, marginTop: 1 }}><Icon name="check" size={11} /></span>
               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--parchment)", margin: 0, lineHeight: 1.55 }}>{r.action}</p>
-            </div>
-          )}
-          {r.cygne && (
-            <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", background: "rgba(122,144,112,0.07)", borderRadius: 8, border: "1px solid rgba(122,144,112,0.18)", marginTop: 8 }}>
-              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", color: "#7a9070", fontWeight: 600 }}>Cygne</span>
-              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", flex: 1 }}>Curated products for this gap — coming soon.</span>
-              <span style={{ fontSize: 9, color: "#7a9070", opacity: 0.7 }}>→</span>
             </div>
           )}
         </div>
