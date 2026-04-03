@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { Icon, Section } from "./components.jsx";
 import { detectActives, analyzeShelf, detectConflicts } from "./engine.js";
-import { RAMP_SCHEDULES, IntroduceSlowlyCard, WeeklyRitualCalendar } from "./ramp.jsx";
+import { RAMP_SCHEDULES, RAMP_ACTIVES, IntroduceSlowlyCard, WeeklyRitualCalendar } from "./ramp.jsx";
 
 
 function computeStabilityScore(products, checkIns, activeMap) {
   const conflicts = detectConflicts(products);
   const { flags } = analyzeShelf(products);
   const exfoliantCount = products.filter(p => {
-    const a = detectActives(p.ingredients);
+    const a = detectActives(p.ingredients || []);
     return a.AHA || a.BHA || p.category === "Exfoliant";
   }).length;
 
@@ -16,7 +16,7 @@ function computeStabilityScore(products, checkIns, activeMap) {
   if (conflicts.length > 0) score -= conflicts.length * 8;
   if (exfoliantCount > 1) score -= 6;
   if (flags.some(f => f.severity === "warning")) score -= 4;
-  if (products.some(p => p.category === "SPF" || detectActives(p.ingredients).SPF)) score += 6;
+  if (products.some(p => p.category === "SPF" || detectActives(p.ingredients || []).SPF)) score += 6;
   if (products.some(p => p.category === "Moisturizer")) score += 5;
   if (activeMap["ceramides"] || activeMap["hyaluronic acid"]) score += 4;
   if (conflicts.length === 0 && !flags.some(f => f.severity === "warning")) score += 8;
