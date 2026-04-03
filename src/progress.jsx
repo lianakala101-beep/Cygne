@@ -553,6 +553,9 @@ function buildTreatmentRoutineAdvice(phase, products, activeMap) {
   return { paused, cleared };
 }
 
+const inputSt = { width: "100%", padding: "12px 16px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 14, color: "var(--parchment)", outline: "none" };
+const labelSt = { fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", display: "block", marginBottom: 6 };
+
 function AddTreatmentModal({ onSave, onClose }) {
   const [typeId, setTypeId] = useState(TREATMENT_TYPES[0].id);
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
