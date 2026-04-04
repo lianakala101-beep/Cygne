@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Icon, Section } from "./components.jsx";
 import { detectActives, analyzeShelf, detectConflicts } from "./engine.js";
 import { RAMP_SCHEDULES, RAMP_ACTIVES, IntroduceSlowlyCard, WeeklyRitualCalendar } from "./ramp.jsx";
@@ -326,6 +326,14 @@ function CycleTracker({ products, activeMap, cycleDay: cycledayProp = 14, onSetC
   const [cycleDay, setCycleDay] = useState(cycledayProp || 14);
   const [editing, setEditing] = useState(false);
   const [inputVal, setInputVal] = useState("14");
+
+  // Sync local state when prop changes (e.g. after Supabase profile loads)
+  useEffect(() => {
+    if (cycledayProp && cycledayProp !== cycleDay) {
+      setCycleDay(cycledayProp);
+      setInputVal(String(cycledayProp));
+    }
+  }, [cycledayProp]);
 
   const hasRetinol = !!(activeMap["retinol"]?.length);
   const hasAHA = !!(activeMap["AHA"]?.length);

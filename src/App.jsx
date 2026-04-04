@@ -51,7 +51,8 @@ export default function App() {
     if (user) {
       const updated = { ...user, notifEnabled: true };
       setUser(updated);
-      supabase.auth.updateUser({ data: { ...updated, onboarding_complete: true } }).catch(() => {});
+      const { email, ...profileData } = updated;
+      supabase.auth.updateUser({ data: { ...profileData, onboarding_complete: true } }).catch(() => {});
     }
   };
 
@@ -80,6 +81,9 @@ export default function App() {
   const [completedSteps, setCompletedSteps] = useLocalStorage("cygne_completedsteps", { date: null, steps: [] });
   const [fitSheet, setFitSheet] = useState(null);
 
+  // Track whether initial load from Supabase is done (prevents overwriting cloud data with empty localStorage)
+  const profileLoaded = useRef(false);
+
   // -- Check Supabase session on mount ----------------------------------------
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -99,6 +103,7 @@ export default function App() {
       if (!session) {
         setUser(null);
         setNeedsOnboarding(false);
+        profileLoaded.current = false;
       }
     });
 
@@ -127,21 +132,47 @@ export default function App() {
         notifEnabled: meta.notifEnabled || false,
         completedSteps: meta.completedSteps || null,
       });
-      // Restore notification state
+      // Restore notification state (don't reset notifDismissed — that's a UI-only preference)
       if (meta.notifEnabled) {
         setNotifPermission("granted");
-        setNotifDismissed(false);
       }
-      // Restore completed steps
+      // Restore completed steps from Supabase
       if (meta.completedSteps) {
         setCompletedSteps(meta.completedSteps);
       }
+      // Restore journals from Supabase (cloud takes priority over localStorage)
+      if (meta.journals && Array.isArray(meta.journals)) {
+        setJournals(meta.journals);
+      }
+      // Restore check-ins from Supabase
+      if (meta.checkIns && Array.isArray(meta.checkIns)) {
+        setCheckIns(meta.checkIns);
+      }
+      profileLoaded.current = true;
       setNeedsOnboarding(false);
     } else {
       setUser(null);
       setNeedsOnboarding(true);
     }
   };
+
+  // -- Sync journals to Supabase when they change ----------------------------
+  useEffect(() => {
+    if (!profileLoaded.current || !authSession) return;
+    supabase.auth.updateUser({ data: { journals } }).catch(() => {});
+  }, [journals]);
+
+  // -- Sync check-ins to Supabase when they change ---------------------------
+  useEffect(() => {
+    if (!profileLoaded.current || !authSession) return;
+    supabase.auth.updateUser({ data: { checkIns } }).catch(() => {});
+  }, [checkIns]);
+
+  // -- Sync completed steps to Supabase when they change ---------------------
+  useEffect(() => {
+    if (!profileLoaded.current || !authSession) return;
+    supabase.auth.updateUser({ data: { completedSteps } }).catch(() => {});
+  }, [completedSteps]);
 
   // Save profile to Supabase user_metadata
   const saveUserProfile = async (profileData) => {
