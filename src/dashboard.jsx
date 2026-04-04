@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Icon, Section, FlagCard } from "./components.jsx";
 import { analyzeShelf, detectConflicts, buildRoutine, calcSpending, getCurrentSession } from "./engine.js";
-import { SwanSenseCard } from "./swansense.jsx";
+import { getSwanSensePredictions } from "./swansense.jsx";
 import { SwanSongCard, FlightModeModal } from "./ritual.jsx";
 import { ShopScanModal } from "./shopscan.jsx";
 import { EnvironmentStrip } from "./environment.jsx";
@@ -18,6 +18,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
   const [flightOpen, setFlightOpen] = useState(false);
   const [shopScanOpen, setShopScanOpen] = useState(false);
   const { activeMap } = analyzeShelf(products);
+  const swanSensePredictions = getSwanSensePredictions(products, checkIns, user, locationData, journals);
   const allAlerts = [
     ...conflicts.map(c => ({ severity: c.severity, label: `${c.pair[0]} + ${c.pair[1]}`, detail: c.reason })),
     ...flags,
@@ -204,8 +205,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
                           {/* Environment strip */}
                           <EnvironmentStrip products={products} activeMap={activeMap} locationData={locationData} />
 
-                          {/* Swan Sense - predictive engine */}
-                          <SwanSenseCard products={products} checkIns={checkIns} user={user} locationData={locationData} journals={journals} />
+                          {/* Swan Sense predictions are now fed into Swan Song below */}
 
                           {/* Quick action buttons - flight + shop scan */}
                           <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
@@ -313,12 +313,12 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
 
           {/* Swan Song - inline settled card at bottom */}
           {swanPopupDismissed && (
-            <SwanSongCard currentSession={currentSession} asPopup={false} user={user} />
+            <SwanSongCard currentSession={currentSession} asPopup={false} user={user} predictions={swanSensePredictions} />
           )}
 
           {/* Swan Song - popup on first load */}
           {!swanPopupDismissed && (
-            <SwanSongCard currentSession={currentSession} asPopup={true} onDismissPopup={onDismissSwanPopup} user={user} />
+            <SwanSongCard currentSession={currentSession} asPopup={true} onDismissPopup={onDismissSwanPopup} user={user} predictions={swanSensePredictions} />
           )}
         </div>
       )}

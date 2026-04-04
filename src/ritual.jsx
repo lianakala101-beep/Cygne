@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from "react";
 import { Icon, Section, Wordmark } from "./components.jsx";
 import { detectActives, analyzeShelf, buildRoutine } from "./engine.js";
 import { getLockedSession } from "./productmodal.jsx";
-import { getSeasonForUser } from "./seasonal.jsx";
 
 function SessionPicker({ productId, product, initial, onSession }) {
   const [selected, setSelected] = useState((initial && initial !== "auto") ? initial : "am");
@@ -229,109 +228,35 @@ function getDayIndex() {
   return Math.floor(now.getTime() / 86400000);
 }
 
-const BIRTHDAY_LINES = [
-  "Another year of taking care of yourself.",
-  "Your skin has carried you this far.",
-  "Today, the ritual is yours entirely.",
-  "A year older. A ritual wiser.",
-  "Happy birthday. Your skin looks radiant.",
-];
+const NO_DATA_LINE = "Log a few check-ins and I'll have something for you soon.";
 
-const SWAN_LINES = [
-  // Actives & ingredients
-  "The retinol is doing its job even when you can't see it yet.",
-  "SPF is the one step that earns everything else.",
-  "Hydration first. Everything else after.",
-  "Patience is the most underrated ingredient.",
-  "Less is often the answer.",
-  "Your barrier does more for you than any serum.",
-  "The cleanser matters more than people think.",
-  "Good skin is mostly water and time.",
-  // Real life
-  "Skincare at midnight still counts.",
-  "You don't have to do everything. Just the important things.",
-  "Rest is part of the ritual too.",
-  "Tired skin needs gentleness, not more actives.",
-  "Some nights a gentle cleanse is the whole ritual. That's fine.",
-  "The weeks your skin acts up are usually the weeks you need more sleep.",
-  "Stress shows up on skin before anywhere else. Be easy with yourself.",
-  "You're allowed to simplify.",
-  "The expensive product doesn't always win.",
-  "A good night's sleep does more than most serums.",
-  "Hot water strips more than it cleans.",
-  "Fragrance is usually the culprit.",
-  // Seasonal & environmental
-  "Your skin shifts with the seasons. Let your ritual shift too.",
-  "The air is drier than it feels. Drink water.",
-  "UV doesn't take days off.",
-  // Gentle reminders
-  "Change your pillowcase this week.",
-  "Reapply the SPF.",
-  "Drink the water before the serum.",
-  "Clean your phone screen today.",
-  "Your hands touch your face more than you think.",
-  "Check the expiry dates this weekend.",
-  "A fresh towel makes a difference.",
-  "Wash your makeup brushes this week.",
-  "Your neck is part of your face.",
-  "Patch test before the full face.",
-  "The retinoid won't work if you keep stopping.",
-  // Progress & patience
-  "Results live on the other side of three months.",
-  "Purging is not failing. It's moving.",
-  "The improvement you can't see yet is still happening.",
-  "You won't notice the day it works. You'll just realise it has.",
-  // Ritual
-  "You showed up. That's the whole thing.",
-  "The ritual is working even on the days you can't tell.",
-  "Consistency is quieter than results but it always comes first.",
-  "Another day of choosing your skin.",
-  "The basics done well beat the complicated ritual every time.",
-  "Tonight just cleanse, moisturize, and sleep. That's enough.",
-  "Skipping one night won't undo anything. Starting again tomorrow will.",
-  "The ritual doesn't need to be perfect to work.",
-];
-
-const SEASONAL_SWAN_LINES = {
-  winter: [
-    "Winter asks more of your barrier. Give it more.",
-    "Cold air strips quietly. Moisture back, every night.",
-    "Your skin is working harder than usual right now.",
-  ],
-  spring: [
-    "Skin is waking up. A good time to rebuild.",
-    "UV is rising. The SPF matters more than it did last month.",
-    "Spring is the right window to reintroduce what you paused.",
-  ],
-  summer: [
-    "Summer skin needs breathing room.",
-    "Reapply the SPF. Heat degrades it faster than you think.",
-    "Lighter layers. Higher protection. That's summer.",
-  ],
-  fall: [
-    "The transition window is open. Use it.",
-    "What you start now carries you through winter.",
-    "Fall is the best time to introduce what you've been putting off.",
-  ],
-};
-
-function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = {}, locationData = null }) {
-  const dayIndex = getDayIndex();
+function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = {}, predictions = [] }) {
+  const [expandedPrediction, setExpandedPrediction] = useState(null);
   const now = new Date();
   const isBirthday = user.birthMonth && user.birthDay &&
     (now.getMonth() + 1) === parseInt(user.birthMonth) &&
     now.getDate() === parseInt(user.birthDay);
 
-  // Build a pool: generic lines + today's seasonal line
-  const season = getSeasonForUser(locationData);
-  const seasonalLines = SEASONAL_SWAN_LINES[season] || [];
-  // Every 4th day, show a seasonal line instead of a generic one
-  const useSeasonalLine = !isBirthday && seasonalLines.length > 0 && (dayIndex % 4 === 0);
+  const BIRTHDAY_LINES = [
+    "Another year of taking care of yourself.",
+    "Your skin has carried you this far.",
+    "Happy birthday. Your skin looks radiant.",
+  ];
+
+  // Separate meaningful predictions from baseline fallbacks
+  const meaningfulPredictions = predictions.filter(p => {
+    const key = p.id || p.type;
+    return key && !key.startsWith("baseline_");
+  });
+  const hasMeaningful = meaningfulPredictions.length > 0;
+
+  // Line: SwanSense prediction > birthday > "not enough data yet"
   const line = isBirthday
     ? BIRTHDAY_LINES[now.getFullYear() % BIRTHDAY_LINES.length]
-    : useSeasonalLine
-      ? seasonalLines[Math.floor(dayIndex / 4) % seasonalLines.length]
-      : SWAN_LINES[dayIndex % SWAN_LINES.length];
+    : hasMeaningful
+      ? meaningfulPredictions[0].headline
+      : NO_DATA_LINE;
+
   const ritualDone = currentSession === "pm";
   const ritualStatus = ritualDone ? "Morning ritual complete" : "Morning ritual pending";
 
@@ -361,11 +286,18 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
           <div style={{ position: "absolute", bottom: 10, right: 14, opacity: 0.07, fontSize: 56, lineHeight: 1, fontFamily: "serif", color: "#e8e3d6", userSelect: "none", pointerEvents: "none" }}>🦢</div>
 
           <div style={{ textAlign: "center", marginBottom: 18 }}>
-            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(192,178,128,0.65)", margin: 0 }}>Swan Song</p>
+            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(192,178,128,0.65)", margin: 0 }}>
+              Swan Song{hasMeaningful ? " · Swan Sense" : ""}
+            </p>
           </div>
           <div style={{ height: 1, background: "rgba(192,178,128,0.12)", marginBottom: 18 }} />
 
           <p style={{ fontFamily: "var(--cursive)", fontSize: 32, fontWeight: 400, lineHeight: 1.5, color: "#e8e3d6", letterSpacing: "0.02em", margin: "0 0 18px" }}>{line}</p>
+
+          {/* Show first prediction detail in popup */}
+          {hasMeaningful && meaningfulPredictions[0].detail && (
+            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "rgba(192,178,128,0.5)", margin: "0 0 16px", lineHeight: 1.65 }}>{meaningfulPredictions[0].detail}</p>
+          )}
 
           <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 22 }}>
             <div style={{ width: 5, height: 5, borderRadius: "50%", background: ritualDone ? "rgba(107,122,82,0.9)" : "rgba(192,178,128,0.3)", flexShrink: 0 }} />
@@ -406,12 +338,40 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
           <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 8, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(192,178,128,0.55)", margin: 0 }}>Swan Song</p>
           <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+            {hasMeaningful && <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 8, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(192,178,128,0.4)", marginRight: 4 }}>Swan Sense</span>}
             <div style={{ width: 4, height: 4, borderRadius: "50%", background: ritualDone ? "rgba(107,122,82,0.8)" : "rgba(192,178,128,0.25)" }} />
             <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, color: ritualDone ? "rgba(140,158,100,0.75)" : "rgba(192,178,128,0.35)", letterSpacing: "0.06em" }}>{ritualStatus}</span>
           </div>
         </div>
 
-        <p style={{ fontFamily: "var(--cursive)", fontSize: 22, fontWeight: 400, lineHeight: 1.5, color: "rgba(232,227,214,0.85)", letterSpacing: "0.02em", margin: 0 }}>{line}</p>
+        <p style={{ fontFamily: "var(--cursive)", fontSize: 22, fontWeight: 400, lineHeight: 1.5, color: "rgba(232,227,214,0.85)", letterSpacing: "0.02em", margin: hasMeaningful ? "0 0 6px" : 0 }}>{line}</p>
+
+        {/* SwanSense prediction details — expandable */}
+        {hasMeaningful && (
+          <div style={{ marginTop: 10, borderTop: "1px solid rgba(192,178,128,0.1)", paddingTop: 10 }}>
+            {meaningfulPredictions.map((p, i) => {
+              const key = p.id || p.type;
+              const isExpanded = expandedPrediction === key;
+              const dotColor = p.color || (p.level === "alert" ? "#c06060" : p.level === "caution" ? "#c49040" : p.level === "cycle" ? "#b06060" : "#7a9070");
+              return (
+                <div key={key}
+                  onClick={() => setExpandedPrediction(isExpanded ? null : key)}
+                  style={{ cursor: "pointer", padding: i > 0 ? "8px 0 0" : 0 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                    <div style={{ width: 4, height: 4, borderRadius: "50%", background: dotColor, flexShrink: 0 }} />
+                    <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "rgba(232,227,214,0.75)", margin: 0, flex: 1, lineHeight: 1.4 }}>
+                      {i === 0 && !isExpanded ? <span style={{ color: "rgba(192,178,128,0.45)", fontSize: 10 }}>Tap for details</span> : p.headline}
+                    </p>
+                    <span style={{ color: "rgba(192,178,128,0.35)", fontSize: 9, flexShrink: 0, transition: "transform 0.18s", transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)", display: "inline-block" }}>▾</span>
+                  </div>
+                  {isExpanded && (
+                    <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "rgba(192,178,128,0.55)", margin: "8px 0 0 11px", lineHeight: 1.65 }}>{p.detail}</p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );
