@@ -196,11 +196,11 @@ export default function App() {
   };
 
   const advanceRamp = (id) => {
-    setProducts(prev => prev.map(p => p.id === id ? { ...p, rampWeek: (p.rampWeek || 1) + 1 } : p));
+    setProducts(prev => prev.map(p => p.id === id ? { ...p, rampWeek: (p.rampWeek || 1) + 1, rampHeld: false } : p));
   };
 
   const holdRamp = (id) => {
-    setProducts(prev => prev.map(p => p.id === id ? { ...p, rampWeek: Math.max(1, (p.rampWeek || 1) + 1) } : p));
+    setProducts(prev => prev.map(p => p.id === id ? { ...p, rampHeld: true } : p));
   };
 
   // -- Loading state ----------------------------------------------------------

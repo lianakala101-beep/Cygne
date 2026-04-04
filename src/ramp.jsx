@@ -189,8 +189,10 @@ function getRampPhase(schedule, week) {
 
 function IntroduceSlowlyCard({ product, schedule, weekNumber, onAdvance, onHold }) {
   const [expanded, setExpanded] = useState(false);
+  const [justActioned, setJustActioned] = useState(null); // "advance" | "hold" | null
   const phase = getRampPhase(schedule, weekNumber);
   const phaseIndex = schedule.phases.findIndex(p => p.weeks.includes(Math.min(weekNumber, 12)));
+  const isHeld = product.rampHeld === true;
   const clampedPhaseIndex = Math.min(phaseIndex, schedule.phases.length - 1);
 
   return (
@@ -201,7 +203,7 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber, onAdvance, onHold 
         <div style={{ flex: 1 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5, flexWrap: "wrap" }}>
             <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: schedule.color, background: `${schedule.color}18`, padding: "2px 8px", borderRadius: 20 }}>{schedule.label}</span>
-            <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.7 }}>Week {weekNumber} · {phase.name}</span>
+            <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", color: isHeld ? "#c06060" : "var(--clay)", opacity: 0.7 }}>Week {weekNumber} · {isHeld ? "Holding" : phase.name}</span>
           </div>
           <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, fontWeight: 500, color: "var(--parchment)", margin: "0 0 2px" }}>{product.name}</p>
           <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: schedule.color, margin: 0, letterSpacing: "0.04em" }}>{phase.frequency}</p>
@@ -236,20 +238,41 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber, onAdvance, onHold 
           </div>
 
           {/* Weekly response buttons */}
-          <div style={{ display: "flex", gap: 8 }}>
-            <button onClick={() => onAdvance(product.id)}
-              style={{ flex: 1, padding: "10px 0", background: "rgba(122,144,112,0.12)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer", transition: "all 0.18s" }}
-              onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.2)"}
-              onMouseLeave={e => e.currentTarget.style.background = "rgba(122,144,112,0.12)"}>
-              Skin handled it ✓
-            </button>
-            <button onClick={() => onHold(product.id)}
-              style={{ flex: 1, padding: "10px 0", background: "rgba(192,96,96,0.06)", border: "1px solid rgba(192,96,96,0.18)", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#c06060", cursor: "pointer", transition: "all 0.18s" }}
-              onMouseEnter={e => e.currentTarget.style.background = "rgba(192,96,96,0.12)"}
-              onMouseLeave={e => e.currentTarget.style.background = "rgba(192,96,96,0.06)"}>
-              Backing off
-            </button>
-          </div>
+          {justActioned ? (
+            <div style={{ padding: "12px 16px", background: justActioned === "advance" ? "rgba(122,144,112,0.12)" : "rgba(192,96,96,0.08)", border: `1px solid ${justActioned === "advance" ? "rgba(122,144,112,0.35)" : "rgba(192,96,96,0.25)"}`, borderRadius: 10, textAlign: "center" }}>
+              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600, color: justActioned === "advance" ? "#7a9070" : "#c06060", margin: 0 }}>
+                {justActioned === "advance" ? "Logged — advancing to next phase" : "Logged — holding this week's frequency"}
+              </p>
+            </div>
+          ) : isHeld ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <div style={{ padding: "12px 16px", background: "rgba(192,96,96,0.08)", border: "1px solid rgba(192,96,96,0.22)", borderRadius: 10, textAlign: "center" }}>
+                <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600, color: "#c06060", margin: "0 0 2px" }}>Paused — repeat this week</p>
+                <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", margin: 0, opacity: 0.7 }}>When you're ready, mark as handled to advance.</p>
+              </div>
+              <button onClick={() => { onAdvance(product.id); setJustActioned("advance"); }}
+                style={{ width: "100%", padding: "10px 0", background: "rgba(122,144,112,0.12)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer", transition: "all 0.18s" }}
+                onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.2)"}
+                onMouseLeave={e => e.currentTarget.style.background = "rgba(122,144,112,0.12)"}>
+                Skin handled it — advance ✓
+              </button>
+            </div>
+          ) : (
+            <div style={{ display: "flex", gap: 8 }}>
+              <button onClick={() => { onAdvance(product.id); setJustActioned("advance"); }}
+                style={{ flex: 1, padding: "10px 0", background: "rgba(122,144,112,0.12)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer", transition: "all 0.18s" }}
+                onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.2)"}
+                onMouseLeave={e => e.currentTarget.style.background = "rgba(122,144,112,0.12)"}>
+                Skin handled it ✓
+              </button>
+              <button onClick={() => { onHold(product.id); setJustActioned("hold"); }}
+                style={{ flex: 1, padding: "10px 0", background: "rgba(192,96,96,0.06)", border: "1px solid rgba(192,96,96,0.18)", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#c06060", cursor: "pointer", transition: "all 0.18s" }}
+                onMouseEnter={e => e.currentTarget.style.background = "rgba(192,96,96,0.12)"}
+                onMouseLeave={e => e.currentTarget.style.background = "rgba(192,96,96,0.06)"}>
+                Backing off
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
