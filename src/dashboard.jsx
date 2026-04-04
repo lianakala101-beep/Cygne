@@ -7,7 +7,7 @@ import { ShopScanModal } from "./shopscan.jsx";
 import { EnvironmentStrip } from "./environment.jsx";
 import { WeekendNudgeCard } from "./weekend.jsx";
 import { SeasonalNudgeCard } from "./seasonal.jsx";
-import { getTreatmentPhase, TreatmentRecoveryCard } from "./progress.jsx";
+import { getTreatmentPhase, TreatmentRecoveryCard, getCyclePhase } from "./progress.jsx";
 
 function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSwanPopup, treatments, locationData, user, theme, notifPermission, onRequestNotif, notifDismissed, onDismissNotif, journals, setCheckIns, onLoadDemo }) {
   const { flags } = analyzeShelf(products);
@@ -180,6 +180,23 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
                             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
                               <div style={{ width: 5, height: 5, borderRadius: "50%", background: color, flexShrink: 0 }} />
                               <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", letterSpacing: "0.03em" }}>{msg}</span>
+                              </div>
+                            );
+                          })()}
+
+                          {/* Cycle phase indicator — visible at a glance */}
+                          {user?.cycleTrackingEnabled && user?.cycleDay && (() => {
+                            const phase = getCyclePhase(user.cycleDay);
+                            return (
+                              <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "11px 16px", background: phase.bg, border: `1px solid ${phase.border}`, borderRadius: 12, marginBottom: 20 }}>
+                                <span style={{ fontSize: 13 }}>◑</span>
+                                <div style={{ flex: 1 }}>
+                                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                                    <div style={{ width: 5, height: 5, borderRadius: "50%", background: phase.dot, flexShrink: 0 }} />
+                                    <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 600, color: "var(--parchment)" }}>{phase.name} Phase</span>
+                                    <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", opacity: 0.7 }}>Day {user.cycleDay}</span>
+                                  </div>
+                                </div>
                               </div>
                             );
                           })()}

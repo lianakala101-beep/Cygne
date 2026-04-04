@@ -321,8 +321,8 @@ function getCyclePhase(day) {
   return CYCLE_PHASES.find(p => day >= p.days[0] && day <= p.days[1]) || CYCLE_PHASES[3];
 }
 
-function CycleTracker({ products, activeMap, cycleDay: cycledayProp = 14, onSetCycleDay }) {
-  const [enabled, setEnabled] = useState(false);
+function CycleTracker({ products, activeMap, cycleDay: cycledayProp = 14, onSetCycleDay, user = {}, onUpdateUser = () => {} }) {
+  const enabled = user.cycleTrackingEnabled || false;
   const [cycleDay, setCycleDay] = useState(cycledayProp || 14);
   const [editing, setEditing] = useState(false);
   const [inputVal, setInputVal] = useState("14");
@@ -353,7 +353,7 @@ function CycleTracker({ products, activeMap, cycleDay: cycledayProp = 14, onSetC
         <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", margin: "0 0 16px", lineHeight: 1.65 }}>
           Your hormones shift every week. Your ritual should too. Enable this to receive phase-aware nudges drawn from what's already on your vanity.
         </p>
-        <button onClick={() => setEnabled(true)}
+        <button onClick={() => onUpdateUser({ ...user, cycleTrackingEnabled: true })}
           style={{ padding: "10px 20px", background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#7a9070", cursor: "pointer", transition: "all 0.2s" }}
           onMouseEnter={e => { e.currentTarget.style.background = "rgba(122,144,112,0.18)"; }}
           onMouseLeave={e => { e.currentTarget.style.background = "rgba(122,144,112,0.10)"; }}>
@@ -790,6 +790,13 @@ const BODY_ZONES = [
     advice: "KP responds to AHA (lactic acid) or urea-based body lotion applied consistently. It's not acne — salicylic acid is less effective here than AHA. Avoid scrubbing, which worsens it.",
     products: ["AHA body lotion (lactic acid 5–10%)", "Urea cream 10–20%", "Gentle non-foaming body wash"],
   },
+  {
+    id: "butt",
+    label: "Butt",
+    causes: ["Prolonged sitting and friction", "Sweat and occlusion from tight clothing", "Folliculitis from shaving or waxing", "Non-breathable fabric underwear"],
+    advice: "Butt acne is usually folliculitis, not true acne. BHA or benzoyl peroxide wash used consistently helps. Wear breathable cotton underwear and shower promptly after sweating. Avoid sitting in damp workout clothes.",
+    products: ["BHA body wash (salicylic acid 2%)", "Benzoyl peroxide wash 5%", "Lightweight non-comedogenic moisturizer"],
+  },
 ];
 
 const BODY_TRIGGERS = [
@@ -822,9 +829,9 @@ function buildBodyShelfAdvice(zones, products, activeMap) {
   return { gaps, doubles };
 }
 
-function BodyAcneTracker({ products, activeMap, user = {} }) {
-  const [enabled, setEnabled] = useState(false);
-  const [zones, setZones] = useState([]);
+function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => {} }) {
+  const enabled = user.bodyAcneEnabled || false;
+  const zones = user.bodyAcneZones || [];
   const [triggerLog, setTriggerLog] = useState([]);
   const [showTriggerModal, setShowTriggerModal] = useState(false);
   const [selectedTriggers, setSelectedTriggers] = useState([]);
@@ -832,10 +839,13 @@ function BodyAcneTracker({ products, activeMap, user = {} }) {
 
   const { gaps, doubles } = buildBodyShelfAdvice(zones, products, activeMap);
 
-  // Detect if luteal phase from cycle — show hormone note
-  const isLuteal = false; // would read from CycleTracker state if shared
+  const setEnabled = (val) => onUpdateUser({ ...user, bodyAcneEnabled: val });
+  const isLuteal = user.cycleDay ? getCyclePhase(user.cycleDay).name === "Luteal" : false;
 
-  const toggleZone = (id) => setZones(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  const toggleZone = (id) => {
+    const updated = zones.includes(id) ? zones.filter(x => x !== id) : [...zones, id];
+    onUpdateUser({ ...user, bodyAcneZones: updated });
+  };
 
   if (!enabled) {
     return (
@@ -1249,8 +1259,8 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
             <div style={{ border: "1px solid var(--border)", borderTop: "none", borderRadius: "0 0 14px 14px", padding: "20px 0 4px" }}>
               <div style={{ padding: "0 18px" }}>
                 <TreatmentSection treatments={treatments} setTreatments={setTreatments} products={products} activeMap={activeMap} />
-                <BodyAcneTracker products={products} activeMap={activeMap} user={user} />
-                <CycleTracker products={products} activeMap={activeMap} cycleDay={user && user.cycleDay ? user.cycleDay : 14} onSetCycleDay={d => onUpdateUser && onUpdateUser({ ...user, cycleDay: d })} />
+                <BodyAcneTracker products={products} activeMap={activeMap} user={user} onUpdateUser={onUpdateUser} />
+                <CycleTracker products={products} activeMap={activeMap} cycleDay={user && user.cycleDay ? user.cycleDay : 14} onSetCycleDay={d => onUpdateUser && onUpdateUser({ ...user, cycleDay: d })} user={user} onUpdateUser={onUpdateUser} />
               </div>
             </div>
           )}

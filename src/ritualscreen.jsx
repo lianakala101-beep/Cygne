@@ -235,21 +235,25 @@ function getSwanGuidingLine(products, checkIns = [], user = {}, cycleDay = null,
   return "Your ritual is ready. Take your time with it.";
 }
 
-function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false, journals = [], checkIns = [], setCheckIns = () => {} }) {
+function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false, journals = [], checkIns = [], setCheckIns = () => {}, completedSteps: completedStepsProp, setCompletedSteps: setCompletedStepsProp, onUpdateUser }) {
   const session = getCurrentSession();
   const { am, pm, periodic } = buildRoutine(products);
   const conflicts = detectConflicts(products);
   const { flags, activeMap } = analyzeShelf(products);
   const [recTab, setRecTab] = useState("additions");
   const today = new Date().toISOString().split("T")[0];
-  const [completedSteps, setCompletedSteps] = useState([]);
+  // Use persisted completed steps scoped to today, fall back to local state
+  const todaySteps = completedStepsProp?.date === today ? completedStepsProp.steps : [];
   const [ritualDismissed, setRitualDismissed] = useState(false);
   const [showRitualCheckIn, setShowRitualCheckIn] = useState(false);
   const todayCheckedIn = checkIns.some(c => c.date === today);
+  const completedSteps = todaySteps;
   const toggleStep = (id) => {
-    setCompletedSteps(prev =>
-      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
-    );
+    const updated = completedSteps.includes(id) ? completedSteps.filter(x => x !== id) : [...completedSteps, id];
+    const newState = { date: today, steps: updated };
+    if (setCompletedStepsProp) setCompletedStepsProp(newState);
+    // Sync to Supabase via user metadata
+    if (onUpdateUser && user) onUpdateUser({ ...user, completedSteps: newState });
   };
 
   const { mode: ritualMode, key: ritualKey, cyclePhase } = getRitualMode(products, [], user, cycleDay, isFlightMode);

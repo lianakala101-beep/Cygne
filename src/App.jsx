@@ -47,6 +47,12 @@ export default function App() {
   const requestNotifications = () => {
     setNotifPermission("granted");
     setNotifDismissed(false);
+    // Save preference to user profile (will sync to Supabase)
+    if (user) {
+      const updated = { ...user, notifEnabled: true };
+      setUser(updated);
+      supabase.auth.updateUser({ data: { ...updated, onboarding_complete: true } }).catch(() => {});
+    }
   };
 
   const [user, setUser] = useLocalStorage("cygne_user", null);
@@ -71,6 +77,7 @@ export default function App() {
   const [locationData, setLocationData] = useState(null);
   const [profileOpen, setProfileOpen] = useState(false);
   const [waitingRoom, setWaitingRoom] = useLocalStorage("cygne_waitingroom", []);
+  const [completedSteps, setCompletedSteps] = useLocalStorage("cygne_completedsteps", { date: null, steps: [] });
   const [fitSheet, setFitSheet] = useState(null);
 
   // -- Check Supabase session on mount ----------------------------------------
@@ -112,7 +119,23 @@ export default function App() {
         concerns: meta.concerns || [],
         knownActives: meta.knownActives || [],
         skinAgeBracket: meta.skinAgeBracket || null,
+        // Persisted settings
+        bodyAcneEnabled: meta.bodyAcneEnabled || false,
+        bodyAcneZones: meta.bodyAcneZones || [],
+        cycleTrackingEnabled: meta.cycleTrackingEnabled || false,
+        cycleDay: meta.cycleDay || null,
+        notifEnabled: meta.notifEnabled || false,
+        completedSteps: meta.completedSteps || null,
       });
+      // Restore notification state
+      if (meta.notifEnabled) {
+        setNotifPermission("granted");
+        setNotifDismissed(false);
+      }
+      // Restore completed steps
+      if (meta.completedSteps) {
+        setCompletedSteps(meta.completedSteps);
+      }
       setNeedsOnboarding(false);
     } else {
       setUser(null);
@@ -328,7 +351,7 @@ export default function App() {
       {/* Content */}
       <div style={{ maxWidth: 600, margin: "0 auto", padding: "32px 22px 0", animation: "fadeUp 0.3s ease" }} key={tab}>
         {tab === "dashboard" && <Dashboard products={products} setTab={setTab} checkIns={checkIns} swanPopupDismissed={swanPopupDismissed} onDismissSwanPopup={dismissSwanPopup} treatments={treatments} locationData={locationData} user={user} theme={theme} notifPermission={notifPermission} onRequestNotif={requestNotifications} notifDismissed={notifDismissed} onDismissNotif={() => setNotifDismissed(true)} journals={journals} setCheckIns={setCheckIns} onLoadDemo={() => setProducts(DEMO_PRODUCTS)} />}
-        {tab === "routine"   && <MyRoutine products={products} user={user} cycleDay={user?.cycleDay || null} isFlightMode={false} journals={journals} />}
+        {tab === "routine"   && <MyRoutine products={products} user={user} cycleDay={user?.cycleDay || null} isFlightMode={false} journals={journals} checkIns={checkIns} setCheckIns={setCheckIns} completedSteps={completedSteps} setCompletedSteps={setCompletedSteps} onUpdateUser={updateUser} />}
         {tab === "shelf" && <Shelf
           products={products}
           onEdit={p => setModal(p)}
