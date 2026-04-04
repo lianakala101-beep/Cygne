@@ -359,6 +359,7 @@ function SwanSenseCard({ products, checkIns = [], user = {}, locationData = null
               {isExpanded && (
                 <div>
                   <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: "10px 0 0", lineHeight: 1.65, paddingTop: 10, borderTop: "1px solid rgba(255,255,255,0.06)" }}>{p.detail}</p>
+                  {p.type && !(p.id && p.id.startsWith("baseline_")) && (
                   <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 12 }}>
                     <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.5, marginRight: 4 }}>
                       {fb ? (fb === "up" ? "Marked as helpful" : "Noted") : "Was this helpful?"}
@@ -372,6 +373,7 @@ function SwanSenseCard({ products, checkIns = [], user = {}, locationData = null
                       ↓ Not really
                     </button>
                   </div>
+                  )}
                 </div>
               )}
             </div>
