@@ -1059,7 +1059,6 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
 function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatments, user = {}, onAdvanceRamp, onHoldRamp, journals = [], setJournals = () => {}, onUpdateUser = () => {} }) {
   const [showCheckIn, setShowCheckIn] = useState(false);
   const [showJournal, setShowJournal] = useState(false);
-  const [deepOpen, setDeepOpen] = useState(false);
   const { activeMap } = analyzeShelf(products);
   const conflicts = detectConflicts(products);
 
@@ -1249,29 +1248,22 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
         </div>
       )}
 
-      {/* -- Deeper tracking --------------------------------------------------- */}
+      {/* -- Treatments --------------------------------------------------------- */}
+      {sectionLabel("drop", "Treatments")}
       <div style={{ marginBottom: 28 }}>
-          <button
-            onClick={() => setDeepOpen(o => !o)}
-            style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 18px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: deepOpen ? "14px 14px 0 0" : 14, cursor: "pointer" }}>
-            <div style={{ textAlign: "left" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
-                <span style={{ color: "var(--clay)", opacity: 0.6 }}><Icon name="layers" size={13} /></span>
-                <span style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 24, color: "var(--clay)", letterSpacing: "0.01em" }}>Deeper Tracking</span>
-              </div>
-              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", opacity: 0.5, margin: 0, letterSpacing: "0.03em" }}>Treatments · Body acne · Cycle tracking</p>
-            </div>
-            <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", transform: deepOpen ? "rotate(180deg)" : "none", display: "inline-block", transition: "transform 0.2s", flexShrink: 0, marginLeft: 12 }}>▾</span>
-          </button>
-          {deepOpen && (
-            <div style={{ border: "1px solid var(--border)", borderTop: "none", borderRadius: "0 0 14px 14px", padding: "20px 0 4px" }}>
-              <div style={{ padding: "0 18px" }}>
-                <TreatmentSection treatments={treatments} setTreatments={setTreatments} products={products} activeMap={activeMap} />
-                <BodyAcneTracker products={products} activeMap={activeMap} user={user} onUpdateUser={onUpdateUser} />
-                <CycleTracker products={products} activeMap={activeMap} cycleDay={user && user.cycleDay ? user.cycleDay : 14} onSetCycleDay={d => onUpdateUser && onUpdateUser({ ...user, cycleDay: d })} user={user} onUpdateUser={onUpdateUser} />
-              </div>
-            </div>
-          )}
+        <TreatmentSection treatments={treatments} setTreatments={setTreatments} products={products} activeMap={activeMap} />
+      </div>
+
+      {/* -- Body Acne --------------------------------------------------------- */}
+      {sectionLabel("layers", "Body Acne")}
+      <div style={{ marginBottom: 28 }}>
+        <BodyAcneTracker products={products} activeMap={activeMap} user={user} onUpdateUser={onUpdateUser} />
+      </div>
+
+      {/* -- Cycle Tracking ---------------------------------------------------- */}
+      {sectionLabel("activity", "Cycle Tracking")}
+      <div style={{ marginBottom: 28 }}>
+        <CycleTracker products={products} activeMap={activeMap} cycleDay={user && user.cycleDay ? user.cycleDay : 14} onSetCycleDay={d => onUpdateUser && onUpdateUser({ ...user, cycleDay: d })} user={user} onUpdateUser={onUpdateUser} />
       </div>
 
       {showCheckIn && (

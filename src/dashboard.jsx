@@ -185,19 +185,17 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
                             );
                           })()}
 
-                          {/* Cycle phase indicator — visible at a glance */}
+                          {/* Cycle phase widget — visible at a glance */}
                           {user?.cycleTrackingEnabled && user?.cycleDay && (() => {
                             const phase = getCyclePhase(user.cycleDay);
                             return (
-                              <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "11px 16px", background: phase.bg, border: `1px solid ${phase.border}`, borderRadius: 12, marginBottom: 20 }}>
-                                <span style={{ fontSize: 13 }}>◑</span>
-                                <div style={{ flex: 1 }}>
-                                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                                    <div style={{ width: 5, height: 5, borderRadius: "50%", background: phase.dot, flexShrink: 0 }} />
-                                    <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 600, color: "var(--parchment)" }}>{phase.name} Phase</span>
-                                    <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", opacity: 0.7 }}>Day {user.cycleDay}</span>
-                                  </div>
+                              <div style={{ padding: "14px 16px", background: phase.bg, border: `1px solid ${phase.border}`, borderRadius: 14, marginBottom: 20 }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                                  <div style={{ width: 6, height: 6, borderRadius: "50%", background: phase.dot, flexShrink: 0 }} />
+                                  <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 600, color: "var(--parchment)" }}>{phase.name} Phase</span>
+                                  <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", opacity: 0.7, marginLeft: "auto" }}>Day {user.cycleDay}</span>
                                 </div>
+                                <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.5 }}>{phase.nudge}</p>
                               </div>
                             );
                           })()}
