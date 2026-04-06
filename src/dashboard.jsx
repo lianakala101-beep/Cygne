@@ -203,13 +203,21 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             </div>
           </div>
         )}
-        {notifPermission === "granted" && !notifDismissed && (
-          <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.2)", borderRadius: 12, padding: "10px 14px", marginBottom: 20 }}>
-            <span style={{ fontSize: 14 }}>✦</span>
-            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>Reminders on - 7:30am & 9:00pm daily.</p>
-            <button onClick={onDismissNotif} style={{ marginLeft: "auto", fontFamily: "Space Grotesk, sans-serif", fontSize: 11, background: "transparent", border: "none", color: "var(--clay)", cursor: "pointer" }}>✕</button>
-          </div>
-        )}
+        {notifPermission === "granted" && !notifDismissed && (() => {
+          const amTime = user?.amReminderTime || "7:30";
+          const pmTime = user?.pmReminderTime || "9:00";
+          const amOn = user?.amReminderEnabled !== false;
+          const pmOn = user?.pmReminderEnabled !== false;
+          const parts = [amOn && `${amTime}am`, pmOn && `${pmTime}pm`].filter(Boolean);
+          const label = parts.length > 0 ? `Reminders on — ${parts.join(" & ")} daily.` : "Reminders enabled.";
+          return (
+            <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.2)", borderRadius: 12, padding: "10px 14px", marginBottom: 20 }}>
+              <span style={{ fontSize: 14 }}>✦</span>
+              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>{label}</p>
+              <button onClick={onDismissNotif} style={{ marginLeft: "auto", fontFamily: "Space Grotesk, sans-serif", fontSize: 11, background: "transparent", border: "none", color: "var(--clay)", cursor: "pointer" }}>✕</button>
+            </div>
+          );
+        })()}
 
         {/* 4. Recovery / daily tips / environment */}
         <EnvironmentStrip products={products} activeMap={activeMap} locationData={locationData} />

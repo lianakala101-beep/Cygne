@@ -49,7 +49,7 @@ export default function App() {
     setNotifDismissed(false);
     // Save preference to user profile (will sync to Supabase)
     if (user) {
-      const updated = { ...user, notifEnabled: true };
+      const updated = { ...user, notifEnabled: true, amReminderEnabled: true, pmReminderEnabled: true, amReminderTime: user.amReminderTime || "7:30", pmReminderTime: user.pmReminderTime || "9:00" };
       setUser(updated);
       const { email, ...profileData } = updated;
       supabase.auth.updateUser({ data: { ...profileData, onboarding_complete: true } }).catch(() => {});
@@ -131,11 +131,19 @@ export default function App() {
         cycleTrackingEnabled: meta.cycleTrackingEnabled || false,
         cycleDay: meta.cycleDay || null,
         notifEnabled: meta.notifEnabled || false,
+        amReminderEnabled: meta.amReminderEnabled !== undefined ? meta.amReminderEnabled : (meta.notifEnabled || false),
+        pmReminderEnabled: meta.pmReminderEnabled !== undefined ? meta.pmReminderEnabled : (meta.notifEnabled || false),
+        amReminderTime: meta.amReminderTime || "7:30",
+        pmReminderTime: meta.pmReminderTime || "9:00",
         completedSteps: meta.completedSteps || null,
       });
-      // Restore notification state (don't reset notifDismissed — that's a UI-only preference)
-      if (meta.notifEnabled) {
+      // Restore notification state
+      if (meta.notifEnabled || meta.amReminderEnabled || meta.pmReminderEnabled) {
         setNotifPermission("granted");
+      }
+      // Restore notification banner dismissal from Supabase
+      if (meta.notifDismissed !== undefined) {
+        setNotifDismissed(meta.notifDismissed);
       }
       // Restore completed steps from Supabase
       if (meta.completedSteps) {
@@ -194,6 +202,12 @@ export default function App() {
     if (!profileLoaded.current || !authSession) return;
     supabase.auth.updateUser({ data: { locationDenied } }).catch(() => {});
   }, [locationDenied]);
+
+  // -- Sync notification dismissal to Supabase --------------------------------
+  useEffect(() => {
+    if (!profileLoaded.current || !authSession) return;
+    supabase.auth.updateUser({ data: { notifDismissed } }).catch(() => {});
+  }, [notifDismissed]);
 
   // Save profile to Supabase user_metadata
   const saveUserProfile = async (profileData) => {
