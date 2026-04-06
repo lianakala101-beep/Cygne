@@ -3,7 +3,7 @@ import { useState, useRef } from "react";
 import { Icon, Section } from "./components.jsx";
 import { calcSpending } from "./engine.js";
 
-function Profile({ user, products, onLogout, locationData, setLocationData }) {
+function Profile({ user, products, onLogout, locationData, setLocationData, locationDenied, setLocationDenied }) {
   const spending = calcSpending(products);
   return (
     <div>
@@ -56,7 +56,7 @@ function Profile({ user, products, onLogout, locationData, setLocationData }) {
       {/* Location */}
       <div style={{ marginBottom: 24 }}>
         <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", marginBottom: 12 }}>Your Environment</p>
-        <LocationManager locationData={locationData} setLocationData={setLocationData} />
+        <LocationManager locationData={locationData} setLocationData={setLocationData} locationDenied={locationDenied} setLocationDenied={setLocationDenied} />
       </div>
 
       <Section title="About Cygne" icon="leaf">
@@ -520,7 +520,7 @@ function SkinHistory({ user, onUpdateUser }) {
   );
 }
 
-function ProfileSheet({ user, products, locationData, setLocationData, onUpdateUser, onLogout, onClose }) {
+function ProfileSheet({ user, products, locationData, setLocationData, locationDenied, setLocationDenied, onUpdateUser, onLogout, onClose }) {
   const [editingAccount, setEditingAccount] = useState(false);
   const [accountDraft, setAccountDraft] = useState({
     name: user?.name || "",
@@ -634,7 +634,7 @@ function ProfileSheet({ user, products, locationData, setLocationData, onUpdateU
           {/* Location */}
           <div style={{ marginBottom: 20 }}>
             <p style={{ fontFamily: "var(--sans)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 10px" }}>Your Environment</p>
-            <LocationManager locationData={locationData} setLocationData={setLocationData} />
+            <LocationManager locationData={locationData} setLocationData={setLocationData} locationDenied={locationDenied} setLocationDenied={setLocationDenied} />
           </div>
 
           {/* Sign out */}

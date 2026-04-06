@@ -76,6 +76,7 @@ export default function App() {
   };
   const [treatments, setTreatments] = useLocalStorage("cygne_treatments", []);
   const [locationData, setLocationData] = useState(null);
+  const [locationDenied, setLocationDenied] = useLocalStorage("cygne_locationdenied", false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [waitingRoom, setWaitingRoom] = useLocalStorage("cygne_waitingroom", []);
   const [completedSteps, setCompletedSteps] = useLocalStorage("cygne_completedsteps", { date: null, steps: [] });
@@ -148,6 +149,14 @@ export default function App() {
       if (meta.checkIns && Array.isArray(meta.checkIns)) {
         setCheckIns(meta.checkIns);
       }
+      // Restore location data from Supabase
+      if (meta.locationData && meta.locationData.lat) {
+        setLocationData(meta.locationData);
+      }
+      // Restore location denied state
+      if (meta.locationDenied) {
+        setLocationDenied(true);
+      }
       profileLoaded.current = true;
       setNeedsOnboarding(false);
     } else {
@@ -173,6 +182,18 @@ export default function App() {
     if (!profileLoaded.current || !authSession) return;
     supabase.auth.updateUser({ data: { completedSteps } }).catch(() => {});
   }, [completedSteps]);
+
+  // -- Sync location data to Supabase when it changes -------------------------
+  useEffect(() => {
+    if (!profileLoaded.current || !authSession) return;
+    supabase.auth.updateUser({ data: { locationData } }).catch(() => {});
+  }, [locationData]);
+
+  // -- Sync location denied state to Supabase ---------------------------------
+  useEffect(() => {
+    if (!profileLoaded.current || !authSession) return;
+    supabase.auth.updateUser({ data: { locationDenied } }).catch(() => {});
+  }, [locationDenied]);
 
   // Save profile to Supabase user_metadata
   const saveUserProfile = async (profileData) => {
@@ -419,7 +440,7 @@ export default function App() {
       </div>
 
       {modal && <ProductModal product={modal === "add" ? null : modal} onSave={saveProduct} onClose={() => setModal(null)} user={user} />}
-      {profileOpen && <ProfileSheet user={user} products={products} locationData={locationData} setLocationData={setLocationData} onUpdateUser={updateUser} onLogout={handleLogout} onClose={() => setProfileOpen(false)} />}
+      {profileOpen && <ProfileSheet user={user} products={products} locationData={locationData} setLocationData={setLocationData} locationDenied={locationDenied} setLocationDenied={setLocationDenied} onUpdateUser={updateUser} onLogout={handleLogout} onClose={() => setProfileOpen(false)} />}
       {fitSheet && (
         <RoutineFitSheet
           product={fitSheet.product}

@@ -1250,7 +1250,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
 }
 
 
-function LocationManager({ locationData, setLocationData }) {
+function LocationManager({ locationData, setLocationData, locationDenied, setLocationDenied }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -1267,13 +1267,18 @@ function LocationManager({ locationData, setLocationData }) {
           const city = geoData.address?.city || geoData.address?.town || geoData.address?.suburb || "Your location";
           const country = geoData.address?.country_code?.toUpperCase() || "";
           setLocationData({ lat, lon, city, country });
+          if (setLocationDenied) setLocationDenied(false);
         } catch(e) {
           setError("Could not resolve location.");
         } finally {
           setLoading(false);
         }
       },
-      () => { setError("Location access denied."); setLoading(false); }
+      () => {
+        setError("Location access denied.");
+        setLoading(false);
+        if (setLocationDenied) setLocationDenied(true);
+      }
     );
   };
 
@@ -1303,13 +1308,15 @@ function LocationManager({ locationData, setLocationData }) {
   return (
     <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: "16px 18px" }}>
       <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", margin: "0 0 14px", lineHeight: 1.65 }}>
-        Share your location so Cygne can read local humidity, UV index, and temperature — and adjust your ritual advice accordingly.
+        {locationDenied
+          ? "Location was previously denied. You can grant access in your browser settings, then try again."
+          : "Share your location so Cygne can read local humidity, UV index, and temperature — and adjust your ritual advice accordingly."}
       </p>
       <button onClick={requestLocation}
         style={{ display: "flex", alignItems: "center", gap: 7, padding: "10px 18px", background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 600, color: "#7a9070", cursor: "pointer", letterSpacing: "0.12em", textTransform: "uppercase", transition: "all 0.2s" }}
         onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.18)"}
         onMouseLeave={e => e.currentTarget.style.background = "rgba(122,144,112,0.10)"}>
-        {loading ? "Requesting..." : "Enable Location"}
+        {loading ? "Requesting..." : locationDenied ? "Try Again" : "Enable Location"}
       </button>
       {error && <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "#c06060", margin: "10px 0 0" }}>{error}</p>}
     </div>
