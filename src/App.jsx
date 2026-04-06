@@ -157,6 +157,10 @@ export default function App() {
       if (meta.checkIns && Array.isArray(meta.checkIns)) {
         setCheckIns(meta.checkIns);
       }
+      // Restore treatments from Supabase
+      if (meta.treatments && Array.isArray(meta.treatments)) {
+        setTreatments(meta.treatments);
+      }
       // Restore location data from Supabase
       if (meta.locationData && meta.locationData.lat) {
         setLocationData(meta.locationData);
@@ -172,6 +176,12 @@ export default function App() {
       setNeedsOnboarding(true);
     }
   };
+
+  // -- Sync treatments to Supabase when they change ---------------------------
+  useEffect(() => {
+    if (!profileLoaded.current || !authSession) return;
+    supabase.auth.updateUser({ data: { treatments } }).catch(() => {});
+  }, [treatments]);
 
   // -- Sync journals to Supabase when they change ----------------------------
   useEffect(() => {

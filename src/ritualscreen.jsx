@@ -335,23 +335,21 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
             <div>{steps.map((p, i) => <RoutineStep key={p.id} step={p} index={i} isLast={i === steps.length - 1} checked={completedSteps.includes(p.id)} onCheck={() => toggleStep(p.id)} />)}</div>
           </Section>
         : <div style={{ padding: "32px 0 16px" }}><div style={{ display: "flex", alignItems: "flex-start", gap: 9, marginBottom: 8 }}><span style={{ fontSize: 15, lineHeight: 1.4, flexShrink: 0 }}>🦢</span><p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 19, color: "var(--clay)", margin: 0, lineHeight: 1.4 }}>Your ritual is waiting. Add products to your vanity and they'll appear here.</p></div></div>}
-      {allDone && steps.length > 0 && (
+      {allDone && steps.length > 0 && !todayCheckedIn && (
         <div style={{ margin: "16px 0", padding: "18px 18px", background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 14 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: todayCheckedIn ? 0 : 14 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
             <span style={{ fontSize: 16 }}>🦢</span>
             <div>
               <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 22, color: "var(--parchment)", margin: "0 0 2px" }}>Ritual complete.</p>
               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>
-                {todayCheckedIn ? "Check-in logged. Rest well." : `Your ${sessionLabel.toLowerCase()} ritual is done — how did your skin feel today?`}
+                {`Your ${sessionLabel.toLowerCase()} ritual is done — how did your skin feel today?`}
               </p>
             </div>
           </div>
-          {!todayCheckedIn && (
-            <button onClick={() => setShowRitualCheckIn(true)}
-              style={{ width: "100%", padding: "12px 0", background: "var(--cta)", border: "1px solid rgba(122,144,112,0.35)", borderRadius: 11, fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 600, color: "var(--parchment)", cursor: "pointer", letterSpacing: "0.04em" }}>
-              Log a check-in →
-            </button>
-          )}
+          <button onClick={() => setShowRitualCheckIn(true)}
+            style={{ width: "100%", padding: "12px 0", background: "var(--cta)", border: "1px solid rgba(122,144,112,0.35)", borderRadius: 11, fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 600, color: "var(--parchment)", cursor: "pointer", letterSpacing: "0.04em" }}>
+            Log a check-in →
+          </button>
         </div>
       )}
 
