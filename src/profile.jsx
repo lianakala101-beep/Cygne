@@ -3,6 +3,9 @@ import { useState, useRef } from "react";
 import { Icon, Section } from "./components.jsx";
 import { calcSpending } from "./engine.js";
 
+const SKIN_TYPES = ["Dry", "Oily", "Combination", "Sensitive", "Normal"];
+const SKIN_CONCERNS = ["Acne", "Hyperpigmentation", "Redness", "Fine lines", "Texture", "Dehydration", "Dullness", "Sensitivity"];
+
 function Profile({ user, products, onLogout, locationData, setLocationData, locationDenied, setLocationDenied }) {
   const spending = calcSpending(products);
   return (

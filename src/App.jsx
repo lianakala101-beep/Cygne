@@ -136,6 +136,9 @@ export default function App() {
         amReminderTime: meta.amReminderTime || "7:30",
         pmReminderTime: meta.pmReminderTime || "9:00",
         completedSteps: meta.completedSteps || null,
+        // Profile data
+        ingredientProfile: meta.ingredientProfile || null,
+        medicalHistory: meta.medicalHistory || null,
       });
       // Restore notification state
       if (meta.notifEnabled || meta.amReminderEnabled || meta.pmReminderEnabled) {
