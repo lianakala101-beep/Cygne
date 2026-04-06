@@ -31,19 +31,6 @@ function computeStabilityScore(products, checkIns, activeMap) {
   return Math.max(20, Math.min(100, score));
 }
 
-function getToleranceStatus(active, checkIns) {
-  if (checkIns.length === 0) return "Tracking";
-  const recent = checkIns.slice(-4);
-  const irritCount = recent.filter(c => c.irritation !== "none").length;
-  if (irritCount === 0) return "Stable";
-  if (irritCount === 1) return "Mild response";
-  return "Monitor closely";
-}
-
-function getToleranceColor(status) {
-  return { "Stable": "#7a9070", "Tracking": "var(--clay)", "Mild response": "#c49040", "Monitor closely": "#c06060" }[status] || "var(--clay)";
-}
-
 function generateTimeline(baseScore, checkIns) {
   return ["Week 1","Week 2","Week 3","Week 4"].map((label, i) => {
     const weekCheckins = checkIns.filter((_, idx) => Math.floor(idx / 2) === i);
@@ -1062,9 +1049,6 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
   const { activeMap } = analyzeShelf(products);
   const conflicts = detectConflicts(products);
 
-  const toleranceActives = Object.keys(activeMap).filter(a => ["retinol","AHA","BHA","vitamin C"].includes(a));
-  const activeLabels = { retinol: "Retinoid Tolerance", AHA: "AHA Exfoliant", BHA: "BHA Exfoliant", "vitamin C": "Vitamin C Response" };
-
   const consistencyPct = checkIns.length === 0 ? null
     : Math.min(100, Math.round(100
         - (checkIns.filter(c => c.irritation !== "none").length / checkIns.length) * 28
@@ -1220,31 +1204,6 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
               );
             })}
           </div>
-        </div>
-      )}
-
-      {/* -- Active Tolerance — only when actives exist ------------------------- */}
-      {toleranceActives.length > 0 && (
-        <div style={{ marginBottom: 28 }}>
-          {sectionLabel("drop", "Active Tolerance")}
-          <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, overflow: "hidden" }}>
-            {toleranceActives.map((active, i) => {
-              const status = getToleranceStatus(active, checkIns);
-              const col = getToleranceColor(status);
-              return (
-                <div key={active} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "13px 18px", borderBottom: i < toleranceActives.length - 1 ? "1px solid var(--border)" : "none" }}>
-                  <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, color: "var(--parchment)" }}>{activeLabels[active] || active}</span>
-                  <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                    <div style={{ width: 6, height: 6, borderRadius: "50%", background: col, flexShrink: 0 }} />
-                    <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: col, letterSpacing: "0.06em" }}>{status}</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          {checkIns.length === 0 && (
-            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", marginTop: 9, lineHeight: 1.6, opacity: 0.7 }}>Log a check-in to begin tracking active tolerance.</p>
-          )}
         </div>
       )}
 
