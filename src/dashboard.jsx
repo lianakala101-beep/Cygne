@@ -19,6 +19,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
   const [shopScanOpen, setShopScanOpen] = useState(false);
   const { activeMap } = analyzeShelf(products);
   const swanSensePredictions = getSwanSensePredictions(products, checkIns, user, locationData, journals);
+
   const allAlerts = [
     ...conflicts.map(c => ({ severity: c.severity, label: `${c.pair[0]} + ${c.pair[1]}`, detail: c.reason })),
     ...flags,
@@ -103,9 +104,11 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           </div>
         );
       })()}
+
+      {/* -- Products present -------------------------------------------- */}
       {products.length > 0 && (
         <div>
-        {/* -- Setup strip - shown until user has products + check-in --------- */}
+        {/* Setup strip - shown until user has products + check-in */}
         {products.length > 0 && (() => {
           const hasProducts = products.filter(p => !p.isDemo).length > 0;
           const hasCheckin = checkIns.length > 0;
@@ -144,180 +147,166 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           );
         })()}
 
+        {/* 1. Swan Song card (intelligence) */}
+        {!swanPopupDismissed && (
+          <SwanSongCard currentSession={currentSession} asPopup={true} onDismissPopup={onDismissSwanPopup} user={user} predictions={swanSensePredictions} />
+        )}
+        {swanPopupDismissed && (
+          <SwanSongCard currentSession={currentSession} asPopup={false} user={user} predictions={swanSensePredictions} />
+        )}
+
+        {/* 2. Cycle phase widget */}
+        {user?.cycleTrackingEnabled && user?.cycleDay && (() => {
+          const phase = getCyclePhase(user.cycleDay);
+          return (
+            <div style={{ padding: "14px 16px", background: phase.bg, border: `1px solid ${phase.border}`, borderRadius: 14, marginBottom: 20 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                <div style={{ width: 6, height: 6, borderRadius: "50%", background: phase.dot, flexShrink: 0 }} />
+                <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 600, color: "var(--parchment)" }}>{phase.name} Phase</span>
+                <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", opacity: 0.7, marginLeft: "auto" }}>Day {user.cycleDay}</span>
+              </div>
+              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.5 }}>{phase.nudge}</p>
+            </div>
+          );
+        })()}
+
+        {/* 3. Check-in signal + reminders */}
+        {(() => {
+          const last = checkIns[checkIns.length - 1];
+          const daysSince = last ? Math.floor((Date.now() - new Date(last.date)) / 86400000) : null;
+          const due = daysSince === null || daysSince >= 7;
+          const msg = daysSince === null
+            ? "No check-ins yet - log your first in Progress."
+            : daysSince === 0 ? "Check-in logged today."
+            : daysSince < 7 ? `Last check-in ${daysSince}d ago.`
+            : "Check-in overdue.";
+          const color = due ? (daysSince === null ? "var(--clay)" : "#c49040") : "#7a9070";
+          return (
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
+              <div style={{ width: 5, height: 5, borderRadius: "50%", background: color, flexShrink: 0 }} />
+              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", letterSpacing: "0.03em" }}>{msg}</span>
+            </div>
+          );
+        })()}
+
         {/* Notification nudge banner */}
         {!notifDismissed && notifPermission === "default" && (
           <div style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.25)", borderRadius: 12, padding: "12px 14px", marginBottom: 20 }}>
             <span style={{ fontSize: 16, flexShrink: 0 }}>🔔</span>
-              <div style={{ flex: 1 }}>
-                <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 600, color: "var(--parchment)", margin: "0 0 2px" }}>Stay on ritual</p>
-                  <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>Get AM & PM reminders so your ritual stays consistent.</p>
+            <div style={{ flex: 1 }}>
+              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 600, color: "var(--parchment)", margin: "0 0 2px" }}>Stay on ritual</p>
+              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>Get AM & PM reminders so your ritual stays consistent.</p>
+            </div>
+            <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+              <button onClick={onRequestNotif} style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600, background: "rgba(122,144,112,0.25)", border: "1px solid rgba(122,144,112,0.4)", borderRadius: 8, color: "var(--parchment)", padding: "6px 12px", cursor: "pointer" }}>Enable</button>
+              <button onClick={onDismissNotif} style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, background: "transparent", border: "none", color: "var(--clay)", cursor: "pointer", padding: "6px 4px" }}>✕</button>
+            </div>
+          </div>
+        )}
+        {notifPermission === "granted" && !notifDismissed && (
+          <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.2)", borderRadius: 12, padding: "10px 14px", marginBottom: 20 }}>
+            <span style={{ fontSize: 14 }}>✦</span>
+            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>Reminders on - 7:30am & 9:00pm daily.</p>
+            <button onClick={onDismissNotif} style={{ marginLeft: "auto", fontFamily: "Space Grotesk, sans-serif", fontSize: 11, background: "transparent", border: "none", color: "var(--clay)", cursor: "pointer" }}>✕</button>
+          </div>
+        )}
+
+        {/* 4. Recovery / daily tips / environment */}
+        <EnvironmentStrip products={products} activeMap={activeMap} locationData={locationData} />
+
+        <WeekendNudgeCard products={products} activeMap={activeMap} />
+
+        {treatments.filter(t => { const r = getTreatmentPhase(t); return r && r.phase && r.phase.label !== "Cleared"; }).map(t => (
+          <TreatmentRecoveryCard key={t.id} treatment={t} products={products} activeMap={activeMap} onDismiss={() => {}} />
+        ))}
+
+        <SeasonalNudgeCard products={products} activeMap={activeMap} locationData={locationData} />
+
+        {/* Current session routine card */}
+        {(() => {
+          const isAM = currentSession === "am";
+          const steps = isAM ? am : pm;
+          const label = isAM ? "Morning" : "Evening";
+          const icon  = isAM ? "sun" : "moon";
+          return (
+            <div onClick={() => setTab("routine")} style={{ marginBottom: 36 }}>
+              <div
+                style={{ background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.45)", borderRadius: 18, padding: "28px 26px", cursor: "pointer", transition: "border-color 0.2s" }}
+                onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(122,144,112,0.75)"}
+                onMouseLeave={e => e.currentTarget.style.borderColor = "rgba(122,144,112,0.45)"}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 22 }}>
+                  <span style={{ color: "#7a9070", opacity: 0.8 }}><Icon name={icon} size={15} /></span>
+                  <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)" }}>{label} Routine</span>
+                  <span style={{ marginLeft: "auto", fontSize: 9, fontFamily: "Space Grotesk, sans-serif", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "#7a9070", background: "rgba(180,175,168,0.25)", padding: "3px 9px", borderRadius: 20 }}>Now</span>
+                </div>
+                <div style={{ display: "flex", alignItems: "flex-end", gap: 10, marginBottom: 8 }}>
+                  <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 64, fontWeight: 200, color: "var(--parchment)", lineHeight: 0.9, letterSpacing: "-0.03em" }}>{steps.length}</span>
+                  <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 14, color: "var(--clay)", paddingBottom: 8, letterSpacing: "0.04em" }}>step{steps.length !== 1 ? "s" : ""} in order</span>
+                </div>
+                {steps.length > 0 && (
+                  <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "#7a9070", margin: "0 0 18px", letterSpacing: "0.06em" }}>
+                    {steps[0].category} → {steps[steps.length - 1].category}
+                  </p>
+                )}
+                {steps.length > 0 && (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                    {steps.map((s, i) => (
+                      <span key={s.id} style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--clay)", background: "var(--surface)", border: "1px solid rgba(255,255,255,0.07)", padding: "3px 9px", borderRadius: 20 }}>
+                        {i + 1}. {s.category}
+                      </span>
+                    ))}
                   </div>
-                  <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-                    <button onClick={onRequestNotif} style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600, background: "rgba(122,144,112,0.25)", border: "1px solid rgba(122,144,112,0.4)", borderRadius: 8, color: "var(--parchment)", padding: "6px 12px", cursor: "pointer" }}>Enable</button>
-                      <button onClick={onDismissNotif} style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, background: "transparent", border: "none", color: "var(--clay)", cursor: "pointer", padding: "6px 4px" }}>✕</button>
-                      </div>
-                    </div>
-                  )}
-                  {notifPermission === "granted" && !notifDismissed && (
-                    <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.2)", borderRadius: 12, padding: "10px 14px", marginBottom: 20 }}>
-                      <span style={{ fontSize: 14 }}>✦</span>
-                        <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>Reminders on - 7:30am & 9:00pm daily.</p>
-                          <button onClick={onDismissNotif} style={{ marginLeft: "auto", fontFamily: "Space Grotesk, sans-serif", fontSize: 11, background: "transparent", border: "none", color: "var(--clay)", cursor: "pointer" }}>✕</button>
-                          </div>
-                        )}
+                )}
+                {steps.length === 0 && (
+                  <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", margin: 0, opacity: 0.6 }}>Add products to build your ritual.</p>
+                )}
+              </div>
+            </div>
+          );
+        })()}
 
-                        {/* Check-in signal */}
-                        {(() => {
-                          const last = checkIns[checkIns.length - 1];
-                          const daysSince = last ? Math.floor((Date.now() - new Date(last.date)) / 86400000) : null;
-                          const due = daysSince === null || daysSince >= 7;
-                          const msg = daysSince === null
-                          ? "No check-ins yet - log your first in Progress."
-                          : daysSince === 0 ? "Check-in logged today."
-                          : daysSince < 7 ? `Last check-in ${daysSince}d ago.`
-                          : "Check-in overdue.";
-                          const color = due ? (daysSince === null ? "var(--clay)" : "#c49040") : "#7a9070";
-                          return (
-                            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
-                              <div style={{ width: 5, height: 5, borderRadius: "50%", background: color, flexShrink: 0 }} />
-                              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", letterSpacing: "0.03em" }}>{msg}</span>
-                              </div>
-                            );
-                          })()}
+        {/* Alerts */}
+        {allAlerts.length > 0 && products.some(p => !p.isDemo) && (
+          <Section title={`${allAlerts.length} alert${allAlerts.length > 1 ? "s" : ""}`} icon="warning">
+            {allAlerts.map((f, i) => <FlagCard key={i} f={f} />)}
+          </Section>
+        )}
+        {allAlerts.length === 0 && products.some(p => !p.isDemo) && (
+          <div style={{ display: "flex", gap: 12, padding: "14px 16px", background: "rgba(107,120,95,0.08)", borderRadius: 12, border: "1px solid rgba(107,120,95,0.2)", marginBottom: 24 }}>
+            <span style={{ color: "#7a9070" }}><Icon name="check" size={15} /></span>
+            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, color: "var(--parchment)", margin: 0 }}>No conflicts detected. Your ritual is clean.</p>
+          </div>
+        )}
 
-                          {/* Cycle phase widget — visible at a glance */}
-                          {user?.cycleTrackingEnabled && user?.cycleDay && (() => {
-                            const phase = getCyclePhase(user.cycleDay);
-                            return (
-                              <div style={{ padding: "14px 16px", background: phase.bg, border: `1px solid ${phase.border}`, borderRadius: 14, marginBottom: 20 }}>
-                                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                                  <div style={{ width: 6, height: 6, borderRadius: "50%", background: phase.dot, flexShrink: 0 }} />
-                                  <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 600, color: "var(--parchment)" }}>{phase.name} Phase</span>
-                                  <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", opacity: 0.7, marginLeft: "auto" }}>Day {user.cycleDay}</span>
-                                </div>
-                                <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.5 }}>{phase.nudge}</p>
-                              </div>
-                            );
-                          })()}
+        {/* 5. Travel Edit + Shop Scan — utility buttons at bottom */}
+        <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
+          <button onClick={() => setFlightOpen(true)}
+            style={{ flex: 1, display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", background: "var(--cta)", border: "1px solid rgba(122,144,112,0.25)", borderRadius: 14, cursor: "pointer", transition: "background 0.2s", textAlign: "left" }}
+            onMouseEnter={e => e.currentTarget.style.background = "#444d3d"}
+            onMouseLeave={e => e.currentTarget.style.background = "#3a4134"}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(232,227,214,0.7)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/>
+            </svg>
+            <div>
+              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "rgba(232,227,214,0.95)", fontWeight: 600, margin: "0 0 2px", letterSpacing: "0.06em", textTransform: "uppercase" }}>Travel Edit</p>
+              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, color: "rgba(232,227,214,0.45)", margin: 0, letterSpacing: "0.02em" }}>Pack & skip</p>
+            </div>
+          </button>
+          <button onClick={() => setShopScanOpen(true)}
+            style={{ flex: 1, display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", background: "var(--cta)", border: "1px solid rgba(122,144,112,0.25)", borderRadius: 14, cursor: "pointer", transition: "background 0.2s", textAlign: "left" }}
+            onMouseEnter={e => e.currentTarget.style.background = "#444d3d"}
+            onMouseLeave={e => e.currentTarget.style.background = "#3a4134"}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(232,227,214,0.7)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+            </svg>
+            <div>
+              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "rgba(232,227,214,0.95)", fontWeight: 600, margin: "0 0 2px", letterSpacing: "0.06em", textTransform: "uppercase" }}>Shop Scan</p>
+              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, color: "rgba(232,227,214,0.45)", margin: 0, letterSpacing: "0.02em" }}>Would my skin like this?</p>
+            </div>
+          </button>
+        </div>
 
-                          {/* Environment strip */}
-                          <EnvironmentStrip products={products} activeMap={activeMap} locationData={locationData} />
-
-                          {/* Swan Sense predictions are now fed into Swan Song below */}
-
-                          {/* Quick action buttons - flight + shop scan */}
-                          <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
-                            <button onClick={() => setFlightOpen(true)}
-                            style={{ flex: 1, display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", background: "var(--cta)", border: "1px solid rgba(122,144,112,0.25)", borderRadius: 14, cursor: "pointer", transition: "background 0.2s", textAlign: "left" }}
-                            onMouseEnter={e => e.currentTarget.style.background = "#444d3d"}
-                            onMouseLeave={e => e.currentTarget.style.background = "#3a4134"}>
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(232,227,214,0.7)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/>
-                              </svg>
-                              <div>
-                                <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "rgba(232,227,214,0.95)", fontWeight: 600, margin: "0 0 2px", letterSpacing: "0.06em", textTransform: "uppercase" }}>Travel Edit</p>
-                                  <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, color: "rgba(232,227,214,0.45)", margin: 0, letterSpacing: "0.02em" }}>Pack & skip</p>
-                                  </div>
-                                </button>
-                                <button onClick={() => setShopScanOpen(true)}
-                                style={{ flex: 1, display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", background: "var(--cta)", border: "1px solid rgba(122,144,112,0.25)", borderRadius: 14, cursor: "pointer", transition: "background 0.2s", textAlign: "left" }}
-                                onMouseEnter={e => e.currentTarget.style.background = "#444d3d"}
-                                onMouseLeave={e => e.currentTarget.style.background = "#3a4134"}>
-                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(232,227,214,0.7)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                    <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-                                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-                                  </svg>
-                                  <div>
-                                    <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "rgba(232,227,214,0.95)", fontWeight: 600, margin: "0 0 2px", letterSpacing: "0.06em", textTransform: "uppercase" }}>Shop Scan</p>
-                                      <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, color: "rgba(232,227,214,0.45)", margin: 0, letterSpacing: "0.02em" }}>Would my skin like this?</p>
-                                      </div>
-                                    </button>
-                                  </div>
-
-                                  {/* Weekend nudge */}
-                                  <WeekendNudgeCard products={products} activeMap={activeMap} />
-
-                                  {/* Active treatment recovery */}
-                                  {treatments.filter(t => { const r = getTreatmentPhase(t); return r && r.phase && r.phase.label !== "Cleared"; }).map(t => (
-                                    <TreatmentRecoveryCard key={t.id} treatment={t} products={products} activeMap={activeMap} onDismiss={() => {}} />
-                                  ))}
-
-                                  {/* Seasonal nudge */}
-                                  <SeasonalNudgeCard products={products} activeMap={activeMap} locationData={locationData} />
-
-                                  {/* Single current-session card */}
-                                  {(() => {
-                                    const isAM = currentSession === "am";
-                                    const steps = isAM ? am : pm;
-                                    const label = isAM ? "Morning" : "Evening";
-                                    const icon  = isAM ? "sun" : "moon";
-                                    return (
-                                      <div onClick={() => setTab("routine")} style={{ marginBottom: 36 }}>
-                                        <div
-                                        style={{ background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.45)", borderRadius: 18, padding: "28px 26px", cursor: "pointer", transition: "border-color 0.2s" }}
-                                        onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(122,144,112,0.75)"}
-                                        onMouseLeave={e => e.currentTarget.style.borderColor = "rgba(122,144,112,0.45)"}>
-                                          {/* Top row */}
-                                          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 22 }}>
-                                            <span style={{ color: "#7a9070", opacity: 0.8 }}><Icon name={icon} size={15} /></span>
-                                              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)" }}>{label} Routine</span>
-                                                <span style={{ marginLeft: "auto", fontSize: 9, fontFamily: "Space Grotesk, sans-serif", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "#7a9070", background: "rgba(180,175,168,0.25)", padding: "3px 9px", borderRadius: 20 }}>Now</span>
-                                                </div>
-                                                {/* Step count */}
-                                                <div style={{ display: "flex", alignItems: "flex-end", gap: 10, marginBottom: 8 }}>
-                                                  <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 64, fontWeight: 200, color: "var(--parchment)", lineHeight: 0.9, letterSpacing: "-0.03em" }}>{steps.length}</span>
-                                                    <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 14, color: "var(--clay)", paddingBottom: 8, letterSpacing: "0.04em" }}>step{steps.length !== 1 ? "s" : ""} in order</span>
-                                                    </div>
-                                                    {/* Category flow */}
-                                                    {steps.length > 0 && (
-                                                      <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "#7a9070", margin: "0 0 18px", letterSpacing: "0.06em" }}>
-                                                        {steps[0].category} → {steps[steps.length - 1].category}
-                                                      </p>
-                                                    )}
-                                                    {/* Step pills */}
-                                                    {steps.length > 0 && (
-                                                      <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-                                                        {steps.map((s, i) => (
-                                                          <span key={s.id} style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--clay)", background: "var(--surface)", border: "1px solid rgba(255,255,255,0.07)", padding: "3px 9px", borderRadius: 20 }}>
-                                                            {i + 1}. {s.category}
-                                                          </span>
-                                                        ))}
-                                                      </div>
-                                                    )}
-                                                    {steps.length === 0 && (
-                                                      <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", margin: 0, opacity: 0.6 }}>Add products to build your ritual.</p>
-                                                      )}
-                                                    </div>
-                                                  </div>
-                                                );
-                                              })()}
-
-                                              {/* Alerts — only when user has logged real products */}
-                                              {allAlerts.length > 0 && products.some(p => !p.isDemo) && (
-                                                <Section title={`${allAlerts.length} alert${allAlerts.length > 1 ? "s" : ""}`} icon="warning">
-                                                  {allAlerts.map((f, i) => <FlagCard key={i} f={f} />)}
-                                                </Section>
-                                              )}
-
-                                              {allAlerts.length === 0 && products.some(p => !p.isDemo) && (
-                                                <div style={{ display: "flex", gap: 12, padding: "14px 16px", background: "rgba(107,120,95,0.08)", borderRadius: 12, border: "1px solid rgba(107,120,95,0.2)", marginBottom: 24 }}>
-                                                  <span style={{ color: "#7a9070" }}><Icon name="check" size={15} /></span>
-                                                    <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, color: "var(--parchment)", margin: 0 }}>No conflicts detected. Your ritual is clean.</p>
-                                                    </div>
-                                                  )}
-
-
-
-
-          {/* Swan Song - inline settled card at bottom */}
-          {swanPopupDismissed && (
-            <SwanSongCard currentSession={currentSession} asPopup={false} user={user} predictions={swanSensePredictions} />
-          )}
-
-          {/* Swan Song - popup on first load */}
-          {!swanPopupDismissed && (
-            <SwanSongCard currentSession={currentSession} asPopup={true} onDismissPopup={onDismissSwanPopup} user={user} predictions={swanSensePredictions} />
-          )}
         </div>
       )}
 
