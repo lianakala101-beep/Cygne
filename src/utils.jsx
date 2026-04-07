@@ -75,12 +75,29 @@ function daysBetweenLocal(startIso, nowDate = new Date()) {
   const nowMs = toLocalMidnight(nowDate);
   return Math.floor((nowMs - startMs) / 86400000);
 }
-// Current cycle day from user.cycleStartDate (1-28, wraps every 28 days).
+// Current cycle day from user.cycleStartDate. Parsed as LOCAL date.
+// Day 1 = cycle start date; wraps every 28 days.
 function getCurrentCycleDay(user) {
   if (!user) return null;
   if (user.cycleStartDate) {
-    const d = daysBetweenLocal(user.cycleStartDate);
-    return ((d % 28) + 28) % 28 + 1;
+    // Parse stored ISO as local date
+    const start = new Date(user.cycleStartDate);
+    const startLocal = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+    const today = new Date();
+    const todayLocal = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const diffDays = Math.floor((todayLocal.getTime() - startLocal.getTime()) / (1000 * 60 * 60 * 24));
+    const rawDay = diffDays + 1;
+    const day = ((rawDay - 1) % 28 + 28) % 28 + 1;
+    // eslint-disable-next-line no-console
+    console.log("[Cygne cycle]", {
+      cycleStartDate: user.cycleStartDate,
+      startLocal: startLocal.toString(),
+      todayLocal: todayLocal.toString(),
+      diffDays,
+      rawDay,
+      wrappedDay: day,
+    });
+    return day;
   }
   return user.cycleDay || null;
 }

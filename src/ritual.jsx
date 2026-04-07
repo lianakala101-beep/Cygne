@@ -231,7 +231,6 @@ function getDayIndex() {
 const NO_DATA_LINE = "Log a few check-ins and I'll have something for you soon.";
 
 function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = {}, predictions = [] }) {
-  const [expandedPrediction, setExpandedPrediction] = useState(null);
   const now = new Date();
   const isBirthday = user.birthMonth && user.birthDay &&
     (now.getMonth() + 1) === parseInt(user.birthMonth) &&
@@ -346,26 +345,20 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
 
         <p style={{ fontFamily: "var(--cursive)", fontSize: 22, fontWeight: 400, lineHeight: 1.5, color: "rgba(232,227,214,0.85)", letterSpacing: "0.02em", margin: hasMeaningful ? "0 0 6px" : 0 }}>{line}</p>
 
-        {/* SwanSense prediction details — expandable */}
+        {/* SwanSense prediction details — static, always visible */}
         {hasMeaningful && (
           <div style={{ marginTop: 10, borderTop: "1px solid rgba(192,178,128,0.1)", paddingTop: 10 }}>
             {meaningfulPredictions.map((p, i) => {
               const key = p.id || p.type;
-              const isExpanded = expandedPrediction === key;
               const dotColor = p.color || (p.level === "alert" ? "#c06060" : p.level === "caution" ? "#c49040" : p.level === "cycle" ? "#b06060" : "#7a9070");
               return (
-                <div key={key}
-                  onClick={() => setExpandedPrediction(isExpanded ? null : key)}
-                  style={{ cursor: "pointer", padding: i > 0 ? "8px 0 0" : 0 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                <div key={key} style={{ padding: i > 0 ? "10px 0 0" : 0 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: p.detail ? 6 : 0 }}>
                     <div style={{ width: 4, height: 4, borderRadius: "50%", background: dotColor, flexShrink: 0 }} />
-                    <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "rgba(232,227,214,0.75)", margin: 0, flex: 1, lineHeight: 1.4 }}>
-                      {i === 0 && !isExpanded ? <span style={{ color: "rgba(192,178,128,0.45)", fontSize: 10 }}>Tap for details</span> : p.headline}
-                    </p>
-                    <span style={{ color: "rgba(192,178,128,0.35)", fontSize: 9, flexShrink: 0, transition: "transform 0.18s", transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)", display: "inline-block" }}>▾</span>
+                    <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "rgba(232,227,214,0.8)", margin: 0, flex: 1, lineHeight: 1.4 }}>{p.headline}</p>
                   </div>
-                  {isExpanded && (
-                    <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "rgba(192,178,128,0.55)", margin: "8px 0 0 11px", lineHeight: 1.65 }}>{p.detail}</p>
+                  {p.detail && (
+                    <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "rgba(192,178,128,0.55)", margin: "0 0 0 11px", lineHeight: 1.65 }}>{p.detail}</p>
                   )}
                 </div>
               );
