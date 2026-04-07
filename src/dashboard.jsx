@@ -220,7 +220,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         })()}
 
         {/* 4. Recovery / daily tips / environment */}
-        <EnvironmentStrip products={products} activeMap={activeMap} locationData={locationData} />
+        <EnvironmentStrip products={products} activeMap={activeMap} locationData={locationData} tempUnit={user?.tempUnit || "C"} />
 
         <WeekendNudgeCard products={products} activeMap={activeMap} />
 

@@ -129,7 +129,11 @@ export default function App() {
         bodyAcneEnabled: meta.bodyAcneEnabled || false,
         bodyAcneZones: meta.bodyAcneZones || [],
         cycleTrackingEnabled: meta.cycleTrackingEnabled || false,
-        cycleDay: meta.cycleDay || null,
+        cycleStartDate: meta.cycleStartDate || null,
+        cycleDay: meta.cycleStartDate
+          ? (((Math.floor((Date.now() - new Date(meta.cycleStartDate).getTime()) / 86400000)) % 28) + 1)
+          : (meta.cycleDay || null),
+        tempUnit: meta.tempUnit || null,
         notifEnabled: meta.notifEnabled || false,
         amReminderEnabled: meta.amReminderEnabled !== undefined ? meta.amReminderEnabled : (meta.notifEnabled || false),
         pmReminderEnabled: meta.pmReminderEnabled !== undefined ? meta.pmReminderEnabled : (meta.notifEnabled || false),
@@ -209,6 +213,17 @@ export default function App() {
     if (!profileLoaded.current || !authSession) return;
     supabase.auth.updateUser({ data: { locationData } }).catch(() => {});
   }, [locationData]);
+
+  // -- Auto-detect temperature unit from location country ---------------------
+  useEffect(() => {
+    if (!user || !locationData?.country) return;
+    if (user.tempUnit) return; // already set
+    const unit = locationData.country === "US" ? "F" : "C";
+    setUser({ ...user, tempUnit: unit });
+    if (profileLoaded.current && authSession) {
+      supabase.auth.updateUser({ data: { tempUnit: unit } }).catch(() => {});
+    }
+  }, [locationData?.country, user?.tempUnit]);
 
   // -- Sync location denied state to Supabase ---------------------------------
   useEffect(() => {

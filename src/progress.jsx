@@ -310,17 +310,13 @@ function getCyclePhase(day) {
 
 function CycleTracker({ products, activeMap, cycleDay: cycledayProp = 14, onSetCycleDay, user = {}, onUpdateUser = () => {} }) {
   const enabled = user.cycleTrackingEnabled || false;
-  const [cycleDay, setCycleDay] = useState(cycledayProp || 14);
+  // Compute cycle day dynamically from cycleStartDate if present
+  const computedDay = user.cycleStartDate
+    ? ((Math.floor((Date.now() - new Date(user.cycleStartDate).getTime()) / 86400000)) % 28) + 1
+    : (cycledayProp || 14);
+  const cycleDay = computedDay;
   const [editing, setEditing] = useState(false);
-  const [inputVal, setInputVal] = useState("14");
-
-  // Sync local state when prop changes (e.g. after Supabase profile loads)
-  useEffect(() => {
-    if (cycledayProp && cycledayProp !== cycleDay) {
-      setCycleDay(cycledayProp);
-      setInputVal(String(cycledayProp));
-    }
-  }, [cycledayProp]);
+  const [inputVal, setInputVal] = useState(String(computedDay));
 
   const hasRetinol = !!(activeMap["retinol"]?.length);
   const hasAHA = !!(activeMap["AHA"]?.length);
@@ -332,8 +328,11 @@ function CycleTracker({ products, activeMap, cycleDay: cycledayProp = 14, onSetC
 
   const handleSetDay = () => {
     const d = Math.max(1, Math.min(35, parseInt(inputVal) || 1));
-    setCycleDay(d);
-    if (onSetCycleDay) onSetCycleDay(d);
+    // Store the cycle start date, not the day number — so it advances automatically
+    const startDate = new Date();
+    startDate.setHours(0, 0, 0, 0);
+    startDate.setDate(startDate.getDate() - (d - 1));
+    onUpdateUser({ ...user, cycleStartDate: startDate.toISOString(), cycleDay: d });
     setEditing(false);
   };
 

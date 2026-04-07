@@ -61,7 +61,7 @@ function buildEnvAdvice(env, products, activeMap) {
   return nudges;
 }
 
-function EnvironmentStrip({ products, activeMap, locationData }) {
+function EnvironmentStrip({ products, activeMap, locationData, tempUnit = "C" }) {
   const [env, setEnv] = useState(null);
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -91,7 +91,7 @@ function EnvironmentStrip({ products, activeMap, locationData }) {
     if (locationData?.lat && locationData?.lon) {
       fetchWeather(locationData.lat, locationData.lon);
     }
-  }, [locationData?.lat, locationData?.lon]);
+  }, [locationData?.lat, locationData?.lon, tempUnit]);
 
   // No location set yet — silent, no button
   if (!locationData) return null;
@@ -141,7 +141,7 @@ function EnvironmentStrip({ products, activeMap, locationData }) {
           )}
           {env.temp !== null && (
             <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)" }}>{Math.round(env.temp)}°</span>
+              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)" }}>{Math.round(tempUnit === "F" ? (env.temp * 9/5 + 32) : env.temp)}°{tempUnit}</span>
             </div>
           )}
           {nudges.length > 0 && (
