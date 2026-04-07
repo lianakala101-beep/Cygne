@@ -10,7 +10,7 @@ import { Progress } from "./progress.jsx";
 import { ProfileSheet } from "./profile.jsx";
 import { ScanModal } from "./modals.jsx";
 import { ProductModal, RoutineFitSheet } from "./productmodal.jsx";
-import { SwanWelcomeScreen, useLocalStorage, DEMO_PRODUCTS, DEMO_VERSION } from "./utils.jsx";
+import { SwanWelcomeScreen, useLocalStorage, DEMO_PRODUCTS, DEMO_VERSION, getCurrentCycleDay } from "./utils.jsx";
 import { WeekendNudgeCard } from "./weekend.jsx";
 import { SeasonalNudgeCard } from "./seasonal.jsx";
 import { AuthScreen } from "./auth.jsx";
@@ -141,9 +141,7 @@ export default function App() {
         bodyAcneZones: meta.bodyAcneZones || [],
         cycleTrackingEnabled: meta.cycleTrackingEnabled || false,
         cycleStartDate: meta.cycleStartDate || null,
-        cycleDay: meta.cycleStartDate
-          ? (((Math.floor((Date.now() - new Date(meta.cycleStartDate).getTime()) / 86400000)) % 28) + 1)
-          : (meta.cycleDay || null),
+        cycleDay: getCurrentCycleDay({ cycleStartDate: meta.cycleStartDate, cycleDay: meta.cycleDay }),
         tempUnit: meta.tempUnit || null,
         notifEnabled: meta.notifEnabled || false,
         amReminderEnabled: meta.amReminderEnabled !== undefined ? meta.amReminderEnabled : (meta.notifEnabled || false),
@@ -490,7 +488,7 @@ export default function App() {
       {/* Content */}
       <div style={{ maxWidth: 600, margin: "0 auto", padding: "32px 22px 0", animation: "fadeUp 0.3s ease" }} key={tab}>
         {tab === "dashboard" && <Dashboard products={products} setTab={setTab} checkIns={checkIns} swanPopupDismissed={swanPopupDismissed} onDismissSwanPopup={dismissSwanPopup} treatments={treatments} locationData={locationData} user={user} theme={theme} notifPermission={notifPermission} onRequestNotif={requestNotifications} notifDismissed={notifDismissed} onDismissNotif={() => setNotifDismissed(true)} journals={journals} setCheckIns={setCheckIns} onLoadDemo={() => setProducts(DEMO_PRODUCTS)} />}
-        {tab === "routine"   && <MyRoutine products={products} user={user} cycleDay={user?.cycleDay || null} isFlightMode={false} journals={journals} checkIns={checkIns} setCheckIns={setCheckIns} completedSteps={completedSteps} setCompletedSteps={setCompletedSteps} onUpdateUser={updateUser} />}
+        {tab === "routine"   && <MyRoutine products={products} user={user} cycleDay={getCurrentCycleDay(user)} isFlightMode={false} journals={journals} checkIns={checkIns} setCheckIns={setCheckIns} completedSteps={completedSteps} setCompletedSteps={setCompletedSteps} onUpdateUser={updateUser} />}
         {tab === "shelf" && <Shelf
           products={products}
           onEdit={p => setModal(p)}

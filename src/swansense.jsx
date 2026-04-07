@@ -2,13 +2,14 @@ import { useState } from "react";
 import { Icon } from "./components.jsx";
 import { analyzeShelf } from "./engine.js";
 import { getSeason } from "./seasonal.jsx";
+import { getCurrentCycleDay } from "./utils.jsx";
 
 // --- SWAN SENSE — PREDICTIVE SKIN ENGINE -------------------------------------
 
 function getSwanSensePredictions(products, checkIns = [], user = {}, locationData = null, journals = []) {
   const predictions = [];
   const season = getSeason();
-  const cycleDay = user?.cycleDay || null;
+  const cycleDay = getCurrentCycleDay(user);
   const activeMap = analyzeShelf(products).activeMap;
 
   // -- Journal-based predictions ----------------------------------------------

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Icon, Section } from "./components.jsx";
 import { detectActives, analyzeShelf, detectConflicts } from "./engine.js";
 import { RAMP_SCHEDULES, RAMP_ACTIVES, IntroduceSlowlyCard, WeeklyRitualCalendar } from "./ramp.jsx";
+import { getCurrentCycleDay, getTreatmentElapsed, daysBetweenLocal } from "./utils.jsx";
 
 
 function computeStabilityScore(products, checkIns, activeMap) {
@@ -310,10 +311,8 @@ function getCyclePhase(day) {
 
 function CycleTracker({ products, activeMap, cycleDay: cycledayProp = 14, onSetCycleDay, user = {}, onUpdateUser = () => {} }) {
   const enabled = user.cycleTrackingEnabled || false;
-  // Compute cycle day dynamically from cycleStartDate if present
-  const computedDay = user.cycleStartDate
-    ? ((Math.floor((Date.now() - new Date(user.cycleStartDate).getTime()) / 86400000)) % 28) + 1
-    : (cycledayProp || 14);
+  // Compute cycle day dynamically from cycleStartDate (LOCAL date, not UTC)
+  const computedDay = getCurrentCycleDay(user) || cycledayProp || 14;
   const cycleDay = computedDay;
   const [editing, setEditing] = useState(false);
   const [inputVal, setInputVal] = useState(String(computedDay));
@@ -328,11 +327,10 @@ function CycleTracker({ products, activeMap, cycleDay: cycledayProp = 14, onSetC
 
   const handleSetDay = () => {
     const d = Math.max(1, Math.min(35, parseInt(inputVal) || 1));
-    // Store the cycle start date, not the day number — so it advances automatically
-    const startDate = new Date();
-    startDate.setHours(0, 0, 0, 0);
-    startDate.setDate(startDate.getDate() - (d - 1));
-    onUpdateUser({ ...user, cycleStartDate: startDate.toISOString(), cycleDay: d });
+    // Store cycle start date at LOCAL midnight so it advances at local midnight
+    const now = new Date();
+    const startLocal = new Date(now.getFullYear(), now.getMonth(), now.getDate() - (d - 1));
+    onUpdateUser({ ...user, cycleStartDate: startLocal.toISOString(), cycleDay: d });
     setEditing(false);
   };
 
@@ -519,7 +517,7 @@ const TREATMENT_TYPES = [
 ];
 
 function getTreatmentPhase(treatment) {
-  const elapsed = Math.floor((Date.now() - new Date(treatment.date).getTime()) / 86400000) + 1;
+  const elapsed = getTreatmentElapsed(treatment.date);
   const type = TREATMENT_TYPES.find(t => t.id === treatment.typeId);
   if (!type) return null;
   const phase = type.phases.find(p => elapsed >= p.days[0] && elapsed <= p.days[1]);
@@ -834,7 +832,8 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
   const { gaps, doubles } = buildBodyShelfAdvice(zones, products, activeMap);
 
   const setEnabled = (val) => onUpdateUser({ ...user, bodyAcneEnabled: val });
-  const isLuteal = user.cycleDay ? getCyclePhase(user.cycleDay).name === "Luteal" : false;
+  const _cd = getCurrentCycleDay(user);
+  const isLuteal = _cd ? getCyclePhase(_cd).name === "Luteal" : false;
 
   const toggleZone = (id) => {
     const updated = zones.includes(id) ? zones.filter(x => x !== id) : [...zones, id];

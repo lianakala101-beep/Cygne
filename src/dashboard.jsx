@@ -8,6 +8,7 @@ import { EnvironmentStrip } from "./environment.jsx";
 import { WeekendNudgeCard } from "./weekend.jsx";
 import { SeasonalNudgeCard } from "./seasonal.jsx";
 import { getTreatmentPhase, TreatmentRecoveryCard, getCyclePhase } from "./progress.jsx";
+import { getCurrentCycleDay } from "./utils.jsx";
 
 function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSwanPopup, treatments, locationData, user, theme, notifPermission, onRequestNotif, notifDismissed, onDismissNotif, journals, setCheckIns, onLoadDemo }) {
   const { flags } = analyzeShelf(products);
@@ -17,6 +18,8 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
   const currentSession = getCurrentSession();
   const [flightOpen, setFlightOpen] = useState(false);
   const [shopScanOpen, setShopScanOpen] = useState(false);
+  const [cycleExpanded, setCycleExpanded] = useState(false);
+  const currentCycleDay = getCurrentCycleDay(user);
   const { activeMap } = analyzeShelf(products);
   const swanSensePredictions = getSwanSensePredictions(products, checkIns, user, locationData, journals);
 
@@ -155,17 +158,39 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           <SwanSongCard currentSession={currentSession} asPopup={false} user={user} predictions={swanSensePredictions} />
         )}
 
-        {/* 2. Cycle phase widget */}
-        {user?.cycleTrackingEnabled && user?.cycleDay && (() => {
-          const phase = getCyclePhase(user.cycleDay);
+        {/* 2. Cycle phase — ambient pill, tap to expand */}
+        {user?.cycleTrackingEnabled && currentCycleDay && (() => {
+          const phase = getCyclePhase(currentCycleDay);
           return (
-            <div style={{ padding: "14px 16px", background: phase.bg, border: `1px solid ${phase.border}`, borderRadius: 14, marginBottom: 20 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                <div style={{ width: 6, height: 6, borderRadius: "50%", background: phase.dot, flexShrink: 0 }} />
-                <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 600, color: "var(--parchment)" }}>{phase.name} Phase</span>
-                <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", opacity: 0.7, marginLeft: "auto" }}>Day {user.cycleDay}</span>
+            <button
+              onClick={() => setCycleExpanded(true)}
+              style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "7px 13px", background: phase.bg, border: `1px solid ${phase.border}`, borderRadius: 999, marginBottom: 20, cursor: "pointer", fontFamily: "inherit" }}>
+              <div style={{ width: 5, height: 5, borderRadius: "50%", background: phase.dot, flexShrink: 0 }} />
+              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 500, color: "var(--parchment)", letterSpacing: "0.02em" }}>{phase.name} Phase · Day {currentCycleDay}</span>
+              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", opacity: 0.6, marginLeft: 2 }}>›</span>
+            </button>
+          );
+        })()}
+
+        {/* Cycle phase expanded modal */}
+        {cycleExpanded && user?.cycleTrackingEnabled && currentCycleDay && (() => {
+          const phase = getCyclePhase(currentCycleDay);
+          return (
+            <div onClick={() => setCycleExpanded(false)}
+              style={{ position: "fixed", inset: 0, background: "var(--overlay)", backdropFilter: "blur(6px)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 22 }}>
+              <div onClick={e => e.stopPropagation()}
+                style={{ background: "var(--ink)", border: `1px solid ${phase.border}`, borderRadius: 18, padding: "24px 22px", maxWidth: 440, width: "100%" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: phase.dot }} />
+                  <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 14, fontWeight: 600, color: "var(--parchment)" }}>{phase.name} Phase</span>
+                  <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", opacity: 0.7, marginLeft: "auto" }}>Day {currentCycleDay}</span>
+                  <button onClick={() => setCycleExpanded(false)} style={{ background: "none", border: "none", color: "var(--clay)", fontSize: 16, cursor: "pointer", marginLeft: 6 }}>✕</button>
+                </div>
+                <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", margin: "0 0 14px", lineHeight: 1.65 }}>{phase.description}</p>
+                <div style={{ padding: "12px 14px", background: "rgba(0,0,0,0.2)", borderRadius: 10 }}>
+                  <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--parchment)", margin: 0, lineHeight: 1.6 }}>{phase.nudge}</p>
+                </div>
               </div>
-              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.5 }}>{phase.nudge}</p>
             </div>
           );
         })()}
@@ -182,10 +207,12 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             : "Check-in overdue.";
           const color = due ? (daysSince === null ? "var(--clay)" : "#c49040") : "#7a9070";
           return (
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
+            <button onClick={() => setTab("progress")}
+              style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20, background: "none", border: "none", padding: "4px 0", cursor: "pointer", fontFamily: "inherit" }}>
               <div style={{ width: 5, height: 5, borderRadius: "50%", background: color, flexShrink: 0 }} />
-              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", letterSpacing: "0.03em" }}>{msg}</span>
-            </div>
+              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", letterSpacing: "0.03em", textDecoration: "underline", textDecorationColor: "rgba(154,150,136,0.3)", textUnderlineOffset: 3 }}>{msg}</span>
+              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", opacity: 0.6 }}>›</span>
+            </button>
           );
         })()}
 

@@ -62,4 +62,31 @@ const DEMO_PRODUCTS = [
 ];
 
 
-export { SwanWelcomeScreen, useLocalStorage, DEMO_PRODUCTS, DEMO_VERSION };
+// --- SHARED LOCAL DATE HELPERS ---------------------------------------------
+// Use local midnight (not UTC) so cycle & treatment tracking advance at the
+// user's local midnight, not UTC midnight.
+function toLocalMidnight(d) {
+  const date = d instanceof Date ? d : new Date(d);
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+}
+function daysBetweenLocal(startIso, nowDate = new Date()) {
+  if (!startIso) return 0;
+  const startMs = toLocalMidnight(startIso);
+  const nowMs = toLocalMidnight(nowDate);
+  return Math.floor((nowMs - startMs) / 86400000);
+}
+// Current cycle day from user.cycleStartDate (1-28, wraps every 28 days).
+function getCurrentCycleDay(user) {
+  if (!user) return null;
+  if (user.cycleStartDate) {
+    const d = daysBetweenLocal(user.cycleStartDate);
+    return ((d % 28) + 28) % 28 + 1;
+  }
+  return user.cycleDay || null;
+}
+// Days elapsed since treatment (1-indexed: day 1 = day of treatment).
+function getTreatmentElapsed(treatmentDate) {
+  return daysBetweenLocal(treatmentDate) + 1;
+}
+
+export { SwanWelcomeScreen, useLocalStorage, DEMO_PRODUCTS, DEMO_VERSION, daysBetweenLocal, getCurrentCycleDay, getTreatmentElapsed, toLocalMidnight };
