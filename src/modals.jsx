@@ -102,18 +102,22 @@ function ScanModal({ products, onAddToShelf, onClose }) {
       const shelfSummary = products.map(p => ({ name: p.name, category: p.category, actives: Object.keys(detectActives(p.ingredients || [])) }));
       const resp = await fetch("https://mxcefgbaaylddnyxrnao.supabase.co/functions/v1/rapid-action", {
         method: "POST", headers: { "Content-Type": "application/json", "apikey": "sb_publishable_6kUbORFpskKo-zg6r0MZtA_x5ppPvin", "Authorization": "Bearer sb_publishable_6kUbORFpskKo-zg6r0MZtA_x5ppPvin" },
-        body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 1000, messages: [{ role: "user", content: [
+        body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 1500, messages: [{ role: "user", content: [
           { type: "image", source: { type: "base64", media_type: file.type, data: base64 } },
-          { type: "text", text: "Analyze this skincare product. User's vanity: " + JSON.stringify(shelfSummary) + ". Return ONLY JSON with fields: brand, name, ingredients array, actives array, verdict (pass/caution/skip), headline, reason, conflicts array, duplicates array." }
+          { type: "text", text: "Analyze this skincare product image. Fully support Korean skincare (COSRX, Innisfree, Laneige, Sulwhasoo, Anua, Beauty of Joseon, Skin1004, etc.) — read Hangul and romanized names. Recognize Korean categories: essence, ampoule, sheet mask, sleeping mask, toner/softener. Recognize Korean ingredients: snail mucin, centella asiatica, galactomyces, mugwort, propolis, rice, green tea, birch sap, etc. User's vanity: " + JSON.stringify(shelfSummary) + ". Return ONLY valid JSON (no markdown) with fields: brand, name, category (Cleanser/Toner/Essence/Serum/Ampoule/Eye Cream/Moisturizer/SPF/Oil/Exfoliant/Mask/Sleeping Mask/Sheet Mask/Treatment/Mist/Lip Care), ingredients (array of strings), actives (array of strings), verdict (pass/caution/skip), headline, reason, conflicts (array), duplicates (array)." }
         ]}] })
       });
       const data = await resp.json();
       const text = (data.content || []).map(c => c.text || "").join("") || "{}";
-      const parsed = JSON.parse(text.replace(/\x60\x60\x60json|\x60\x60\x60/g, "").trim());
+      const clean = text.replace(/```json|```/g, "").trim();
+      const jsonStart = clean.indexOf("{");
+      const jsonEnd = clean.lastIndexOf("}");
+      const jsonStr = jsonStart >= 0 && jsonEnd >= 0 ? clean.slice(jsonStart, jsonEnd + 1) : "{}";
+      const parsed = JSON.parse(jsonStr);
       setScanned(parsed);
-      setVerdict(parsed.verdict);
+      setVerdict(parsed.verdict || "pass");
       setMode("result");
-    } catch { setMode("scan"); }
+    } catch(err) { console.error("[Cygne scan]", err); setMode("scan"); }
   };
 
   const handleFile = (e) => {

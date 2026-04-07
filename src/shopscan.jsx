@@ -36,19 +36,23 @@ function ShopScanModal({ products, user = {}, onClose }) {
         headers: { "Content-Type": "application/json", "apikey": "sb_publishable_6kUbORFpskKo-zg6r0MZtA_x5ppPvin", "Authorization": "Bearer sb_publishable_6kUbORFpskKo-zg6r0MZtA_x5ppPvin" },
         body: JSON.stringify({
           model: "claude-sonnet-4-20250514",
-          max_tokens: 1000,
+          max_tokens: 1500,
           messages: [{
             role: "user",
             content: [
               { type: "image", source: { type: "base64", media_type: file.type, data: base64 } },
-              { type: "text", text: "You are a skincare expert helping someone decide whether to buy a product. User skin profile: " + (skinContext || "Unknown") + ". Current shelf: " + JSON.stringify(shelfSummary) + ". Analyze this product photo. Return ONLY valid JSON with fields: brand, name, category, ingredients array, actives array, verdict (love/maybe/skip), headline (max 10 words), reason (2-3 sentences specific to their skin), conflicts array, duplicates array, skinTypeFit, fillsGap boolean, gap, routineSlot. Verdict: love=good fit no conflicts, maybe=minor concern, skip=conflicts or bad fit. Be direct and personal." }
+              { type: "text", text: "You are a skincare expert helping someone decide whether to buy a product. Fully support Korean skincare brands (COSRX, Innisfree, Laneige, Sulwhasoo, Anua, Beauty of Joseon, Skin1004, etc.) — read Hangul and romanized names. Recognize Korean categories (essence, ampoule, sheet mask, sleeping mask, toner/softener) and Korean ingredients (snail mucin, centella asiatica, galactomyces, mugwort, propolis, rice, green tea, birch sap). User skin profile: " + (skinContext || "Unknown") + ". Current shelf: " + JSON.stringify(shelfSummary) + ". Analyze this product photo. Return ONLY valid JSON (no markdown) with fields: brand, name, category (Cleanser/Toner/Essence/Serum/Ampoule/Eye Cream/Moisturizer/SPF/Oil/Exfoliant/Mask/Sleeping Mask/Sheet Mask/Treatment/Mist/Lip Care), ingredients array, actives array, verdict (love/maybe/skip), headline (max 10 words), reason (2-3 sentences specific to their skin), conflicts array, duplicates array, skinTypeFit, fillsGap boolean, gap, routineSlot. Verdict: love=good fit no conflicts, maybe=minor concern, skip=conflicts or bad fit. Be direct and personal." }
             ]}]
         })
       });
 
       const data = await resp.json();
       const text = data.content?.map(c => c.text || "").join("") || "{}";
-      const parsed = JSON.parse(text.replace(/\x60\x60\x60json|\x60\x60\x60/g, "").trim());
+      const clean = text.replace(/```json|```/g, "").trim();
+      const jsonStart = clean.indexOf("{");
+      const jsonEnd = clean.lastIndexOf("}");
+      const jsonStr = jsonStart >= 0 && jsonEnd >= 0 ? clean.slice(jsonStart, jsonEnd + 1) : "{}";
+      const parsed = JSON.parse(jsonStr);
       setResult(parsed);
       setPhase("result");
     } catch(err) {
