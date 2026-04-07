@@ -105,6 +105,17 @@ export default function App() {
         setUser(null);
         setNeedsOnboarding(false);
         profileLoaded.current = false;
+        // Clear all local caches so the next sign-in doesn't inherit stale data
+        setProducts([]);
+        setJournals([]);
+        setCheckIns([]);
+        setTreatments([]);
+        setWaitingRoom([]);
+        setCompletedSteps({ date: null, steps: [] });
+        setLocationData(null);
+        setLocationDenied(false);
+        setNotifDismissed(false);
+        setSwanPopupDismissed(false);
       }
     });
 
@@ -176,6 +187,22 @@ export default function App() {
       if (meta.locationDenied) {
         setLocationDenied(true);
       }
+      // Restore products (vanity shelf) from Supabase
+      if (meta.products && Array.isArray(meta.products)) {
+        setProducts(meta.products);
+      } else {
+        setProducts([]);
+      }
+      // Restore waiting room from Supabase
+      if (meta.waitingRoom && Array.isArray(meta.waitingRoom)) {
+        setWaitingRoom(meta.waitingRoom);
+      } else {
+        setWaitingRoom([]);
+      }
+      // Restore swan popup dismissal
+      if (meta.swanPopupDismissed !== undefined) {
+        setSwanPopupDismissed(meta.swanPopupDismissed);
+      }
       profileLoaded.current = true;
       setNeedsOnboarding(false);
     } else {
@@ -236,6 +263,24 @@ export default function App() {
     if (!profileLoaded.current || !authSession) return;
     supabase.auth.updateUser({ data: { notifDismissed } }).catch(() => {});
   }, [notifDismissed]);
+
+  // -- Sync products (vanity shelf) to Supabase -------------------------------
+  useEffect(() => {
+    if (!profileLoaded.current || !authSession) return;
+    supabase.auth.updateUser({ data: { products } }).catch(() => {});
+  }, [products]);
+
+  // -- Sync waiting room to Supabase ------------------------------------------
+  useEffect(() => {
+    if (!profileLoaded.current || !authSession) return;
+    supabase.auth.updateUser({ data: { waitingRoom } }).catch(() => {});
+  }, [waitingRoom]);
+
+  // -- Sync swan popup dismissal to Supabase ----------------------------------
+  useEffect(() => {
+    if (!profileLoaded.current || !authSession) return;
+    supabase.auth.updateUser({ data: { swanPopupDismissed } }).catch(() => {});
+  }, [swanPopupDismissed]);
 
   // Save profile to Supabase user_metadata
   const saveUserProfile = async (profileData) => {
