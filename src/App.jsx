@@ -185,17 +185,14 @@ export default function App() {
       if (meta.locationDenied) {
         setLocationDenied(true);
       }
-      // Restore products (vanity shelf) from Supabase
+      // Restore products (vanity shelf) from Supabase — but fall back to
+      // existing localStorage state if cloud hasn't been populated yet,
+      // so pre-migration users don't see an empty vanity.
       if (meta.products && Array.isArray(meta.products)) {
         setProducts(meta.products);
-      } else {
-        setProducts([]);
       }
-      // Restore waiting room from Supabase
       if (meta.waitingRoom && Array.isArray(meta.waitingRoom)) {
         setWaitingRoom(meta.waitingRoom);
-      } else {
-        setWaitingRoom([]);
       }
       // Restore swan popup dismissal
       if (meta.swanPopupDismissed !== undefined) {

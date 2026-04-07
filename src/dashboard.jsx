@@ -150,13 +150,8 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           );
         })()}
 
-        {/* 1. Swan Song card (intelligence) */}
-        {!swanPopupDismissed && (
-          <SwanSongCard currentSession={currentSession} asPopup={true} onDismissPopup={onDismissSwanPopup} user={user} predictions={swanSensePredictions} />
-        )}
-        {swanPopupDismissed && (
-          <SwanSongCard currentSession={currentSession} asPopup={false} user={user} predictions={swanSensePredictions} />
-        )}
+        {/* 1. Swan Song card (intelligence) — always fully visible */}
+        <SwanSongCard currentSession={currentSession} asPopup={false} user={user} predictions={swanSensePredictions} />
 
         {/* 2. Cycle phase — ambient pill, tap to expand */}
         {user?.cycleTrackingEnabled && currentCycleDay && (() => {
