@@ -1,6 +1,6 @@
 // --- CONSTANTS ----------------------------------------------------------------
 
-const CATEGORIES = ["Cleanser", "Toner", "Toning Pad", "Essence", "Serum", "Eye Cream", "Moisturizer", "Oil", "SPF", "Exfoliant", "Mask", "Mist", "Treatment", "Prescription", "Lip"];
+const CATEGORIES = ["Cleanser", "Toner", "Toning Pad", "Essence", "Serum", "Eye Cream", "Moisturizer", "SPF Moisturizer", "Oil", "SPF", "Exfoliant", "Mask", "Mist", "Treatment", "Prescription", "Lip"];
 
 const FREQUENCIES = [
   { id: "daily",       label: "Daily" },
@@ -52,7 +52,7 @@ function getNextUseLabel(product) {
 const LAYER_ORDER = {
   Cleanser: 1, Toner: 2, "Toning Pad": 2.3, Mist: 2.5, Essence: 3, Exfoliant: 4,
   Serum: 5, Treatment: 5, Eye_Cream: 6, Moisturizer: 7, Oil: 8, SPF: 9,
-  Mask: 10, Lip: 11,
+  "SPF Moisturizer": 9, Mask: 10, Lip: 11,
 };
 const layerIndex = (cat) => LAYER_ORDER[cat.replace(" ", "_")] ?? 6;
 

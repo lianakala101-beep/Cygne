@@ -545,12 +545,28 @@ export default function App() {
         />
       )}
       {scanOpen && <ScanModal products={products} onAddToShelf={p => {
+          const ingredients = Array.isArray(p.ingredients) ? p.ingredients : (p.ingredients || "").split(",").map(s => s.trim().toLowerCase()).filter(Boolean);
+          // Infer category from ingredients/name when the scan didn't return one
+          const inferCategory = () => {
+            const name = (p.name || "").toLowerCase();
+            const text = name + " " + ingredients.join(" ");
+            if (/cleanser|wash|foam|cleansing/.test(text)) return "Cleanser";
+            if (/sunscreen|spf/.test(text)) return "SPF";
+            if (/moistur|cream|lotion|balm/.test(text)) return "Moisturizer";
+            if (/toner|essence|softener/.test(text)) return "Toner";
+            if (/eye cream|eye gel/.test(text)) return "Eye Cream";
+            if (/oil(?!\s*free)/.test(text)) return "Oil";
+            if (/mask/.test(text)) return "Mask";
+            if (/exfoliant|peel|scrub|acid pad/.test(text)) return "Exfoliant";
+            return "Serum";
+          };
           const newProduct = {
             id: Date.now().toString(),
             brand: p.brand || "",
             name: p.name || "",
-            category: p.category || "Serum",
-            ingredients: Array.isArray(p.ingredients) ? p.ingredients : (p.ingredients || "").split(",").map(s => s.trim().toLowerCase()).filter(Boolean),
+            category: p.category || inferCategory(),
+            spf: p.spf || null,
+            ingredients,
             inRoutine: true,
             session: "auto",
             frequency: "daily",

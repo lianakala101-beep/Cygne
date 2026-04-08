@@ -87,8 +87,31 @@ function analyzeShelf(products) {
   }
   const exfCount = products.filter(p => { const a = detectActives(p.ingredients); return a.AHA || a.BHA || p.category === "Exfoliant"; }).length;
   if (exfCount > 1) flags.push({ severity: "warning", label: `${exfCount} exfoliants detected`, detail: "Multiple exfoliants risk barrier damage. Alternate days — never layer." });
-  if (!products.some(p => p.category === "SPF" || detectActives(p.ingredients).SPF)) flags.push({ severity: "missing", label: "No SPF in your vanity", detail: "Daily SPF is non-negotiable — even indoors, even in winter." });
-  if (!products.some(p => p.category === "Moisturizer")) flags.push({ severity: "missing", label: "No moisturizer detected", detail: "A moisturizer is a foundational step in every ritual." });
+
+  // SPF coverage — include dedicated SPF, SPF Moisturizer, or any product with UV filters
+  const dedicatedSpf = products.filter(p => p.category === "SPF" || p.category === "SPF Moisturizer");
+  const hasAnySpf = dedicatedSpf.length > 0 || products.some(p => detectActives(p.ingredients).SPF);
+  if (!hasAnySpf) {
+    flags.push({ severity: "missing", label: "No SPF in your vanity", detail: "Daily SPF is non-negotiable — even indoors, even in winter." });
+  } else {
+    // Only low-SPF moisturizers with SPF <= 15 and no dedicated high-SPF product
+    const highSpf = dedicatedSpf.find(p => !p.spf || p.spf >= 30);
+    const lowSpfOnly = !highSpf && dedicatedSpf.every(p => p.spf && p.spf <= 15);
+    if (dedicatedSpf.length && lowSpfOnly) {
+      flags.push({ severity: "caution", label: "Only low SPF detected", detail: "Your only sun protection is SPF 15 or lower. Add a dedicated SPF 30+ for reliable daily protection." });
+    }
+  }
+
+  // Retinol / AHA / BHA without any SPF
+  const hasRetinolOrAcid = products.some(p => { const a = detectActives(p.ingredients); return a.retinol || a.AHA || a.BHA; });
+  if (hasRetinolOrAcid && !hasAnySpf) {
+    flags.push({ severity: "warning", label: "Actives without SPF", detail: "Retinol, AHAs, and BHAs increase photosensitivity. A dedicated SPF is required in your routine." });
+  }
+
+  // Moisturizer coverage — SPF Moisturizer also counts
+  if (!products.some(p => p.category === "Moisturizer" || p.category === "SPF Moisturizer")) {
+    flags.push({ severity: "missing", label: "No moisturizer detected", detail: "A moisturizer is a foundational step in every ritual." });
+  }
   return { activeMap, flags };
 }
 
