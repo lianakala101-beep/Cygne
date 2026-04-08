@@ -13,81 +13,112 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
   const hasBHA = !!activeMap["BHA"];
   const hasHA = !!activeMap["hyaluronic acid"];
   const hasCeramides = !!activeMap["ceramides"];
-  const hasSPF = cats.has("SPF") || !!activeMap["SPF"];
-  const hasMoisturizer = cats.has("Moisturizer");
+  // SPF logic: a dedicated SPF product satisfies the requirement. An SPF
+  // Moisturizer also satisfies it — unless its stated SPF is 15 or lower, in
+  // which case we still recommend a dedicated SPF for adequate protection.
+  const parseSpfValue = (p) => {
+    const m = (p.name || "").match(/SPF\s*(\d+)/i);
+    return m ? parseInt(m[1], 10) : null;
+  };
+  const hasDedicatedSPF = cats.has("SPF") || !!activeMap["SPF"];
+  const spfMoisturizers = products.filter(p => p.category === "SPF Moisturizer");
+  const hasAdequateSpfMoisturizer = spfMoisturizers.some(p => {
+    const lvl = parseSpfValue(p);
+    return lvl === null || lvl > 15;
+  });
+  const hasSPF = hasDedicatedSPF || hasAdequateSpfMoisturizer;
+  // An SPF Moisturizer (at any SPF level) satisfies the moisturizer slot.
+  const hasMoisturizer = cats.has("Moisturizer") || spfMoisturizers.length > 0;
   const hasCleanser = cats.has("Cleanser");
   const hasEyeCream = cats.has("Eye Cream");
   const hasPeptides = !!activeMap["peptides"];
   const hasExfoliant = cats.has("Exfoliant") || hasAHA || hasBHA;
 
+  // Cygne gold used for "Essential" tags — matches brand palette
+  const ESSENTIAL_GOLD = "#c4a060";
+
   // -- ADDITIONS -------------------------------------------------------------
   if (!hasSPF) recs.push({
+    id: "add-spf",
     type: "addition", priority: 1,
     title: "Add daily SPF",
     body: "No sun protection found. SPF is the single most evidence-backed step for preventing premature aging and skin damage — it belongs in every AM ritual.",
     tag: "Essential",
-    tagColor: "#c06060",
+    tagColor: ESSENTIAL_GOLD,
     cygne: true,
+    addCategory: "SPF",
     note: "Look for SPF 30–50, broad spectrum. Mineral or chemical — find one you'll actually use daily.",
   });
 
   if (!hasCleanser) recs.push({
+    id: "add-cleanser",
     type: "addition", priority: 2,
     title: "Add a gentle cleanser",
     body: "No cleanser detected. A pH-balanced cleanser removes pollutants and preps skin so your actives absorb properly — without stripping the barrier.",
     tag: "Essential",
-    tagColor: "#c06060",
+    tagColor: ESSENTIAL_GOLD,
     cygne: true,
+    addCategory: "Cleanser",
     note: "Choose a low-pH, sulfate-free formula. Gel for oilier skin, cream or milk for drier.",
   });
 
   if (!hasMoisturizer) recs.push({
+    id: "add-moisturizer",
     type: "addition", priority: 3,
     title: "Add a moisturizer",
     body: "Without a moisturizer, actives can over-penetrate and cause irritation. A moisturizer seals in hydration and supports the skin barrier after every step.",
     tag: "Essential",
-    tagColor: "#c06060",
+    tagColor: ESSENTIAL_GOLD,
     cygne: true,
+    addCategory: "Moisturizer",
     note: "A fragrance-free ceramide cream or gel moisturizer works for most skin types.",
   });
 
   if (!hasVitC && products.length >= 2) recs.push({
+    id: "add-vitc",
     type: "addition", priority: 4,
     title: "Consider a Vitamin C serum (AM)",
     body: "No antioxidant protection detected in your ritual. A stable Vitamin C serum each morning shields against free radical damage and supports brightness over time.",
     tag: "Recommended",
     tagColor: "#7a9070",
     cygne: true,
+    addCategory: "Serum",
     note: "Apply after cleansing, before moisturizer and SPF. Start with 10–15% L-ascorbic acid.",
   });
 
   if (!hasRetinol && products.length >= 3) recs.push({
+    id: "add-retinoid",
     type: "addition", priority: 5,
     title: "Consider a retinoid (PM)",
     body: "No retinoid detected. Retinoids remain the most studied active for cell turnover, texture, fine lines, and long-term skin health. Worth building into a PM ritual.",
     tag: "Recommended",
     tagColor: "#7a9070",
     cygne: true,
+    addCategory: "Treatment",
     note: "Start with retinol 0.025–0.1% two nights per week. Introduce gradually to avoid purging.",
   });
 
   if ((hasRetinol || hasAHA || hasBHA) && !hasHA && !hasCeramides) recs.push({
+    id: "add-barrier",
     type: "addition", priority: 6,
     title: "Add a barrier-support serum",
     body: "You're using active exfoliants or retinoids without any humectant or ceramide support. This increases transepidermal water loss (TEWL) and may slowly compromise your barrier.",
     tag: "Recommended",
     tagColor: "#7a9070",
     cygne: true,
+    addCategory: "Serum",
     note: "A hyaluronic acid or ceramide serum applied before moisturizer on active nights.",
   });
 
   if (!hasEyeCream && products.length >= 4) recs.push({
+    id: "add-eye-cream",
     type: "addition", priority: 7,
     title: "Consider an eye cream",
     body: "The skin around the eyes is significantly thinner. A dedicated eye product prevents milia and accidental irritation from actives that migrate during application.",
     tag: "Optional",
     tagColor: "#8a8278",
     cygne: true,
+    addCategory: "Eye Cream",
     note: "Apply with your ring finger using a gentle tapping motion. Peptide or caffeine formulas work well.",
   });
 
@@ -130,37 +161,41 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
 
   if (skinType === "Dry" || concerns.includes("Dehydration")) {
     if (!hasCeramides) recs.push({
+      id: "add-ceramides-dry",
       type: "addition", priority: 4,
       title: "Add a ceramide moisturizer",
       body: "Dry skin loses moisture faster than it can replenish. Ceramides rebuild the lipid barrier that holds water in — they're not optional for dry skin types.",
-      tag: "Dry Skin", tagColor: "#8aa8c4", cygne: true,
+      tag: "Dry Skin", tagColor: "#8aa8c4", cygne: true, addCategory: "Moisturizer",
       note: "Look for ceramides NP, AP, or EOP in the ingredients list. CeraVe, La Roche-Posay, and Avène are reliable.",
     });
   }
 
   if (skinType === "Oily" || concerns.includes("Acne")) {
     if (!hasBHA) recs.push({
+      id: "add-bha-oily",
       type: "addition", priority: 4,
       title: "Add a BHA exfoliant",
       body: "Salicylic acid is oil-soluble — it penetrates the pore lining where congestion starts. For oily or acne-prone skin it's the most targeted active available OTC.",
-      tag: skinType === "Oily" ? "Oily Skin" : "Acne", tagColor: "#c49040", cygne: true,
+      tag: skinType === "Oily" ? "Oily Skin" : "Acne", tagColor: "#c49040", cygne: true, addCategory: "Exfoliant",
       note: "2% salicylic acid, used 2–3× per week. Paula's Choice BHA is the benchmark.",
     });
   }
 
   if (concerns.includes("Hyperpigmentation")) {
     if (!hasVitC) recs.push({
+      id: "add-vitc-hyperpig",
       type: "addition", priority: 4,
       title: "Add Vitamin C for hyperpigmentation",
       body: "Vitamin C inhibits melanin production at the source. For hyperpigmentation concerns it's the most evidence-backed brightening active — especially paired with SPF.",
-      tag: "Hyperpigmentation", tagColor: "#c4a060", cygne: true,
+      tag: "Hyperpigmentation", tagColor: "#c4a060", cygne: true, addCategory: "Serum",
       note: "L-ascorbic acid 10–20% is most effective. Keep it in the fridge and replace when it turns orange.",
     });
     if (!hasSPF) recs.push({
+      id: "add-spf-hyperpig",
       type: "addition", priority: 1,
       title: "SPF is essential for hyperpigmentation",
       body: "Without daily SPF, UV exposure reverses brightening progress every morning. SPF is not optional when treating pigmentation — it's half the treatment.",
-      tag: "Hyperpigmentation", tagColor: "#c06060", cygne: true,
+      tag: "Essential", tagColor: ESSENTIAL_GOLD, cygne: true, addCategory: "SPF",
       note: "SPF 50 broad-spectrum. Reapply every 2 hours outdoors.",
     });
   }
@@ -168,6 +203,7 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
   if (skinType === "Sensitive" || concerns.includes("Redness") || concerns.includes("Sensitivity")) {
     const activeCount = Object.keys(activeMap).length;
     if (activeCount >= 3) recs.push({
+      id: "simplify-sensitive",
       type: "simplify", priority: 1,
       title: "Reduce active load for sensitive skin",
       body: "Sensitive skin has a lower threshold for irritation. Running multiple actives simultaneously increases the risk of barrier disruption — simplifying is not a step back.",
@@ -175,30 +211,33 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
       note: "Identify your one highest-priority active and hold others until skin is stable.",
     });
     if (!hasCeramides) recs.push({
+      id: "add-ceramides-sensitive",
       type: "addition", priority: 4,
       title: "Add ceramides for barrier support",
       body: "Sensitive skin typically has a compromised barrier that allows irritants in. Ceramides are the primary repair ingredient — they rebuild the barrier from the inside out.",
-      tag: "Sensitive Skin", tagColor: "#9a8070", cygne: true,
+      tag: "Sensitive Skin", tagColor: "#9a8070", cygne: true, addCategory: "Moisturizer",
       note: "Fragrance-free formula essential. CeraVe Moisturizing Cream is a reliable baseline.",
     });
   }
 
   if (concerns.includes("Fine lines")) {
     if (!hasRetinol) recs.push({
+      id: "add-retinoid-lines",
       type: "addition", priority: 4,
       title: "Consider introducing a retinoid",
       body: "Retinoids are the most studied active for fine lines — they accelerate cell turnover and stimulate collagen production. Nothing else comes close in terms of evidence.",
-      tag: "Fine Lines", tagColor: "#9a8070", cygne: true,
+      tag: "Fine Lines", tagColor: "#9a8070", cygne: true, addCategory: "Treatment",
       note: "Start at 0.025–0.05% retinol, 1–2× per week. Expect a 12-week adjustment period.",
     });
   }
 
   if (concerns.includes("Texture")) {
     if (!hasAHA && !hasBHA) recs.push({
+      id: "add-aha-texture",
       type: "addition", priority: 4,
       title: "Add a chemical exfoliant for texture",
       body: "Texture is primarily a cell turnover issue. AHA (glycolic, lactic) dissolves the bonds between dead skin cells and resurfaces the top layer — physical scrubs can't match this.",
-      tag: "Texture", tagColor: "#9a8070", cygne: true,
+      tag: "Texture", tagColor: "#9a8070", cygne: true, addCategory: "Exfoliant",
       note: "Lactic acid 5–10% is gentler and a good starting point. Use 2–3× per week, PM only.",
     });
   }
@@ -243,10 +282,20 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
 
 // --- MY ROUTINE ---------------------------------------------------------------
 
-function RecommendationCard({ rec }) {
+function RecommendationCard({ rec, onAdd, onDismiss, onEdit }) {
   const [expanded, setExpanded] = useState(false);
   const typeIcon = { addition: "plus", swap: "layers", simplify: "drop" };
   const typeLabelMap = { addition: "Add", swap: "Swap", simplify: "Simplify" };
+
+  const handleAdd = (e) => {
+    e.stopPropagation();
+    if (rec.type === "addition" && onAdd) onAdd(rec.addCategory || "Serum");
+    else if (onEdit) onEdit();
+  };
+  const handleDismiss = (e) => {
+    e.stopPropagation();
+    if (onDismiss) onDismiss(rec.id || rec.title);
+  };
 
   return (
     <div onClick={() => setExpanded(e => !e)}
@@ -264,6 +313,13 @@ function RecommendationCard({ rec }) {
           </div>
           <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, color: "var(--parchment)", margin: 0, fontWeight: 500, lineHeight: 1.35 }}>{rec.title}</p>
         </div>
+        {rec.type === "addition" && onAdd && (
+          <button onClick={handleAdd}
+            title="Add to vanity"
+            style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(122,144,112,0.18)", border: "1px solid rgba(122,144,112,0.35)", display: "flex", alignItems: "center", justifyContent: "center", color: "#7a9070", cursor: "pointer", flexShrink: 0 }}>
+            <Icon name="plus" size={12} />
+          </button>
+        )}
         <span style={{ color: "var(--clay)", opacity: 0.35, flexShrink: 0, marginTop: 5, display: "inline-block", transform: expanded ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>
           <Icon name="chevron" size={13} />
         </span>
@@ -283,6 +339,20 @@ function RecommendationCard({ rec }) {
               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{rec.note}</p>
             </div>
           )}
+          <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+            {rec.type === "addition" && onAdd && (
+              <button onClick={handleAdd}
+                style={{ flex: 1, padding: "10px 14px", background: "rgba(122,144,112,0.15)", border: "1px solid rgba(122,144,112,0.35)", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600, color: "#7a9070", cursor: "pointer", letterSpacing: "0.06em" }}>
+                + Add {rec.addCategory || "to vanity"}
+              </button>
+            )}
+            {onDismiss && (
+              <button onClick={handleDismiss}
+                style={{ padding: "10px 14px", background: "transparent", border: "1px solid var(--border)", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", cursor: "pointer", letterSpacing: "0.04em" }}>
+                Dismiss
+              </button>
+            )}
+          </div>
         </div>
       )}
     </div>
@@ -411,8 +481,19 @@ function buildRefinements(products, activeMap, conflicts) {
   }
 
   // -- 4. ADD (progress essentials) -----------------------------------------
-  const hasSPF = !!cats["SPF"] || !!activeMap["SPF"];
-  const hasMoisturizer = !!cats["Moisturizer"];
+  // An SPF Moisturizer satisfies both the SPF and moisturizer slots, unless
+  // its stated SPF is 15 or under (in which case dedicated SPF is still recommended).
+  const parseSpfValue = (p) => {
+    const m = (p.name || "").match(/SPF\s*(\d+)/i);
+    return m ? parseInt(m[1], 10) : null;
+  };
+  const spfMoisturizers = cats["SPF Moisturizer"] || [];
+  const hasAdequateSpfMoisturizer = spfMoisturizers.some(p => {
+    const lvl = parseSpfValue(p);
+    return lvl === null || lvl > 15;
+  });
+  const hasSPF = !!cats["SPF"] || !!activeMap["SPF"] || hasAdequateSpfMoisturizer;
+  const hasMoisturizer = !!cats["Moisturizer"] || spfMoisturizers.length > 0;
   const hasCleanser = !!cats["Cleanser"];
 
   if (!hasSPF) {
