@@ -160,6 +160,10 @@ export default function App() {
       if (meta.dismissedSuggestions && Array.isArray(meta.dismissedSuggestions)) {
         setDismissedSuggestions(meta.dismissedSuggestions);
       }
+      // Restore treatments from Supabase
+      if (meta.treatments && Array.isArray(meta.treatments)) {
+        setTreatments(meta.treatments);
+      }
       profileLoaded.current = true;
       setNeedsOnboarding(false);
     } else {
@@ -185,6 +189,12 @@ export default function App() {
     if (!profileLoaded.current || !authSession) return;
     supabase.auth.updateUser({ data: { completedSteps } }).catch(() => {});
   }, [completedSteps]);
+
+  // -- Sync treatments to Supabase when they change --------------------------
+  useEffect(() => {
+    if (!profileLoaded.current || !authSession) return;
+    supabase.auth.updateUser({ data: { treatments } }).catch(() => {});
+  }, [treatments]);
 
   // -- Sync dismissed suggestions to Supabase when they change ---------------
   useEffect(() => {
