@@ -41,6 +41,7 @@ function SessionPicker({ productId, product, initial, onSession }) {
 }
 
 function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, user = {} }) {
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
   const activeKeys = Object.keys(detectActives(product.ingredients || []));
   const inRoutine = product.inRoutine !== false; // default true
   const ingredientList = (product.ingredients || []).map(i => i.toLowerCase());
@@ -87,7 +88,7 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
         </div>
         <div style={{ display: "flex", gap: 0, flexShrink: 0, marginLeft: 8 }}>
           <button onClick={() => onEdit(product)} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: "4px 6px", opacity: 0.6, transition: "opacity 0.15s" }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0.6}><Icon name="edit" size={13} /></button>
-          <button onClick={() => onDelete(product.id)} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: "4px 6px", opacity: 0.6, transition: "opacity 0.15s" }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0.6}><Icon name="trash" size={13} /></button>
+          <button onClick={() => setConfirmingDelete(true)} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: "4px 6px", opacity: 0.6, transition: "opacity 0.15s" }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0.6}><Icon name="trash" size={13} /></button>
         </div>
       </div>
 
@@ -137,6 +138,31 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
       {/* Session picker — only when in routine */}
       {inRoutine && (
         <SessionPicker productId={product.id} product={product} initial={product.session} onSession={onSession} />
+      )}
+
+      {/* Delete confirmation */}
+      {confirmingDelete && (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, padding: "10px 14px", background: "rgba(192,96,96,0.07)", border: "1px solid rgba(192,96,96,0.22)", borderRadius: 10 }}>
+          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--parchment)", margin: 0, lineHeight: 1.4 }}>
+            Remove <span style={{ fontWeight: 600 }}>{product.name}</span> from your vanity?
+          </p>
+          <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+            <button
+              onClick={() => setConfirmingDelete(false)}
+              style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", fontWeight: 600, color: "var(--clay)", background: "none", border: "1px solid var(--border)", borderRadius: 8, padding: "5px 12px", cursor: "pointer", transition: "border-color 0.15s" }}
+              onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)"}
+              onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}>
+              Cancel
+            </button>
+            <button
+              onClick={() => onDelete(product.id)}
+              style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", fontWeight: 600, color: "#c06060", background: "rgba(192,96,96,0.10)", border: "1px solid rgba(192,96,96,0.30)", borderRadius: 8, padding: "5px 12px", cursor: "pointer", transition: "background 0.15s" }}
+              onMouseEnter={e => e.currentTarget.style.background = "rgba(192,96,96,0.18)"}
+              onMouseLeave={e => e.currentTarget.style.background = "rgba(192,96,96,0.10)"}>
+              Remove
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
