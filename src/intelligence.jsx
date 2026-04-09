@@ -421,7 +421,7 @@ function buildRefinements(products, activeMap, conflicts) {
     }
   }
 
-  if (activeMap["vitamin C"] && hasRetinol && !products.find(p => detectActives(p.ingredients)["vitamin C"] && p.category !== "Treatment")) {
+  if (activeMap["vitamin C"] && hasRetinol && !products.find(p => detectActives(p.ingredients)["vitamin C"])) {
     const vitcProduct = (activeMap["vitamin C"] || [])[0];
     const vitcName = pName(vitcProduct) || "your Vitamin C";
     refinements.push({

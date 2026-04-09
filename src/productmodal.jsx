@@ -209,7 +209,7 @@ function ProductModal({ product, onSave, onClose, user }) {
         method: "POST", headers: { "Content-Type": "application/json", "apikey": "sb_publishable_6kUbORFpskKo-zg6r0MZtA_x5ppPvin", "Authorization": "Bearer sb_publishable_6kUbORFpskKo-zg6r0MZtA_x5ppPvin" },
         body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 1000, messages: [{ role: "user", content: [
           { type: "image", source: { type: "base64", media_type: file.type, data: base64 } },
-          { type: "text", text: "You are a skincare product analyst. Look at this product image and return ONLY a JSON object with these exact fields: brand (string), name (string), category (one of: Cleanser/Toner/Serum/Eye Cream/Moisturizer/SPF/Oil/Exfoliant/Mask/Treatment), ingredients (comma-separated string of ingredients if visible). No markdown, no explanation, just the JSON object." }
+          { type: "text", text: "You are a skincare product analyst. Look at this product image and return ONLY a JSON object with these exact fields: brand (string), name (string), category (one of: Cleanser/Toner/Serum/Eye Cream/Moisturizer/SPF/Oil/Exfoliant/Mask/Prescription), ingredients (comma-separated string of ingredients if visible). No markdown, no explanation, just the JSON object." }
         ]}] })
       });
       const data = await resp.json();

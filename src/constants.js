@@ -1,6 +1,6 @@
 // --- CONSTANTS ----------------------------------------------------------------
 
-const CATEGORIES = ["Cleanser", "Toner", "Toning Pad", "Essence", "Serum", "Eye Cream", "Moisturizer", "Oil", "SPF", "Exfoliant", "Mask", "Mist", "Treatment", "Prescription", "Lip"];
+const CATEGORIES = ["Cleanser", "Toner", "Toning Pad", "Essence", "Serum", "Eye Cream", "Moisturizer", "Oil", "SPF", "Exfoliant", "Mask", "Mist", "Prescription", "Lip"];
 
 const FREQUENCIES = [
   { id: "daily",       label: "Daily" },
@@ -90,7 +90,7 @@ const SAMPLE_PRODUCTS = [
   { id: "4", brand: "Tatcha", name: "The Dewy Skin Cream", category: "Moisturizer", price: 68.00, ingredients: ["water", "glycerin", "squalane", "niacinamide", "japanese purple rice", "uva ursi leaf extract"], dateAdded: "2024-12-01" },
   { id: "5", brand: "Supergoop!", name: "Unseen Sunscreen SPF 40", category: "SPF", price: 38.00, ingredients: ["avobenzone", "homosalate", "octisalate", "octocrylene", "glycerin", "squalane"], dateAdded: "2024-11-20" },
   { id: "6", brand: "COSRX", name: "Snail 96 Mucin Power Essence", category: "Serum", price: 24.00, ingredients: ["snail secretion filtrate", "sodium hyaluronate", "betaine", "glycerin"], dateAdded: "2024-10-01" },
-  { id: "7", brand: "The Ordinary", name: "Retinol 0.5% in Squalane", category: "Treatment", price: 11.90, ingredients: ["squalane", "retinol", "solanum lycopersicum"], dateAdded: "2024-12-10" },
+  { id: "7", brand: "The Ordinary", name: "Retinol 0.5% in Squalane", category: "Serum", price: 11.90, ingredients: ["squalane", "retinol", "solanum lycopersicum"], dateAdded: "2024-12-10" },
 ];
 
 

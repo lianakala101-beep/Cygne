@@ -183,7 +183,6 @@ const STEP_REASONS = {
   "Toning Pad":  "An exfoliating step applied after cleansing. Used less frequently while your skin builds tolerance.",
   Mist:          "A hydrating layer that can be used before serums or over makeup to refresh.",
   Balm:          "A rich occlusive layer applied last to seal everything in overnight.",
-  Treatment:     "Targeted treatment applied after cleansing, before moisturiser, so actives reach the skin directly.",
   Prescription:  "Applied after cleansing, before moisturiser. PM only — prescription actives like tretinoin are photosensitive and work best overnight.",
 };
 
