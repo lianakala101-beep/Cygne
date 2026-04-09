@@ -353,12 +353,16 @@ function ProductModal({ product, onSave, onClose, user }) {
                     ? form.ingredients.split(",").map(s => s.trim()).filter(Boolean)
                     : (form.ingredients || []);
                   const withoutKey = current.filter(i => !i.toLowerCase().includes(key));
-                  const isSelected = lowerIng.includes(key);
-                  if (isSelected) {
-                    set("ingredients", withoutKey.join(", "));
-                  } else {
-                    set("ingredients", [...withoutKey, key + " " + pct].join(", "));
-                  }
+                  set("ingredients", [...withoutKey, key + " " + pct].join(", "));
+                };
+
+                const setActivePercent = (key, pct) => {
+                  if (!pct.trim()) return;
+                  const current = typeof form.ingredients === "string"
+                    ? form.ingredients.split(",").map(s => s.trim()).filter(Boolean)
+                    : (form.ingredients || []);
+                  const withoutKey = current.filter(i => !i.toLowerCase().includes(key));
+                  set("ingredients", [...withoutKey, key + " " + pct.trim()].join(", "));
                 };
 
                 const getSelected = (key) => {
@@ -403,8 +407,8 @@ function ProductModal({ product, onSave, onClose, user }) {
                                 ))}
                                 <input
                                   placeholder="custom %"
-                                  defaultValue={selected && !active.options.includes(selected) ? selected : ""}
-                                  onBlur={e => { if (e.target.value.trim()) toggleActive(active.key, e.target.value.trim()); }}
+                                  value={selected && !active.options.includes(selected) ? selected : ""}
+                                  onChange={e => setActivePercent(active.key, e.target.value)}
                                   style={{ width: 72, padding: "4px 10px", borderRadius: 20, border: "1px solid var(--border)", background: "transparent", fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", outline: "none" }}
                                 />
                               </div>
