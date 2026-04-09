@@ -13,7 +13,7 @@ import { ProductModal, RoutineFitSheet } from "./productmodal.jsx";
 import { SwanWelcomeScreen, useLocalStorage, DEMO_PRODUCTS, DEMO_VERSION } from "./utils.jsx";
 import { WeekendNudgeCard } from "./weekend.jsx";
 import { SeasonalNudgeCard } from "./seasonal.jsx";
-import { AuthScreen } from "./auth.jsx";
+import { AuthScreen, ResetPasswordScreen } from "./auth.jsx";
 import { supabase } from "./supabase.js";
 
 export default function App() {
@@ -21,6 +21,7 @@ export default function App() {
   const [authSession, setAuthSession] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
+  const [resetMode, setResetMode] = useState(false);
 
   // -- Theme: auto by time, manual override ----------------------------------
   const getAutoTheme = () => {
@@ -99,12 +100,18 @@ export default function App() {
       setAuthLoading(false);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY") {
+        setAuthSession(session);
+        setResetMode(true);
+        return;
+      }
       setAuthSession(session);
       if (!session) {
         setUser(null);
         setNeedsOnboarding(false);
         profileLoaded.current = false;
+        setResetMode(false);
       }
     });
 
@@ -291,6 +298,11 @@ export default function App() {
   // -- No session → Auth screen -----------------------------------------------
   if (!authSession) {
     return <AuthScreen onAuth={handleAuth} />;
+  }
+
+  // -- Password reset (user clicked email link) --------------------------------
+  if (resetMode) {
+    return <ResetPasswordScreen onDone={() => { setResetMode(false); loadUserProfile(authSession.user); }} />;
   }
 
   // -- Needs onboarding (new signup) ------------------------------------------
