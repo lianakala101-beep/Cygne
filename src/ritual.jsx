@@ -102,6 +102,11 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
             {shelfStatus.label}
           </span>
         )}
+        {!shelfStatus && product.openedDate && !product.paoMonths && (
+          <span style={{ fontSize: 10, fontFamily: "Space Grotesk, sans-serif", color: "var(--clay)", opacity: 0.5, letterSpacing: "0.02em" }}>
+            Most opened products are best used within 12 months
+          </span>
+        )}
       </div>
       {/* Active tags */}
       {activeKeys.length > 0 && (
