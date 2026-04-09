@@ -9,6 +9,7 @@ function AuthScreen({ onAuth }) {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [resetSent, setResetSent] = useState(false);
+  const [failedAttempts, setFailedAttempts] = useState(0);
 
   const handleSubmit = async () => {
     if (!email || !password) { setError("Email and password required."); return; }
@@ -46,6 +47,7 @@ function AuthScreen({ onAuth }) {
         if (err) {
           console.error("[Cygne Auth] signIn error:", err);
           setError(err.message || JSON.stringify(err));
+          setFailedAttempts(n => n + 1);
           setLoading(false);
           return;
         }
@@ -128,17 +130,17 @@ function AuthScreen({ onAuth }) {
                 style={inputStyle} />
             </div>
 
-            {mode === "login" && (
-              <button onClick={() => { setMode("forgot"); setError(null); setResetSent(false); }}
-                style={{ display: "block", background: "none", border: "none", fontFamily: "'Space Grotesk', sans-serif", fontSize: 11, color: "rgba(232,227,214,0.38)", cursor: "pointer", padding: "0 0 14px", letterSpacing: "0.04em", transition: "color 0.2s" }}
-                onMouseEnter={e => e.currentTarget.style.color = "rgba(232,227,214,0.6)"}
-                onMouseLeave={e => e.currentTarget.style.color = "rgba(232,227,214,0.38)"}>
-                Forgot password?
-              </button>
+            {error && (
+              <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 11, color: "#c06060", margin: "0 0 10px", lineHeight: 1.5 }}>{error}</p>
             )}
 
-            {error && (
-              <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 11, color: "#c06060", margin: "0 0 14px", lineHeight: 1.5 }}>{error}</p>
+            {mode === "login" && failedAttempts > 0 && (
+              <button onClick={() => { setMode("forgot"); setError(null); setResetSent(false); }}
+                style={{ display: "block", background: "none", border: "none", fontFamily: "'Space Grotesk', sans-serif", fontSize: 11, color: "rgba(232,227,214,0.45)", cursor: "pointer", padding: "0 0 14px", letterSpacing: "0.04em", transition: "color 0.2s" }}
+                onMouseEnter={e => e.currentTarget.style.color = "rgba(232,227,214,0.65)"}
+                onMouseLeave={e => e.currentTarget.style.color = "rgba(232,227,214,0.45)"}>
+                Forgot password?
+              </button>
             )}
 
             <button onClick={handleSubmit} disabled={loading}
