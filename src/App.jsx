@@ -420,7 +420,7 @@ export default function App() {
           products={products}
           onEdit={p => setModal(p)}
           onDelete={id => setProducts(prev => prev.filter(x => x.id !== id))}
-          onAdd={() => setModal({ brand: "", name: "", category: "Serum", price: "", ingredients: "" })}
+          onAdd={() => setModal({ brand: "", name: "", category: "", price: "", ingredients: "" })}
           onToggleRoutine={toggleRoutine}
           onClearDemo={() => setProducts(prev => prev.filter(p => !p.isDemo))}
           onClearAll={() => setProducts([])}
@@ -479,7 +479,7 @@ export default function App() {
             id: Date.now().toString(),
             brand: p.brand || "",
             name: p.name || "",
-            category: p.category || "Serum",
+            category: p.category || "",
             ingredients: Array.isArray(p.ingredients) ? p.ingredients : (p.ingredients || "").split(",").map(s => s.trim().toLowerCase()).filter(Boolean),
             inRoutine: true,
             session: "auto",

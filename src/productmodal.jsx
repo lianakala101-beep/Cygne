@@ -130,7 +130,7 @@ function ShelfLifeSection({ form, set }) {
 }
 
 function ProductModal({ product, onSave, onClose, user }) {
-  const [form, setForm] = useState(product || { brand: "", name: "", category: "Serum", price: "", ingredients: "" });
+  const [form, setForm] = useState(product || { brand: "", name: "", category: "", price: "", ingredients: "" });
   const [analyzing, setAnalyzing] = useState(false);
   const [modalStep, setModalStep] = useState(product && product.id ? "form" : "choose");
   const fileRef = useRef();
@@ -321,7 +321,8 @@ function ProductModal({ product, onSave, onClose, user }) {
               <div style={{ gridColumn: "1/-1" }}><label style={labelSt}>Product Name *</label><input style={inputSt} value={form.name || ""} onChange={e => set("name", e.target.value)} placeholder="e.g. Hydrating Cleanser" /></div>
               <div>
                 <label style={labelSt}>Category</label>
-                <select style={{ ...inputSt, appearance: "none" }} value={form.category || "Serum"} onChange={e => set("category", e.target.value)}>
+                <select style={{ ...inputSt, appearance: "none" }} value={form.category || ""} onChange={e => set("category", e.target.value)}>
+                  <option value="" disabled style={{ background: "var(--ink)", color: "var(--clay)" }}>Select category</option>
                   {CATEGORIES.map(c => <option key={c} style={{ background: "var(--ink)" }}>{c}</option>)}
                 </select>
               </div>

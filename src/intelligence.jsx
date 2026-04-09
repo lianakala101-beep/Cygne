@@ -441,7 +441,7 @@ function buildRefinements(products, activeMap, conflicts) {
   const hasCleanser = !!cats["Cleanser"];
 
   if (!hasSPF) refinements.push({
-    verb: "Add", verbColor: "#c06060", icon: "plus",
+    verb: "Add", verbColor: "#7a9070", icon: "plus",
     title: "No SPF in your AM ritual",
     body: "SPF is non-negotiable. Every active you apply — retinol, AHA, Vitamin C — becomes significantly less effective without UV protection the following morning.",
     action: "Add a broad-spectrum SPF 30–50 as your final AM step, every day.",
@@ -449,7 +449,7 @@ function buildRefinements(products, activeMap, conflicts) {
   });
 
   if (!hasMoisturizer) refinements.push({
-    verb: "Add", verbColor: "#c06060", icon: "plus",
+    verb: "Add", verbColor: "#7a9070", icon: "plus",
     title: "No moisturizer in your ritual",
     body: "Actives thin the barrier — moisturizer rebuilds it. Skipping it while using exfoliants or retinoids puts you in a constant cycle of damage without recovery.",
     action: "Apply a ceramide or hyaluronic acid moisturizer after serums, before SPF.",
@@ -457,7 +457,7 @@ function buildRefinements(products, activeMap, conflicts) {
   });
 
   if (!hasCleanser) refinements.push({
-    verb: "Add", verbColor: "#c06060", icon: "plus",
+    verb: "Add", verbColor: "#7a9070", icon: "plus",
     title: "No cleanser in your ritual",
     body: "Starting with unwashed skin means actives are layering on top of pollution, sebum, and residue — blocking absorption and increasing irritation risk.",
     action: "Add a gentle, pH-balanced cleanser as step one, AM and PM.",
@@ -483,7 +483,7 @@ function RefinementsCard({ products, activeMap, conflicts }) {
     "Remove":           { color: "#c06060", bg: "rgba(192,96,96,0.08)",  border: "rgba(192,96,96,0.28)" },
     "Reduce Frequency": { color: "#c49040", bg: "rgba(196,144,64,0.08)", border: "rgba(196,144,64,0.28)" },
     "Replace":          { color: "#7a9070", bg: "rgba(122,144,112,0.08)",border: "rgba(122,144,112,0.28)" },
-    "Add":              { color: "#c06060", bg: "rgba(192,96,96,0.08)",  border: "rgba(192,96,96,0.28)" },
+    "Add":              { color: "#7a9070", bg: "rgba(122,144,112,0.08)", border: "rgba(122,144,112,0.28)" },
   };
 
   return (
