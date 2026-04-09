@@ -532,8 +532,24 @@ const TREATMENT_TYPES = [
   },
 ];
 
+function localDateStr() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function localMidnight(dateStr) {
+  // Parse "YYYY-MM-DD" (take first 10 chars to handle any ISO suffix) as local midnight
+  const s = (dateStr || "").slice(0, 10);
+  const [y, m, d] = s.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+
 function getTreatmentPhase(treatment) {
-  const elapsed = Math.floor((Date.now() - new Date(treatment.date).getTime()) / 86400000) + 1;
+  const today = new Date();
+  const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const startMidnight = localMidnight(treatment.date);
+  // Never let elapsed go below 1; Math.max guards against any clock/date anomaly
+  const elapsed = Math.max(1, Math.floor((todayMidnight - startMidnight) / 86400000) + 1);
   const type = TREATMENT_TYPES.find(t => t.id === treatment.typeId);
   if (!type) return null;
   const phase = type.phases.find(p => elapsed >= p.days[0] && elapsed <= p.days[1]);
@@ -566,7 +582,7 @@ const labelSt = { fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterS
 
 function AddTreatmentModal({ onSave, onClose }) {
   const [typeId, setTypeId] = useState(TREATMENT_TYPES[0].id);
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const [date, setDate] = useState(localDateStr());
   const [intensity, setIntensity] = useState("standard");
   const selected = TREATMENT_TYPES.find(t => t.id === typeId);
 
