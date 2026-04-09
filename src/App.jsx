@@ -107,6 +107,9 @@ export default function App() {
         return;
       }
       setAuthSession(session);
+      if (session && (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") && !profileLoaded.current) {
+        loadUserProfile(session.user);
+      }
       if (!session) {
         setUser(null);
         setNeedsOnboarding(false);
@@ -164,6 +167,10 @@ export default function App() {
       if (meta.treatments && Array.isArray(meta.treatments)) {
         setTreatments(meta.treatments);
       }
+      // Restore products from Supabase (cloud takes priority over localStorage)
+      if (meta.products && Array.isArray(meta.products)) {
+        setProducts(meta.products);
+      }
       profileLoaded.current = true;
       setNeedsOnboarding(false);
     } else {
@@ -171,6 +178,12 @@ export default function App() {
       setNeedsOnboarding(true);
     }
   };
+
+  // -- Sync products to Supabase when they change ----------------------------
+  useEffect(() => {
+    if (!profileLoaded.current || !authSession) return;
+    supabase.auth.updateUser({ data: { products } }).catch(() => {});
+  }, [products]);
 
   // -- Sync journals to Supabase when they change ----------------------------
   useEffect(() => {
