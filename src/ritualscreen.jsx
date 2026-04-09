@@ -2,9 +2,8 @@ import { useState } from "react";
 import { Icon, Section, FlagCard } from "./components.jsx";
 import { detectActives, analyzeShelf, buildRoutine, detectConflicts, getCurrentSession, isScheduledToday } from "./engine.js";
 import { FREQUENCIES } from "./constants.js";
-import { buildRecommendations, buildRefinements } from "./intelligence.jsx";
+import { buildRecommendations, buildRefinements, RecommendationCard, RefinementItem } from "./intelligence.jsx";
 import { RoutineStep } from "./ritual.jsx";
-import { RecommendationCard } from "./intelligence.jsx";
 import { CheckInModal } from "./progress.jsx";
 import { getCyclePhase } from "./progress.jsx";
 import { getNextUseLabel } from "./constants.js";
@@ -235,7 +234,7 @@ function getSwanGuidingLine(products, checkIns = [], user = {}, cycleDay = null,
   return "Your ritual is ready. Take your time with it.";
 }
 
-function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false, journals = [], checkIns = [], setCheckIns = () => {}, completedSteps: completedStepsProp, setCompletedSteps: setCompletedStepsProp, onUpdateUser }) {
+function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false, journals = [], checkIns = [], setCheckIns = () => {}, completedSteps: completedStepsProp, setCompletedSteps: setCompletedStepsProp, onUpdateUser, setTab = () => {}, setModal = () => {} }) {
   const session = getCurrentSession();
   const { am, pm, periodic } = buildRoutine(products);
   const conflicts = detectConflicts(products);
@@ -270,6 +269,21 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
   const swaps     = recs.filter(r => r.type === "swap");
   const simplifications = recs.filter(r => r.type === "simplify");
   const totalRecs = recs.length + refinements.length;
+
+  const onAdd = (category) => {
+    setTab("shelf");
+    setModal({ brand: "", name: "", category, price: "", ingredients: "" });
+  };
+  const onEdit = (product) => {
+    setModal(product);
+  };
+
+  const refineVerbStyle = {
+    "Remove":           { color: "#c06060", bg: "rgba(192,96,96,0.08)",  border: "rgba(192,96,96,0.28)" },
+    "Reduce Frequency": { color: "#c49040", bg: "rgba(196,144,64,0.08)", border: "rgba(196,144,64,0.28)" },
+    "Replace":          { color: "#7a9070", bg: "rgba(122,144,112,0.08)",border: "rgba(122,144,112,0.28)" },
+    "Add":              { color: "#c06060", bg: "rgba(192,96,96,0.08)",  border: "rgba(192,96,96,0.28)" },
+  };
 
   const guidingLine = getSwanGuidingLine(products, [], user, cycleDay, ritualKey, session, journals);
 
@@ -461,24 +475,13 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
           </div>
 
           <div>
-            {recTab === "additions"  && additions.map((r, i) => <RecommendationCard key={i} rec={r} />)}
+            {recTab === "additions"  && additions.map((r, i) => <RecommendationCard key={i} rec={r} onAdd={onAdd} />)}
             {recTab === "swaps"      && swaps.map((r, i) => <RecommendationCard key={i} rec={r} />)}
             {recTab === "simplify"   && simplifications.map((r, i) => <RecommendationCard key={i} rec={r} />)}
-            {recTab === "refine"     && refinements.map((r, i) => (
-              <div key={i} style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "13px 15px", marginBottom: 8 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-                  <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", fontWeight: 700, letterSpacing: "0.13em", textTransform: "uppercase", color: "var(--parchment)", opacity: 0.7 }}>{r.verb}</span>
-                  <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--parchment)", margin: 0, flex: 1, fontWeight: 500, lineHeight: 1.3 }}>{r.title}</p>
-                </div>
-                <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.65 }}>{r.body}</p>
-                {r.action && (
-                  <div style={{ display: "flex", gap: 8, padding: "9px 11px", background: "rgba(122,144,112,0.06)", borderRadius: 8, border: "1px solid rgba(122,144,112,0.15)", marginTop: 10 }}>
-                    <span style={{ color: "#7a9070", flexShrink: 0, marginTop: 1 }}><Icon name="check" size={11} /></span>
-                    <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--parchment)", margin: 0, lineHeight: 1.55 }}>{r.action}</p>
-                  </div>
-                )}
-              </div>
-            ))}
+            {recTab === "refine"     && refinements.map((r, i) => {
+              const vs = refineVerbStyle[r.verb] || { color: "#7a9070", bg: "rgba(122,144,112,0.08)", border: "rgba(122,144,112,0.28)" };
+              return <RefinementItem key={i} r={r} vs={vs} onEdit={onEdit} />;
+            })}
           </div>
 
         </div>

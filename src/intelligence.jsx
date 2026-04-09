@@ -26,7 +26,8 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
     title: "Add daily SPF",
     body: "No sun protection found. SPF is the single most evidence-backed step for preventing premature aging and skin damage — it belongs in every AM ritual.",
     tag: "Essential",
-    tagColor: "#c06060",
+    tagColor: "#c4a060",
+    category: "SPF",
     cygne: true,
     note: "Look for SPF 30–50, broad spectrum. Mineral or chemical — find one you'll actually use daily.",
   });
@@ -36,7 +37,8 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
     title: "Add a gentle cleanser",
     body: "No cleanser detected. A pH-balanced cleanser removes pollutants and preps skin so your actives absorb properly — without stripping the barrier.",
     tag: "Essential",
-    tagColor: "#c06060",
+    tagColor: "#c4a060",
+    category: "Cleanser",
     cygne: true,
     note: "Choose a low-pH, sulfate-free formula. Gel for oilier skin, cream or milk for drier.",
   });
@@ -46,7 +48,8 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
     title: "Add a moisturizer",
     body: "Without a moisturizer, actives can over-penetrate and cause irritation. A moisturizer seals in hydration and supports the skin barrier after every step.",
     tag: "Essential",
-    tagColor: "#c06060",
+    tagColor: "#c4a060",
+    category: "Moisturizer",
     cygne: true,
     note: "A fragrance-free ceramide cream or gel moisturizer works for most skin types.",
   });
@@ -57,6 +60,7 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
     body: "No antioxidant protection detected in your ritual. A stable Vitamin C serum each morning shields against free radical damage and supports brightness over time.",
     tag: "Recommended",
     tagColor: "#7a9070",
+    category: "Serum",
     cygne: true,
     note: "Apply after cleansing, before moisturizer and SPF. Start with 10–15% L-ascorbic acid.",
   });
@@ -67,6 +71,7 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
     body: "No retinoid detected. Retinoids remain the most studied active for cell turnover, texture, fine lines, and long-term skin health. Worth building into a PM ritual.",
     tag: "Recommended",
     tagColor: "#7a9070",
+    category: "Serum",
     cygne: true,
     note: "Start with retinol 0.025–0.1% two nights per week. Introduce gradually to avoid purging.",
   });
@@ -77,6 +82,7 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
     body: "You're using active exfoliants or retinoids without any humectant or ceramide support. This increases transepidermal water loss (TEWL) and may slowly compromise your barrier.",
     tag: "Recommended",
     tagColor: "#7a9070",
+    category: "Serum",
     cygne: true,
     note: "A hyaluronic acid or ceramide serum applied before moisturizer on active nights.",
   });
@@ -87,6 +93,7 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
     body: "The skin around the eyes is significantly thinner. A dedicated eye product prevents milia and accidental irritation from actives that migrate during application.",
     tag: "Optional",
     tagColor: "#8a8278",
+    category: "Eye Cream",
     cygne: true,
     note: "Apply with your ring finger using a gentle tapping motion. Peptide or caffeine formulas work well.",
   });
@@ -133,7 +140,7 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
       type: "addition", priority: 4,
       title: "Add a ceramide moisturizer",
       body: "Dry skin loses moisture faster than it can replenish. Ceramides rebuild the lipid barrier that holds water in — they're not optional for dry skin types.",
-      tag: "Dry Skin", tagColor: "#8aa8c4", cygne: true,
+      tag: "Dry Skin", tagColor: "#8aa8c4", category: "Moisturizer", cygne: true,
       note: "Look for ceramides NP, AP, or EOP in the ingredients list. CeraVe, La Roche-Posay, and Avène are reliable.",
     });
   }
@@ -143,7 +150,7 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
       type: "addition", priority: 4,
       title: "Add a BHA exfoliant",
       body: "Salicylic acid is oil-soluble — it penetrates the pore lining where congestion starts. For oily or acne-prone skin it's the most targeted active available OTC.",
-      tag: skinType === "Oily" ? "Oily Skin" : "Acne", tagColor: "#c49040", cygne: true,
+      tag: skinType === "Oily" ? "Oily Skin" : "Acne", tagColor: "#c49040", category: "Exfoliant", cygne: true,
       note: "2% salicylic acid, used 2–3× per week. Paula's Choice BHA is the benchmark.",
     });
   }
@@ -153,14 +160,14 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
       type: "addition", priority: 4,
       title: "Add Vitamin C for hyperpigmentation",
       body: "Vitamin C inhibits melanin production at the source. For hyperpigmentation concerns it's the most evidence-backed brightening active — especially paired with SPF.",
-      tag: "Hyperpigmentation", tagColor: "#c4a060", cygne: true,
+      tag: "Hyperpigmentation", tagColor: "#c4a060", category: "Serum", cygne: true,
       note: "L-ascorbic acid 10–20% is most effective. Keep it in the fridge and replace when it turns orange.",
     });
     if (!hasSPF) recs.push({
       type: "addition", priority: 1,
       title: "SPF is essential for hyperpigmentation",
       body: "Without daily SPF, UV exposure reverses brightening progress every morning. SPF is not optional when treating pigmentation — it's half the treatment.",
-      tag: "Hyperpigmentation", tagColor: "#c06060", cygne: true,
+      tag: "Hyperpigmentation", tagColor: "#c4a060", category: "SPF", cygne: true,
       note: "SPF 50 broad-spectrum. Reapply every 2 hours outdoors.",
     });
   }
@@ -178,7 +185,7 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
       type: "addition", priority: 4,
       title: "Add ceramides for barrier support",
       body: "Sensitive skin typically has a compromised barrier that allows irritants in. Ceramides are the primary repair ingredient — they rebuild the barrier from the inside out.",
-      tag: "Sensitive Skin", tagColor: "#9a8070", cygne: true,
+      tag: "Sensitive Skin", tagColor: "#9a8070", category: "Moisturizer", cygne: true,
       note: "Fragrance-free formula essential. CeraVe Moisturizing Cream is a reliable baseline.",
     });
   }
@@ -188,7 +195,7 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
       type: "addition", priority: 4,
       title: "Consider introducing a retinoid",
       body: "Retinoids are the most studied active for fine lines — they accelerate cell turnover and stimulate collagen production. Nothing else comes close in terms of evidence.",
-      tag: "Fine Lines", tagColor: "#9a8070", cygne: true,
+      tag: "Fine Lines", tagColor: "#9a8070", category: "Serum", cygne: true,
       note: "Start at 0.025–0.05% retinol, 1–2× per week. Expect a 12-week adjustment period.",
     });
   }
@@ -198,7 +205,7 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
       type: "addition", priority: 4,
       title: "Add a chemical exfoliant for texture",
       body: "Texture is primarily a cell turnover issue. AHA (glycolic, lactic) dissolves the bonds between dead skin cells and resurfaces the top layer — physical scrubs can't match this.",
-      tag: "Texture", tagColor: "#9a8070", cygne: true,
+      tag: "Texture", tagColor: "#9a8070", category: "Exfoliant", cygne: true,
       note: "Lactic acid 5–10% is gentler and a good starting point. Use 2–3× per week, PM only.",
     });
   }
@@ -243,7 +250,7 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
 
 // --- MY ROUTINE ---------------------------------------------------------------
 
-function RecommendationCard({ rec }) {
+function RecommendationCard({ rec, onAdd }) {
   const [expanded, setExpanded] = useState(false);
   const typeIcon = { addition: "plus", swap: "layers", simplify: "drop" };
   const typeLabelMap = { addition: "Add", swap: "Swap", simplify: "Simplify" };
@@ -283,6 +290,16 @@ function RecommendationCard({ rec }) {
               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{rec.note}</p>
             </div>
           )}
+          {rec.type === "addition" && rec.category && onAdd && (
+            <button
+              onClick={e => { e.stopPropagation(); onAdd(rec.category); }}
+              style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4, padding: "8px 14px", background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.30)", borderRadius: 9, cursor: "pointer", transition: "background 0.15s" }}
+              onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.18)"}
+              onMouseLeave={e => e.currentTarget.style.background = "rgba(122,144,112,0.10)"}>
+              <Icon name="plus" size={11} color="#7a9070" />
+              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 600, color: "#7a9070", letterSpacing: "0.08em", textTransform: "uppercase" }}>Add {rec.category} to vanity</span>
+            </button>
+          )}
         </div>
       )}
     </div>
@@ -306,6 +323,7 @@ function buildRefinements(products, activeMap, conflicts) {
         body: `You have ${prods.map(p => `${p.brand} ${p.name}`).join(" and ")}. Layering two ${cat.toLowerCase()}s adds no benefit and can overload the skin.`,
         action: `Keep your preferred ${cat.toLowerCase()}. Remove the other — or save it for travel.`,
         trigger: "duplicate",
+        product: prods[1],
       });
     }
   });
@@ -392,6 +410,7 @@ function buildRefinements(products, activeMap, conflicts) {
         body: `${overlap.map(p => p.name).join(", ")} share active ingredients. A multi-active serum covering the same ground in one product would simplify your ritual and reduce layering risk.`,
         action: "Look for a single well-formulated serum combining your key actives. Retire the duplicates.",
         trigger: "serum-overlap",
+        product: overlap[0],
         cygne: true,
       });
     }
@@ -406,6 +425,7 @@ function buildRefinements(products, activeMap, conflicts) {
       body: "L-Ascorbic acid is unstable and degrades when exposed to heat, air, and especially alongside retinol. If your Vitamin C isn't in a dedicated AM product, it may not be delivering.",
       action: "Swap to a stabilized Vitamin C derivative (ascorbyl glucoside, SAP) or ensure it's used AM-only in an airtight formula.",
       trigger: "vitc-instability",
+      product: (activeMap["vitamin C"] || [])[0] || null,
       cygne: true,
     });
   }
@@ -525,7 +545,7 @@ function RefinementsCard({ products, activeMap, conflicts }) {
   );
 }
 
-function RefinementItem({ r, vs }) {
+function RefinementItem({ r, vs, onEdit }) {
   const [open, setOpen] = useState(false);
   return (
     <div onClick={() => setOpen(o => !o)}
@@ -543,10 +563,20 @@ function RefinementItem({ r, vs }) {
         <div style={{ marginTop: 11, paddingTop: 11, borderTop: "1px solid var(--border)" }}>
           <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: "0 0 9px", lineHeight: 1.65 }}>{r.body}</p>
           {r.action && (
-            <div style={{ display: "flex", gap: 8, padding: "9px 11px", background: `${vs.color}0d`, borderRadius: 8, border: `1px solid ${vs.color}28` }}>
+            <div style={{ display: "flex", gap: 8, padding: "9px 11px", background: `${vs.color}0d`, borderRadius: 8, border: `1px solid ${vs.color}28`, marginBottom: r.product && onEdit ? 8 : 0 }}>
               <span style={{ color: vs.color, flexShrink: 0, marginTop: 1 }}><Icon name="check" size={11} /></span>
               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--parchment)", margin: 0, lineHeight: 1.55 }}>{r.action}</p>
             </div>
+          )}
+          {r.product && onEdit && (
+            <button
+              onClick={e => { e.stopPropagation(); onEdit(r.product); }}
+              style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4, padding: "8px 14px", background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.30)", borderRadius: 9, cursor: "pointer", transition: "background 0.15s" }}
+              onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.18)"}
+              onMouseLeave={e => e.currentTarget.style.background = "rgba(122,144,112,0.10)"}>
+              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 600, color: "#7a9070", letterSpacing: "0.08em", textTransform: "uppercase" }}>Edit {r.product.brand ? `${r.product.brand} ${r.product.name}` : r.product.name}</span>
+              <Icon name="chevron" size={11} color="#7a9070" />
+            </button>
           )}
         </div>
       )}
@@ -558,4 +588,4 @@ function RefinementItem({ r, vs }) {
 // --- RITUAL GUIDANCE ENGINE ---------------------------------------------------
 
 
-export { buildRecommendations, RecommendationCard, buildRefinements, RefinementsCard };
+export { buildRecommendations, RecommendationCard, buildRefinements, RefinementsCard, RefinementItem };
