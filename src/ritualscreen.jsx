@@ -234,7 +234,7 @@ function getSwanGuidingLine(products, checkIns = [], user = {}, cycleDay = null,
   return "Your ritual is ready. Take your time with it.";
 }
 
-function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false, journals = [], checkIns = [], setCheckIns = () => {}, completedSteps: completedStepsProp, setCompletedSteps: setCompletedStepsProp, onUpdateUser, setTab = () => {}, setModal = () => {} }) {
+function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false, journals = [], checkIns = [], setCheckIns = () => {}, completedSteps: completedStepsProp, setCompletedSteps: setCompletedStepsProp, onUpdateUser, setTab = () => {}, setModal = () => {}, dismissedSuggestions = [], onDismissSuggestion = () => {} }) {
   const session = getCurrentSession();
   const { am, pm, periodic } = buildRoutine(products);
   const conflicts = detectConflicts(products);
@@ -265,10 +265,12 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
 
   const recs = buildRecommendations(products, activeMap, conflicts, user);
   const refinements = buildRefinements(products, activeMap, conflicts);
-  const additions = recs.filter(r => r.type === "addition");
-  const swaps     = recs.filter(r => r.type === "swap");
-  const simplifications = recs.filter(r => r.type === "simplify");
-  const totalRecs = recs.length + refinements.length;
+  const dismissed = new Set(dismissedSuggestions);
+  const additions = recs.filter(r => r.type === "addition" && !dismissed.has(r.trigger));
+  const swaps     = recs.filter(r => r.type === "swap"     && !dismissed.has(r.trigger));
+  const simplifications = recs.filter(r => r.type === "simplify" && !dismissed.has(r.trigger));
+  const visibleRefinements = refinements.filter(r => !dismissed.has(r.trigger));
+  const totalRecs = additions.length + swaps.length + simplifications.length + visibleRefinements.length;
 
   const onAdd = (category) => {
     setTab("shelf");
@@ -463,7 +465,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
               { id: "additions", label: "Add",      count: additions.length,      icon: "plus" },
               { id: "swaps",     label: "Swap",     count: swaps.length,          icon: "layers" },
               { id: "simplify",  label: "Simplify", count: simplifications.length, icon: "drop" },
-              { id: "refine",    label: "Refine",   count: refinements.length,    icon: "sparkle" },
+              { id: "refine",    label: "Refine",   count: visibleRefinements.length, icon: "sparkle" },
             ].filter(t => t.count > 0).map(t => (
               <button key={t.id} onClick={() => setRecTab(t.id)}
                 style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 12px", borderRadius: 20, border: `1px solid ${recTab === t.id ? "#7a9070" : "var(--border)"}`, background: recTab === t.id ? "rgba(122,144,112,0.11)" : "transparent", color: recTab === t.id ? "#7a9070" : "var(--clay)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: recTab === t.id ? 700 : 400, cursor: "pointer", letterSpacing: "0.1em", textTransform: "uppercase", transition: "all 0.16s" }}>
@@ -475,12 +477,12 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
           </div>
 
           <div>
-            {recTab === "additions"  && additions.map((r, i) => <RecommendationCard key={i} rec={r} onAdd={onAdd} />)}
-            {recTab === "swaps"      && swaps.map((r, i) => <RecommendationCard key={i} rec={r} />)}
-            {recTab === "simplify"   && simplifications.map((r, i) => <RecommendationCard key={i} rec={r} />)}
-            {recTab === "refine"     && refinements.map((r, i) => {
+            {recTab === "additions"  && additions.map((r, i) => <RecommendationCard key={r.trigger || i} rec={r} onAdd={onAdd} onDismiss={r.trigger ? () => onDismissSuggestion(r.trigger) : undefined} />)}
+            {recTab === "swaps"      && swaps.map((r, i) => <RecommendationCard key={r.trigger || i} rec={r} onDismiss={r.trigger ? () => onDismissSuggestion(r.trigger) : undefined} />)}
+            {recTab === "simplify"   && simplifications.map((r, i) => <RecommendationCard key={r.trigger || i} rec={r} onDismiss={r.trigger ? () => onDismissSuggestion(r.trigger) : undefined} />)}
+            {recTab === "refine"     && visibleRefinements.map((r, i) => {
               const vs = refineVerbStyle[r.verb] || { color: "#7a9070", bg: "rgba(122,144,112,0.08)", border: "rgba(122,144,112,0.28)" };
-              return <RefinementItem key={i} r={r} vs={vs} onEdit={onEdit} />;
+              return <RefinementItem key={r.trigger || i} r={r} vs={vs} onEdit={onEdit} onDismiss={r.trigger ? () => onDismissSuggestion(r.trigger) : undefined} />;
             })}
           </div>
 

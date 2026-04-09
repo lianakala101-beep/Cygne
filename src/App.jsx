@@ -80,6 +80,7 @@ export default function App() {
   const [waitingRoom, setWaitingRoom] = useLocalStorage("cygne_waitingroom", []);
   const [completedSteps, setCompletedSteps] = useLocalStorage("cygne_completedsteps", { date: null, steps: [] });
   const [fitSheet, setFitSheet] = useState(null);
+  const [dismissedSuggestions, setDismissedSuggestions] = useLocalStorage("cygne_dismissed_suggestions", []);
 
   // Track whether initial load from Supabase is done (prevents overwriting cloud data with empty localStorage)
   const profileLoaded = useRef(false);
@@ -148,6 +149,10 @@ export default function App() {
       if (meta.checkIns && Array.isArray(meta.checkIns)) {
         setCheckIns(meta.checkIns);
       }
+      // Restore dismissed suggestions from Supabase
+      if (meta.dismissedSuggestions && Array.isArray(meta.dismissedSuggestions)) {
+        setDismissedSuggestions(meta.dismissedSuggestions);
+      }
       profileLoaded.current = true;
       setNeedsOnboarding(false);
     } else {
@@ -173,6 +178,22 @@ export default function App() {
     if (!profileLoaded.current || !authSession) return;
     supabase.auth.updateUser({ data: { completedSteps } }).catch(() => {});
   }, [completedSteps]);
+
+  // -- Sync dismissed suggestions to Supabase when they change ---------------
+  useEffect(() => {
+    if (!profileLoaded.current || !authSession) return;
+    supabase.auth.updateUser({ data: { dismissedSuggestions } }).catch(() => {});
+  }, [dismissedSuggestions]);
+
+  // -- Regenerate: clear dismissed suggestions when products change -----------
+  const prevProductIds = useRef(null);
+  useEffect(() => {
+    const ids = products.map(p => p.id).sort().join(",");
+    if (prevProductIds.current !== null && prevProductIds.current !== ids) {
+      setDismissedSuggestions([]);
+    }
+    prevProductIds.current = ids;
+  }, [products]);
 
   // Save profile to Supabase user_metadata
   const saveUserProfile = async (profileData) => {
@@ -382,7 +403,7 @@ export default function App() {
       {/* Content */}
       <div style={{ maxWidth: 600, margin: "0 auto", padding: "32px 22px 0", animation: "fadeUp 0.3s ease" }} key={tab}>
         {tab === "dashboard" && <Dashboard products={products} setTab={setTab} checkIns={checkIns} swanPopupDismissed={swanPopupDismissed} onDismissSwanPopup={dismissSwanPopup} treatments={treatments} locationData={locationData} user={user} theme={theme} notifPermission={notifPermission} onRequestNotif={requestNotifications} notifDismissed={notifDismissed} onDismissNotif={() => setNotifDismissed(true)} journals={journals} setCheckIns={setCheckIns} onLoadDemo={() => setProducts(DEMO_PRODUCTS)} />}
-        {tab === "routine"   && <MyRoutine products={products} user={user} cycleDay={user?.cycleDay || null} isFlightMode={false} journals={journals} checkIns={checkIns} setCheckIns={setCheckIns} completedSteps={completedSteps} setCompletedSteps={setCompletedSteps} onUpdateUser={updateUser} setTab={setTab} setModal={setModal} />}
+        {tab === "routine"   && <MyRoutine products={products} user={user} cycleDay={user?.cycleDay || null} isFlightMode={false} journals={journals} checkIns={checkIns} setCheckIns={setCheckIns} completedSteps={completedSteps} setCompletedSteps={setCompletedSteps} onUpdateUser={updateUser} setTab={setTab} setModal={setModal} dismissedSuggestions={dismissedSuggestions} onDismissSuggestion={trigger => setDismissedSuggestions(prev => [...new Set([...prev, trigger])])} />}
         {tab === "shelf" && <Shelf
           products={products}
           onEdit={p => setModal(p)}
