@@ -39,7 +39,11 @@ function buildRoutine(products) {
     if (p.session === "pm")   { pm.push(p); return; }
     if (p.session === "both") { am.push(p); pm.push(p); return; }
 
-    // Auto-detection fallback
+    // Category-based session lock (matches getLockedSession in productmodal)
+    if (p.category === "SPF")          { am.push(p); return; }
+    if (p.category === "Prescription") { pm.push(p); return; }
+
+    // Ingredient auto-detection fallback
     const actives = detectActives(p.ingredients);
     const isToningPad = p.category === "Toning Pad";
     if (isToningPad) {
