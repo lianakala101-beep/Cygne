@@ -111,7 +111,7 @@ function ShelfLifeSection({ form, set }) {
             <div><label style={labelSt}>Expiry date</label><input style={inputSt2} type="date" value={form.expiryDate || ""} onChange={e => set("expiryDate", e.target.value)} /></div>
             <div><label style={labelSt}>Opened on</label><input style={inputSt2} type="date" value={form.openedDate || ""} onChange={e => set("openedDate", e.target.value)} /></div>
           </div>
-          <label style={labelSt}>PAO</label>
+          <label style={labelSt}>Period After Opening</label>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
             {[null, 3, 6, 9, 12, 18, 24].map(m => {
               const active = (form.paoMonths ?? null) === m;

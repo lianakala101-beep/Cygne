@@ -34,8 +34,8 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         const paoExp = new Date(p.openedDate);
         paoExp.setMonth(paoExp.getMonth() + p.paoMonths);
         const days = Math.ceil((paoExp - now) / 86400000);
-        if (days <= 0) alerts.push({ severity: "high", label: `${p.name} - PAO exceeded`, detail: `This product was opened ${p.paoMonths}M ago and is past its period after opening. Its efficacy and safety may be compromised.` });
-        else if (days <= 30) alerts.push({ severity: "medium", label: `${p.name} - PAO ending soon`, detail: `${days} day${days === 1 ? "" : "s"} left within its ${p.paoMonths}M period after opening.` });
+        if (days <= 0) alerts.push({ severity: "high", label: `${p.name} - period after opening exceeded`, detail: `This product was opened ${p.paoMonths}M ago and is past its period after opening. Its efficacy and safety may be compromised.` });
+        else if (days <= 30) alerts.push({ severity: "medium", label: `${p.name} - period after opening ending soon`, detail: `${days} day${days === 1 ? "" : "s"} left within its ${p.paoMonths}M period after opening.` });
       }
       return alerts;
     }),

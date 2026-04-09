@@ -68,8 +68,8 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
       const paoExp = new Date(opened);
       paoExp.setMonth(paoExp.getMonth() + product.paoMonths);
       const days = Math.ceil((paoExp - now) / 86400000);
-      if (days <= 0) return { label: `PAO expired ${Math.abs(days)}d ago`, color: "#c06060", bg: "rgba(192,96,96,0.08)", border: "rgba(192,96,96,0.25)" };
-      if (days <= 30) return { label: `PAO: ${days}d left`, color: "#c49040", bg: "rgba(196,144,64,0.08)", border: "rgba(196,144,64,0.25)" };
+      if (days <= 0) return { label: `Period after opening exceeded ${Math.abs(days)}d ago`, color: "#c06060", bg: "rgba(192,96,96,0.08)", border: "rgba(192,96,96,0.25)" };
+      if (days <= 30) return { label: `Period after opening: ${days}d left`, color: "#c49040", bg: "rgba(196,144,64,0.08)", border: "rgba(196,144,64,0.25)" };
     }
     return null;
   })();
