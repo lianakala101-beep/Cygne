@@ -41,11 +41,13 @@ function useLocalStorage(key, initialValue) {
     } catch { return initialValue; }
   });
   const setValue = (value) => {
-    try {
-      const next = typeof value === "function" ? value(storedValue) : value;
-      setStoredValue(next);
-      localStorage.setItem(key, JSON.stringify(next));
-    } catch { setStoredValue(value); }
+    setStoredValue(prev => {
+      try {
+        const next = typeof value === "function" ? value(prev) : value;
+        localStorage.setItem(key, JSON.stringify(next));
+        return next;
+      } catch { return typeof value === "function" ? value(prev) : value; }
+    });
   };
   return [storedValue, setValue];
 }

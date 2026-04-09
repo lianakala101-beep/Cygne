@@ -685,7 +685,7 @@ function TreatmentRecoveryCard({ treatment, products, activeMap, onDismiss }) {
   );
 }
 
-function TreatmentSection({ treatments, setTreatments, products, activeMap }) {
+function TreatmentSection({ treatments, saveTreatment, removeTreatment, products, activeMap }) {
   const [addOpen, setAddOpen] = useState(false);
   const activeTreatments = treatments.filter(t => {
     const r = getTreatmentPhase(t);
@@ -721,14 +721,14 @@ function TreatmentSection({ treatments, setTreatments, products, activeMap }) {
             treatment={t}
             products={products}
             activeMap={activeMap}
-            onDismiss={() => setTreatments(prev => prev.filter(x => x.id !== t.id))}
+            onDismiss={() => removeTreatment(t.id)}
           />
         ))
       )}
 
       {addOpen && (
         <AddTreatmentModal
-          onSave={t => { setTreatments(prev => [...prev, t]); setAddOpen(false); }}
+          onSave={t => { saveTreatment(t); setAddOpen(false); }}
           onClose={() => setAddOpen(false)}
         />
       )}
@@ -1041,7 +1041,7 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
   );
 }
 
-function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatments, user = {}, onAdvanceRamp, onHoldRamp, journals = [], setJournals = () => {}, onUpdateUser = () => {} }) {
+function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatments, saveTreatment, removeTreatment, user = {}, onAdvanceRamp, onHoldRamp, journals = [], setJournals = () => {}, onUpdateUser = () => {} }) {
   const [showCheckIn, setShowCheckIn] = useState(false);
   const [showJournal, setShowJournal] = useState(false);
   const { activeMap } = analyzeShelf(products);
@@ -1208,7 +1208,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
       {/* -- Treatments --------------------------------------------------------- */}
       {sectionLabel("drop", "Treatments")}
       <div style={{ marginBottom: 28 }}>
-        <TreatmentSection treatments={treatments} setTreatments={setTreatments} products={products} activeMap={activeMap} />
+        <TreatmentSection treatments={treatments} saveTreatment={saveTreatment} removeTreatment={removeTreatment} products={products} activeMap={activeMap} />
       </div>
 
       {/* -- Body Acne --------------------------------------------------------- */}

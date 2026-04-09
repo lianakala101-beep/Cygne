@@ -206,11 +206,21 @@ export default function App() {
     }
   };
 
-  // -- Sync treatments to Supabase when they change ---------------------------
-  useEffect(() => {
-    if (!profileLoaded.current || !authSession) return;
-    supabase.auth.updateUser({ data: { treatments } }).catch(() => {});
-  }, [treatments]);
+  // -- Treatment CRUD with immediate Supabase persistence ----------------------
+  const saveTreatment = (treatment) => {
+    setTreatments(prev => {
+      const next = [...prev, treatment];
+      if (authSession) supabase.auth.updateUser({ data: { treatments: next } }).catch(e => console.error("[Cygne] treatment save failed:", e));
+      return next;
+    });
+  };
+  const removeTreatment = (id) => {
+    setTreatments(prev => {
+      const next = prev.filter(t => t.id !== id);
+      if (authSession) supabase.auth.updateUser({ data: { treatments: next } }).catch(e => console.error("[Cygne] treatment remove failed:", e));
+      return next;
+    });
+  };
 
   // -- Sync journals to Supabase when they change ----------------------------
   useEffect(() => {
@@ -504,7 +514,7 @@ export default function App() {
           checkIns={checkIns}
           user={user}
         />}
-        {tab === "progress"  && <Progress products={products} checkIns={checkIns} setCheckIns={setCheckIns} treatments={treatments} setTreatments={setTreatments} user={user} onAdvanceRamp={advanceRamp} onHoldRamp={holdRamp} journals={journals} setJournals={setJournals} onUpdateUser={updateUser} />}
+        {tab === "progress"  && <Progress products={products} checkIns={checkIns} setCheckIns={setCheckIns} treatments={treatments} setTreatments={setTreatments} saveTreatment={saveTreatment} removeTreatment={removeTreatment} user={user} onAdvanceRamp={advanceRamp} onHoldRamp={holdRamp} journals={journals} setJournals={setJournals} onUpdateUser={updateUser} />}
       </div>
 
       {/* Bottom nav */}
