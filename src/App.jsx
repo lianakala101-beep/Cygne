@@ -143,9 +143,12 @@ export default function App() {
         notifEnabled: meta.notifEnabled || false,
         completedSteps: meta.completedSteps || null,
       });
-      // Restore notification state (don't reset notifDismissed — that's a UI-only preference)
+      // Restore notification state
       if (meta.notifEnabled) {
         setNotifPermission("granted");
+      }
+      if (meta.notifDismissed) {
+        setNotifDismissed(true);
       }
       // Restore completed steps from Supabase
       if (meta.completedSteps) {
@@ -202,6 +205,12 @@ export default function App() {
     if (!profileLoaded.current || !authSession) return;
     supabase.auth.updateUser({ data: { completedSteps } }).catch(() => {});
   }, [completedSteps]);
+
+  // -- Sync notifDismissed to Supabase when it changes -----------------------
+  useEffect(() => {
+    if (!profileLoaded.current || !authSession) return;
+    supabase.auth.updateUser({ data: { notifDismissed } }).catch(() => {});
+  }, [notifDismissed]);
 
   // -- Sync treatments to Supabase when they change --------------------------
   useEffect(() => {
