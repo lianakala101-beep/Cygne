@@ -555,11 +555,11 @@ export default function App() {
         />
       )}
       {scanOpen && <ScanModal products={products} onAddToShelf={p => {
-          const ingredients = Array.isArray(p.ingredients) ? p.ingredients : (p.ingredients || "").split(",").map(s => s.trim().toLowerCase()).filter(Boolean);
+          const ingredients = Array.isArray(p.ingredients) ? p.ingredients.join(", ") : (p.ingredients || "");
           // Infer category from ingredients/name when the scan didn't return one
           const inferCategory = () => {
             const name = (p.name || "").toLowerCase();
-            const text = name + " " + ingredients.join(" ");
+            const text = name + " " + ingredients.toLowerCase();
             if (/cleanser|wash|foam|cleansing/.test(text)) return "Cleanser";
             if (/sunscreen|spf/.test(text)) return "SPF";
             if (/moistur|cream|lotion|balm/.test(text)) return "Moisturizer";
@@ -570,20 +570,16 @@ export default function App() {
             if (/exfoliant|peel|scrub|acid pad/.test(text)) return "Exfoliant";
             return "Serum";
           };
-          const newProduct = {
-            id: Date.now().toString(),
+          // Open ProductModal pre-populated with scan data so user can review
+          setScanOpen(false);
+          setModal({
             brand: p.brand || "",
             name: p.name || "",
             category: p.category || inferCategory(),
             spf: p.spf || null,
+            price: "",
             ingredients,
-            inRoutine: true,
-            session: "auto",
-            frequency: "daily",
-            price: 0,
-          };
-          setProducts(prev => [...prev, newProduct]);
-          setScanOpen(false);
+          });
         }} onClose={() => setScanOpen(false)} />}
     </div>
   );

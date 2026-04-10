@@ -132,7 +132,7 @@ function ShelfLifeSection({ form, set }) {
 function ProductModal({ product, onSave, onClose, user }) {
   const [form, setForm] = useState(product || { brand: "", name: "", category: "Serum", price: "", ingredients: "" });
   const [analyzing, setAnalyzing] = useState(false);
-  const [modalStep, setModalStep] = useState(product && product.id ? "form" : "choose");
+  const [modalStep, setModalStep] = useState(product && (product.id || product.brand) ? "form" : "choose");
   const fileRef = useRef();
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
@@ -219,13 +219,14 @@ function ProductModal({ product, onSave, onClose, user }) {
       const jsonEnd = clean.lastIndexOf("}");
       const jsonStr = jsonStart >= 0 && jsonEnd >= 0 ? clean.slice(jsonStart, jsonEnd + 1) : "{}";
       const parsed = JSON.parse(jsonStr);
+      const ing = Array.isArray(parsed.ingredients) ? parsed.ingredients.join(", ") : (parsed.ingredients || "");
       setForm(f => ({
         ...f,
         brand: parsed.brand || f.brand,
         name: parsed.name || f.name,
         category: parsed.category || f.category,
         spf: parsed.spf || f.spf || null,
-        ingredients: parsed.ingredients || f.ingredients,
+        ingredients: ing || f.ingredients,
       }));
       setModalStep("form");
     } catch (err) { console.error(err); setModalStep("form"); }
