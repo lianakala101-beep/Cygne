@@ -1041,10 +1041,80 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
   );
 }
 
+function JournalFullView({ journals, onClose, onEditToday }) {
+  const today = new Date().toISOString().split("T")[0];
+  const sorted = [...journals].sort((a, b) => b.date.localeCompare(a.date));
+
+  // Group by month
+  const groups = [];
+  let currentMonth = null;
+  for (const j of sorted) {
+    const d = new Date(j.date + "T12:00:00");
+    const monthKey = d.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+    if (monthKey !== currentMonth) {
+      currentMonth = monthKey;
+      groups.push({ month: monthKey, entries: [] });
+    }
+    groups[groups.length - 1].entries.push(j);
+  }
+
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 2000, background: "var(--ink)", overflowY: "auto", padding: "0 0 40px" }}>
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 20px 12px", borderBottom: "1px solid var(--border)" }}>
+        <button onClick={onClose}
+          style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+          ← Back
+        </button>
+        <h2 style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 30, fontWeight: 400, color: "var(--parchment)", margin: 0 }}>Skin Journal</h2>
+        <button onClick={onEditToday}
+          style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600, color: "#7a9070", background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+          + Log
+        </button>
+      </div>
+
+      <div style={{ padding: "0 20px" }}>
+        {groups.map(g => (
+          <div key={g.month}>
+            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)", margin: "24px 0 10px", opacity: 0.7 }}>{g.month}</p>
+            {g.entries.map(j => {
+              const c = SKIN_CONDITIONS.find(x => x.key === j.condition);
+              const d = new Date(j.date + "T12:00:00");
+              const isToday = j.date === today;
+              const dateLabel = isToday ? "Today" : d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+              return (
+                <div key={j.date} style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "14px 16px", marginBottom: 8 }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: j.notes ? 8 : 0 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <div style={{ width: 8, height: 8, borderRadius: "50%", background: c ? c.color : "var(--clay)", flexShrink: 0 }} />
+                      <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: isToday ? "var(--parchment)" : "var(--clay)" }}>{dateLabel}</span>
+                      <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: c ? c.color : "var(--parchment)", fontWeight: 600 }}>{c ? c.label : j.condition}</span>
+                    </div>
+                    <div style={{ display: "flex", gap: 5 }}>
+                      {j.sleep && <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--clay)", background: "var(--ink)", padding: "2px 7px", borderRadius: 20 }}>Sleep {j.sleep}</span>}
+                      {j.stress && <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--clay)", background: "var(--ink)", padding: "2px 7px", borderRadius: 20 }}>Stress {j.stress}</span>}
+                    </div>
+                  </div>
+                  {j.notes && (
+                    <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.5, opacity: 0.8 }}>{j.notes}</p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        ))}
+        {sorted.length === 0 && (
+          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", textAlign: "center", marginTop: 40, opacity: 0.6 }}>No journal entries yet. Start logging to see your history.</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatments, saveTreatment, removeTreatment, user = {}, onAdvanceRamp, onHoldRamp, journals = [], setJournals = () => {}, onUpdateUser = () => {} }) {
   const [showCheckIn, setShowCheckIn] = useState(false);
   const [showJournal, setShowJournal] = useState(false);
-  const [journalExpanded, setJournalExpanded] = useState(false);
+  const [journalFullView, setJournalFullView] = useState(false);
   const { activeMap } = analyzeShelf(products);
   const conflicts = detectConflicts(products);
 
@@ -1086,10 +1156,11 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
         const today = new Date().toISOString().split("T")[0];
         const todayEntry = journals.find(j => j.date === today);
         const pastEntries = [...journals].filter(j => j.date !== today).sort((a, b) => b.date.localeCompare(a.date));
-        const visiblePast = journalExpanded ? pastEntries : pastEntries.slice(0, 3);
+        const visiblePast = pastEntries.slice(0, 3);
         const cond = todayEntry ? SKIN_CONDITIONS.find(c => c.key === todayEntry.condition) : null;
         return (
           <div style={{ marginBottom: 24 }}>
+            {/* Today's featured card */}
             {!todayEntry ? (
               <button onClick={() => setShowJournal(true)}
                 style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "15px 18px", background: "rgba(122,144,112,0.07)", border: "1px solid rgba(122,144,112,0.18)", borderRadius: 14, cursor: "pointer" }}>
@@ -1112,12 +1183,17 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
                 </div>
               </div>
             )}
+
+            {/* Previous entries (max 3) */}
+            {visiblePast.length > 0 && (
+              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)", margin: "14px 0 6px", opacity: 0.7 }}>Previous entries</p>
+            )}
             {visiblePast.map(j => {
               const c = SKIN_CONDITIONS.find(x => x.key === j.condition);
               const d = new Date(j.date + "T12:00:00");
               const label = d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
               return (
-                <div key={j.date} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 18px", background: "var(--surface)", borderTop: "none", border: "1px solid var(--border)", marginTop: -1 }}>
+                <div key={j.date} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 18px", background: "var(--surface)", border: "1px solid var(--border)", marginTop: -1, borderRadius: 0 }}>
                   <div style={{ width: 7, height: 7, borderRadius: "50%", background: c ? c.color : "var(--clay)", flexShrink: 0 }} />
                   <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", flex: 1 }}>{label}</span>
                   <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: c ? c.color : "var(--parchment)", fontWeight: 500 }}>{c ? c.label : j.condition}</span>
@@ -1125,10 +1201,12 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
                 </div>
               );
             })}
-            {pastEntries.length > 3 && (
-              <button onClick={() => setJournalExpanded(v => !v)}
-                style={{ width: "100%", padding: "9px 0", background: "var(--surface)", border: "1px solid var(--border)", borderTop: "none", marginTop: -1, borderRadius: "0 0 10px 10px", cursor: "pointer", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.08em", color: "var(--clay)", textAlign: "center" }}>
-                {journalExpanded ? "Show less" : `View all ${pastEntries.length} entries`}
+
+            {/* View all link */}
+            {pastEntries.length > 0 && (
+              <button onClick={() => setJournalFullView(true)}
+                style={{ width: "100%", padding: "9px 0", background: "var(--surface)", border: "1px solid var(--border)", borderTop: "none", marginTop: -1, borderRadius: "0 0 10px 10px", cursor: "pointer", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.08em", color: "#7a9070", textAlign: "center" }}>
+                View all {journals.length} entries →
               </button>
             )}
           </div>
@@ -1249,6 +1327,14 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
             setShowJournal(false);
           }}
           onClose={() => setShowJournal(false)}
+        />
+      )}
+
+      {journalFullView && (
+        <JournalFullView
+          journals={journals}
+          onClose={() => setJournalFullView(false)}
+          onEditToday={() => { setJournalFullView(false); setShowJournal(true); }}
         />
       )}
     </div>
