@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Icon, Section, FlagCard } from "./components.jsx";
 import { detectActives, analyzeShelf } from "./engine.js";
 import { getSeason } from "./seasonal.jsx";
+import { supabase } from "./supabase.js";
 
 
 // SCAN MODAL
@@ -100,24 +101,26 @@ function ScanModal({ products, onAddToShelf, onClose }) {
     });
     try {
       const shelfSummary = products.map(p => ({ name: p.name, category: p.category, actives: Object.keys(detectActives(p.ingredients || [])) }));
-      const resp = await fetch("https://mxcefgbaaylddnyxrnao.supabase.co/functions/v1/rapid-action", {
-        method: "POST", headers: { "Content-Type": "application/json", "apikey": "sb_publishable_6kUbORFpskKo-zg6r0MZtA_x5ppPvin", "Authorization": "Bearer sb_publishable_6kUbORFpskKo-zg6r0MZtA_x5ppPvin" },
-        body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 1500, messages: [{ role: "user", content: [
+      console.log("[Cygne scan] sending photo, base64 length:", base64.length, "type:", file.type);
+      const { data, error } = await supabase.functions.invoke("rapid-action", {
+        body: { model: "claude-sonnet-4-20250514", max_tokens: 1500, messages: [{ role: "user", content: [
           { type: "image", source: { type: "base64", media_type: file.type, data: base64 } },
           { type: "text", text: "Analyze this skincare product image. You are an international product expert. Fully support: KOREAN (COSRX, Innisfree, Laneige, Sulwhasoo, Anua, Beauty of Joseon, Skin1004, Torriden, Tirtir, Numbuzin, Round Lab, Abib, Isntree, Mixsoon, Haruharu Wonder, Axis-Y, Some By Mi, Medicube, Dr. Jart, I'm From, Klairs, Purito, Benton, Mediheal) — read Hangul. JAPANESE (SK-II, Hada Labo, DHC, Shiseido, Tatcha, Rohto, Curel, Kose, Minon, Kanebo, Kiehl's Japan, Albion, Decorté, Kose Sekkisei) — read Kanji/Hiragana/Katakana. FRENCH PHARMACY/LUXURY (La Roche-Posay, Avène, Bioderma, Vichy, Uriage, A-Derma, Caudalie, Nuxe, Embryolisse, Filorga, Biotherm, Clarins, Sisley, Darphin). AUSTRALIAN (Aesop, Ultra Violette, Sand & Sky, Jurlique, Grown Alchemist, Frank Body, Bondi Sands, Alpha-H, Rationale, Medik8). BRITISH/EUROPEAN (The Ordinary, NIOD, Deciem, Pai, Emma Hardie, Liz Earle, Eve Lom, Weleda, Dr. Hauschka, Eucerin, Hydraluron, Allies of Skin). Recognize international categories: Korean essence/ampoule/sleeping mask/sheet mask/softener, Japanese milky lotion (nyuueki)/lotion (keshouisui, actually a hydrating toner)/emulsion, French eau thermale/eau micellaire (micellar water)/lait/crème, Australian SPF serums. INGREDIENT NORMALIZATION — map local names to INCI English: oxyde de zinc → zinc oxide, eau thermale → thermal spring water, acide hyaluronique → hyaluronic acid, melaleuca → tea tree oil, kakadu plum → Terminalia ferdinandiana, quandong → Santalum acuminatum, galactomyces/pitera → Galactomyces Ferment Filtrate, placenta extract → placental protein, fullerene → fullerenes, snail mucin → snail secretion filtrate, centella asiatica → Centella Asiatica Extract, madecassoside, asiaticoside, heartleaf → Houttuynia Cordata, mugwort → Artemisia, propolis, rice ferment → Rice Ferment Filtrate, birch sap → Betula Alba Juice, niacinamide, bifida ferment lysate. FLAG (do not warn) ingredients restricted in the US but common abroad: Tinosorb S/Bemotrizinol, Tinosorb M/Bisoctrizole, Mexoryl SX/Ecamsule, Mexoryl XL/Drometrizole Trisiloxane, Uvinul A Plus, Uvinul T 150, Enzacamene, Iscotrizinol, hydroquinone >2%, tranexamic acid (prescription in US). Add these to a 'flags' array as informational notes, NOT conflicts. CATEGORIZATION RULES — choose the most accurate category based on what the product ACTUALLY is; NEVER default to Serum unless the product is genuinely a serum. SPF LOGIC: (1) If SPF 30+ and the product is primarily a sunscreen with minimal moisturizing claims → 'SPF'. (2) If SPF 15 or lower and the product is primarily a moisturizer with incidental sun protection → 'Moisturizer' (put the SPF value in the 'spf' field). (3) If SPF 30+ AND the product is marketed as a moisturizer/day cream with heavy hydration (ceramides, hyaluronic acid, shea butter, squalane, 'hydrating', 'moisturizing sunscreen', 'day cream SPF', 'SPF moisturizer') → 'SPF Moisturizer'. User's vanity: " + JSON.stringify(shelfSummary) + ". Return ONLY valid JSON (no markdown) with fields: brand, name, category (Cleanser/Toner/Essence/Serum/Ampoule/Eye Cream/Moisturizer/SPF Moisturizer/SPF/Oil/Exfoliant/Mask/Sleeping Mask/Sheet Mask/Treatment/Mist/Lip Care/Milky Lotion/Micellar Water/Emulsion), spf (numeric SPF level if present, else null), ingredients (array of INCI English strings), actives (array), verdict (pass/caution/skip), headline, reason, conflicts (array), duplicates (array), flags (array of informational notes)." }
-        ]}] })
+        ]}] }
       });
-      const data = await resp.json();
-      const text = (data.content || []).map(c => c.text || "").join("") || "{}";
+      if (error) { console.error("[Cygne scan] edge function error:", error); setMode("scan"); return; }
+      console.log("[Cygne scan] raw response:", data);
+      const text = (data.content || []).map(c => c.text || "").join("") || JSON.stringify(data);
       const clean = text.replace(/```json|```/g, "").trim();
       const jsonStart = clean.indexOf("{");
       const jsonEnd = clean.lastIndexOf("}");
       const jsonStr = jsonStart >= 0 && jsonEnd >= 0 ? clean.slice(jsonStart, jsonEnd + 1) : "{}";
       const parsed = JSON.parse(jsonStr);
+      console.log("[Cygne scan] parsed result:", parsed);
       setScanned(parsed);
       setVerdict(parsed.verdict || "pass");
       setMode("result");
-    } catch(err) { console.error("[Cygne scan]", err); setMode("scan"); }
+    } catch(err) { console.error("[Cygne scan] exception:", err); setMode("scan"); }
   };
 
   const handleFile = (e) => {
