@@ -8,7 +8,7 @@ import { EnvironmentStrip } from "./environment.jsx";
 import { WeekendNudgeCard } from "./weekend.jsx";
 import { SeasonalNudgeCard } from "./seasonal.jsx";
 import { getTreatmentPhase, TreatmentRecoveryCard, getCyclePhase } from "./progress.jsx";
-import { getCurrentCycleDay } from "./utils.jsx";
+import { getCurrentCycleDay, daysBetweenLocal } from "./utils.jsx";
 
 function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSwanPopup, treatments, locationData, user, theme, notifPermission, onRequestNotif, notifDismissed, onDismissNotif, journals, setCheckIns, onLoadDemo }) {
   const { flags } = analyzeShelf(products);
@@ -151,7 +151,9 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         })()}
 
         {/* 1. Swan Song card (intelligence) — always fully visible */}
-        <SwanSongCard currentSession={currentSession} asPopup={false} user={user} predictions={swanSensePredictions} />
+        <div style={{ marginBottom: 20 }}>
+          <SwanSongCard currentSession={currentSession} asPopup={false} user={user} predictions={swanSensePredictions} />
+        </div>
 
         {/* 2. Cycle phase — ambient pill, tap to expand */}
         {user?.cycleTrackingEnabled && currentCycleDay && (() => {
@@ -192,8 +194,8 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
 
         {/* 3. Check-in signal + reminders */}
         {(() => {
-          const last = checkIns[checkIns.length - 1];
-          const daysSince = last ? Math.floor((Date.now() - new Date(last.date)) / 86400000) : null;
+          const last = checkIns.length ? checkIns.reduce((a, b) => new Date(a.date) > new Date(b.date) ? a : b) : null;
+          const daysSince = last ? daysBetweenLocal(last.date) : null;
           const due = daysSince === null || daysSince >= 7;
           const msg = daysSince === null
             ? "No check-ins yet - log your first in Progress."
@@ -242,15 +244,23 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         })()}
 
         {/* 4. Recovery / daily tips / environment */}
-        <EnvironmentStrip products={products} activeMap={activeMap} locationData={locationData} tempUnit={user?.tempUnit || "C"} />
+        <div style={{ marginBottom: 20 }}>
+          <EnvironmentStrip products={products} activeMap={activeMap} locationData={locationData} tempUnit={user?.tempUnit || "C"} />
+        </div>
 
-        <WeekendNudgeCard products={products} activeMap={activeMap} />
+        <div style={{ marginBottom: 20 }}>
+          <WeekendNudgeCard products={products} activeMap={activeMap} />
+        </div>
 
         {treatments.filter(t => { const r = getTreatmentPhase(t); return r && r.phase && r.phase.label !== "Cleared"; }).map(t => (
-          <TreatmentRecoveryCard key={t.id} treatment={t} products={products} activeMap={activeMap} onDismiss={() => {}} />
+          <div key={t.id} style={{ marginBottom: 20 }}>
+            <TreatmentRecoveryCard treatment={t} products={products} activeMap={activeMap} onDismiss={() => {}} />
+          </div>
         ))}
 
-        <SeasonalNudgeCard products={products} activeMap={activeMap} locationData={locationData} />
+        <div style={{ marginBottom: 20 }}>
+          <SeasonalNudgeCard products={products} activeMap={activeMap} locationData={locationData} />
+        </div>
 
         {/* Current session routine card */}
         {(() => {

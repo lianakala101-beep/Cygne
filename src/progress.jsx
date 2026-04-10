@@ -1044,6 +1044,7 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
 function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatments, saveTreatment, removeTreatment, user = {}, onAdvanceRamp, onHoldRamp, journals = [], setJournals = () => {}, onUpdateUser = () => {} }) {
   const [showCheckIn, setShowCheckIn] = useState(false);
   const [showJournal, setShowJournal] = useState(false);
+  const [journalExpanded, setJournalExpanded] = useState(false);
   const { activeMap } = analyzeShelf(products);
   const conflicts = detectConflicts(products);
 
@@ -1053,8 +1054,8 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
         - (checkIns.filter(c => c.tight).length / checkIns.length) * 18
         - (checkIns.filter(c => c.breakout).length / checkIns.length) * 14));
 
-  const lastCheckIn = checkIns[checkIns.length - 1];
-  const daysSince = lastCheckIn ? Math.floor((Date.now() - new Date(lastCheckIn.date)) / 86400000) : null;
+  const lastCheckIn = checkIns.length ? checkIns.reduce((a, b) => new Date(a.date) > new Date(b.date) ? a : b) : null;
+  const daysSince = lastCheckIn ? daysBetweenLocal(lastCheckIn.date) : null;
   const dueCheckin = daysSince === null || daysSince >= 3;
 
   const rampProducts = products.filter(p =>
@@ -1084,7 +1085,8 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
       {(() => {
         const today = new Date().toISOString().split("T")[0];
         const todayEntry = journals.find(j => j.date === today);
-        const recent = journals.slice(-5).reverse();
+        const pastEntries = [...journals].filter(j => j.date !== today).sort((a, b) => b.date.localeCompare(a.date));
+        const visiblePast = journalExpanded ? pastEntries : pastEntries.slice(0, 3);
         const cond = todayEntry ? SKIN_CONDITIONS.find(c => c.key === todayEntry.condition) : null;
         return (
           <div style={{ marginBottom: 24 }}>
@@ -1110,7 +1112,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
                 </div>
               </div>
             )}
-            {recent.filter(j => j.date !== today).slice(0, 3).map(j => {
+            {visiblePast.map(j => {
               const c = SKIN_CONDITIONS.find(x => x.key === j.condition);
               const d = new Date(j.date + "T12:00:00");
               const label = d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
@@ -1123,6 +1125,12 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
                 </div>
               );
             })}
+            {pastEntries.length > 3 && (
+              <button onClick={() => setJournalExpanded(v => !v)}
+                style={{ width: "100%", padding: "9px 0", background: "var(--surface)", border: "1px solid var(--border)", borderTop: "none", marginTop: -1, borderRadius: "0 0 10px 10px", cursor: "pointer", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.08em", color: "var(--clay)", textAlign: "center" }}>
+                {journalExpanded ? "Show less" : `View all ${pastEntries.length} entries`}
+              </button>
+            )}
           </div>
         );
       })()}
