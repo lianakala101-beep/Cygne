@@ -4,7 +4,7 @@ import { detectActives, analyzeShelf } from "./engine.js";
 import { CATEGORIES, FREQUENCIES } from "./constants.js";
 import { DEFER_TAG_CONFIG } from "./modals.jsx";
 import { compressImage } from "./utils.jsx";
-import { supabase } from "./supabase.js";
+import { supabase, invokeEdgeFunction } from "./supabase.js";
 
 function RoutineFitSheet({ product, assessment, onAddNow, onDefer, onClose }) {
   const isDefer = assessment.verdict === "defer";
@@ -211,28 +211,15 @@ function ProductModal({ product, onSave, onClose, user }) {
       const base64 = await compressImage(file);
       console.log("[Cygne scan] 3. compressed base64 length:", base64.length, "(~" + Math.round(base64.length * 0.75 / 1024) + "KB)");
 
-      // Step 3: check auth
-      const { data: { session } } = await supabase.auth.getSession();
-      console.log("[Cygne scan] 4. auth session:", session ? "active (user: " + session.user.email + ")" : "NO SESSION — edge function will likely fail");
-
-      // Step 4: call edge function
-      console.log("[Cygne scan] 5. calling rapid-action edge function...");
-      const { data, error } = await supabase.functions.invoke("rapid-action", {
-        body: { model: "claude-sonnet-4-20250514", max_tokens: 1500, messages: [{ role: "user", content: [
+      // Step 3: call edge function via direct fetch (full error visibility)
+      console.log("[Cygne scan] 4. calling rapid-action...");
+      const data = await invokeEdgeFunction("rapid-action", {
+        model: "claude-sonnet-4-20250514", max_tokens: 1500, messages: [{ role: "user", content: [
           { type: "image", source: { type: "base64", media_type: "image/jpeg", data: base64 } },
           { type: "text", text: "You are an international skincare product analyst with expertise across K-beauty, J-beauty, French pharmacy, Australian, British, and Western brands. Identify the product from this image. Fully support: KOREAN (COSRX, Beauty of Joseon, Anua, Some By Mi, Isntree, Innisfree, Laneige, Sulwhasoo, Missha, Etude House, Tirtir, Torriden, Mixsoon, Haruharu Wonder, Round Lab, Skin1004, Klairs, Purito, Iunik, Abib, Axis-Y, By Wishtrend, Medicube, Numbuzin, Rovectin, Pyunkang Yul, Dr. Ceuracle, Dr. Jart, I'm From, Benton, Sioris, Ma:nyo, Hanyul, Sum37, Belif, Neogen, Mediheal). JAPANESE (SK-II, Hada Labo, DHC, Shiseido, Tatcha, Rohto, Curel, Kose, Minon, Albion, Decorté, Sekkisei, Kanebo). FRENCH PHARMACY/LUXURY (La Roche-Posay, Avène, Bioderma, Vichy, Uriage, A-Derma, Caudalie, Nuxe, Embryolisse, Filorga, Biotherm, Clarins, Sisley, Darphin). AUSTRALIAN (Aesop, Ultra Violette, Sand & Sky, Jurlique, Grown Alchemist, Frank Body, Bondi Sands, Alpha-H, Rationale, Medik8). BRITISH/EUROPEAN (The Ordinary, NIOD, Deciem, Pai, Emma Hardie, Liz Earle, Eve Lom, Weleda, Dr. Hauschka, Eucerin, Allies of Skin). Read Hangul, Kanji/Hiragana/Katakana, French, and English text on packaging. CATEGORIZATION RULES — identify the actual product type from label, claims, and formulation; NEVER default to Serum. SPF LOGIC: SPF 30+ pure sunscreen → 'SPF'; SPF 15 or lower in a moisturizer where hydration is primary → 'Moisturizer' (put SPF value in 'spf' field); SPF 30+ marketed as both moisturizer and sunscreen with heavy hydrating ingredients (ceramides, hyaluronic acid, shea butter, squalane, 'SPF moisturizer', 'day cream SPF', 'hydrating sunscreen') → 'SPF Moisturizer'. Return ONLY a JSON object with these exact fields: brand (string), name (string), category (one of: Cleanser/Toner/Essence/Serum/Ampoule/Eye Cream/Moisturizer/SPF Moisturizer/SPF/Oil/Exfoliant/Mask/Sleeping Mask/Sheet Mask/Treatment/Mist/Lip Care/Milky Lotion/Micellar Water/Emulsion), spf (numeric SPF level if present, else null), ingredients (comma-separated string of all visible ingredients, normalized to INCI English — oxyde de zinc → zinc oxide, acide hyaluronique → hyaluronic acid, melaleuca → tea tree oil, eau thermale → thermal spring water, galactomyces/pitera → Galactomyces Ferment Filtrate, snail mucin → snail secretion filtrate, centella asiatica, madecassoside, mugwort → Artemisia, propolis, rice ferment, birch sap, niacinamide, fullerenes, kakadu plum → Terminalia ferdinandiana), flags (comma-separated string of informational notes about US-restricted ingredients common abroad — Tinosorb S, Tinosorb M, Mexoryl SX, Mexoryl XL, Uvinul A Plus/T 150, Enzacamene, hydroquinone, tranexamic acid — these are notes NOT warnings). No markdown, no explanation, just the JSON object." }
-        ]}] }
+        ]}]
       });
-
-      // Step 5: check response
-      if (error) {
-        console.error("[Cygne scan] 6. EDGE FUNCTION ERROR:", error);
-        console.error("[Cygne scan] error type:", typeof error, "message:", error?.message, "context:", error?.context);
-        setScanError("Scan failed: " + (error.message || "edge function error"));
-        setModalStep("form"); setAnalyzing(false); return;
-      }
-      console.log("[Cygne scan] 6. raw response type:", typeof data);
-      console.log("[Cygne scan] 6. raw response:", JSON.stringify(data).slice(0, 500));
+      console.log("[Cygne scan] 5. response:", JSON.stringify(data).slice(0, 500));
 
       // Step 6: parse response — handle both direct Anthropic format and wrapped
       let text;
