@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { LOGO_SRC } from "./components.jsx";
 
-/** Compress an image file to JPEG, max 1200px on longest side, ~200-400KB output */
-export async function compressImage(file, maxDim = 1200, quality = 0.8) {
+/** Compress an image file to JPEG, max 800px on longest side, keeps output well under 1MB */
+export async function compressImage(file, maxDim = 800, quality = 0.7) {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => {

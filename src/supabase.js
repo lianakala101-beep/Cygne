@@ -8,34 +8,23 @@ console.log("[Cygne] Supabase key prefix:", supabaseAnonKey.substring(0, 20) + "
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-/** Call a Supabase edge function via direct fetch — gives full error visibility */
+/** Call a Supabase edge function with a fresh session token */
 export async function invokeEdgeFunction(functionName, body) {
-  const url = supabaseUrl + "/functions/v1/" + functionName;
+  const { data: { session } } = await supabase.auth.getSession();
+  console.log("[Cygne edge] calling", functionName, "| auth:", session ? "session" : "anon-only", "| payload:", JSON.stringify(body).length, "bytes");
 
-  console.log("[Cygne edge] POST", url);
-  console.log("[Cygne edge] payload size:", JSON.stringify(body).length, "bytes");
-
-  // Use the anon key as both apikey and Authorization bearer token.
-  // The anon key is a valid JWT that the gateway accepts.
-  // The edge function is an Anthropic proxy — it doesn't need user identity.
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + supabaseAnonKey,
-      "apikey": supabaseAnonKey,
-    },
-    body: JSON.stringify(body),
+  const { data, error } = await supabase.functions.invoke(functionName, {
+    body,
+    headers: session?.access_token
+      ? { Authorization: `Bearer ${session.access_token}` }
+      : {},
   });
 
-  console.log("[Cygne edge] response:", response.status, response.statusText);
-
-  if (!response.ok) {
-    const errorBody = await response.text();
-    console.error("[Cygne edge] ERROR " + response.status + ":", errorBody);
-    throw new Error("Edge function " + response.status + ": " + (errorBody || response.statusText).slice(0, 300));
+  if (error) {
+    console.error("[Cygne edge] error:", error);
+    throw new Error(error.message || "Edge function call failed");
   }
 
-  const data = await response.json();
+  console.log("[Cygne edge] success, response type:", typeof data);
   return data;
 }

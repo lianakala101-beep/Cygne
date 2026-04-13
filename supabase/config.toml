@@ -1,0 +1,5 @@
+[project]
+id = "mxcefgbaaylddnyxrnao"
+
+[functions.rapid-action]
+verify_jwt = false
