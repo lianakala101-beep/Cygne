@@ -3,6 +3,7 @@ import { Icon, Section } from "./components.jsx";
 import { detectActives, analyzeShelf } from "./engine.js";
 import { CATEGORIES, FREQUENCIES } from "./constants.js";
 import { DEFER_TAG_CONFIG } from "./modals.jsx";
+import { compressImage } from "./utils.jsx";
 import { supabase } from "./supabase.js";
 
 function RoutineFitSheet({ product, assessment, onAddNow, onDefer, onClose }) {
@@ -133,6 +134,7 @@ function ShelfLifeSection({ form, set }) {
 function ProductModal({ product, onSave, onClose, user }) {
   const [form, setForm] = useState(product || { brand: "", name: "", category: "Serum", price: "", ingredients: "" });
   const [analyzing, setAnalyzing] = useState(false);
+  const [scanError, setScanError] = useState(null);
   const [modalStep, setModalStep] = useState(product && (product.id || product.brand) ? "form" : "choose");
   const fileRef = useRef();
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
@@ -200,25 +202,60 @@ function ProductModal({ product, onSave, onClose, user }) {
   const handleFile = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+    console.log("[Cygne scan] 1. image selected:", file.name, "size:", file.size, "type:", file.type);
     setAnalyzing(true);
+    setScanError(null);
     try {
-      const base64 = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result.split(",")[1]); r.onerror = rej; r.readAsDataURL(file); });
-      console.log("[Cygne scan] photo captured, base64 length:", base64.length, "type:", file.type);
+      // Step 2: compress image
+      console.log("[Cygne scan] 2. compressing image...");
+      const base64 = await compressImage(file);
+      console.log("[Cygne scan] 3. compressed base64 length:", base64.length, "(~" + Math.round(base64.length * 0.75 / 1024) + "KB)");
+
+      // Step 3: check auth
+      const { data: { session } } = await supabase.auth.getSession();
+      console.log("[Cygne scan] 4. auth session:", session ? "active (user: " + session.user.email + ")" : "NO SESSION — edge function will likely fail");
+
+      // Step 4: call edge function
+      console.log("[Cygne scan] 5. calling rapid-action edge function...");
       const { data, error } = await supabase.functions.invoke("rapid-action", {
         body: { model: "claude-sonnet-4-20250514", max_tokens: 1500, messages: [{ role: "user", content: [
-          { type: "image", source: { type: "base64", media_type: file.type, data: base64 } },
+          { type: "image", source: { type: "base64", media_type: "image/jpeg", data: base64 } },
           { type: "text", text: "You are an international skincare product analyst with expertise across K-beauty, J-beauty, French pharmacy, Australian, British, and Western brands. Identify the product from this image. Fully support: KOREAN (COSRX, Beauty of Joseon, Anua, Some By Mi, Isntree, Innisfree, Laneige, Sulwhasoo, Missha, Etude House, Tirtir, Torriden, Mixsoon, Haruharu Wonder, Round Lab, Skin1004, Klairs, Purito, Iunik, Abib, Axis-Y, By Wishtrend, Medicube, Numbuzin, Rovectin, Pyunkang Yul, Dr. Ceuracle, Dr. Jart, I'm From, Benton, Sioris, Ma:nyo, Hanyul, Sum37, Belif, Neogen, Mediheal). JAPANESE (SK-II, Hada Labo, DHC, Shiseido, Tatcha, Rohto, Curel, Kose, Minon, Albion, Decorté, Sekkisei, Kanebo). FRENCH PHARMACY/LUXURY (La Roche-Posay, Avène, Bioderma, Vichy, Uriage, A-Derma, Caudalie, Nuxe, Embryolisse, Filorga, Biotherm, Clarins, Sisley, Darphin). AUSTRALIAN (Aesop, Ultra Violette, Sand & Sky, Jurlique, Grown Alchemist, Frank Body, Bondi Sands, Alpha-H, Rationale, Medik8). BRITISH/EUROPEAN (The Ordinary, NIOD, Deciem, Pai, Emma Hardie, Liz Earle, Eve Lom, Weleda, Dr. Hauschka, Eucerin, Allies of Skin). Read Hangul, Kanji/Hiragana/Katakana, French, and English text on packaging. CATEGORIZATION RULES — identify the actual product type from label, claims, and formulation; NEVER default to Serum. SPF LOGIC: SPF 30+ pure sunscreen → 'SPF'; SPF 15 or lower in a moisturizer where hydration is primary → 'Moisturizer' (put SPF value in 'spf' field); SPF 30+ marketed as both moisturizer and sunscreen with heavy hydrating ingredients (ceramides, hyaluronic acid, shea butter, squalane, 'SPF moisturizer', 'day cream SPF', 'hydrating sunscreen') → 'SPF Moisturizer'. Return ONLY a JSON object with these exact fields: brand (string), name (string), category (one of: Cleanser/Toner/Essence/Serum/Ampoule/Eye Cream/Moisturizer/SPF Moisturizer/SPF/Oil/Exfoliant/Mask/Sleeping Mask/Sheet Mask/Treatment/Mist/Lip Care/Milky Lotion/Micellar Water/Emulsion), spf (numeric SPF level if present, else null), ingredients (comma-separated string of all visible ingredients, normalized to INCI English — oxyde de zinc → zinc oxide, acide hyaluronique → hyaluronic acid, melaleuca → tea tree oil, eau thermale → thermal spring water, galactomyces/pitera → Galactomyces Ferment Filtrate, snail mucin → snail secretion filtrate, centella asiatica, madecassoside, mugwort → Artemisia, propolis, rice ferment, birch sap, niacinamide, fullerenes, kakadu plum → Terminalia ferdinandiana), flags (comma-separated string of informational notes about US-restricted ingredients common abroad — Tinosorb S, Tinosorb M, Mexoryl SX, Mexoryl XL, Uvinul A Plus/T 150, Enzacamene, hydroquinone, tranexamic acid — these are notes NOT warnings). No markdown, no explanation, just the JSON object." }
         ]}] }
       });
-      if (error) { console.error("[Cygne scan] edge function error:", error); setModalStep("form"); setAnalyzing(false); return; }
-      console.log("[Cygne scan] raw response:", data);
-      const text = (data.content || []).map(c => c.text || "").join("") || JSON.stringify(data);
+
+      // Step 5: check response
+      if (error) {
+        console.error("[Cygne scan] 6. EDGE FUNCTION ERROR:", error);
+        console.error("[Cygne scan] error type:", typeof error, "message:", error?.message, "context:", error?.context);
+        setScanError("Scan failed: " + (error.message || "edge function error"));
+        setModalStep("form"); setAnalyzing(false); return;
+      }
+      console.log("[Cygne scan] 6. raw response type:", typeof data);
+      console.log("[Cygne scan] 6. raw response:", JSON.stringify(data).slice(0, 500));
+
+      // Step 6: parse response — handle both direct Anthropic format and wrapped
+      let text;
+      if (data && data.content && Array.isArray(data.content)) {
+        text = data.content.map(c => c.text || "").join("");
+      } else if (typeof data === "string") {
+        text = data;
+      } else {
+        text = JSON.stringify(data);
+      }
+      console.log("[Cygne scan] 7. extracted text:", text.slice(0, 300));
+
       const clean = text.replace(/```json|```/g, "").trim();
       const jsonStart = clean.indexOf("{");
       const jsonEnd = clean.lastIndexOf("}");
-      const jsonStr = jsonStart >= 0 && jsonEnd >= 0 ? clean.slice(jsonStart, jsonEnd + 1) : "{}";
+      if (jsonStart < 0 || jsonEnd < 0) {
+        console.error("[Cygne scan] 8. NO JSON found in response:", clean.slice(0, 200));
+        setScanError("Scan returned unexpected format. Check console.");
+        setModalStep("form"); setAnalyzing(false); return;
+      }
+      const jsonStr = clean.slice(jsonStart, jsonEnd + 1);
       const parsed = JSON.parse(jsonStr);
-      console.log("[Cygne scan] parsed product:", parsed);
+      console.log("[Cygne scan] 8. parsed product:", parsed);
       const ing = Array.isArray(parsed.ingredients) ? parsed.ingredients.join(", ") : (parsed.ingredients || "");
       setForm(f => ({
         ...f,
@@ -229,7 +266,12 @@ function ProductModal({ product, onSave, onClose, user }) {
         ingredients: ing || f.ingredients,
       }));
       setModalStep("form");
-    } catch (err) { console.error("[Cygne scan] exception:", err); setModalStep("form"); }
+    } catch (err) {
+      console.error("[Cygne scan] EXCEPTION:", err);
+      console.error("[Cygne scan] stack:", err.stack);
+      setScanError("Scan failed: " + (err.message || "unknown error"));
+      setModalStep("form");
+    }
     setAnalyzing(false);
   };
 
@@ -308,6 +350,10 @@ function ProductModal({ product, onSave, onClose, user }) {
                 <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>Point at the product — Cygne reads the label.</p>
               </div>
             </div>
+
+            {scanError && (
+              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "#c06060", margin: "0 0 10px", padding: "8px 12px", background: "rgba(192,96,96,0.08)", border: "1px solid rgba(192,96,96,0.2)", borderRadius: 8 }}>{scanError}</p>
+            )}
 
             <button onClick={() => setModalStep("form")}
               style={{ width: "100%", padding: "13px 0", background: "none", border: "1px solid var(--border)", borderRadius: 14, fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", cursor: "pointer", marginTop: 4 }}>

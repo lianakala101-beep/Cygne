@@ -3,6 +3,7 @@ import { Icon, Section, FlagCard } from "./components.jsx";
 import { detectActives, analyzeShelf } from "./engine.js";
 import { getSeason } from "./seasonal.jsx";
 import { supabase } from "./supabase.js";
+import { compressImage } from "./utils.jsx";
 
 
 // SCAN MODAL
@@ -12,6 +13,7 @@ function ScanModal({ products, onAddToShelf, onClose }) {
   const [scanned, setScanned] = useState(null);
   const [verdict, setVerdict] = useState(null);
   const [saved, setSaved] = useState(false);
+  const [scanError, setScanError] = useState(null);
   const fileRef = useRef();
   const { activeMap } = analyzeShelf(products);
 
@@ -96,31 +98,63 @@ function ScanModal({ products, onAddToShelf, onClose }) {
 
   const analyze = async (file) => {
     setMode("scanning");
-    const base64 = await new Promise((res, rej) => {
-      const r = new FileReader(); r.onload = () => res(r.result.split(",")[1]); r.onerror = rej; r.readAsDataURL(file);
-    });
+    setScanError(null);
+    console.log("[Cygne vanity-scan] 1. image selected:", file.name, "size:", file.size, "type:", file.type);
     try {
+      console.log("[Cygne vanity-scan] 2. compressing image...");
+      const base64 = await compressImage(file);
+      console.log("[Cygne vanity-scan] 3. compressed base64 length:", base64.length, "(~" + Math.round(base64.length * 0.75 / 1024) + "KB)");
+
+      const { data: { session } } = await supabase.auth.getSession();
+      console.log("[Cygne vanity-scan] 4. auth session:", session ? "active (user: " + session.user.email + ")" : "NO SESSION");
+
       const shelfSummary = products.map(p => ({ name: p.name, category: p.category, actives: Object.keys(detectActives(p.ingredients || [])) }));
-      console.log("[Cygne scan] sending photo, base64 length:", base64.length, "type:", file.type);
+      console.log("[Cygne vanity-scan] 5. calling rapid-action...");
       const { data, error } = await supabase.functions.invoke("rapid-action", {
         body: { model: "claude-sonnet-4-20250514", max_tokens: 1500, messages: [{ role: "user", content: [
-          { type: "image", source: { type: "base64", media_type: file.type, data: base64 } },
+          { type: "image", source: { type: "base64", media_type: "image/jpeg", data: base64 } },
           { type: "text", text: "Analyze this skincare product image. You are an international product expert. Fully support: KOREAN (COSRX, Innisfree, Laneige, Sulwhasoo, Anua, Beauty of Joseon, Skin1004, Torriden, Tirtir, Numbuzin, Round Lab, Abib, Isntree, Mixsoon, Haruharu Wonder, Axis-Y, Some By Mi, Medicube, Dr. Jart, I'm From, Klairs, Purito, Benton, Mediheal) — read Hangul. JAPANESE (SK-II, Hada Labo, DHC, Shiseido, Tatcha, Rohto, Curel, Kose, Minon, Kanebo, Kiehl's Japan, Albion, Decorté, Kose Sekkisei) — read Kanji/Hiragana/Katakana. FRENCH PHARMACY/LUXURY (La Roche-Posay, Avène, Bioderma, Vichy, Uriage, A-Derma, Caudalie, Nuxe, Embryolisse, Filorga, Biotherm, Clarins, Sisley, Darphin). AUSTRALIAN (Aesop, Ultra Violette, Sand & Sky, Jurlique, Grown Alchemist, Frank Body, Bondi Sands, Alpha-H, Rationale, Medik8). BRITISH/EUROPEAN (The Ordinary, NIOD, Deciem, Pai, Emma Hardie, Liz Earle, Eve Lom, Weleda, Dr. Hauschka, Eucerin, Hydraluron, Allies of Skin). Recognize international categories: Korean essence/ampoule/sleeping mask/sheet mask/softener, Japanese milky lotion (nyuueki)/lotion (keshouisui, actually a hydrating toner)/emulsion, French eau thermale/eau micellaire (micellar water)/lait/crème, Australian SPF serums. INGREDIENT NORMALIZATION — map local names to INCI English: oxyde de zinc → zinc oxide, eau thermale → thermal spring water, acide hyaluronique → hyaluronic acid, melaleuca → tea tree oil, kakadu plum → Terminalia ferdinandiana, quandong → Santalum acuminatum, galactomyces/pitera → Galactomyces Ferment Filtrate, placenta extract → placental protein, fullerene → fullerenes, snail mucin → snail secretion filtrate, centella asiatica → Centella Asiatica Extract, madecassoside, asiaticoside, heartleaf → Houttuynia Cordata, mugwort → Artemisia, propolis, rice ferment → Rice Ferment Filtrate, birch sap → Betula Alba Juice, niacinamide, bifida ferment lysate. FLAG (do not warn) ingredients restricted in the US but common abroad: Tinosorb S/Bemotrizinol, Tinosorb M/Bisoctrizole, Mexoryl SX/Ecamsule, Mexoryl XL/Drometrizole Trisiloxane, Uvinul A Plus, Uvinul T 150, Enzacamene, Iscotrizinol, hydroquinone >2%, tranexamic acid (prescription in US). Add these to a 'flags' array as informational notes, NOT conflicts. CATEGORIZATION RULES — choose the most accurate category based on what the product ACTUALLY is; NEVER default to Serum unless the product is genuinely a serum. SPF LOGIC: (1) If SPF 30+ and the product is primarily a sunscreen with minimal moisturizing claims → 'SPF'. (2) If SPF 15 or lower and the product is primarily a moisturizer with incidental sun protection → 'Moisturizer' (put the SPF value in the 'spf' field). (3) If SPF 30+ AND the product is marketed as a moisturizer/day cream with heavy hydration (ceramides, hyaluronic acid, shea butter, squalane, 'hydrating', 'moisturizing sunscreen', 'day cream SPF', 'SPF moisturizer') → 'SPF Moisturizer'. User's vanity: " + JSON.stringify(shelfSummary) + ". Return ONLY valid JSON (no markdown) with fields: brand, name, category (Cleanser/Toner/Essence/Serum/Ampoule/Eye Cream/Moisturizer/SPF Moisturizer/SPF/Oil/Exfoliant/Mask/Sleeping Mask/Sheet Mask/Treatment/Mist/Lip Care/Milky Lotion/Micellar Water/Emulsion), spf (numeric SPF level if present, else null), ingredients (array of INCI English strings), actives (array), verdict (pass/caution/skip), headline, reason, conflicts (array), duplicates (array), flags (array of informational notes)." }
         ]}] }
       });
-      if (error) { console.error("[Cygne scan] edge function error:", error); setMode("scan"); return; }
-      console.log("[Cygne scan] raw response:", data);
-      const text = (data.content || []).map(c => c.text || "").join("") || JSON.stringify(data);
+      if (error) {
+        console.error("[Cygne vanity-scan] 6. EDGE FUNCTION ERROR:", error);
+        console.error("[Cygne vanity-scan] error details:", error?.message, error?.context);
+        setScanError("Scan failed: " + (error.message || "edge function error"));
+        setMode("scan"); return;
+      }
+      console.log("[Cygne vanity-scan] 6. raw response type:", typeof data);
+      console.log("[Cygne vanity-scan] 6. raw response:", JSON.stringify(data).slice(0, 500));
+
+      let text;
+      if (data && data.content && Array.isArray(data.content)) {
+        text = data.content.map(c => c.text || "").join("");
+      } else if (typeof data === "string") {
+        text = data;
+      } else {
+        text = JSON.stringify(data);
+      }
+      console.log("[Cygne vanity-scan] 7. extracted text:", text.slice(0, 300));
+
       const clean = text.replace(/```json|```/g, "").trim();
       const jsonStart = clean.indexOf("{");
       const jsonEnd = clean.lastIndexOf("}");
-      const jsonStr = jsonStart >= 0 && jsonEnd >= 0 ? clean.slice(jsonStart, jsonEnd + 1) : "{}";
+      if (jsonStart < 0 || jsonEnd < 0) {
+        console.error("[Cygne vanity-scan] 8. NO JSON in response:", clean.slice(0, 200));
+        setScanError("Unexpected response format. Check console.");
+        setMode("scan"); return;
+      }
+      const jsonStr = clean.slice(jsonStart, jsonEnd + 1);
       const parsed = JSON.parse(jsonStr);
-      console.log("[Cygne scan] parsed result:", parsed);
+      console.log("[Cygne vanity-scan] 8. parsed result:", parsed);
       setScanned(parsed);
       setVerdict(parsed.verdict || "pass");
       setMode("result");
-    } catch(err) { console.error("[Cygne scan] exception:", err); setMode("scan"); }
+    } catch(err) {
+      console.error("[Cygne vanity-scan] EXCEPTION:", err);
+      console.error("[Cygne vanity-scan] stack:", err.stack);
+      setScanError("Scan failed: " + (err.message || "unknown error"));
+      setMode("scan");
+    }
   };
 
   const handleFile = (e) => {
@@ -227,6 +261,9 @@ function ScanModal({ products, onAddToShelf, onClose }) {
         {mode === "scan" && (
           <div>
             <input ref={fileRef} type="file" accept="image/*" capture="environment" style={{ display: "none" }} onChange={handleFile} />
+            {scanError && (
+              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "#c06060", margin: "0 0 10px", padding: "8px 12px", background: "rgba(192,96,96,0.08)", border: "1px solid rgba(192,96,96,0.2)", borderRadius: 8 }}>{scanError}</p>
+            )}
             <button onClick={() => fileRef.current.click()}
               style={{ width: "100%", padding: "32px 0", background: "rgba(122,144,112,0.08)", border: "1px dashed rgba(122,144,112,0.35)", borderRadius: 14, cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
               <Icon name="camera" size={28} color="var(--sage)" />

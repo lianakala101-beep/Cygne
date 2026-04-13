@@ -1,6 +1,34 @@
 import { useState } from "react";
 import { LOGO_SRC } from "./components.jsx";
 
+/** Compress an image file to JPEG, max 1200px on longest side, ~200-400KB output */
+export async function compressImage(file, maxDim = 1200, quality = 0.8) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+      console.log("[Cygne compress] original:", width, "x", height, "file size:", file.size);
+      if (width > maxDim || height > maxDim) {
+        const ratio = Math.min(maxDim / width, maxDim / height);
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, width, height);
+      const dataUrl = canvas.toDataURL("image/jpeg", quality);
+      const b64 = dataUrl.split(",")[1];
+      console.log("[Cygne compress] resized:", width, "x", height, "base64 length:", b64.length, "(~" + Math.round(b64.length * 0.75 / 1024) + "KB)");
+      URL.revokeObjectURL(img.src);
+      resolve(b64);
+    };
+    img.onerror = (e) => { URL.revokeObjectURL(img.src); reject(e); };
+    img.src = URL.createObjectURL(file);
+  });
+}
+
 
 function SwanWelcomeScreen({ user, onDone }) {
   const name = user?.name && user.name !== "Friend" ? user.name.split(" ")[0] : null;
