@@ -11,13 +11,15 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 /** Call a Supabase edge function with a fresh session token */
 export async function invokeEdgeFunction(functionName, body) {
   const { data: { session } } = await supabase.auth.getSession();
-  console.log("[Cygne edge] calling", functionName, "| auth:", session ? "session" : "anon-only", "| payload:", JSON.stringify(body).length, "bytes");
+  if (!session) {
+    console.error("[Cygne edge] no session — user is not signed in");
+    throw new Error("Not signed in. Please log in and try again.");
+  }
+  console.log("[Cygne edge] calling", functionName, "| payload:", JSON.stringify(body).length, "bytes");
 
   const { data, error } = await supabase.functions.invoke(functionName, {
     body,
-    headers: session?.access_token
-      ? { Authorization: `Bearer ${session.access_token}` }
-      : {},
+    headers: { Authorization: `Bearer ${session.access_token}` },
   });
 
   if (error) {
