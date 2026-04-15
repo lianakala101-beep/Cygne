@@ -1111,6 +1111,102 @@ function JournalFullView({ journals, onClose, onEditToday }) {
   );
 }
 
+// --- WEEK AT A GLANCE --------------------------------------------------------
+// Weekly summary: skin ratings, check-ins, and ritual adherence proxy
+// (days with any logged journal OR check-in entry this week).
+function WeekAtAGlance({ checkIns, journals }) {
+  // Build a 7-day window ending today (local).
+  const today = new Date();
+  const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(startOfToday.getTime() - i * 86400000);
+    const iso = d.toISOString().split("T")[0];
+    const label = d.toLocaleDateString("en-US", { weekday: "short" }).slice(0, 1);
+    const journal = journals.find(j => j.date === iso) || null;
+    const dayCheckIns = checkIns.filter(c => {
+      if (!c.date) return false;
+      const cd = new Date(c.date);
+      return cd.getFullYear() === d.getFullYear() && cd.getMonth() === d.getMonth() && cd.getDate() === d.getDate();
+    });
+    const cond = journal ? SKIN_CONDITIONS.find(x => x.key === journal.condition) : null;
+    const hasActivity = !!journal || dayCheckIns.length > 0;
+    const hasIrritation = dayCheckIns.some(c => c.irritation && c.irritation !== "none");
+    days.push({ iso, label, date: d, journal, cond, dayCheckIns, hasActivity, hasIrritation, isToday: i === 0 });
+  }
+
+  const weekJournals = days.filter(d => d.journal).length;
+  const weekCheckIns = days.reduce((sum, d) => sum + d.dayCheckIns.length, 0);
+  const adherencePct = Math.round((days.filter(d => d.hasActivity).length / 7) * 100);
+
+  const bestDay = days.filter(d => d.cond).sort((a, b) => {
+    const order = { rough: 0, dull: 1, okay: 2, good: 3, glowing: 4 };
+    return (order[b.journal.condition] ?? -1) - (order[a.journal.condition] ?? -1);
+  })[0];
+
+  const hasAnyData = weekJournals > 0 || weekCheckIns > 0;
+
+  return (
+    <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: "16px 16px 14px" }}>
+      {/* Day strip */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 4, marginBottom: 14 }}>
+        {days.map(d => (
+          <div key={d.iso} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+            <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.1em", color: "var(--clay)", opacity: d.isToday ? 0.95 : 0.5 }}>{d.label}</span>
+            <div style={{
+              width: 22, height: 22, borderRadius: "50%",
+              background: d.cond ? d.cond.bg : "transparent",
+              border: `1px solid ${d.cond ? d.cond.border : "var(--border)"}`,
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              {d.cond && <div style={{ width: 8, height: 8, borderRadius: "50%", background: d.cond.color }} />}
+            </div>
+            <div style={{ display: "flex", gap: 2, minHeight: 5 }}>
+              {d.dayCheckIns.length > 0 && (
+                <div style={{ width: 4, height: 4, borderRadius: "50%", background: d.hasIrritation ? "#c06060" : "#7a9070" }} />
+              )}
+            </div>
+            {d.isToday && (
+              <div style={{ width: 4, height: 1, background: "var(--sage)", marginTop: -2 }} />
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Stats row */}
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 12, paddingTop: 12, borderTop: "1px solid var(--border)" }}>
+        <div style={{ textAlign: "center", flex: 1 }}>
+          <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 22, color: "var(--parchment)", margin: 0, lineHeight: 1 }}>{weekJournals}<span style={{ fontSize: 13, color: "var(--clay)", opacity: 0.6 }}>/7</span></p>
+          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", margin: "4px 0 0", opacity: 0.6 }}>Journaled</p>
+        </div>
+        <div style={{ width: 1, background: "var(--border)" }} />
+        <div style={{ textAlign: "center", flex: 1 }}>
+          <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 22, color: "var(--parchment)", margin: 0, lineHeight: 1 }}>{weekCheckIns}</p>
+          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", margin: "4px 0 0", opacity: 0.6 }}>Check-ins</p>
+        </div>
+        <div style={{ width: 1, background: "var(--border)" }} />
+        <div style={{ textAlign: "center", flex: 1 }}>
+          <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 22, color: "var(--parchment)", margin: 0, lineHeight: 1 }}>{adherencePct}<span style={{ fontSize: 13, color: "var(--clay)", opacity: 0.6 }}>%</span></p>
+          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", margin: "4px 0 0", opacity: 0.6 }}>Adherence</p>
+        </div>
+      </div>
+
+      {/* Best day summary */}
+      {bestDay && bestDay.cond && (
+        <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: "12px 0 0", opacity: 0.75, lineHeight: 1.5 }}>
+          Best day: <span style={{ color: bestDay.cond.color, fontWeight: 500 }}>{bestDay.date.toLocaleDateString("en-US", { weekday: "long" })}</span> — {bestDay.cond.label.toLowerCase()}.
+        </p>
+      )}
+      {!hasAnyData && (
+        <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: "12px 0 0", opacity: 0.55, textAlign: "center" }}>
+          Log a journal or check-in to start building your week.
+        </p>
+      )}
+    </div>
+  );
+}
+
+
 function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatments, saveTreatment, removeTreatment, user = {}, onAdvanceRamp, onHoldRamp, journals = [], setJournals = () => {}, onUpdateUser = () => {} }) {
   const [showCheckIn, setShowCheckIn] = useState(false);
   const [showJournal, setShowJournal] = useState(false);
@@ -1263,33 +1359,46 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
         </div>
       )}
 
-      {/* -- Week at a glance + Introduce Slowly — only with ramp products ------- */}
-      {rampProducts.length > 0 && (
-        <div style={{ marginBottom: 28 }}>
-          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--clay)", marginBottom: 14 }}>Your week at a glance</p>
-          <WeeklyRitualCalendar rampProducts={rampProducts} products={products} />
-          <div style={{ marginTop: 24 }}>
-            {sectionLabel("leaf", "Introduce Slowly")}
-            {rampProducts.map(p => {
-              const activeKey = p.category === "Toning Pad"
-                ? "toning pad"
-                : RAMP_ACTIVES.find(a => detectActives(p.ingredients || [])[a]);
-              const schedule = RAMP_SCHEDULES[activeKey];
-              if (!schedule) return null;
-              return (
-                <IntroduceSlowlyCard
-                  key={p.id}
-                  product={p}
-                  schedule={schedule}
-                  weekNumber={p.rampWeek || 1}
-                  onAdvance={onAdvanceRamp}
-                  onHold={onHoldRamp}
-                />
-              );
-            })}
+      {/* -- Week at a glance (always visible) ---------------------------------- */}
+      <div style={{ marginBottom: 28 }}>
+        <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--clay)", marginBottom: 14 }}>Your week at a glance</p>
+        <WeekAtAGlance checkIns={checkIns} journals={journals} />
+        {rampProducts.length > 0 && (
+          <div style={{ marginTop: 16 }}>
+            <WeeklyRitualCalendar rampProducts={rampProducts} products={products} />
           </div>
-        </div>
-      )}
+        )}
+      </div>
+
+      {/* -- Introduce Slowly (always visible; empty state when no ramp) -------- */}
+      <div style={{ marginBottom: 28 }}>
+        {sectionLabel("leaf", "Introduce Slowly")}
+        {rampProducts.length > 0 ? (
+          rampProducts.map(p => {
+            const activeKey = p.category === "Toning Pad"
+              ? "toning pad"
+              : RAMP_ACTIVES.find(a => detectActives(p.ingredients || [])[a]);
+            const schedule = RAMP_SCHEDULES[activeKey];
+            if (!schedule) return null;
+            return (
+              <IntroduceSlowlyCard
+                key={p.id}
+                product={p}
+                schedule={schedule}
+                weekNumber={p.rampWeek || 1}
+                onAdvance={onAdvanceRamp}
+                onHold={onHoldRamp}
+              />
+            );
+          })
+        ) : (
+          <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: "18px 18px 16px" }}>
+            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", margin: 0, lineHeight: 1.6, opacity: 0.75 }}>
+              No actives currently in ramp-up. When you add retinol, AHA/BHA exfoliants, vitamin C, or a toning pad to your routine, they'll appear here with a gradual build-up schedule and "Skin handled it" / "Backing off" controls.
+            </p>
+          </div>
+        )}
+      </div>
 
       {/* -- Treatments --------------------------------------------------------- */}
       {sectionLabel("drop", "Treatments")}
