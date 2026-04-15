@@ -22,6 +22,45 @@ function detectActives(ingredients) {
   return found;
 }
 
+// --- DAMP-SKIN DETECTION ----------------------------------------------------
+// Products that absorb best when applied to damp skin: essences and
+// HA-dominant light serums. We bump them right after toner/essence so they
+// sit before heavier serums in the routine order.
+const DAMP_HUMECTANTS = [
+  "hyaluronic acid", "sodium hyaluronate", "sodium acetylated hyaluronate",
+  "hydrolyzed hyaluronic acid", "glycerin", "panthenol", "betaine",
+];
+function isDampSkinProduct(p) {
+  if (!p) return false;
+  if (p.applyOnDamp === true) return true;
+  if (p.applyOnDamp === false) return false;
+  if (p.category === "Essence") return true;
+  if (p.category !== "Serum") return false;
+  // Serum counts as damp-skin when a humectant (HA, glycerin, panthenol)
+  // appears in the first 3 ingredients AND no heavy retinol/AHA/BHA/vitC/peptide.
+  const ing = Array.isArray(p.ingredients)
+    ? p.ingredients
+    : typeof p.ingredients === "string"
+      ? p.ingredients.split(",").map(s => s.trim()).filter(Boolean)
+      : [];
+  const firstThree = ing.slice(0, 3).map(i => i.toLowerCase());
+  const hasDampHumectant = firstThree.some(i => DAMP_HUMECTANTS.some(h => i.includes(h)));
+  if (!hasDampHumectant) return false;
+  const actives = detectActives(ing);
+  const hasHeavyActive = ["retinol", "AHA", "BHA", "vitamin C", "peptides"].some(a => actives[a]);
+  return !hasHeavyActive;
+}
+
+// Effective ordering index. Damp-skin Serums get bumped to 3.7 so they sit
+// between Essence (3) and Exfoliant (4) / regular Serum (5).
+function effectiveLayer(p, session) {
+  const key = session === "am" ? "orderAm" : "orderPm";
+  if (typeof p[key] === "number") return p[key];
+  const base = layerIndex(p.category);
+  if (isDampSkinProduct(p) && base >= 4) return 3.7;
+  return base;
+}
+
 function buildRoutine(products) {
   products = products.filter(p => p.inRoutine !== false);
   const am = [], pm = [];
@@ -55,8 +94,32 @@ function buildRoutine(products) {
     else if (hasAMPref) { am.push(p); if (["Cleanser", "Moisturizer", "Toner", "Essence", "Mist"].includes(p.category)) pm.push(p); }
     else { am.push(p); pm.push(p); }
   });
-  const sort = arr => { const seen = new Set(); return arr.filter(p => { if (seen.has(p.id)) return false; seen.add(p.id); return true; }).sort((a, b) => layerIndex(a.category) - layerIndex(b.category)); };
-  return { am: sort(am), pm: sort(pm), periodic };
+  const sort = (arr, session) => {
+    const seen = new Set();
+    return arr
+      .filter(p => { if (seen.has(p.id)) return false; seen.add(p.id); return true; })
+      .sort((a, b) => effectiveLayer(a, session) - effectiveLayer(b, session));
+  };
+  return { am: sort(am, "am"), pm: sort(pm, "pm"), periodic };
+}
+
+// Detect damp-skin products that ended up positioned after heavier steps
+// (moisturizer/oil/SPF) — usually a manual reorder mistake.
+function getOrderWarnings(orderedSteps) {
+  const warnings = [];
+  const HEAVY = new Set(["Moisturizer", "SPF Moisturizer", "SPF", "Oil"]);
+  let sawHeavy = false;
+  for (const step of orderedSteps) {
+    if (HEAVY.has(step.category)) { sawHeavy = true; continue; }
+    if (sawHeavy && isDampSkinProduct(step)) {
+      warnings.push({
+        productId: step.id,
+        product: step,
+        message: `${step.name} absorbs best on damp skin — consider moving it earlier in your routine.`,
+      });
+    }
+  }
+  return warnings;
 }
 
 function detectConflicts(products) {
@@ -123,4 +186,4 @@ function calcSpending(products) {
 }
 
 
-export { isScheduledToday, getNextUseLabel, getCurrentSession, detectActives, buildRoutine, detectConflicts, analyzeShelf, calcSpending };
+export { isScheduledToday, getNextUseLabel, getCurrentSession, detectActives, buildRoutine, detectConflicts, analyzeShelf, calcSpending, isDampSkinProduct, getOrderWarnings };

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Icon, Section, Wordmark } from "./components.jsx";
-import { detectActives, analyzeShelf, buildRoutine } from "./engine.js";
+import { detectActives, analyzeShelf, buildRoutine, isDampSkinProduct } from "./engine.js";
 import { getLockedSession } from "./productmodal.jsx";
 
 function SessionPicker({ productId, product, initial, onSession }) {
@@ -172,10 +172,12 @@ function getStepReason(step) {
   return STEP_REASONS[step.category] || null;
 }
 
-function RoutineStep({ step, index, isLast, checked, onCheck }) {
+function RoutineStep({ step, index, isLast, checked, onCheck, onMoveUp, onMoveDown, canMoveUp, canMoveDown }) {
   const activeKeys = Object.keys(detectActives(step.ingredients || []));
   const [expanded, setExpanded] = useState(false);
   const reason = getStepReason(step);
+  const damp = isDampSkinProduct(step);
+  const moveBtnSt = { background: "none", border: "1px solid var(--border)", borderRadius: 6, width: 22, height: 18, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "var(--clay)", padding: 0, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, lineHeight: 1 };
   return (
     <div style={{ display: "flex", gap: 16, alignItems: "flex-start", opacity: checked ? 0.45 : 1, transition: "opacity 0.2s" }}>
       <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center" }}>
@@ -215,8 +217,24 @@ function RoutineStep({ step, index, isLast, checked, onCheck }) {
               <span style={{ color: "var(--clay)", opacity: 0.35, fontSize: 11, flexShrink: 0, marginTop: 2, display: "inline-block", transition: "transform 0.18s", transform: expanded ? "rotate(180deg)" : "rotate(0deg)" }}>▾</span>
             )}
           </div>
+          {damp && (
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 10, padding: "6px 9px", borderRadius: 8, background: "rgba(138,168,196,0.08)", border: "1px solid rgba(138,168,196,0.2)" }}>
+              <span style={{ fontSize: 11 }}>💧</span>
+              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "rgba(154,180,200,0.85)", letterSpacing: "0.02em" }}>Apply on damp skin for best absorption</span>
+            </div>
+          )}
           {expanded && reason && (
             <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: "10px 0 0", lineHeight: 1.65, paddingTop: 10, borderTop: "1px solid var(--border)", opacity: 0.85 }}>{reason}</p>
+          )}
+          {(onMoveUp || onMoveDown) && (
+            <div style={{ display: "flex", gap: 6, marginTop: 10, paddingTop: 10, borderTop: "1px solid var(--border)", justifyContent: "flex-end" }}>
+              <button onClick={e => { e.stopPropagation(); if (canMoveUp) onMoveUp?.(); }} disabled={!canMoveUp}
+                style={{ ...moveBtnSt, opacity: canMoveUp ? 0.75 : 0.25, cursor: canMoveUp ? "pointer" : "default" }}
+                aria-label="Move earlier">▲</button>
+              <button onClick={e => { e.stopPropagation(); if (canMoveDown) onMoveDown?.(); }} disabled={!canMoveDown}
+                style={{ ...moveBtnSt, opacity: canMoveDown ? 0.75 : 0.25, cursor: canMoveDown ? "pointer" : "default" }}
+                aria-label="Move later">▼</button>
+            </div>
           )}
         </div>
       </div>

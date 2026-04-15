@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Icon, Section, FlagCard } from "./components.jsx";
-import { detectActives, analyzeShelf, buildRoutine, detectConflicts, getCurrentSession, isScheduledToday } from "./engine.js";
+import { detectActives, analyzeShelf, buildRoutine, detectConflicts, getCurrentSession, isScheduledToday, getOrderWarnings } from "./engine.js";
 import { FREQUENCIES } from "./constants.js";
 import { buildRecommendations, buildRefinements } from "./intelligence.jsx";
 import { RoutineStep } from "./ritual.jsx";
@@ -235,7 +235,7 @@ function getSwanGuidingLine(products, checkIns = [], user = {}, cycleDay = null,
   return "Your ritual is ready. Take your time with it.";
 }
 
-function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false, journals = [], checkIns = [], setCheckIns = () => {}, completedSteps: completedStepsProp, setCompletedSteps: setCompletedStepsProp, onUpdateUser }) {
+function MyRoutine({ products, setProducts = () => {}, user = {}, cycleDay = null, isFlightMode = false, journals = [], checkIns = [], setCheckIns = () => {}, completedSteps: completedStepsProp, setCompletedSteps: setCompletedStepsProp, onUpdateUser }) {
   const session = getCurrentSession();
   const { am, pm, periodic } = buildRoutine(products);
   const conflicts = detectConflicts(products);
@@ -272,6 +272,25 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
   const totalRecs = recs.length + refinements.length;
 
   const guidingLine = getSwanGuidingLine(products, [], user, cycleDay, ritualKey, session, journals);
+
+  // Damp-skin products positioned after heavier steps (usually after a manual reorder)
+  const orderWarnings = getOrderWarnings(steps);
+
+  // Manual reorder: write fresh orderAm/orderPm indices across the current
+  // session so the new position persists, then let buildRoutine re-sort.
+  const moveStep = (id, direction) => {
+    const orderKey = session === "am" ? "orderAm" : "orderPm";
+    const ids = steps.map(s => s.id);
+    const idx = ids.indexOf(id);
+    const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+    if (idx < 0 || swapIdx < 0 || swapIdx >= ids.length) return;
+    const newIds = [...ids];
+    [newIds[idx], newIds[swapIdx]] = [newIds[swapIdx], newIds[idx]];
+    setProducts(prev => prev.map(p => {
+      const newPos = newIds.indexOf(p.id);
+      return newPos >= 0 ? { ...p, [orderKey]: newPos } : p;
+    }));
+  };
 
   return (
     <div>
@@ -330,9 +349,29 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
       {steps.length > 0
         ? <Section title={`${steps.length} steps — apply in this order`} icon="layers">
             <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", opacity: 0.5, margin: "-4px 0 16px", lineHeight: 1.6, letterSpacing: "0.02em" }}>
-              Tap the circle next to each step to check it off as you go.
+              Tap the circle next to each step to check it off as you go. Use ▲▼ to reorder.
             </p>
-            <div>{steps.map((p, i) => <RoutineStep key={p.id} step={p} index={i} isLast={i === steps.length - 1} checked={completedSteps.includes(p.id)} onCheck={() => toggleStep(p.id)} />)}</div>
+            {orderWarnings.length > 0 && (
+              <div style={{ marginBottom: 16, padding: "12px 14px", background: "rgba(196,160,96,0.08)", border: "1px solid rgba(196,160,96,0.25)", borderRadius: 12 }}>
+                {orderWarnings.map(w => (
+                  <p key={w.productId} style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "rgba(212,184,128,0.9)", margin: 0, lineHeight: 1.55, letterSpacing: "0.01em" }}>
+                    ⚠ {w.message}
+                  </p>
+                ))}
+              </div>
+            )}
+            <div>{steps.map((p, i) => <RoutineStep
+              key={p.id}
+              step={p}
+              index={i}
+              isLast={i === steps.length - 1}
+              checked={completedSteps.includes(p.id)}
+              onCheck={() => toggleStep(p.id)}
+              onMoveUp={() => moveStep(p.id, "up")}
+              onMoveDown={() => moveStep(p.id, "down")}
+              canMoveUp={i > 0}
+              canMoveDown={i < steps.length - 1}
+            />)}</div>
           </Section>
         : <div style={{ padding: "32px 0 16px" }}><div style={{ display: "flex", alignItems: "flex-start", gap: 9, marginBottom: 8 }}><span style={{ fontSize: 15, lineHeight: 1.4, flexShrink: 0 }}>🦢</span><p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 19, color: "var(--clay)", margin: 0, lineHeight: 1.4 }}>Your ritual is waiting. Add products to your vanity and they'll appear here.</p></div></div>}
       {allDone && steps.length > 0 && !todayCheckedIn && (
