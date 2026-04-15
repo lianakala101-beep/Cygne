@@ -524,6 +524,40 @@ function getTreatmentPhase(treatment) {
   return { phase, elapsed, type, totalDays: type.phases[type.phases.length - 1].days[0] - 1 };
 }
 
+// Determines which active ingredients are currently paused / reintroducing
+// based on the most recent non-cleared treatment. Wires the Treatment
+// recovery tracker to the Introduce Slowly tracker so users don't have
+// to manually bridge the gap.
+//
+// Returns { pausedActives, reintroActives, treatment, phase }:
+//   pausedActives  — active keys that must be excluded from today's ritual
+//   reintroActives — active keys that should appear in Introduce Slowly
+//                    (the phase explicitly says "resume this active")
+//   treatment      — the treatment driving the state (or null)
+//   phase          — the current phase object (or null)
+function getActivePauseState(treatments = [], products = []) {
+  if (!treatments.length) return { pausedActives: [], reintroActives: [], treatment: null, phase: null };
+  const candidates = treatments
+    .map(t => ({ t, info: getTreatmentPhase(t) }))
+    .filter(x => x.info && x.info.phase && x.info.phase.label !== "Cleared")
+    .sort((a, b) => new Date(b.t.date) - new Date(a.t.date));
+  if (!candidates.length) return { pausedActives: [], reintroActives: [], treatment: null, phase: null };
+  const { t: treatment, info } = candidates[0];
+  const { phase } = info;
+  const tracked = ["retinol", "AHA", "BHA", "vitamin C"];
+  const isResumed = (act) => (phase.resume || []).some(r =>
+    r === "Full Ritual" || r.toLowerCase().includes(act.toLowerCase())
+  );
+  const isReintroPhase = /reintroduc|rebuilding|stabilized/i.test(phase.label);
+  const pausedActives = [];
+  const reintroActives = [];
+  tracked.forEach(act => {
+    if (isResumed(act) && isReintroPhase) reintroActives.push(act);
+    else if (!isResumed(act)) pausedActives.push(act);
+  });
+  return { pausedActives, reintroActives, treatment, phase };
+}
+
 function buildTreatmentRoutineAdvice(phase, products, activeMap) {
   const hasRetinol = !!activeMap["retinol"]?.length;
   const hasAHA = !!activeMap["AHA"]?.length;
@@ -1224,11 +1258,30 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
   const daysSince = lastCheckIn ? daysBetweenLocal(lastCheckIn.date) : null;
   const dueCheckin = daysSince === null || daysSince >= 3;
 
-  const rampProducts = products.filter(p =>
+  // Active treatment pause state — drives reintroduction after recovery.
+  const { reintroActives, treatment: pauseTreatment, phase: pausePhase } = getActivePauseState(treatments, products);
+
+  // Core ramp list: products the user has actively been building up.
+  const primaryRamp = products.filter(p =>
     p.inRoutine !== false &&
     p.routineStartDate &&
     (p.category === "Toning Pad" || RAMP_ACTIVES.some(a => detectActives(p.ingredients || [])[a]))
   );
+
+  // Reintroduction list: products whose active is resuming after a treatment
+  // but which aren't already in the primary ramp. We reset them to week 1
+  // conceptually — but only for display (we don't mutate the stored rampWeek
+  // unless the user explicitly advances).
+  const reintroRamp = reintroActives.length > 0
+    ? products.filter(p => {
+        if (p.inRoutine === false) return false;
+        if (primaryRamp.find(x => x.id === p.id)) return false;
+        const actives = detectActives(p.ingredients || []);
+        return reintroActives.some(a => actives[a]);
+      }).map(p => ({ ...p, __reintroducing: true, rampWeek: 1 }))
+    : [];
+
+  const rampProducts = [...primaryRamp, ...reintroRamp];
 
   const sectionLabel = (icon, text) => (
     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
@@ -1373,6 +1426,14 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
       {/* -- Introduce Slowly (always visible; empty state when no ramp) -------- */}
       <div style={{ marginBottom: 28 }}>
         {sectionLabel("leaf", "Introduce Slowly")}
+        {reintroActives.length > 0 && pauseTreatment && pausePhase && (
+          <div style={{ background: "rgba(196,144,64,0.08)", border: "1px solid rgba(196,144,64,0.25)", borderRadius: 12, padding: "12px 14px", marginBottom: 12 }}>
+            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: "#c49040", margin: "0 0 4px" }}>Reintroducing after recovery</p>
+            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>
+              You're in the {pausePhase.label.toLowerCase()} phase. {reintroActives.join(", ")} can return — but build slowly from week 1 to avoid overwhelming skin that's still settling.
+            </p>
+          </div>
+        )}
         {rampProducts.length > 0 ? (
           rampProducts.map(p => {
             const activeKey = p.category === "Toning Pad"
@@ -1524,4 +1585,4 @@ function LocationManager({ locationData, setLocationData, locationDenied, setLoc
   );
 }
 
-export { Progress, CheckInModal, LocationManager, getTreatmentPhase, TreatmentRecoveryCard, getCyclePhase };
+export { Progress, CheckInModal, LocationManager, getTreatmentPhase, TreatmentRecoveryCard, getCyclePhase, getActivePauseState };

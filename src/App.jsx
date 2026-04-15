@@ -507,6 +507,7 @@ export default function App() {
           completedSteps={completedSteps}
           setCompletedSteps={setCompletedSteps}
           onUpdateUser={updateUser}
+          treatments={treatments}
           onAddProduct={(category) => setModal({ brand: "", name: "", category: category || "Serum", price: "", ingredients: "" })}
           onEditProduct={(idOrProduct) => {
             const p = typeof idOrProduct === "string" ? products.find(x => x.id === idOrProduct) : idOrProduct;

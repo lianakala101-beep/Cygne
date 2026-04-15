@@ -61,8 +61,17 @@ function effectiveLayer(p, session) {
   return base;
 }
 
-function buildRoutine(products) {
+function buildRoutine(products, { pausedActives = [] } = {}) {
   products = products.filter(p => p.inRoutine !== false);
+  // Exclude products whose detected active is currently paused by a
+  // treatment recovery phase. The product stays in the vanity and in
+  // Introduce Slowly — it just doesn't appear in today's ritual.
+  if (pausedActives.length > 0) {
+    products = products.filter(p => {
+      const actives = detectActives(p.ingredients);
+      return !pausedActives.some(a => actives[a]);
+    });
+  }
   const am = [], pm = [];
   // Periodic = classic exfoliant/mask categories OR any product explicitly set to weekly/2-3x/as-needed
   const periodic = products.filter(p =>

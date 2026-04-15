@@ -6,7 +6,7 @@ import { buildRecommendations, buildRefinements } from "./intelligence.jsx";
 import { RoutineStep } from "./ritual.jsx";
 import { RecommendationCard } from "./intelligence.jsx";
 import { CheckInModal } from "./progress.jsx";
-import { getCyclePhase } from "./progress.jsx";
+import { getCyclePhase, getActivePauseState } from "./progress.jsx";
 import { getNextUseLabel } from "./constants.js";
 import { getSeason } from "./seasonal.jsx";
 
@@ -235,9 +235,20 @@ function getSwanGuidingLine(products, checkIns = [], user = {}, cycleDay = null,
   return "Your ritual is ready. Take your time with it.";
 }
 
-function MyRoutine({ products, setProducts = () => {}, user = {}, cycleDay = null, isFlightMode = false, journals = [], checkIns = [], setCheckIns = () => {}, completedSteps: completedStepsProp, setCompletedSteps: setCompletedStepsProp, onUpdateUser, onAddProduct, onEditProduct }) {
+function MyRoutine({ products, setProducts = () => {}, user = {}, cycleDay = null, isFlightMode = false, journals = [], checkIns = [], setCheckIns = () => {}, completedSteps: completedStepsProp, setCompletedSteps: setCompletedStepsProp, onUpdateUser, onAddProduct, onEditProduct, treatments = [] }) {
   const session = getCurrentSession();
-  const { am, pm, periodic } = buildRoutine(products);
+  // Pause actives that are still under recovery from a logged treatment.
+  // These products disappear from today's ritual and surface in Introduce
+  // Slowly instead so users aren't told to apply retinol while they're
+  // still healing from microneedling (etc).
+  const { pausedActives, treatment: pauseTreatment, phase: pausePhase } = getActivePauseState(treatments, products);
+  const pausedProducts = pausedActives.length > 0
+    ? products.filter(p => {
+        const actives = detectActives(p.ingredients || []);
+        return p.inRoutine !== false && pausedActives.some(a => actives[a]);
+      })
+    : [];
+  const { am, pm, periodic } = buildRoutine(products, { pausedActives });
   const conflicts = detectConflicts(products);
   const { flags, activeMap } = analyzeShelf(products);
   const [recTab, setRecTab] = useState("additions");
@@ -335,6 +346,21 @@ function MyRoutine({ products, setProducts = () => {}, user = {}, cycleDay = nul
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Treatment recovery pause banner */}
+      {pausedProducts.length > 0 && pauseTreatment && pausePhase && (
+        <div style={{ marginBottom: 18, padding: "13px 15px", background: "rgba(192,96,96,0.07)", border: "1px solid rgba(192,96,96,0.22)", borderRadius: 12 }}>
+          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "#c06060", margin: "0 0 5px" }}>Paused during recovery</p>
+          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--parchment)", margin: "0 0 8px", lineHeight: 1.55 }}>
+            {pausedProducts.map(p => p.name).join(", ")} {pausedProducts.length === 1 ? "is" : "are"} held for your {pausePhase.label.toLowerCase()} phase. They'll return via Introduce Slowly once your skin is ready.
+          </p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+            {pausedProducts.map(p => (
+              <span key={p.id} style={{ padding: "3px 10px", borderRadius: 20, background: "var(--ink)", border: "1px solid var(--border)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)" }}>{p.name}</span>
+            ))}
+          </div>
         </div>
       )}
 
