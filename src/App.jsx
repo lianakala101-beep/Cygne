@@ -495,7 +495,24 @@ export default function App() {
       {/* Content */}
       <div style={{ maxWidth: 600, margin: "0 auto", padding: "32px 22px 0", animation: "fadeUp 0.3s ease" }} key={tab}>
         {tab === "dashboard" && <Dashboard products={products} setTab={setTab} checkIns={checkIns} swanPopupDismissed={swanPopupDismissed} onDismissSwanPopup={dismissSwanPopup} treatments={treatments} locationData={locationData} user={user} theme={theme} notifPermission={notifPermission} onRequestNotif={requestNotifications} notifDismissed={notifDismissed} onDismissNotif={() => setNotifDismissed(true)} journals={journals} setCheckIns={setCheckIns} onLoadDemo={() => setProducts(DEMO_PRODUCTS)} />}
-        {tab === "routine"   && <MyRoutine products={products} setProducts={setProducts} user={user} cycleDay={getCurrentCycleDay(user)} isFlightMode={false} journals={journals} checkIns={checkIns} setCheckIns={setCheckIns} completedSteps={completedSteps} setCompletedSteps={setCompletedSteps} onUpdateUser={updateUser} />}
+        {tab === "routine"   && <MyRoutine
+          products={products}
+          setProducts={setProducts}
+          user={user}
+          cycleDay={getCurrentCycleDay(user)}
+          isFlightMode={false}
+          journals={journals}
+          checkIns={checkIns}
+          setCheckIns={setCheckIns}
+          completedSteps={completedSteps}
+          setCompletedSteps={setCompletedSteps}
+          onUpdateUser={updateUser}
+          onAddProduct={(category) => setModal({ brand: "", name: "", category: category || "Serum", price: "", ingredients: "" })}
+          onEditProduct={(idOrProduct) => {
+            const p = typeof idOrProduct === "string" ? products.find(x => x.id === idOrProduct) : idOrProduct;
+            if (p) { setTab("shelf"); setModal(p); }
+          }}
+        />}
         {tab === "shelf" && <Shelf
           products={products}
           onEdit={p => setModal(p)}

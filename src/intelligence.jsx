@@ -376,11 +376,13 @@ function buildRefinements(products, activeMap, conflicts) {
         body: `You have ${prods.map(p => `${p.brand} ${p.name}`).join(" and ")}. Layering two ${cat.toLowerCase()}s adds no benefit and can overload the skin.`,
         action: `Keep your preferred ${cat.toLowerCase()}. Remove the other — or save it for travel.`,
         trigger: "duplicate",
+        productIds: prods.map(p => p.id),
       });
     }
   });
   // Severe conflicts → suggest removing one product
   conflicts.filter(c => c.severity === "warning").forEach(c => {
+    const conflictProducts = [...(c.productsA || []), ...(c.productsB || [])];
     refinements.push({
       verb: "Remove",
       verbColor: "#c06060",
@@ -389,6 +391,7 @@ function buildRefinements(products, activeMap, conflicts) {
       body: `These two actives are fighting each other in the same ritual. The combination can compromise your barrier and diminish both ingredients' effectiveness.`,
       action: `Remove or re-home one. ${c.reason}`,
       trigger: "conflict",
+      productIds: conflictProducts.map(p => p.id),
     });
   });
   // Barrier overload — 3+ actives
@@ -463,6 +466,7 @@ function buildRefinements(products, activeMap, conflicts) {
         action: "Look for a single well-formulated serum combining your key actives. Retire the duplicates.",
         trigger: "serum-overlap",
         cygne: true,
+        productIds: overlap.map(p => p.id),
       });
     }
   }
@@ -506,6 +510,7 @@ function buildRefinements(products, activeMap, conflicts) {
       action: "Add a broad-spectrum SPF 30–50 as your final AM step, every day.",
       trigger: "missing-spf",
       cygne: true,
+      addCategory: "SPF",
     });
   }
   if (!hasMoisturizer) {
@@ -518,6 +523,7 @@ function buildRefinements(products, activeMap, conflicts) {
       action: "Apply a ceramide or hyaluronic acid moisturizer after serums, before SPF.",
       trigger: "missing-moisturizer",
       cygne: true,
+      addCategory: "Moisturizer",
     });
   }
   if (!hasCleanser) {
@@ -530,6 +536,7 @@ function buildRefinements(products, activeMap, conflicts) {
       action: "Add a gentle, pH-balanced cleanser as step one, AM and PM.",
       trigger: "missing-cleanser",
       cygne: true,
+      addCategory: "Cleanser",
     });
   }
 

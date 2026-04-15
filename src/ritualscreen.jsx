@@ -235,7 +235,7 @@ function getSwanGuidingLine(products, checkIns = [], user = {}, cycleDay = null,
   return "Your ritual is ready. Take your time with it.";
 }
 
-function MyRoutine({ products, setProducts = () => {}, user = {}, cycleDay = null, isFlightMode = false, journals = [], checkIns = [], setCheckIns = () => {}, completedSteps: completedStepsProp, setCompletedSteps: setCompletedStepsProp, onUpdateUser }) {
+function MyRoutine({ products, setProducts = () => {}, user = {}, cycleDay = null, isFlightMode = false, journals = [], checkIns = [], setCheckIns = () => {}, completedSteps: completedStepsProp, setCompletedSteps: setCompletedStepsProp, onUpdateUser, onAddProduct, onEditProduct }) {
   const session = getCurrentSession();
   const { am, pm, periodic } = buildRoutine(products);
   const conflicts = detectConflicts(products);
@@ -498,24 +498,47 @@ function MyRoutine({ products, setProducts = () => {}, user = {}, cycleDay = nul
           </div>
 
           <div>
-            {recTab === "additions"  && additions.map((r, i) => <RecommendationCard key={i} rec={r} />)}
-            {recTab === "swaps"      && swaps.map((r, i) => <RecommendationCard key={i} rec={r} />)}
-            {recTab === "simplify"   && simplifications.map((r, i) => <RecommendationCard key={i} rec={r} />)}
-            {recTab === "refine"     && refinements.map((r, i) => (
-              <div key={i} style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "13px 15px", marginBottom: 8 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-                  <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", fontWeight: 700, letterSpacing: "0.13em", textTransform: "uppercase", color: "var(--parchment)", opacity: 0.7 }}>{r.verb}</span>
-                  <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--parchment)", margin: 0, flex: 1, fontWeight: 500, lineHeight: 1.3 }}>{r.title}</p>
-                </div>
-                <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.65 }}>{r.body}</p>
-                {r.action && (
-                  <div style={{ display: "flex", gap: 8, padding: "9px 11px", background: "rgba(122,144,112,0.06)", borderRadius: 8, border: "1px solid rgba(122,144,112,0.15)", marginTop: 10 }}>
-                    <span style={{ color: "#7a9070", flexShrink: 0, marginTop: 1 }}><Icon name="check" size={11} /></span>
-                    <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--parchment)", margin: 0, lineHeight: 1.55 }}>{r.action}</p>
+            {recTab === "additions"  && additions.map((r, i) => <RecommendationCard key={i} rec={r} onAdd={onAddProduct} onEdit={onEditProduct} />)}
+            {recTab === "swaps"      && swaps.map((r, i) => <RecommendationCard key={i} rec={r} onAdd={onAddProduct} onEdit={onEditProduct} />)}
+            {recTab === "simplify"   && simplifications.map((r, i) => <RecommendationCard key={i} rec={r} onAdd={onAddProduct} onEdit={onEditProduct} />)}
+            {recTab === "refine"     && refinements.map((r, i) => {
+              const targets = (r.productIds || [])
+                .map(id => products.find(p => p.id === id))
+                .filter(Boolean);
+              return (
+                <div key={i} style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "13px 15px", marginBottom: 8 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                    <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", fontWeight: 700, letterSpacing: "0.13em", textTransform: "uppercase", color: "var(--parchment)", opacity: 0.7 }}>{r.verb}</span>
+                    <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--parchment)", margin: 0, flex: 1, fontWeight: 500, lineHeight: 1.3 }}>{r.title}</p>
                   </div>
-                )}
-              </div>
-            ))}
+                  <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.65 }}>{r.body}</p>
+                  {r.action && (
+                    <div style={{ display: "flex", gap: 8, padding: "9px 11px", background: "rgba(122,144,112,0.06)", borderRadius: 8, border: "1px solid rgba(122,144,112,0.15)", marginTop: 10 }}>
+                      <span style={{ color: "#7a9070", flexShrink: 0, marginTop: 1 }}><Icon name="check" size={11} /></span>
+                      <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--parchment)", margin: 0, lineHeight: 1.55 }}>{r.action}</p>
+                    </div>
+                  )}
+                  {targets.length > 0 && onEditProduct && (
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 10 }}>
+                      {targets.map(p => (
+                        <button key={p.id} onClick={() => onEditProduct(p)}
+                          style={{ padding: "6px 11px", borderRadius: 20, background: "rgba(122,144,112,0.12)", border: "1px solid rgba(122,144,112,0.3)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 600, color: "#7a9070", cursor: "pointer", letterSpacing: "0.05em", display: "inline-flex", alignItems: "center", gap: 5 }}>
+                          {p.name} <Icon name="chevron" size={10} />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {targets.length === 0 && r.addCategory && onAddProduct && (
+                    <div style={{ marginTop: 10 }}>
+                      <button onClick={() => onAddProduct(r.addCategory)}
+                        style={{ padding: "8px 14px", borderRadius: 10, background: "rgba(122,144,112,0.15)", border: "1px solid rgba(122,144,112,0.35)", fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600, color: "#7a9070", cursor: "pointer", letterSpacing: "0.05em" }}>
+                        + Add {r.addCategory}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
 
         </div>
