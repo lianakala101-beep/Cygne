@@ -1149,12 +1149,14 @@ function JournalFullView({ journals, onClose, onEditToday }) {
 // Weekly summary: skin ratings, check-ins, and ritual adherence proxy
 // (days with any logged journal OR check-in entry this week).
 function WeekAtAGlance({ checkIns, journals }) {
-  // Build a 7-day window ending today (local).
+  // Build a Mon–Sun window for the current week (local).
   const today = new Date();
   const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const diffToMon = (today.getDay() + 6) % 7; // Mon=0, Tue=1, ... Sun=6
+  const monday = new Date(startOfToday.getTime() - diffToMon * 86400000);
   const days = [];
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date(startOfToday.getTime() - i * 86400000);
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday.getTime() + i * 86400000);
     const iso = d.toISOString().split("T")[0];
     const label = d.toLocaleDateString("en-US", { weekday: "short" }).slice(0, 1);
     const journal = journals.find(j => j.date === iso) || null;
@@ -1166,7 +1168,8 @@ function WeekAtAGlance({ checkIns, journals }) {
     const cond = journal ? SKIN_CONDITIONS.find(x => x.key === journal.condition) : null;
     const hasActivity = !!journal || dayCheckIns.length > 0;
     const hasIrritation = dayCheckIns.some(c => c.irritation && c.irritation !== "none");
-    days.push({ iso, label, date: d, journal, cond, dayCheckIns, hasActivity, hasIrritation, isToday: i === 0 });
+    const isToday = d.getTime() === startOfToday.getTime();
+    days.push({ iso, label, date: d, journal, cond, dayCheckIns, hasActivity, hasIrritation, isToday });
   }
 
   const weekJournals = days.filter(d => d.journal).length;
@@ -1427,8 +1430,8 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
       <div style={{ marginBottom: 28 }}>
         {sectionLabel("leaf", "Introduce Slowly")}
         {reintroActives.length > 0 && pauseTreatment && pausePhase && (
-          <div style={{ background: "rgba(196,144,64,0.08)", border: "1px solid rgba(196,144,64,0.25)", borderRadius: 12, padding: "12px 14px", marginBottom: 12 }}>
-            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: "#c49040", margin: "0 0 4px" }}>Reintroducing after recovery</p>
+          <div style={{ background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.25)", borderRadius: 12, padding: "12px 14px", marginBottom: 12 }}>
+            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--sage)", margin: "0 0 4px" }}>Reintroducing after recovery</p>
             <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>
               You're in the {pausePhase.label.toLowerCase()} phase. {reintroActives.join(", ")} can return — but build slowly from week 1 to avoid overwhelming skin that's still settling.
             </p>
@@ -1455,7 +1458,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
         ) : (
           <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: "18px 18px 16px" }}>
             <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", margin: 0, lineHeight: 1.6, opacity: 0.75 }}>
-              No actives currently in ramp-up. When you add retinol, AHA/BHA exfoliants, vitamin C, or a toning pad to your routine, they'll appear here with a gradual build-up schedule and "Skin handled it" / "Backing off" controls.
+              No actives in ramp-up right now.
             </p>
           </div>
         )}
