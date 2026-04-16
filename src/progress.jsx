@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Icon, Section } from "./components.jsx";
-import { detectActives, analyzeShelf, detectConflicts } from "./engine.js";
-import { RAMP_SCHEDULES, RAMP_ACTIVES, IntroduceSlowlyCard, WeeklyRitualCalendar } from "./ramp.jsx";
+import { detectActives, analyzeShelf, detectConflicts, buildRoutine } from "./engine.js";
+import { getAutoSession } from "./productmodal.jsx";
+import { RAMP_SCHEDULES, RAMP_ACTIVES, IntroduceSlowlyCard } from "./ramp.jsx";
 import { getCurrentCycleDay, getTreatmentElapsed, daysBetweenLocal } from "./utils.jsx";
 
 
@@ -1148,17 +1149,42 @@ function JournalFullView({ journals, onClose, onEditToday }) {
 // --- WEEK AT A GLANCE --------------------------------------------------------
 // Weekly summary: skin ratings, check-ins, and ritual adherence proxy
 // (days with any logged journal OR check-in entry this week).
-function WeekAtAGlance({ checkIns, journals }) {
-  // Build a Mon–Sun window for the current week (local).
+function isScheduledOnDate(product, date) {
+  const freq = product.frequency || "daily";
+  if (freq === "daily") return true;
+  if (freq === "as-needed") return false;
+  const start = product.routineStartDate ? new Date(product.routineStartDate) : new Date();
+  const dayDiff = Math.floor((date - new Date(start.getFullYear(), start.getMonth(), start.getDate())) / 86400000);
+  if (freq === "alternating") return dayDiff % 2 === 0;
+  if (freq === "2-3x") return [0, 2, 4].includes(((dayDiff % 7) + 7) % 7);
+  if (freq === "weekly") return ((dayDiff % 7) + 7) % 7 === 0;
+  return true;
+}
+
+function getProductSession(product) {
+  if (product.session === "am") return "am";
+  if (product.session === "pm") return "pm";
+  if (product.session === "both") return "both";
+  return getAutoSession(product).session;
+}
+
+function WeekAtAGlance({ checkIns, journals, products = [], pausedActives = [] }) {
+  const [selectedDay, setSelectedDay] = useState(null);
   const today = new Date();
   const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  const diffToMon = (today.getDay() + 6) % 7; // Mon=0, Tue=1, ... Sun=6
+  const diffToMon = (today.getDay() + 6) % 7;
   const monday = new Date(startOfToday.getTime() - diffToMon * 86400000);
+
+  const { am: amProducts, pm: pmProducts, periodic } = buildRoutine(products, { pausedActives });
+  const allRoutine = [...new Map([...amProducts, ...pmProducts, ...periodic].map(p => [p.id, p])).values()];
+
+  const DAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
+  const DAY_FULL = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
   const days = [];
   for (let i = 0; i < 7; i++) {
     const d = new Date(monday.getTime() + i * 86400000);
     const iso = d.toISOString().split("T")[0];
-    const label = d.toLocaleDateString("en-US", { weekday: "short" }).slice(0, 1);
     const journal = journals.find(j => j.date === iso) || null;
     const dayCheckIns = checkIns.filter(c => {
       if (!c.date) return false;
@@ -1169,7 +1195,16 @@ function WeekAtAGlance({ checkIns, journals }) {
     const hasActivity = !!journal || dayCheckIns.length > 0;
     const hasIrritation = dayCheckIns.some(c => c.irritation && c.irritation !== "none");
     const isToday = d.getTime() === startOfToday.getTime();
-    days.push({ iso, label, date: d, journal, cond, dayCheckIns, hasActivity, hasIrritation, isToday });
+
+    const am = [], pm = [];
+    allRoutine.forEach(p => {
+      const scheduled = isScheduledOnDate(p, d);
+      const sess = getProductSession(p);
+      if (sess === "am" || sess === "both") am.push({ ...p, scheduled });
+      if (sess === "pm" || sess === "both") pm.push({ ...p, scheduled });
+    });
+
+    days.push({ iso, label: DAY_LABELS[i], full: DAY_FULL[i], date: d, journal, cond, dayCheckIns, hasActivity, hasIrritation, isToday, am, pm });
   }
 
   const weekJournals = days.filter(d => d.journal).length;
@@ -1182,33 +1217,114 @@ function WeekAtAGlance({ checkIns, journals }) {
   })[0];
 
   const hasAnyData = weekJournals > 0 || weekCheckIns > 0;
+  const selectedDayObj = selectedDay !== null ? days[selectedDay] : null;
 
   return (
     <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: "16px 16px 14px" }}>
-      {/* Day strip */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 4, marginBottom: 14 }}>
-        {days.map(d => (
-          <div key={d.iso} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-            <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.1em", color: "var(--clay)", opacity: d.isToday ? 0.95 : 0.5 }}>{d.label}</span>
-            <div style={{
-              width: 22, height: 22, borderRadius: "50%",
-              background: d.cond ? d.cond.bg : "transparent",
-              border: `1px solid ${d.cond ? d.cond.border : "var(--border)"}`,
-              display: "flex", alignItems: "center", justifyContent: "center",
-            }}>
-              {d.cond && <div style={{ width: 8, height: 8, borderRadius: "50%", background: d.cond.color }} />}
-            </div>
-            <div style={{ display: "flex", gap: 2, minHeight: 5 }}>
-              {d.dayCheckIns.length > 0 && (
-                <div style={{ width: 4, height: 4, borderRadius: "50%", background: d.hasIrritation ? "#c06060" : "#7a9070" }} />
-              )}
-            </div>
-            {d.isToday && (
-              <div style={{ width: 4, height: 1, background: "var(--sage)", marginTop: -2 }} />
-            )}
-          </div>
-        ))}
+      {/* 7-day routine grid */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 5, marginBottom: 14 }}>
+        {days.map((d, i) => {
+          const amScheduled = d.am.filter(p => p.scheduled).length;
+          const pmScheduled = d.pm.filter(p => p.scheduled).length;
+          const selected = selectedDay === i;
+          return (
+            <button key={d.iso} onClick={() => setSelectedDay(selected ? null : i)}
+              style={{
+                display: "flex", flexDirection: "column", alignItems: "center",
+                padding: "10px 4px 8px", gap: 6,
+                background: selected ? "rgba(122,144,112,0.15)" : d.isToday ? "rgba(122,144,112,0.07)" : "transparent",
+                border: selected ? "1px solid rgba(122,144,112,0.45)" : d.isToday ? "1px solid rgba(122,144,112,0.25)" : "1px solid var(--border)",
+                borderRadius: 12, cursor: "pointer", transition: "all 0.15s",
+              }}>
+              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: d.isToday ? 700 : 500, letterSpacing: "0.08em", color: d.isToday ? "var(--parchment)" : "var(--clay)" }}>{d.label}</span>
+              <div style={{ display: "flex", flexDirection: "column", gap: 3, minHeight: 32, justifyContent: "flex-start", alignItems: "center", width: "100%" }}>
+                {d.am.length > 0 && (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 3, justifyContent: "center" }}>
+                    {d.am.map((p, j) => (
+                      <div key={j} style={{ width: 6, height: 6, borderRadius: "50%", background: p.scheduled ? "var(--sage)" : "var(--border)", opacity: p.scheduled ? 0.9 : 0.35 }} />
+                    ))}
+                  </div>
+                )}
+                {(d.am.length > 0 || d.pm.length > 0) && (
+                  <div style={{ width: "60%", height: 1, background: "var(--border)", opacity: 0.5 }} />
+                )}
+                {d.pm.length > 0 && (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 3, justifyContent: "center" }}>
+                    {d.pm.map((p, j) => (
+                      <div key={j} style={{ width: 6, height: 6, borderRadius: "50%", background: p.scheduled ? "rgba(100,90,160,0.7)" : "var(--border)", opacity: p.scheduled ? 0.85 : 0.35 }} />
+                    ))}
+                  </div>
+                )}
+                {d.am.length === 0 && d.pm.length === 0 && (
+                  <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--border)", opacity: 0.3 }} />
+                )}
+              </div>
+              {d.isToday && <div style={{ width: 4, height: 4, borderRadius: "50%", background: "var(--sage)" }} />}
+            </button>
+          );
+        })}
       </div>
+
+      {/* Legend */}
+      <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: selectedDay !== null ? 14 : 14 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+          <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--sage)", opacity: 0.9 }} />
+          <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.6 }}>AM</span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+          <div style={{ width: 6, height: 6, borderRadius: "50%", background: "rgba(100,90,160,0.7)", opacity: 0.85 }} />
+          <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.6 }}>PM</span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+          <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--border)", opacity: 0.4 }} />
+          <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.6 }}>Skipped</span>
+        </div>
+        <div style={{ flex: 1 }} />
+        <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, color: "var(--clay)", opacity: 0.4, letterSpacing: "0.06em" }}>Tap a day</span>
+      </div>
+
+      {/* Expanded day detail */}
+      {selectedDayObj && (
+        <div style={{ background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 14, overflow: "hidden", marginBottom: 14 }}>
+          <div style={{ padding: "14px 16px 12px", borderBottom: "1px solid var(--border)" }}>
+            <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 22, color: "var(--parchment)", margin: 0 }}>{selectedDayObj.full}</p>
+          </div>
+          {selectedDayObj.am.length === 0 && selectedDayObj.pm.length === 0 ? (
+            <div style={{ padding: "18px 16px" }}>
+              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", margin: 0, opacity: 0.6 }}>No products in your routine yet.</p>
+            </div>
+          ) : (
+            <div>
+              {[{ key: "am", label: "\u2600 Morning", items: selectedDayObj.am }, { key: "pm", label: "\u25D7 Evening", items: selectedDayObj.pm }].map(slot => {
+                if (slot.items.length === 0) return null;
+                return (
+                  <div key={slot.key} style={{ padding: "12px 16px", borderBottom: "1px solid var(--border)" }}>
+                    <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 10px", opacity: 0.55 }}>{slot.label}</p>
+                    {slot.items.map((p, j) => {
+                      const freq = p.frequency || "daily";
+                      const isAlternating = freq !== "daily";
+                      return (
+                        <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: j < slot.items.length - 1 ? 8 : 0, opacity: p.scheduled ? 1 : 0.35 }}>
+                          <div style={{ width: 8, height: 8, borderRadius: "50%", background: slot.key === "am" ? "var(--sage)" : "rgba(100,90,160,0.7)", flexShrink: 0, opacity: p.scheduled ? 1 : 0.4 }} />
+                          <div style={{ flex: 1 }}>
+                            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 500, color: "var(--parchment)", margin: "0 0 1px" }}>
+                              {p.name}
+                              {!p.scheduled && isAlternating && <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", opacity: 0.6, marginLeft: 6 }}>skipped</span>}
+                            </p>
+                            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", margin: 0, opacity: 0.6 }}>
+                              {p.brand}{isAlternating ? " · " + ({ alternating: "Every other night", "2-3x": "2-3× per week", weekly: "Once a week", "as-needed": "As needed" }[freq] || freq) : ""}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Stats row */}
       <div style={{ display: "flex", justifyContent: "space-between", gap: 12, paddingTop: 12, borderTop: "1px solid var(--border)" }}>
@@ -1234,9 +1350,9 @@ function WeekAtAGlance({ checkIns, journals }) {
           Best day: <span style={{ color: bestDay.cond.color, fontWeight: 500 }}>{bestDay.date.toLocaleDateString("en-US", { weekday: "long" })}</span> — {bestDay.cond.label.toLowerCase()}.
         </p>
       )}
-      {!hasAnyData && (
+      {!hasAnyData && allRoutine.length === 0 && (
         <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: "12px 0 0", opacity: 0.55, textAlign: "center" }}>
-          Log a journal or check-in to start building your week.
+          Add products to your vanity to see your weekly schedule.
         </p>
       )}
     </div>
@@ -1262,7 +1378,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
   const dueCheckin = daysSince === null || daysSince >= 3;
 
   // Active treatment pause state — drives reintroduction after recovery.
-  const { reintroActives, treatment: pauseTreatment, phase: pausePhase } = getActivePauseState(treatments, products);
+  const { pausedActives, reintroActives, treatment: pauseTreatment, phase: pausePhase } = getActivePauseState(treatments, products);
 
   // Core ramp list: products the user has actively been building up.
   const primaryRamp = products.filter(p =>
@@ -1418,12 +1534,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
       {/* -- Week at a glance (always visible) ---------------------------------- */}
       <div style={{ marginBottom: 28 }}>
         <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--clay)", marginBottom: 14 }}>Your week at a glance</p>
-        <WeekAtAGlance checkIns={checkIns} journals={journals} />
-        {rampProducts.length > 0 && (
-          <div style={{ marginTop: 16 }}>
-            <WeeklyRitualCalendar rampProducts={rampProducts} products={products} />
-          </div>
-        )}
+        <WeekAtAGlance checkIns={checkIns} journals={journals} products={products} pausedActives={pausedActives} />
       </div>
 
       {/* -- Introduce Slowly (always visible; empty state when no ramp) -------- */}
