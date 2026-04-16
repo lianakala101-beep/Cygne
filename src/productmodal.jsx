@@ -95,6 +95,125 @@ function getLockedSession(product) {
   return null;
 }
 
+// --- FREQUENCY SUGGESTION -------------------------------------------------------
+
+function getSuggestedFrequency(product, user = {}) {
+  const cat = product.category || "Serum";
+  const actives = Object.keys(detectActives(product.ingredients || []));
+  const ing = Array.isArray(product.ingredients) ? product.ingredients : typeof product.ingredients === "string" ? product.ingredients.split(",").map(s => s.trim()).filter(Boolean) : [];
+  const lower = ing.map(i => i.toLowerCase());
+  const isSensitive = user.skinType === "Sensitive" || (user.medicalHistory?.sensitivities?.length > 0);
+  const onTret = user.medicalHistory?.onTretinoin;
+
+  // --- SPF: always daily AM ---
+  if (cat === "SPF" || cat === "SPF Moisturizer")
+    return { id: "daily", reason: "Every morning without exception — SPF is non-negotiable." };
+
+  // --- Prescription ---
+  if (cat === "Prescription")
+    return { id: "alternating", reason: "Start slow as prescribed — every other night, then build up." };
+
+  // --- Exfoliant ---
+  if (cat === "Exfoliant") {
+    // Check for high-strength AHA (>10%)
+    const pctMatch = lower.find(i => /glycolic|lactic|mandelic/.test(i) && /\d{2,}%/.test(i));
+    if (pctMatch)
+      return { id: "weekly", reason: "High-strength AHA — once a week max to protect your barrier." };
+    if (isSensitive)
+      return { id: "weekly", reason: "Sensitive skin does best with weekly exfoliation." };
+    return { id: "2-3x", reason: "2-3 times per week gives your barrier time to recover between uses." };
+  }
+
+  // --- Mask ---
+  if (cat === "Mask")
+    return { id: "weekly", reason: "1-2 times per week is ideal — masks are a treat, not a daily step." };
+
+  // --- Toning Pad ---
+  if (cat === "Toning Pad") {
+    if (isSensitive)
+      return { id: "2-3x", reason: "Start at 2-3x per week — sensitive skin needs time to adjust." };
+    return { id: "daily", reason: "Toning pads can be used daily — back off if you notice tightness." };
+  }
+
+  // --- Oil ---
+  if (cat === "Oil")
+    return { id: "daily", reason: "Facial oils work best as a nightly seal — daily PM use." };
+
+  // --- Cleanser with actives ---
+  if (cat === "Cleanser") {
+    if (actives.includes("AHA") || actives.includes("BHA"))
+      return { id: "2-3x", reason: "Exfoliating cleansers are best limited to 2-3x per week." };
+    return { id: "daily", reason: "Gentle cleanser — use morning and night." };
+  }
+
+  // --- Retinol serums/treatments ---
+  if (actives.includes("retinol")) {
+    if (onTret)
+      return { id: "alternating", reason: "On tretinoin — start every other night and build tolerance slowly." };
+    if (isSensitive)
+      return { id: "2-3x", reason: "Sensitive skin + retinol — start at 2x per week and build up." };
+    return { id: "alternating", reason: "Start every other night — retinol needs time for your skin to adapt." };
+  }
+
+  // --- Vitamin C ---
+  if (actives.includes("vitamin C"))
+    return { id: "daily", reason: "Vitamin C works best with consistent daily AM use alongside SPF." };
+
+  // --- AHA/BHA serums ---
+  if (actives.includes("AHA")) {
+    if (isSensitive)
+      return { id: "weekly", reason: "AHA on sensitive skin — start once a week, increase if tolerated." };
+    return { id: "2-3x", reason: "AHA serums 2-3 times per week — never layer with other exfoliants." };
+  }
+  if (actives.includes("BHA")) {
+    if (isSensitive)
+      return { id: "2-3x", reason: "BHA on sensitive skin — 2-3 times per week to start." };
+    return { id: "daily", reason: "BHA is generally gentle enough for daily use — reduce if irritated." };
+  }
+
+  // --- Benzoyl peroxide ---
+  if (actives.includes("benzoyl peroxide"))
+    return { id: "daily", reason: "Daily use is standard — apply PM, and always follow with moisturizer." };
+
+  // --- Default by category ---
+  if (["Moisturizer", "Eye Cream", "Toner", "Essence", "Mist"].includes(cat))
+    return { id: "daily", reason: "A foundational step — use daily, morning and night." };
+
+  if (cat === "Serum") {
+    if (actives.includes("peptides"))
+      return { id: "daily", reason: "Peptides work best with consistent daily PM use." };
+    return { id: "daily", reason: "Daily use — serums are most effective with consistent application." };
+  }
+
+  return { id: "daily", reason: null };
+}
+
+// Frequency ordering for overuse comparison (lower = less frequent)
+const FREQ_RANK = { "weekly": 1, "as-needed": 1, "2-3x": 2, "alternating": 3, "daily": 4 };
+
+function getOveruseWarning(chosenFreq, suggested, product) {
+  const chosenRank = FREQ_RANK[chosenFreq] || 0;
+  const suggestedRank = FREQ_RANK[suggested.id] || 0;
+  if (chosenRank <= suggestedRank) return null;
+
+  const actives = Object.keys(detectActives(product.ingredients || []));
+  const cat = product.category || "Serum";
+  const isHarsh = actives.includes("retinol") || actives.includes("AHA") || actives.includes("BHA") || cat === "Exfoliant" || cat === "Prescription";
+  if (!isHarsh) return null;
+
+  if (actives.includes("retinol"))
+    return "Daily retinol can cause irritation and peeling. Consider alternating nights while your skin builds tolerance.";
+  if (actives.includes("AHA"))
+    return "Daily use of AHA may compromise your barrier over time. Consider alternating nights.";
+  if (actives.includes("BHA") && cat === "Exfoliant")
+    return "Daily exfoliation can over-strip your skin. Give your barrier recovery time between uses.";
+  if (cat === "Exfoliant")
+    return "Daily exfoliation risks barrier damage. Most skin does better with 2-3 uses per week.";
+  if (cat === "Prescription")
+    return "Increasing frequency beyond your prescribed schedule can cause irritation. Follow your provider's guidance.";
+  return "Using this more frequently than recommended may irritate your skin. Adjust based on how your skin responds.";
+}
+
 // --- SESSION PICKER -----------------------------------------------------------
 
 function ShelfLifeSection({ form, set }) {
@@ -137,7 +256,29 @@ function ProductModal({ product, onSave, onClose, user }) {
   const [scanError, setScanError] = useState(null);
   const [modalStep, setModalStep] = useState(product && (product.id || product.brand) ? "form" : "choose");
   const fileRef = useRef();
+  const isEdit = !!(product && product.id);
+  const [freqTouched, setFreqTouched] = useState(isEdit);
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  // Frequency suggestion based on category + ingredients + user profile
+  const freqSuggestion = getSuggestedFrequency(form, user);
+  const prevSuggestionRef = useRef(freqSuggestion.id);
+
+  // Auto-apply suggestion when it changes (for new products, or when user hasn't manually picked)
+  useEffect(() => {
+    if (isEdit) return;
+    if (freqSuggestion.id !== prevSuggestionRef.current) {
+      prevSuggestionRef.current = freqSuggestion.id;
+      if (!freqTouched) set("frequency", freqSuggestion.id);
+    }
+  }, [freqSuggestion.id]);
+
+  // Also set initial frequency for new products
+  useEffect(() => {
+    if (!isEdit && !form.frequency) set("frequency", freqSuggestion.id);
+  }, []);
+
+  const overuseWarning = getOveruseWarning(form.frequency || "daily", freqSuggestion, form);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -465,13 +606,28 @@ function ProductModal({ product, onSave, onClose, user }) {
             <div style={{ marginBottom: 16 }}>
               <label style={labelSt}>Use frequency</label>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                {FREQUENCIES.map(f => (
-                  <button key={f.id} onClick={() => set("frequency", f.id)}
-                    style={{ padding: "7px 14px", borderRadius: 20, border: "1px solid " + ((form.frequency || "daily") === f.id ? "var(--sage)" : "var(--border)"), background: (form.frequency || "daily") === f.id ? "rgba(122,144,112,0.18)" : "transparent", color: (form.frequency || "daily") === f.id ? "var(--parchment)" : "var(--clay)", fontFamily: "Space Grotesk, sans-serif", fontSize: 11, cursor: "pointer" }}>
-                    {f.label}
-                  </button>
-                ))}
+                {FREQUENCIES.map(f => {
+                  const active = (form.frequency || "daily") === f.id;
+                  const isSuggested = f.id === freqSuggestion.id && !active;
+                  return (
+                    <button key={f.id} onClick={() => { setFreqTouched(true); set("frequency", f.id); }}
+                      style={{ padding: "7px 14px", borderRadius: 20, border: "1px solid " + (active ? "var(--sage)" : isSuggested ? "rgba(122,144,112,0.35)" : "var(--border)"), background: active ? "rgba(122,144,112,0.18)" : "transparent", color: active ? "var(--parchment)" : "var(--clay)", fontFamily: "Space Grotesk, sans-serif", fontSize: 11, cursor: "pointer", position: "relative" }}>
+                      {f.label}
+                    </button>
+                  );
+                })}
               </div>
+              {freqSuggestion.reason && (
+                <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--sage)", margin: "10px 0 0", lineHeight: 1.6, opacity: 0.85 }}>
+                  {freqSuggestion.reason}
+                </p>
+              )}
+              {overuseWarning && (
+                <div style={{ display: "flex", gap: 10, marginTop: 10, padding: "10px 14px", background: "rgba(196,144,64,0.08)", border: "1px solid rgba(196,144,64,0.25)", borderRadius: 10 }}>
+                  <span style={{ fontSize: 13, flexShrink: 0, lineHeight: 1.4 }}>⚠</span>
+                  <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "#c49040", margin: 0, lineHeight: 1.6 }}>{overuseWarning}</p>
+                </div>
+              )}
             </div>
 
             <div style={{ marginBottom: 16 }}>
