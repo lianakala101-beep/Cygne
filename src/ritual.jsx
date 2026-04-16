@@ -1,11 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 import { Icon, Section, Wordmark } from "./components.jsx";
 import { detectActives, analyzeShelf, buildRoutine, isDampSkinProduct } from "./engine.js";
-import { getLockedSession } from "./productmodal.jsx";
+import { getLockedSession, getAutoSession } from "./productmodal.jsx";
 
 function SessionPicker({ productId, product, initial, onSession }) {
-  const [selected, setSelected] = useState((initial && initial !== "auto") ? initial : "am");
   const locked = product ? getLockedSession(product) : null;
+  const auto = product ? getAutoSession(product) : { session: "both" };
+  const resolved = (initial && initial !== "auto") ? initial : auto.session;
+  const [selected, setSelected] = useState(resolved);
 
   if (locked) {
     const isAM = locked.session === "am";
@@ -21,7 +23,7 @@ function SessionPicker({ productId, product, initial, onSession }) {
     );
   }
 
-  const options = [{ id: "am", label: "AM" }, { id: "pm", label: "PM" }, { id: "both", label: "Both" }];
+  const options = [{ id: "am", label: "AM only" }, { id: "pm", label: "PM only" }, { id: "both", label: "AM + PM" }];
   return (
     <div onClick={e => e.stopPropagation()} style={{ marginTop: 10 }}>
       <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 6px", opacity: 0.6 }}>Session</p>
@@ -238,7 +240,7 @@ function RoutineStep({ step, index, isLast, checked, onCheck }) {
                   <span style={{ marginLeft: 8, fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.6 }}>{step.frequency}</span>
                 )}
                 {step.session && step.session !== "auto" && (
-                  <span style={{ marginLeft: 8, fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.6 }}>{step.session}</span>
+                  <span style={{ marginLeft: 8, fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.6 }}>{step.session === "both" ? "AM + PM" : step.session === "am" ? "AM" : step.session === "pm" ? "PM" : step.session}</span>
                 )}
               </p>
               {activeKeys.length > 0 && (

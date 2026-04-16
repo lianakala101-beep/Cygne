@@ -95,6 +95,52 @@ function getLockedSession(product) {
   return null;
 }
 
+// Soft auto-assignment: returns { session, reason } for products that aren't
+// hard-locked.  The user sees this as the default but can override freely.
+function getAutoSession(product) {
+  const cat = product.category || "Serum";
+  const actives = Object.keys(detectActives(product.ingredients || []));
+
+  // SPF categories — always AM
+  if (cat === "SPF" || cat === "SPF Moisturizer")
+    return { session: "am", reason: "SPF protects against daytime UV — AM only." };
+
+  // Prescription — PM
+  if (cat === "Prescription")
+    return { session: "pm", reason: "Prescription actives work best overnight." };
+
+  // Active-driven
+  if (actives.includes("vitamin C"))
+    return { session: "am", reason: "Vitamin C pairs with SPF for daytime antioxidant protection." };
+  if (actives.includes("retinol"))
+    return { session: "pm", reason: "Retinol is photosensitive — PM only." };
+  if (actives.includes("AHA"))
+    return { session: "pm", reason: "AHAs increase sun sensitivity — best used at night." };
+  if (actives.includes("BHA"))
+    return { session: "pm", reason: "BHA exfoliates inside the pore — PM lets skin recover." };
+  if (actives.includes("peptides"))
+    return { session: "pm", reason: "Peptides support overnight repair." };
+  if (actives.includes("benzoyl peroxide"))
+    return { session: "am", reason: "Benzoyl peroxide can bleach pillowcases — AM is safer." };
+
+  // Category-driven defaults
+  if (["Cleanser", "Moisturizer", "Toner", "Essence", "Eye Cream", "Mist"].includes(cat))
+    return { session: "both", reason: "A foundational step — use morning and night." };
+  if (cat === "Oil" || cat === "Balm")
+    return { session: "pm", reason: "Rich occlusives seal everything in overnight." };
+  if (cat === "Exfoliant" || cat === "Toning Pad")
+    return { session: "pm", reason: "Exfoliating steps are best used at night." };
+  if (cat === "Mask")
+    return { session: "pm", reason: "Masks work best in the evening on clean skin." };
+
+  // Hydrating serums with HA/ceramides/niacinamide — both
+  if (actives.includes("hyaluronic acid") || actives.includes("ceramides") || actives.includes("niacinamide"))
+    return { session: "both", reason: "Hydrating actives benefit from twice-daily use." };
+
+  // Default serum/treatment — both
+  return { session: "both", reason: null };
+}
+
 // --- FREQUENCY SUGGESTION -------------------------------------------------------
 
 function getSuggestedFrequency(product, user = {}) {
@@ -258,13 +304,21 @@ function ProductModal({ product, onSave, onClose, user }) {
   const fileRef = useRef();
   const isEdit = !!(product && product.id);
   const [freqTouched, setFreqTouched] = useState(isEdit);
+  const [sessionTouched, setSessionTouched] = useState(isEdit);
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   // Frequency suggestion based on category + ingredients + user profile
   const freqSuggestion = getSuggestedFrequency(form, user);
   const prevSuggestionRef = useRef(freqSuggestion.id);
 
-  // Auto-apply suggestion when it changes (for new products, or when user hasn't manually picked)
+  // Session auto-assignment based on category + ingredients
+  const locked = getLockedSession({ ...form, id: product ? product.id : null });
+  const autoSession = getAutoSession(form);
+  // Resolve current effective session: locked > explicit user pick > auto
+  const effectiveSession = locked ? locked.session : (form.session && form.session !== "auto") ? form.session : autoSession.session;
+  const prevAutoRef = useRef(autoSession.session);
+
+  // Auto-apply frequency suggestion when it changes (new products only)
   useEffect(() => {
     if (isEdit) return;
     if (freqSuggestion.id !== prevSuggestionRef.current) {
@@ -273,9 +327,19 @@ function ProductModal({ product, onSave, onClose, user }) {
     }
   }, [freqSuggestion.id]);
 
-  // Also set initial frequency for new products
+  // Auto-apply session when it changes (new products, or user hasn't manually picked)
+  useEffect(() => {
+    if (isEdit) return;
+    if (autoSession.session !== prevAutoRef.current) {
+      prevAutoRef.current = autoSession.session;
+      if (!sessionTouched) set("session", autoSession.session);
+    }
+  }, [autoSession.session]);
+
+  // Set initial frequency + session for new products
   useEffect(() => {
     if (!isEdit && !form.frequency) set("frequency", freqSuggestion.id);
+    if (!isEdit && (!form.session || form.session === "auto")) set("session", autoSession.session);
   }, []);
 
   const overuseWarning = getOveruseWarning(form.frequency || "daily", freqSuggestion, form);
@@ -632,34 +696,32 @@ function ProductModal({ product, onSave, onClose, user }) {
 
             <div style={{ marginBottom: 16 }}>
               <label style={labelSt}>Session</label>
-              {(() => {
-                const locked = getLockedSession({ ...form, id: product ? product.id : null });
-                if (locked) {
-                  const isAM = locked.session === "am";
-                  return (
-                    <div>
-                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                        <span style={{ padding: "5px 14px", borderRadius: 20, background: isAM ? "rgba(196,144,64,0.12)" : "rgba(100,90,160,0.12)", border: "1px solid " + (isAM ? "rgba(196,144,64,0.35)" : "rgba(100,90,160,0.3)"), fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 700, color: isAM ? "#c49040" : "#9490c8" }}>{isAM ? "AM only" : "PM only"}</span>
-                        <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", opacity: 0.6 }}>locked by ingredients</span>
-                      </div>
-                      <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.5, opacity: 0.7 }}>{locked.reason}</p>
-                    </div>
-                  );
-                }
-                return (
+              {locked ? (
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                    <span style={{ padding: "5px 14px", borderRadius: 20, background: locked.session === "am" ? "rgba(196,144,64,0.12)" : "rgba(100,90,160,0.12)", border: "1px solid " + (locked.session === "am" ? "rgba(196,144,64,0.35)" : "rgba(100,90,160,0.3)"), fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 700, color: locked.session === "am" ? "#c49040" : "#9490c8" }}>{locked.session === "am" ? "AM only" : "PM only"}</span>
+                    <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", opacity: 0.6 }}>locked by ingredients</span>
+                  </div>
+                  <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.5, opacity: 0.7 }}>{locked.reason}</p>
+                </div>
+              ) : (
+                <div>
                   <div style={{ display: "flex", gap: 8 }}>
-                    {[{ id: "am", label: "AM" }, { id: "pm", label: "PM" }, { id: "both", label: "Both" }, { id: "auto", label: "Auto" }].map(s => {
-                      const active = (form.session || "auto") === s.id;
+                    {[{ id: "am", label: "AM only" }, { id: "pm", label: "PM only" }, { id: "both", label: "AM + PM" }].map(s => {
+                      const active = effectiveSession === s.id;
                       return (
-                        <button key={s.id} onClick={() => set("session", s.id)}
+                        <button key={s.id} onClick={() => { setSessionTouched(true); set("session", s.id); }}
                           style={{ flex: 1, padding: "8px 0", borderRadius: 20, border: "1px solid " + (active ? "var(--sage)" : "var(--border)"), background: active ? "rgba(122,144,112,0.18)" : "transparent", color: active ? "var(--parchment)" : "var(--clay)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: active ? 600 : 400, cursor: "pointer" }}>
                           {s.label}
                         </button>
                       );
                     })}
                   </div>
-                );
-              })()}
+                  {autoSession.reason && (
+                    <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: "8px 0 0", lineHeight: 1.5, opacity: 0.6 }}>{autoSession.reason}</p>
+                  )}
+                </div>
+              )}
             </div>
 
             <div style={{ marginBottom: 20, borderTop: "1px solid var(--border)", paddingTop: 16 }}>
@@ -681,4 +743,4 @@ function ProductModal({ product, onSave, onClose, user }) {
 
 // --- SESSION LOCKED BY INGREDIENTS -------------------------------------------
 
-export { RoutineFitSheet, ProductModal, ShelfLifeSection, getLockedSession };
+export { RoutineFitSheet, ProductModal, ShelfLifeSection, getLockedSession, getAutoSession };

@@ -82,13 +82,13 @@ function useLocalStorage(key, initialValue) {
 
 const DEMO_VERSION = "3";
 const DEMO_PRODUCTS = [
-  { id: "demo1", brand: "CeraVe", name: "Hydrating Facial Cleanser", category: "Cleanser", ingredients: ["water", "glycerin", "ceramide np", "ceramide ap", "ceramide eg", "hyaluronic acid", "niacinamide"], inRoutine: true, session: "auto", frequency: "daily", price: 16, isDemo: true },
+  { id: "demo1", brand: "CeraVe", name: "Hydrating Facial Cleanser", category: "Cleanser", ingredients: ["water", "glycerin", "ceramide np", "ceramide ap", "ceramide eg", "hyaluronic acid", "niacinamide"], inRoutine: true, session: "both", frequency: "daily", price: 16, isDemo: true },
   { id: "demo2", brand: "Paula's Choice", name: "C15 Super Booster", category: "Serum", ingredients: ["ascorbic acid", "vitamin c", "ferulic acid", "vitamin e", "tocopherol", "hyaluronic acid"], inRoutine: true, session: "am", frequency: "daily", price: 49, isDemo: true },
   { id: "demo3", brand: "The Ordinary", name: "Granactive Retinoid 2% Emulsion", category: "Serum", ingredients: ["retinol", "hydroxypinacolone retinoate", "squalane", "glycerin", "hyaluronic acid"], inRoutine: true, session: "pm", frequency: "alternating", price: 14, routineStartDate: new Date(Date.now() - 14*86400000).toISOString().split("T")[0], rampWeek: 3, isDemo: true },
   { id: "demo4", brand: "La Roche-Posay", name: "Anthelios Melt-In Sunscreen SPF 60", category: "SPF", ingredients: ["avobenzone", "homosalate", "octisalate", "octocrylene", "glycerin", "niacinamide"], inRoutine: true, session: "am", frequency: "daily", price: 38, isDemo: true },
-  { id: "demo5", brand: "CeraVe", name: "Moisturizing Cream", category: "Moisturizer", ingredients: ["ceramide np", "ceramide ap", "ceramide eg", "hyaluronic acid", "cholesterol", "glycerin", "petrolatum"], inRoutine: true, session: "auto", frequency: "daily", price: 19, isDemo: true },
+  { id: "demo5", brand: "CeraVe", name: "Moisturizing Cream", category: "Moisturizer", ingredients: ["ceramide np", "ceramide ap", "ceramide eg", "hyaluronic acid", "cholesterol", "glycerin", "petrolatum"], inRoutine: true, session: "both", frequency: "daily", price: 19, isDemo: true },
   { id: "demo6", brand: "Paula's Choice", name: "Skin Perfecting 2% BHA Liquid", category: "Toning Pad", ingredients: ["salicylic acid", "niacinamide", "methylpropanediol", "green tea extract"], inRoutine: true, session: "pm", frequency: "alternating", price: 34, routineStartDate: new Date(Date.now() - 21*86400000).toISOString().split("T")[0], rampWeek: 4, isDemo: true },
-  { id: "demo7", brand: "The Ordinary", name: "Hyaluronic Acid 2% + B5", category: "Serum", ingredients: ["hyaluronic acid", "sodium hyaluronate", "panthenol", "vitamin b5", "glycerin"], inRoutine: true, session: "auto", frequency: "daily", price: 9, isDemo: true },
+  { id: "demo7", brand: "The Ordinary", name: "Hyaluronic Acid 2% + B5", category: "Serum", ingredients: ["hyaluronic acid", "sodium hyaluronate", "panthenol", "vitamin b5", "glycerin"], inRoutine: true, session: "both", frequency: "daily", price: 9, isDemo: true },
 ];
 
 
