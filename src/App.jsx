@@ -497,7 +497,6 @@ export default function App() {
         {tab === "dashboard" && <Dashboard products={products} setTab={setTab} checkIns={checkIns} swanPopupDismissed={swanPopupDismissed} onDismissSwanPopup={dismissSwanPopup} treatments={treatments} locationData={locationData} user={user} theme={theme} notifPermission={notifPermission} onRequestNotif={requestNotifications} notifDismissed={notifDismissed} onDismissNotif={() => setNotifDismissed(true)} journals={journals} setCheckIns={setCheckIns} onLoadDemo={() => setProducts(DEMO_PRODUCTS)} />}
         {tab === "routine"   && <MyRoutine
           products={products}
-          setProducts={setProducts}
           user={user}
           cycleDay={getCurrentCycleDay(user)}
           isFlightMode={false}

@@ -54,8 +54,6 @@ function isDampSkinProduct(p) {
 // Effective ordering index. Damp-skin Serums get bumped to 3.7 so they sit
 // between Essence (3) and Exfoliant (4) / regular Serum (5).
 function effectiveLayer(p, session) {
-  const key = session === "am" ? "orderAm" : "orderPm";
-  if (typeof p[key] === "number") return p[key];
   const base = layerIndex(p.category);
   if (isDampSkinProduct(p) && base >= 4) return 3.7;
   return base;
@@ -110,25 +108,6 @@ function buildRoutine(products, { pausedActives = [] } = {}) {
       .sort((a, b) => effectiveLayer(a, session) - effectiveLayer(b, session));
   };
   return { am: sort(am, "am"), pm: sort(pm, "pm"), periodic };
-}
-
-// Detect damp-skin products that ended up positioned after heavier steps
-// (moisturizer/oil/SPF) — usually a manual reorder mistake.
-function getOrderWarnings(orderedSteps) {
-  const warnings = [];
-  const HEAVY = new Set(["Moisturizer", "SPF Moisturizer", "SPF", "Oil"]);
-  let sawHeavy = false;
-  for (const step of orderedSteps) {
-    if (HEAVY.has(step.category)) { sawHeavy = true; continue; }
-    if (sawHeavy && isDampSkinProduct(step)) {
-      warnings.push({
-        productId: step.id,
-        product: step,
-        message: `${step.name} absorbs best on damp skin — consider moving it earlier in your routine.`,
-      });
-    }
-  }
-  return warnings;
 }
 
 function detectConflicts(products) {
@@ -195,4 +174,4 @@ function calcSpending(products) {
 }
 
 
-export { isScheduledToday, getNextUseLabel, getCurrentSession, detectActives, buildRoutine, detectConflicts, analyzeShelf, calcSpending, isDampSkinProduct, getOrderWarnings };
+export { isScheduledToday, getNextUseLabel, getCurrentSession, detectActives, buildRoutine, detectConflicts, analyzeShelf, calcSpending, isDampSkinProduct };
