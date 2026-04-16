@@ -43,6 +43,15 @@ function SessionPicker({ productId, product, initial, onSession }) {
 function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, user = {} }) {
   const activeKeys = Object.keys(detectActives(product.ingredients || []));
   const inRoutine = product.inRoutine !== false; // default true
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const menuRef = useRef(null);
+  useEffect(() => {
+    if (!menuOpen) return;
+    const close = (e) => { if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false); };
+    document.addEventListener("pointerdown", close);
+    return () => document.removeEventListener("pointerdown", close);
+  }, [menuOpen]);
   const ingredientList = (product.ingredients || []).map(i => i.toLowerCase());
   const allergenHits = (user?.ingredientProfile?.allergens || []).filter(a =>
     ingredientList.some(i => i.includes(a.toLowerCase()))
@@ -85,9 +94,19 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
           <h3 style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 22, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: "0 0 2px", lineHeight: 1.15 }}>{product.name}</h3>
           <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, letterSpacing: "0.04em" }}>{product.brand}</p>
         </div>
-        <div style={{ display: "flex", gap: 0, flexShrink: 0, marginLeft: 8 }}>
-          <button onClick={() => onEdit(product)} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: "4px 6px", opacity: 0.6, transition: "opacity 0.15s" }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0.6}><Icon name="edit" size={13} /></button>
-          <button onClick={() => onDelete(product.id)} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: "4px 6px", opacity: 0.6, transition: "opacity 0.15s" }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0.6}><Icon name="trash" size={13} /></button>
+        <div ref={menuRef} style={{ position: "relative", flexShrink: 0, marginLeft: 8 }}>
+          <button onClick={() => setMenuOpen(o => !o)} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: "6px 8px", opacity: 0.6, transition: "opacity 0.15s", fontSize: 16, lineHeight: 1, fontFamily: "sans-serif" }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0.6} aria-label="Product options">⋯</button>
+          {menuOpen && (
+            <div style={{ position: "absolute", right: 0, top: "100%", zIndex: 50, minWidth: 180, background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 12, padding: "6px 0", boxShadow: "0 8px 28px rgba(0,0,0,0.45)" }}>
+              <button onClick={() => { setMenuOpen(false); onEdit(product); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "var(--parchment)", fontFamily: "Space Grotesk, sans-serif", fontSize: 12, textAlign: "left", transition: "background 0.12s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.1)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>
+                <Icon name="edit" size={12} /><span>Edit product</span>
+              </button>
+              <div style={{ height: 1, background: "var(--border)", margin: "4px 12px" }} />
+              <button onClick={() => { setMenuOpen(false); setConfirmDelete(true); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#c06060", fontFamily: "Space Grotesk, sans-serif", fontSize: 12, textAlign: "left", transition: "background 0.12s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(192,96,96,0.08)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>
+                <Icon name="trash" size={12} /><span>Remove from vanity</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -137,6 +156,22 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
       {/* Session picker — only when in routine */}
       {inRoutine && (
         <SessionPicker productId={product.id} product={product} initial={product.session} onSession={onSession} />
+      )}
+
+      {/* Delete confirmation */}
+      {confirmDelete && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(8,10,8,0.75)", backdropFilter: "blur(8px)", padding: "0 28px" }} onClick={() => setConfirmDelete(false)}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 320, background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 18, padding: "26px 24px 22px", boxShadow: "0 16px 48px rgba(0,0,0,0.55)" }}>
+            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 12px" }}>Confirm</p>
+            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, color: "var(--parchment)", margin: "0 0 22px", lineHeight: 1.65 }}>
+              Remove <strong>{product.name}</strong> from your vanity? This cannot be undone.
+            </p>
+            <div style={{ display: "flex", gap: 10 }}>
+              <button onClick={() => setConfirmDelete(false)} style={{ flex: 1, padding: "12px 0", borderRadius: 10, border: "1px solid var(--border)", background: "transparent", color: "var(--parchment)", fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 600, cursor: "pointer", transition: "background 0.15s" }} onMouseEnter={e => e.currentTarget.style.background = "var(--surface)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>Cancel</button>
+              <button onClick={() => { setConfirmDelete(false); onDelete(product.id); }} style={{ flex: 1, padding: "12px 0", borderRadius: 10, border: "1px solid rgba(192,96,96,0.35)", background: "rgba(192,96,96,0.12)", color: "#c06060", fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 600, cursor: "pointer", transition: "background 0.15s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(192,96,96,0.2)"} onMouseLeave={e => e.currentTarget.style.background = "rgba(192,96,96,0.12)"}>Remove</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
