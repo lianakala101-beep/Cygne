@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Icon, Wordmark, LOGO_SRC } from "./components.jsx";
-import { analyzeShelf, detectConflicts, buildRoutine } from "./engine.js";
+import { analyzeShelf, detectConflicts, buildRoutine, detectActives } from "./engine.js";
+import { RAMP_SCHEDULES, RAMP_ACTIVES } from "./ramp.jsx";
 import { SplashScreen } from "./splash.jsx";
 import { OnboardingScreen } from "./onboarding.jsx";
 import { Dashboard } from "./dashboard.jsx";
@@ -363,7 +364,21 @@ export default function App() {
   };
 
   const advanceRamp = (id) => {
-    setProducts(prev => prev.map(p => p.id === id ? { ...p, rampWeek: (p.rampWeek || 1) + 1, rampHeld: false } : p));
+    setProducts(prev => prev.map(p => {
+      if (p.id !== id) return p;
+      const nextWeek = (p.rampWeek || 1) + 1;
+      const activeKey = p.category === "Toning Pad"
+        ? "toning pad"
+        : RAMP_ACTIVES.find(a => detectActives(p.ingredients || [])[a]);
+      const schedule = activeKey ? RAMP_SCHEDULES[activeKey] : null;
+      const maxWeek = schedule
+        ? Math.max(...schedule.phases[schedule.phases.length - 1].weeks)
+        : 12;
+      if (nextWeek > maxWeek) {
+        return { ...p, rampWeek: undefined, routineStartDate: undefined, rampHeld: false };
+      }
+      return { ...p, rampWeek: nextWeek, rampHeld: false };
+    }));
   };
 
   const holdRamp = (id) => {

@@ -526,16 +526,15 @@ function getTreatmentPhase(treatment) {
 }
 
 // Determines which active ingredients are currently paused / reintroducing
-// based on the most recent non-cleared treatment. Wires the Treatment
-// recovery tracker to the Introduce Slowly tracker so users don't have
-// to manually bridge the gap.
+// based on the most recent non-cleared treatment.
 //
-// Returns { pausedActives, reintroActives, treatment, phase }:
-//   pausedActives  — active keys that must be excluded from today's ritual
-//   reintroActives — active keys that should appear in Introduce Slowly
-//                    (the phase explicitly says "resume this active")
-//   treatment      — the treatment driving the state (or null)
-//   phase          — the current phase object (or null)
+// Three states per active:
+//   pausedActives  — completely removed from routine (early recovery phases)
+//   reintroActives — in routine at reduced frequency via Introduce Slowly
+//   (not listed)   — fully active, no restrictions
+//
+// pausedActives and reintroActives are mutually exclusive — an active is
+// never in both lists.
 function getActivePauseState(treatments = [], products = []) {
   if (!treatments.length) return { pausedActives: [], reintroActives: [], treatment: null, phase: null };
   const candidates = treatments
@@ -550,11 +549,19 @@ function getActivePauseState(treatments = [], products = []) {
     r === "Full Ritual" || r.toLowerCase().includes(act.toLowerCase())
   );
   const isReintroPhase = /reintroduc|rebuilding|stabilized/i.test(phase.label);
+  const isEarlyPhase = /acute|healing|settling/i.test(phase.label);
   const pausedActives = [];
   const reintroActives = [];
   tracked.forEach(act => {
-    if (isResumed(act) && isReintroPhase) reintroActives.push(act);
-    else if (!isResumed(act)) pausedActives.push(act);
+    if (isResumed(act)) {
+      if (isReintroPhase) reintroActives.push(act);
+      // else: fully resumed, no restrictions
+    } else if (isEarlyPhase) {
+      pausedActives.push(act);
+    } else {
+      // Reintro phase but not yet explicitly resumed → introduce slowly
+      reintroActives.push(act);
+    }
   });
   return { pausedActives, reintroActives, treatment, phase };
 }
