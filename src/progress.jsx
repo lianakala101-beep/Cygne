@@ -107,9 +107,9 @@ function CheckInModal({ onSubmit, onClose }) {
                   return (
                     <button key={z} onClick={() => toggleZone(z)} style={{
                       padding: "6px 13px", borderRadius: 20,
-                      border: `1px solid ${active ? "rgba(192,96,96,0.55)" : "var(--border)"}`,
-                      background: active ? "rgba(192,96,96,0.12)" : "transparent",
-                      color: active ? "#c06060" : "var(--clay)",
+                      border: `1px solid ${active ? "rgba(139,115,85,0.55)" : "var(--border)"}`,
+                      background: active ? "rgba(139,115,85,0.12)" : "transparent",
+                      color: active ? "#8b7355" : "var(--clay)",
                       fontFamily: "Space Grotesk, sans-serif", fontSize: 11,
                       fontWeight: active ? 600 : 400,
                       cursor: "pointer", transition: "all 0.15s",
@@ -151,11 +151,11 @@ function CheckInModal({ onSubmit, onClose }) {
 // --- SKIN JOURNAL -------------------------------------------------------------
 
 const SKIN_CONDITIONS = [
-  { key: "rough",    label: "Rough",    color: "#c06060", bg: "rgba(192,96,96,0.10)",   border: "rgba(192,96,96,0.35)"  },
-  { key: "dull",     label: "Dull",     color: "#9a9688", bg: "rgba(154,150,136,0.10)", border: "rgba(154,150,136,0.35)"},
+  { key: "rough",    label: "Rough",    color: "#8b7355", bg: "rgba(139,115,85,0.10)",   border: "rgba(139,115,85,0.35)"  },
+  { key: "dull",     label: "Dull",     color: "#8b7355", bg: "rgba(139,115,85,0.10)", border: "rgba(139,115,85,0.35)"},
   { key: "okay",     label: "Okay",     color: "#7a9070", bg: "rgba(122,144,112,0.10)", border: "rgba(122,144,112,0.25)"},
   { key: "good",     label: "Good",     color: "#7a9070", bg: "rgba(122,144,112,0.13)", border: "rgba(122,144,112,0.4)" },
-  { key: "glowing",  label: "Glowing",  color: "#c4b070", bg: "rgba(196,176,112,0.10)", border: "rgba(196,176,112,0.4)"},
+  { key: "glowing",  label: "Glowing",  color: "#7a9070", bg: "rgba(122,144,112,0.10)", border: "rgba(122,144,112,0.4)"},
 ];
 
 function SkinJournalModal({ onSubmit, onClose, existing = null }) {
@@ -250,10 +250,10 @@ const CYCLE_PHASES = [
   {
     name: "Menstrual",
     days: [1, 5],
-    color: "#b06060",
-    bg: "rgba(176,96,96,0.08)",
-    border: "rgba(176,96,96,0.25)",
-    dot: "rgba(176,96,96,0.85)",
+    color: "#8b7355",
+    bg: "rgba(139,115,85,0.08)",
+    border: "rgba(139,115,85,0.25)",
+    dot: "rgba(139,115,85,0.85)",
     description: "Estrogen and progesterone are at their lowest. The skin barrier is more permeable and reactive.",
     nudge: "Reduce active intensity this week. Prioritize ceramides, gentle cleansing, and occlusive hydration.",
     activeAdvice: (hasRetinol, hasAHA, hasBHA) => {
@@ -281,10 +281,10 @@ const CYCLE_PHASES = [
   {
     name: "Ovulatory",
     days: [14, 16],
-    color: "#c4a060",
-    bg: "rgba(196,160,96,0.08)",
-    border: "rgba(196,160,96,0.25)",
-    dot: "rgba(196,160,96,0.85)",
+    color: "#8b7355",
+    bg: "rgba(139,115,85,0.08)",
+    border: "rgba(139,115,85,0.25)",
+    dot: "rgba(139,115,85,0.85)",
     description: "Estrogen peaks. Skin typically looks and feels its best — luminous and well-hydrated.",
     nudge: "Peak skin window. Your ritual is working optimally. No adjustments needed.",
     activeAdvice: () => "Skin is at peak resilience. Continue your ritual as normal."
@@ -292,10 +292,10 @@ const CYCLE_PHASES = [
   {
     name: "Luteal",
     days: [17, 35],
-    color: "#c49040",
-    bg: "rgba(196,144,64,0.08)",
-    border: "rgba(196,144,64,0.28)",
-    dot: "rgba(196,144,64,0.85)",
+    color: "#8b7355",
+    bg: "rgba(139,115,85,0.08)",
+    border: "rgba(139,115,85,0.28)",
+    dot: "rgba(139,115,85,0.85)",
     description: "Progesterone rises, increasing sebum production. Congestion and breakouts are more likely.",
     nudge: "Watch for congestion. BHA helps keep pores clear. Reduce heavy occlusives if skin feels clogged.",
     activeAdvice: (hasRetinol, hasAHA, hasBHA) => {
@@ -660,12 +660,12 @@ function TreatmentRecoveryCard({ treatment, products, activeMap, onDismiss }) {
             <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 3px" }}>Recovery — Day {elapsed}</p>
             <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 22, fontWeight: 400, color: "var(--parchment)", margin: "0 0 2px", lineHeight: 1.2 }}>{type.label}</p>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <div style={{ width: 5, height: 5, borderRadius: "50%", background: isLastPhase ? "#7a9070" : "#c49040" }} />
-              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: isLastPhase ? "#7a9070" : "#c49040", fontWeight: 600, letterSpacing: "0.06em" }}>{phase.label}</span>
+              <div style={{ width: 5, height: 5, borderRadius: "50%", background: isLastPhase ? "#7a9070" : "#8b7355" }} />
+              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: isLastPhase ? "#7a9070" : "#8b7355", fontWeight: 600, letterSpacing: "0.06em" }}>{phase.label}</span>
             </div>
           </div>
           {isLastPhase && (
-            <button onClick={onDismiss} style={{ padding: "6px 12px", background: "rgba(200,195,188,0.18)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 8, fontFamily: "Space Grotesk, sans-serif", fontSize: 9, color: "#7a9070", cursor: "pointer", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+            <button onClick={onDismiss} style={{ padding: "6px 12px", background: "rgba(232,226,217,0.18)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 8, fontFamily: "Space Grotesk, sans-serif", fontSize: 9, color: "#7a9070", cursor: "pointer", letterSpacing: "0.1em", textTransform: "uppercase" }}>
               All Clear
             </button>
           )}
@@ -684,10 +684,10 @@ function TreatmentRecoveryCard({ treatment, products, activeMap, onDismiss }) {
         {/* Paused actives */}
         {paused.length > 0 && (
           <div style={{ marginBottom: 10 }}>
-            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "#c06060", margin: "0 0 6px" }}>Paused from your vanity</p>
+            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "#8b7355", margin: "0 0 6px" }}>Paused from your vanity</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
               {paused.map((p, i) => (
-                <span key={i} style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", color: "#c06060", background: "rgba(192,96,96,0.08)", border: "1px solid rgba(192,96,96,0.22)", padding: "3px 10px", borderRadius: 20, letterSpacing: "0.06em" }}>{p}</span>
+                <span key={i} style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", color: "#8b7355", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.22)", padding: "3px 10px", borderRadius: 20, letterSpacing: "0.06em" }}>{p}</span>
               ))}
             </div>
           </div>
@@ -740,7 +740,7 @@ function TreatmentSection({ treatments, saveTreatment, removeTreatment, products
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)" }}>Treatments</span>
           {activeTreatments.length > 0 && (
-            <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", color: "#7a9070", background: "rgba(200,195,188,0.18)", border: "1px solid rgba(122,144,112,0.25)", padding: "2px 8px", borderRadius: 20 }}>{activeTreatments.length} active</span>
+            <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", color: "#7a9070", background: "rgba(232,226,217,0.18)", border: "1px solid rgba(122,144,112,0.25)", padding: "2px 8px", borderRadius: 20 }}>{activeTreatments.length} active</span>
           )}
         </div>
         <button onClick={() => setAddOpen(true)}
@@ -908,7 +908,7 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)" }}>Body Acne</span>
-          {zones.length > 0 && <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", color: "#7a9070", background: "rgba(200,195,188,0.18)", border: "1px solid rgba(122,144,112,0.25)", padding: "2px 8px", borderRadius: 20 }}>{zones.length} zone{zones.length !== 1 ? "s" : ""}</span>}
+          {zones.length > 0 && <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", color: "#7a9070", background: "rgba(232,226,217,0.18)", border: "1px solid rgba(122,144,112,0.25)", padding: "2px 8px", borderRadius: 20 }}>{zones.length} zone{zones.length !== 1 ? "s" : ""}</span>}
         </div>
         <button onClick={() => setShowTriggerModal(true)}
           style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 12px", background: "none", border: "1px solid var(--border)", borderRadius: 8, fontFamily: "Space Grotesk, sans-serif", fontSize: 9, color: "var(--clay)", cursor: "pointer", letterSpacing: "0.1em", textTransform: "uppercase", transition: "all 0.2s" }}
@@ -1001,10 +1001,10 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
 
           {gaps.length > 0 && (
             <div>
-              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "#c49040", margin: "0 0 8px" }}>Worth adding</p>
+              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "#8b7355", margin: "0 0 8px" }}>Worth adding</p>
               {gaps.map((g, i) => (
                 <div key={i} style={{ display: "flex", gap: 10, marginBottom: 7 }}>
-                  <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#c49040", flexShrink: 0, marginTop: 4 }} />
+                  <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#8b7355", flexShrink: 0, marginTop: 4 }} />
                   <div>
                     <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--parchment)", margin: "0 0 2px", fontWeight: 500 }}>{g.product}</p>
                     <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>{g.reason}</p>
@@ -1248,7 +1248,7 @@ function WeekAtAGlance({ checkIns, journals, products = [], pausedActives = [] }
                 {d.am.length > 0 && (
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 3, justifyContent: "center" }}>
                     {d.am.map((p, j) => (
-                      <div key={j} style={{ width: 6, height: 6, borderRadius: "50%", background: p.scheduled ? "var(--sage)" : "var(--border)", opacity: p.scheduled ? 0.9 : 0.35 }} />
+                      <div key={j} style={{ width: 6, height: 6, borderRadius: "50%", background: p.scheduled ? "var(--sage)" : "var(--taupe)", opacity: p.scheduled ? 0.9 : 0.4 }} />
                     ))}
                   </div>
                 )}
@@ -1258,12 +1258,12 @@ function WeekAtAGlance({ checkIns, journals, products = [], pausedActives = [] }
                 {d.pm.length > 0 && (
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 3, justifyContent: "center" }}>
                     {d.pm.map((p, j) => (
-                      <div key={j} style={{ width: 6, height: 6, borderRadius: "50%", background: p.scheduled ? "var(--parchment)" : "var(--border)", opacity: p.scheduled ? 0.85 : 0.35 }} />
+                      <div key={j} style={{ width: 6, height: 6, borderRadius: "50%", background: p.scheduled ? "var(--parchment)" : "var(--taupe)", opacity: p.scheduled ? 0.85 : 0.4 }} />
                     ))}
                   </div>
                 )}
                 {d.am.length === 0 && d.pm.length === 0 && (
-                  <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--border)", opacity: 0.3 }} />
+                  <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--taupe)", opacity: 0.35 }} />
                 )}
               </div>
               {d.isToday && <div style={{ width: 4, height: 4, borderRadius: "50%", background: "var(--sage)" }} />}
@@ -1283,7 +1283,7 @@ function WeekAtAGlance({ checkIns, journals, products = [], pausedActives = [] }
           <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.6 }}>PM</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-          <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--border)", opacity: 0.4 }} />
+          <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--taupe)", opacity: 0.4 }} />
           <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.6 }}>Skipped</span>
         </div>
         <div style={{ flex: 1 }} />
@@ -1312,7 +1312,7 @@ function WeekAtAGlance({ checkIns, journals, products = [], pausedActives = [] }
                       const isAlternating = freq !== "daily";
                       return (
                         <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: j < slot.items.length - 1 ? 8 : 0, opacity: p.scheduled ? 1 : 0.35 }}>
-                          <div style={{ width: 8, height: 8, borderRadius: "50%", background: slot.key === "am" ? "var(--sage)" : "var(--parchment)", flexShrink: 0, opacity: p.scheduled ? 1 : 0.4 }} />
+                          <div style={{ width: 8, height: 8, borderRadius: "50%", background: p.scheduled ? (slot.key === "am" ? "var(--sage)" : "var(--parchment)") : "var(--taupe)", flexShrink: 0, opacity: p.scheduled ? 1 : 0.5 }} />
                           <div style={{ flex: 1 }}>
                             <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 500, color: "var(--parchment)", margin: "0 0 1px" }}>
                               {p.name}
@@ -1528,7 +1528,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
             <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", opacity: 0.6 }}>from {checkIns.length} check-in{checkIns.length !== 1 ? "s" : ""}</span>
           </div>
           <div style={{ height: 2, background: "rgba(255,255,255,0.05)", borderRadius: 2, marginBottom: 12, overflow: "hidden" }}>
-            <div style={{ width: consistencyPct + "%", height: "100%", background: consistencyPct >= 80 ? "#7a9070" : consistencyPct >= 60 ? "#c49040" : "#c06060", borderRadius: 2, transition: "width 0.6s ease" }} />
+            <div style={{ width: consistencyPct + "%", height: "100%", background: consistencyPct >= 80 ? "#7a9070" : consistencyPct >= 60 ? "#8b7355" : "#8b7355", borderRadius: 2, transition: "width 0.6s ease" }} />
           </div>
           <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>
             {consistencyPct >= 85 ? "Strong adherence — your ritual is building compounding benefit." :
@@ -1683,7 +1683,7 @@ function LocationManager({ locationData, setLocationData, locationDenied, setLoc
             {loading ? "..." : "Update"}
           </button>
         </div>
-        {error && <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "#c06060", margin: "10px 0 0" }}>{error}</p>}
+        {error && <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "#8b7355", margin: "10px 0 0" }}>{error}</p>}
       </div>
     );
   }
@@ -1701,7 +1701,7 @@ function LocationManager({ locationData, setLocationData, locationDenied, setLoc
         onMouseLeave={e => e.currentTarget.style.background = "rgba(122,144,112,0.10)"}>
         {loading ? "Requesting..." : locationDenied ? "Try Again" : "Enable Location"}
       </button>
-      {error && <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "#c06060", margin: "10px 0 0" }}>{error}</p>}
+      {error && <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "#8b7355", margin: "10px 0 0" }}>{error}</p>}
     </div>
   );
 }

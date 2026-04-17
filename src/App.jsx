@@ -428,8 +428,9 @@ export default function App() {
           --surface:   #1c201a;
           --border:    rgba(200,215,190,0.09);
           --parchment: #e8e2d9;
-          --clay:      #9a9688;
-          --muted:     #6a6860;
+          --clay:      #8b7355;
+          --muted:     #6b5a43;
+          --taupe:     #8b7355;
           --overlay:   rgba(8,12,8,0.72);
           --cta:       #3a4134;
         }
@@ -439,8 +440,9 @@ export default function App() {
           --surface:   #ffffff;
           --border:    rgba(0,0,0,0.10);
           --parchment: #1a1612;
-          --clay:      #7a7268;
-          --muted:     #a09890;
+          --clay:      #6b5338;
+          --muted:     #a8906c;
+          --taupe:     #6b5338;
           --overlay:   rgba(30,25,20,0.5);
           --sage:      #5a7060;
           --cta:       #4a5e44;
@@ -463,13 +465,13 @@ export default function App() {
           color: #1a1612 !important;
         }
         .theme-light .modal-bg {
-          background: rgba(200,195,188,0.55) !important;
+          background: rgba(232,226,217,0.55) !important;
         }
         .theme-light option {
           background: #f7f4f0;
           color: #1a1612;
         }
-        .theme-light .modal-bg { background: rgba(200,195,188,0.5) !important; }
+        .theme-light .modal-bg { background: rgba(232,226,217,0.5) !important; }
       `}</style>
 
       {/* Header */}

@@ -6,9 +6,9 @@ import { detectActives } from "./engine.js";
 const RAMP_SCHEDULES = {
   retinol: {
     label: "Retinol",
-    color: "#c49040",
-    colorBg: "rgba(196,144,64,0.08)",
-    colorBorder: "rgba(196,144,64,0.22)",
+    color: "#8b7355",
+    colorBg: "rgba(139,115,85,0.08)",
+    colorBorder: "rgba(139,115,85,0.22)",
     phases: [
       {
         name: "Patch",
@@ -46,9 +46,9 @@ const RAMP_SCHEDULES = {
   },
   AHA: {
     label: "AHA Exfoliant",
-    color: "#9a8070",
-    colorBg: "rgba(154,128,112,0.08)",
-    colorBorder: "rgba(154,128,112,0.22)",
+    color: "#8b7355",
+    colorBg: "rgba(139,115,85,0.08)",
+    colorBorder: "rgba(139,115,85,0.22)",
     phases: [
       {
         name: "Patch",
@@ -126,9 +126,9 @@ const RAMP_SCHEDULES = {
   },
   "vitamin C": {
     label: "Vitamin C",
-    color: "#c49040",
-    colorBg: "rgba(196,144,64,0.06)",
-    colorBorder: "rgba(196,144,64,0.18)",
+    color: "#8b7355",
+    colorBg: "rgba(139,115,85,0.06)",
+    colorBorder: "rgba(139,115,85,0.18)",
     phases: [
       {
         name: "Patch",
@@ -166,9 +166,9 @@ const RAMP_SCHEDULES = {
   },
   "toning pad": {
     label: "Toning Pad (BHA/AHA)",
-    color: "#8090a4",
-    colorBg: "rgba(128,144,164,0.08)",
-    colorBorder: "rgba(128,144,164,0.22)",
+    color: "#8b7355",
+    colorBg: "rgba(139,115,85,0.08)",
+    colorBorder: "rgba(139,115,85,0.22)",
     phases: [
       { name: "Patch", weeks: [1], frequency: "Patch test first", instruction: "Apply to your jawline or cheek for 2 nights before using all over. Daily-dose actives are gentler but still worth checking.", onTrack: "No reaction — you're clear to start daily use.", backOff: "Any irritation — give skin 3 days rest before trying again." },
       { name: "Introduce", weeks: [2, 3], frequency: "Daily — PM only", instruction: "Use once daily in the evening. Apply after cleansing, before serum. BHA pads can be used AM too once tolerated.", onTrack: "Skin feels smooth, no flaking or redness.", backOff: "Stinging or peeling — drop to every other night for a week." },
@@ -203,7 +203,7 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber, onAdvance, onHold 
         <div style={{ flex: 1 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5, flexWrap: "wrap" }}>
             <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: schedule.color, background: `${schedule.color}18`, padding: "2px 8px", borderRadius: 20 }}>{schedule.label}</span>
-            <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", color: isHeld ? "#c06060" : "var(--clay)", opacity: 0.7 }}>Week {weekNumber} · {isHeld ? "Holding" : phase.name}</span>
+            <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", color: isHeld ? "#8b7355" : "var(--clay)", opacity: 0.7 }}>Week {weekNumber} · {isHeld ? "Holding" : phase.name}</span>
           </div>
           <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, fontWeight: 500, color: "var(--parchment)", margin: "0 0 2px" }}>{product.name}</p>
           <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: schedule.color, margin: 0, letterSpacing: "0.04em" }}>{phase.frequency}</p>
@@ -231,23 +231,23 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber, onAdvance, onHold 
               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--sage)", margin: "0 0 4px" }}>On track</p>
               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>{phase.onTrack}</p>
             </div>
-            <div style={{ padding: "10px 12px", background: "rgba(192,96,96,0.06)", border: "1px solid rgba(192,96,96,0.18)", borderRadius: 10 }}>
-              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#c06060", margin: "0 0 4px" }}>Back off</p>
+            <div style={{ padding: "10px 12px", background: "rgba(139,115,85,0.06)", border: "1px solid rgba(139,115,85,0.18)", borderRadius: 10 }}>
+              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#8b7355", margin: "0 0 4px" }}>Back off</p>
               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>{phase.backOff}</p>
             </div>
           </div>
 
           {/* Weekly response buttons */}
           {justActioned ? (
-            <div style={{ padding: "12px 16px", background: justActioned === "advance" ? "rgba(122,144,112,0.12)" : "rgba(192,96,96,0.08)", border: `1px solid ${justActioned === "advance" ? "rgba(122,144,112,0.35)" : "rgba(192,96,96,0.25)"}`, borderRadius: 10, textAlign: "center" }}>
-              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600, color: justActioned === "advance" ? "#7a9070" : "#c06060", margin: 0 }}>
+            <div style={{ padding: "12px 16px", background: justActioned === "advance" ? "rgba(122,144,112,0.12)" : "rgba(139,115,85,0.08)", border: `1px solid ${justActioned === "advance" ? "rgba(122,144,112,0.35)" : "rgba(139,115,85,0.25)"}`, borderRadius: 10, textAlign: "center" }}>
+              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600, color: justActioned === "advance" ? "#7a9070" : "#8b7355", margin: 0 }}>
                 {justActioned === "advance" ? "Logged — advancing to next phase" : "Logged — holding this week's frequency"}
               </p>
             </div>
           ) : isHeld ? (
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              <div style={{ padding: "12px 16px", background: "rgba(192,96,96,0.08)", border: "1px solid rgba(192,96,96,0.22)", borderRadius: 10, textAlign: "center" }}>
-                <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600, color: "#c06060", margin: "0 0 2px" }}>Paused — repeat this week</p>
+              <div style={{ padding: "12px 16px", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.22)", borderRadius: 10, textAlign: "center" }}>
+                <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600, color: "#8b7355", margin: "0 0 2px" }}>Paused — repeat this week</p>
                 <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", margin: 0, opacity: 0.7 }}>When you're ready, mark as handled to advance.</p>
               </div>
               <button onClick={() => { onAdvance(product.id); setJustActioned("advance"); }}
@@ -266,9 +266,9 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber, onAdvance, onHold 
                 Skin handled it ✓
               </button>
               <button onClick={() => { onHold(product.id); setJustActioned("hold"); }}
-                style={{ flex: 1, padding: "10px 0", background: "rgba(192,96,96,0.06)", border: "1px solid rgba(192,96,96,0.18)", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#c06060", cursor: "pointer", transition: "all 0.18s" }}
-                onMouseEnter={e => e.currentTarget.style.background = "rgba(192,96,96,0.12)"}
-                onMouseLeave={e => e.currentTarget.style.background = "rgba(192,96,96,0.06)"}>
+                style={{ flex: 1, padding: "10px 0", background: "rgba(139,115,85,0.06)", border: "1px solid rgba(139,115,85,0.18)", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#8b7355", cursor: "pointer", transition: "all 0.18s" }}
+                onMouseEnter={e => e.currentTarget.style.background = "rgba(139,115,85,0.12)"}
+                onMouseLeave={e => e.currentTarget.style.background = "rgba(139,115,85,0.06)"}>
                 Backing off
               </button>
             </div>

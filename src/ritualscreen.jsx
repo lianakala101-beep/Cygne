@@ -14,9 +14,9 @@ const RITUAL_MODES = {
   travel: {
     name: "travel ritual",
     tagline: "Simplified for the road.",
-    color: "#9a9688",
-    bg: "rgba(154,150,136,0.08)",
-    border: "rgba(154,150,136,0.22)",
+    color: "#8b7355",
+    bg: "rgba(139,115,85,0.08)",
+    border: "rgba(139,115,85,0.22)",
     filterSteps: (steps) => steps.filter(p =>
       ["Cleanser","Moisturizer","SPF","Eye Cream"].includes(p.category)
     ),
@@ -25,9 +25,9 @@ const RITUAL_MODES = {
   recovery: {
     name: "recovery ritual",
     tagline: "Let your barrier breathe.",
-    color: "#c06060",
-    bg: "rgba(192,96,96,0.08)",
-    border: "rgba(192,96,96,0.22)",
+    color: "#8b7355",
+    bg: "rgba(139,115,85,0.08)",
+    border: "rgba(139,115,85,0.22)",
     filterSteps: (steps) => steps.filter(p =>
       !["Exfoliant","Toning Pad"].includes(p.category) &&
       !["retinol","AHA","BHA","benzoyl peroxide"].some(a =>
@@ -39,9 +39,9 @@ const RITUAL_MODES = {
   barrier_repair: {
     name: "barrier repair ritual",
     tagline: "Rebuild, don't strip.",
-    color: "#c4a060",
-    bg: "rgba(196,160,96,0.08)",
-    border: "rgba(196,160,96,0.22)",
+    color: "#8b7355",
+    bg: "rgba(139,115,85,0.08)",
+    border: "rgba(139,115,85,0.22)",
     filterSteps: (steps) => steps.filter(p =>
       ["Cleanser","Essence","Moisturizer","Oil","Eye Cream"].includes(p.category) ||
       (p.ingredients||[]).some(i => /ceramide|hyaluronic|squalane|panthenol/i.test(i))
@@ -51,9 +51,9 @@ const RITUAL_MODES = {
   menstrual: {
     name: "gentle ritual",
     tagline: "Your skin is more sensitive right now.",
-    color: "#b06060",
-    bg: "rgba(176,96,96,0.07)",
-    border: "rgba(176,96,96,0.2)",
+    color: "#8b7355",
+    bg: "rgba(139,115,85,0.07)",
+    border: "rgba(139,115,85,0.2)",
     filterSteps: (steps) => steps.filter(p =>
       !["Exfoliant","Toning Pad"].includes(p.category) &&
       !(p.ingredients||[]).some(i => /retinol|retinyl|tretinoin|glycolic|lactic|salicylic/i.test(i))
@@ -63,9 +63,9 @@ const RITUAL_MODES = {
   luteal: {
     name: "oil control ritual",
     tagline: "Sebum is peaking. Get ahead of it.",
-    color: "#c49040",
-    bg: "rgba(196,144,64,0.08)",
-    border: "rgba(196,144,64,0.22)",
+    color: "#8b7355",
+    bg: "rgba(139,115,85,0.08)",
+    border: "rgba(139,115,85,0.22)",
     filterSteps: (steps) => steps,
     guidance: "Progesterone is driving up sebum production this week. Prioritise your BHA if you have one, keep moisturiser lighter, and watch for congestion.",
   },
@@ -81,27 +81,27 @@ const RITUAL_MODES = {
   winter: {
     name: "winter ritual",
     tagline: "Moisture in, barrier up.",
-    color: "#7a9aaa",
-    bg: "rgba(122,154,170,0.08)",
-    border: "rgba(122,154,170,0.22)",
+    color: "#8b7355",
+    bg: "rgba(139,115,85,0.08)",
+    border: "rgba(139,115,85,0.22)",
     filterSteps: (steps) => steps,
     guidance: "Cold strips moisture and weakens the barrier. Swap any foaming cleansers for cream formulas tonight if you can, and lock everything in with an occlusive.",
   },
   summer: {
     name: "minimal ritual",
     tagline: "Light layers, consistent SPF.",
-    color: "#c4a060",
-    bg: "rgba(196,160,96,0.07)",
-    border: "rgba(196,160,96,0.2)",
+    color: "#8b7355",
+    bg: "rgba(139,115,85,0.07)",
+    border: "rgba(139,115,85,0.2)",
     filterSteps: (steps) => steps.filter(p => p.category !== "Oil"),
     guidance: "Heat and humidity mean your skin retains more moisture naturally. Oils and heavy occlusives can congest — keep it light and make SPF the hero.",
   },
   reset: {
     name: "reset ritual",
     tagline: "Back to basics.",
-    color: "#9a9688",
-    bg: "rgba(154,150,136,0.08)",
-    border: "rgba(154,150,136,0.22)",
+    color: "#8b7355",
+    bg: "rgba(139,115,85,0.08)",
+    border: "rgba(139,115,85,0.22)",
     filterSteps: (steps) => steps.filter(p =>
       ["Cleanser","Moisturizer","SPF"].includes(p.category)
     ),
@@ -332,8 +332,8 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
 
       {/* Treatment recovery pause banner */}
       {pausedProducts.length > 0 && pauseTreatment && pausePhase && (
-        <div style={{ marginBottom: 18, padding: "13px 15px", background: "rgba(192,96,96,0.07)", border: "1px solid rgba(192,96,96,0.22)", borderRadius: 12 }}>
-          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "#c06060", margin: "0 0 5px" }}>Paused during recovery</p>
+        <div style={{ marginBottom: 18, padding: "13px 15px", background: "rgba(139,115,85,0.07)", border: "1px solid rgba(139,115,85,0.22)", borderRadius: 12 }}>
+          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "#8b7355", margin: "0 0 5px" }}>Paused during recovery</p>
           <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--parchment)", margin: "0 0 8px", lineHeight: 1.55 }}>
             {pausedProducts.map(p => p.name).join(", ")} {pausedProducts.length === 1 ? "is" : "are"} held for your {pausePhase.label.toLowerCase()} phase. They'll return via Introduce Slowly once your skin is ready.
           </p>
@@ -539,7 +539,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
       )}
 
       {conflicts.length === 0 && flags.length === 0 && totalRecs === 0 && products.length > 0 && (
-        <div style={{ display: "flex", gap: 11, padding: "13px 16px", background: "rgba(107,120,95,0.07)", borderRadius: 12, border: "1px solid rgba(107,120,95,0.18)" }}>
+        <div style={{ display: "flex", gap: 11, padding: "13px 16px", background: "rgba(122,144,112,0.07)", borderRadius: 12, border: "1px solid rgba(122,144,112,0.18)" }}>
           <span style={{ color: "#7a9070" }}><Icon name="check" size={14} /></span>
           <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, color: "var(--parchment)", margin: 0 }}>No conflicts. Your ritual is well-balanced.</p>
         </div>

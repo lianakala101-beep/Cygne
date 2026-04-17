@@ -86,7 +86,7 @@ function AuthScreen({ onAuth }) {
         </div>
 
         {error && (
-          <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 11, color: "#c06060", margin: "0 0 14px", lineHeight: 1.5 }}>{error}</p>
+          <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 11, color: "#8b7355", margin: "0 0 14px", lineHeight: 1.5 }}>{error}</p>
         )}
 
         <button onClick={handleSubmit} disabled={loading}

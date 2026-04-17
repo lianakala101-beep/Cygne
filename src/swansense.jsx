@@ -88,9 +88,9 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
           ? "Tretinoin is cumulative. After consecutive nights, the skin barrier can become compromised even before visible irritation appears. Consider a rest night."
           : "Strong actives used multiple nights in a row. Your skin may not show irritation yet, but risk is elevated — a rest night tonight can prevent it.",
         level: "caution",
-        color: "#c49040",
-        bg: "rgba(196,144,64,0.07)",
-        border: "rgba(196,144,64,0.2)",
+        color: "#8b7355",
+        bg: "rgba(139,115,85,0.07)",
+        border: "rgba(139,115,85,0.2)",
       });
     }
   }
@@ -116,9 +116,9 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
         headline: `Sensitivity window in ~${daysUntilMenstrual} day${daysUntilMenstrual === 1 ? "" : "s"}.`,
         detail: "Approaching menstruation, progesterone drops and barrier permeability increases. Consider easing up on exfoliants and actives over the next few days.",
         level: "cycle",
-        color: "#b06060",
-        bg: "rgba(176,96,96,0.07)",
-        border: "rgba(176,96,96,0.2)",
+        color: "#8b7355",
+        bg: "rgba(139,115,85,0.07)",
+        border: "rgba(139,115,85,0.2)",
       });
     } else if (daysUntilMenstrual === 0 && cycleDay <= 5) {
       predictions.push({
@@ -126,9 +126,9 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
         headline: "Elevated skin sensitivity right now.",
         detail: "During menstruation, barrier permeability is at its highest. Breakouts and irritation are more likely. A gentler ritual is recommended.",
         level: "cycle",
-        color: "#b06060",
-        bg: "rgba(176,96,96,0.07)",
-        border: "rgba(176,96,96,0.2)",
+        color: "#8b7355",
+        bg: "rgba(139,115,85,0.07)",
+        border: "rgba(139,115,85,0.2)",
       });
     }
 
@@ -138,9 +138,9 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
         headline: `Oil surge likely in ~${daysUntilLuteal} day${daysUntilLuteal === 1 ? "" : "s"}.`,
         detail: "Progesterone rise during luteal phase drives up sebum production. Your BHA will be especially useful this week — keep it consistent.",
         level: "cycle",
-        color: "#c49040",
-        bg: "rgba(196,144,64,0.07)",
-        border: "rgba(196,144,64,0.2)",
+        color: "#8b7355",
+        bg: "rgba(139,115,85,0.07)",
+        border: "rgba(139,115,85,0.2)",
       });
     }
 
@@ -152,9 +152,9 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
           headline: "Elevated breakout risk — late luteal phase.",
           detail: "Sebum is peaking and your recent check-ins flagged congestion. This is the highest-risk window. BHA and a lighter moisturiser will help.",
           level: "alert",
-          color: "#c06060",
-          bg: "rgba(192,96,96,0.08)",
-          border: "rgba(192,96,96,0.22)",
+          color: "#8b7355",
+          bg: "rgba(139,115,85,0.08)",
+          border: "rgba(139,115,85,0.22)",
         });
       }
     }
@@ -192,9 +192,9 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
         headline: season === "winter" ? "Barrier risk this week." : "Barrier risk as temperatures drop.",
         detail: "Cold air strips moisture faster than summer. Without an occlusive layer, your moisturiser's benefits will evaporate quickly. Consider adding a facial oil or balm as a final step.",
         level: "caution",
-        color: "#7a9aaa",
-        bg: "rgba(122,154,170,0.07)",
-        border: "rgba(122,154,170,0.2)",
+        color: "#8b7355",
+        bg: "rgba(139,115,85,0.07)",
+        border: "rgba(139,115,85,0.2)",
       });
     }
   }
@@ -207,9 +207,9 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
       headline: "Recurring irritation detected.",
       detail: "Two or more recent check-ins have flagged irritation. This may indicate an active is accumulating, a product isn't suiting you, or the barrier is compromised. A reset ritual for 3–5 nights can help identify the cause.",
       level: "alert",
-      color: "#c06060",
-      bg: "rgba(192,96,96,0.08)",
-      border: "rgba(192,96,96,0.22)",
+      color: "#8b7355",
+      bg: "rgba(139,115,85,0.08)",
+      border: "rgba(139,115,85,0.22)",
     });
   }
 
@@ -233,9 +233,9 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
         headline: season === "winter" ? "Winter is tough on skin barriers." : "Cooler air arriving — barrier watch.",
         detail: "As temperatures drop, transepidermal water loss increases. Check that you have a moisturiser and ideally an occlusive as your final PM step.",
         level: "caution",
-        color: "#7a9aaa",
-        bg: "rgba(122,154,170,0.07)",
-        border: "rgba(122,154,170,0.2)",
+        color: "#8b7355",
+        bg: "rgba(139,115,85,0.07)",
+        border: "rgba(139,115,85,0.2)",
       });
     } else {
       predictions.push({
@@ -370,7 +370,7 @@ function SwanSenseCard({ products, checkIns = [], user = {}, locationData = null
                       ↑ Yes
                     </button>
                     <button onClick={e => giveFeedback(p.type, "down", e)}
-                      style={{ background: fb === "down" ? "rgba(192,96,96,0.15)" : "transparent", border: `1px solid ${fb === "down" ? "rgba(192,96,96,0.4)" : "var(--border)"}`, borderRadius: 20, padding: "4px 10px", cursor: "pointer", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: fb === "down" ? "#c06060" : "var(--clay)", transition: "all 0.15s" }}>
+                      style={{ background: fb === "down" ? "rgba(139,115,85,0.15)" : "transparent", border: `1px solid ${fb === "down" ? "rgba(139,115,85,0.4)" : "var(--border)"}`, borderRadius: 20, padding: "4px 10px", cursor: "pointer", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: fb === "down" ? "#8b7355" : "var(--clay)", transition: "all 0.15s" }}>
                       ↓ Not really
                     </button>
                   </div>

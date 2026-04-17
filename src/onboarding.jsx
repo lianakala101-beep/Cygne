@@ -91,7 +91,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
         const active = single ? selected === opt : selected.includes(opt);
         return (
           <button key={opt} onClick={() => onToggle(opt)}
-            style={{ padding: "10px 18px", borderRadius: 24, border: `1px solid ${active ? "rgba(122,144,112,0.7)" : "var(--border)"}`, background: active ? "rgba(122,144,112,0.12)" : "var(--surface)", color: active ? "#5a7a60" : "#6a6560", fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: active ? 600 : 400, cursor: "pointer", transition: "all 0.18s", letterSpacing: "0.02em" }}>
+            style={{ padding: "10px 18px", borderRadius: 24, border: `1px solid ${active ? "rgba(122,144,112,0.7)" : "var(--border)"}`, background: active ? "rgba(122,144,112,0.12)" : "var(--surface)", color: active ? "#5a7a60" : "#6b5a43", fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: active ? 600 : 400, cursor: "pointer", transition: "all 0.18s", letterSpacing: "0.02em" }}>
             {opt}
           </button>
         );
@@ -252,8 +252,8 @@ function OnboardingScreen({ onComplete, setLocationData }) {
 
         <div style={{ minHeight: "100vh", background: "#f5f2ee", display: "flex", flexDirection: "column", padding: "0 24px 40px", position: "relative", overflow: "hidden" }}>
       {/* Background blobs */}
-      <div style={{ position: "absolute", top: "-20%", right: "-15%", width: 500, height: 500, borderRadius: "60% 40% 55% 45%", background: "rgba(180,175,168,0.25)", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", bottom: "-25%", left: "-10%", width: 440, height: 440, borderRadius: "45% 55% 40% 60%", background: "rgba(200,195,188,0.18)", pointerEvents: "none" }} />
+      <div style={{ position: "absolute", top: "-20%", right: "-15%", width: 500, height: 500, borderRadius: "60% 40% 55% 45%", background: "rgba(232,226,217,0.25)", pointerEvents: "none" }} />
+      <div style={{ position: "absolute", bottom: "-25%", left: "-10%", width: 440, height: 440, borderRadius: "45% 55% 40% 60%", background: "rgba(232,226,217,0.18)", pointerEvents: "none" }} />
 
       {/* Progress bar */}
       {step < TOTAL_STEPS - 1 && (
@@ -304,7 +304,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
 // Onboarding text styles
 const obEyebrow = { fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 10px" };
 const obHeading = { fontFamily: "Reenie Beanie, cursive", fontSize: 36, fontWeight: 400, color: "var(--parchment)", margin: "0 0 8px", letterSpacing: "0.01em", lineHeight: 1.15 };
-const obSub = { fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "#5a5550", margin: 0, lineHeight: 1.7, opacity: 0.8 };
+const obSub = { fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "#6b5338", margin: 0, lineHeight: 1.7, opacity: 0.8 };
 const inputSt = { width: "100%", padding: "12px 16px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 14, color: "var(--parchment)", outline: "none" };
 const labelSt = { fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", display: "block", marginBottom: 6 };
 

@@ -15,7 +15,7 @@ function SessionPicker({ productId, product, initial, onSession }) {
       <div onClick={e => e.stopPropagation()} style={{ marginTop: 10 }}>
         <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 6px", opacity: 0.6 }}>Session</p>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ padding: "5px 12px", borderRadius: 8, background: isAM ? "rgba(196,144,64,0.12)" : "rgba(100,90,160,0.12)", border: "1px solid " + (isAM ? "rgba(196,144,64,0.35)" : "rgba(100,90,160,0.3)"), fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 700, color: isAM ? "#c49040" : "#9490c8" }}>{isAM ? "AM only" : "PM only"}</span>
+          <span style={{ padding: "5px 12px", borderRadius: 8, background: isAM ? "rgba(122,144,112,0.14)" : "rgba(232,226,217,0.10)", border: "1px solid " + (isAM ? "rgba(122,144,112,0.4)" : "rgba(232,226,217,0.3)"), fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 700, color: isAM ? "var(--sage)" : "#e8e2d9" }}>{isAM ? "AM only" : "PM only"}</span>
           <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", opacity: 0.5 }}>locked by ingredients</span>
         </div>
         <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", margin: "8px 0 0", lineHeight: 1.5, opacity: 0.6 }}>{locked.reason}</p>
@@ -69,8 +69,8 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
     if (product.expiryDate) {
       const exp = new Date(product.expiryDate);
       const days = Math.ceil((exp - now) / 86400000);
-      if (days <= 0) return { label: `Expired ${Math.abs(days)}d ago`, color: "#c06060", bg: "rgba(192,96,96,0.08)", border: "rgba(192,96,96,0.25)" };
-      if (days <= 30) return { label: `Expires in ${days}d`, color: "#c49040", bg: "rgba(196,144,64,0.08)", border: "rgba(196,144,64,0.25)" };
+      if (days <= 0) return { label: `Expired ${Math.abs(days)}d ago`, color: "#8b7355", bg: "rgba(139,115,85,0.08)", border: "rgba(139,115,85,0.25)" };
+      if (days <= 30) return { label: `Expires in ${days}d`, color: "#8b7355", bg: "rgba(139,115,85,0.08)", border: "rgba(139,115,85,0.25)" };
     }
     // Check PAO + opened date
     if (product.paoMonths && product.openedDate) {
@@ -78,8 +78,8 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
       const paoExp = new Date(opened);
       paoExp.setMonth(paoExp.getMonth() + product.paoMonths);
       const days = Math.ceil((paoExp - now) / 86400000);
-      if (days <= 0) return { label: `PAO expired ${Math.abs(days)}d ago`, color: "#c06060", bg: "rgba(192,96,96,0.08)", border: "rgba(192,96,96,0.25)" };
-      if (days <= 30) return { label: `PAO: ${days}d left`, color: "#c49040", bg: "rgba(196,144,64,0.08)", border: "rgba(196,144,64,0.25)" };
+      if (days <= 0) return { label: `PAO expired ${Math.abs(days)}d ago`, color: "#8b7355", bg: "rgba(139,115,85,0.08)", border: "rgba(139,115,85,0.25)" };
+      if (days <= 30) return { label: `PAO: ${days}d left`, color: "#8b7355", bg: "rgba(139,115,85,0.08)", border: "rgba(139,115,85,0.25)" };
     }
     return null;
   })();
@@ -104,7 +104,7 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
                 <Icon name="edit" size={12} /><span>Edit product</span>
               </button>
               <div style={{ height: 1, background: "var(--border)", margin: "4px 12px" }} />
-              <button onClick={() => { setMenuOpen(false); setConfirmDelete(true); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#c06060", fontFamily: "Space Grotesk, sans-serif", fontSize: 12, textAlign: "left", transition: "background 0.12s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(192,96,96,0.08)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>
+              <button onClick={() => { setMenuOpen(false); setConfirmDelete(true); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#8b7355", fontFamily: "Space Grotesk, sans-serif", fontSize: 12, textAlign: "left", transition: "background 0.12s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(139,115,85,0.08)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>
                 <Icon name="trash" size={12} /><span>Remove from vanity</span>
               </button>
             </div>
@@ -134,7 +134,7 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
       {(allergenHits.length > 0 || lovedHits.length > 0) && (
         <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: activeKeys.length > 0 ? 5 : 0 }}>
           {allergenHits.map(a => (
-            <span key={a} style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.08em", color: "#c06060", background: "rgba(192,96,96,0.08)", padding: "3px 8px", borderRadius: 20, border: "1px solid rgba(192,96,96,0.22)" }}>⚠ {a}</span>
+            <span key={a} style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.08em", color: "#8b7355", background: "rgba(139,115,85,0.08)", padding: "3px 8px", borderRadius: 20, border: "1px solid rgba(139,115,85,0.22)" }}>⚠ {a}</span>
           ))}
           {lovedHits.map(l => (
             <span key={l} style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.08em", color: "#7a9070", background: "rgba(122,144,112,0.08)", padding: "3px 8px", borderRadius: 20, border: "1px solid rgba(122,144,112,0.2)" }}>✦ {l}</span>
@@ -170,7 +170,7 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
             </p>
             <div style={{ display: "flex", gap: 10 }}>
               <button onClick={() => setConfirmDelete(false)} style={{ flex: 1, padding: "12px 0", borderRadius: 10, border: "1px solid var(--border)", background: "transparent", color: "var(--parchment)", fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 600, cursor: "pointer", transition: "background 0.15s" }} onMouseEnter={e => e.currentTarget.style.background = "var(--surface)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>Cancel</button>
-              <button onClick={() => { setConfirmDelete(false); onDelete(product.id); }} style={{ flex: 1, padding: "12px 0", borderRadius: 10, border: "1px solid rgba(192,96,96,0.35)", background: "rgba(192,96,96,0.12)", color: "#c06060", fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 600, cursor: "pointer", transition: "background 0.15s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(192,96,96,0.2)"} onMouseLeave={e => e.currentTarget.style.background = "rgba(192,96,96,0.12)"}>Remove</button>
+              <button onClick={() => { setConfirmDelete(false); onDelete(product.id); }} style={{ flex: 1, padding: "12px 0", borderRadius: 10, border: "1px solid rgba(139,115,85,0.35)", background: "rgba(139,115,85,0.12)", color: "#8b7355", fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 600, cursor: "pointer", transition: "background 0.15s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(139,115,85,0.2)"} onMouseLeave={e => e.currentTarget.style.background = "rgba(139,115,85,0.12)"}>Remove</button>
             </div>
           </div>
         </div>
@@ -254,9 +254,9 @@ function RoutineStep({ step, index, isLast, checked, onCheck }) {
             )}
           </div>
           {damp && (
-            <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 10, padding: "6px 9px", borderRadius: 8, background: "rgba(138,168,196,0.08)", border: "1px solid rgba(138,168,196,0.2)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 10, padding: "6px 9px", borderRadius: 8, background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.2)" }}>
               <span style={{ fontSize: 11 }}>💧</span>
-              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "rgba(154,180,200,0.85)", letterSpacing: "0.02em" }}>Apply on damp skin for best absorption</span>
+              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "rgba(139,115,85,0.85)", letterSpacing: "0.02em" }}>Apply on damp skin for best absorption</span>
             </div>
           )}
           {expanded && reason && (
@@ -322,40 +322,40 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
           padding: "28px 26px 24px",
           overflow: "hidden",
           boxShadow: "0 24px 60px rgba(0,0,0,0.7), 0 1px 0 rgba(232,220,180,0.06) inset",
-          border: "1px solid rgba(160,148,100,0.22)",
+          border: "1px solid rgba(139,115,85,0.22)",
         }}>
           <div style={{ position: "absolute", inset: 0, borderRadius: 22, pointerEvents: "none", backgroundImage: grain, backgroundSize: "180px 180px", opacity: 0.7 }} />
-          <div style={{ position: "absolute", inset: 0, borderRadius: 22, pointerEvents: "none", background: "radial-gradient(ellipse at 85% 15%, rgba(120,105,55,0.12) 0%, transparent 65%)" }} />
+          <div style={{ position: "absolute", inset: 0, borderRadius: 22, pointerEvents: "none", background: "radial-gradient(ellipse at 85% 15%, rgba(139,115,85,0.12) 0%, transparent 65%)" }} />
           <div style={{ position: "absolute", bottom: 10, right: 14, opacity: 0.07, fontSize: 56, lineHeight: 1, fontFamily: "serif", color: "#e8e3d6", userSelect: "none", pointerEvents: "none" }}>🦢</div>
 
           <div style={{ textAlign: "center", marginBottom: 18 }}>
-            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(192,178,128,0.65)", margin: 0 }}>
+            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(232,226,217,0.65)", margin: 0 }}>
               Swan Song{hasMeaningful ? " · Swan Sense" : ""}
             </p>
           </div>
-          <div style={{ height: 1, background: "rgba(192,178,128,0.12)", marginBottom: 18 }} />
+          <div style={{ height: 1, background: "rgba(232,226,217,0.12)", marginBottom: 18 }} />
 
           <p style={{ fontFamily: "var(--cursive)", fontSize: 32, fontWeight: 400, lineHeight: 1.5, color: "#e8e3d6", letterSpacing: "0.02em", margin: "0 0 18px" }}>{line}</p>
 
           {/* Show first prediction detail in popup */}
           {hasMeaningful && meaningfulPredictions[0].detail && (
-            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "rgba(192,178,128,0.5)", margin: "0 0 16px", lineHeight: 1.65 }}>{meaningfulPredictions[0].detail}</p>
+            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "rgba(232,226,217,0.5)", margin: "0 0 16px", lineHeight: 1.65 }}>{meaningfulPredictions[0].detail}</p>
           )}
 
           <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 22 }}>
-            <div style={{ width: 5, height: 5, borderRadius: "50%", background: ritualDone ? "rgba(107,122,82,0.9)" : "rgba(192,178,128,0.3)", flexShrink: 0 }} />
-            <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.1em", color: ritualDone ? "rgba(140,158,100,0.85)" : "rgba(192,178,128,0.4)" }}>{ritualStatus}</span>
+            <div style={{ width: 5, height: 5, borderRadius: "50%", background: ritualDone ? "rgba(122,144,112,0.9)" : "rgba(232,226,217,0.3)", flexShrink: 0 }} />
+            <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.1em", color: ritualDone ? "rgba(122,144,112,0.85)" : "rgba(232,226,217,0.4)" }}>{ritualStatus}</span>
           </div>
 
           <button onClick={onDismissPopup} style={{
             width: "100%", padding: "11px 0",
-            background: "rgba(192,178,128,0.08)", border: "1px solid rgba(192,178,128,0.18)",
+            background: "rgba(232,226,217,0.08)", border: "1px solid rgba(232,226,217,0.18)",
             borderRadius: 10, cursor: "pointer",
             fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.2em",
-            textTransform: "uppercase", color: "rgba(192,178,128,0.55)", transition: "all 0.2s",
+            textTransform: "uppercase", color: "rgba(232,226,217,0.55)", transition: "all 0.2s",
           }}
-            onMouseEnter={e => { e.currentTarget.style.background = "rgba(192,178,128,0.14)"; e.currentTarget.style.color = "rgba(192,178,128,0.85)"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "rgba(192,178,128,0.08)"; e.currentTarget.style.color = "rgba(192,178,128,0.55)"; }}>
+            onMouseEnter={e => { e.currentTarget.style.background = "rgba(232,226,217,0.14)"; e.currentTarget.style.color = "rgba(232,226,217,0.85)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "rgba(232,226,217,0.08)"; e.currentTarget.style.color = "rgba(232,226,217,0.55)"; }}>
             Carry on
           </button>
         </div>
@@ -373,17 +373,17 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
         padding: "16px 18px 14px",
         overflow: "hidden",
         boxShadow: "0 4px 18px rgba(0,0,0,0.35)",
-        border: "1px solid rgba(160,148,100,0.15)",
+        border: "1px solid rgba(139,115,85,0.15)",
       }}>
         <div style={{ position: "absolute", inset: 0, borderRadius: 14, pointerEvents: "none", backgroundImage: grain, backgroundSize: "180px 180px", opacity: 0.6 }} />
         <div style={{ position: "absolute", bottom: 6, right: 10, opacity: 0.06, fontSize: 44, lineHeight: 1, fontFamily: "serif", color: "#e8e3d6", userSelect: "none", pointerEvents: "none" }}>🦢</div>
 
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 8, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(192,178,128,0.55)", margin: 0 }}>Swan Song</p>
+          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 8, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(232,226,217,0.55)", margin: 0 }}>Swan Song</p>
           <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-            {hasMeaningful && <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 8, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(192,178,128,0.4)", marginRight: 4 }}>Swan Sense</span>}
-            <div style={{ width: 4, height: 4, borderRadius: "50%", background: ritualDone ? "rgba(107,122,82,0.8)" : "rgba(192,178,128,0.25)" }} />
-            <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, color: ritualDone ? "rgba(140,158,100,0.75)" : "rgba(192,178,128,0.35)", letterSpacing: "0.06em" }}>{ritualStatus}</span>
+            {hasMeaningful && <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 8, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(232,226,217,0.4)", marginRight: 4 }}>Swan Sense</span>}
+            <div style={{ width: 4, height: 4, borderRadius: "50%", background: ritualDone ? "rgba(122,144,112,0.8)" : "rgba(232,226,217,0.25)" }} />
+            <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, color: ritualDone ? "rgba(122,144,112,0.75)" : "rgba(232,226,217,0.35)", letterSpacing: "0.06em" }}>{ritualStatus}</span>
           </div>
         </div>
 
@@ -391,10 +391,10 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
 
         {/* SwanSense prediction details — static, always visible */}
         {hasMeaningful && (
-          <div style={{ marginTop: 10, borderTop: "1px solid rgba(192,178,128,0.1)", paddingTop: 10 }}>
+          <div style={{ marginTop: 10, borderTop: "1px solid rgba(232,226,217,0.1)", paddingTop: 10 }}>
             {meaningfulPredictions.map((p, i) => {
               const key = p.id || p.type;
-              const dotColor = p.color || (p.level === "alert" ? "#c06060" : p.level === "caution" ? "#c49040" : p.level === "cycle" ? "#b06060" : "#7a9070");
+              const dotColor = p.color || (p.level === "alert" ? "#8b7355" : p.level === "caution" ? "#8b7355" : p.level === "cycle" ? "#8b7355" : "#7a9070");
               return (
                 <div key={key} style={{ padding: i > 0 ? "10px 0 0" : 0 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: p.detail ? 6 : 0 }}>
@@ -402,7 +402,7 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
                     <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "rgba(232,227,214,0.8)", margin: 0, flex: 1, lineHeight: 1.4 }}>{p.headline}</p>
                   </div>
                   {p.detail && (
-                    <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "rgba(192,178,128,0.55)", margin: "0 0 0 11px", lineHeight: 1.65 }}>{p.detail}</p>
+                    <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "rgba(232,226,217,0.55)", margin: "0 0 0 11px", lineHeight: 1.65 }}>{p.detail}</p>
                   )}
                 </div>
               );
@@ -501,7 +501,7 @@ function FlightModeModal({ products, activeMap, onClose }) {
                 ? unique.join(" and ")
                 : unique.slice(0, -1).join(", ") + " and " + unique.slice(-1);
               return (
-                <div style={{ display: "flex", gap: 12, padding: "13px 16px", background: "rgba(196,144,64,0.07)", border: "1px solid rgba(196,144,64,0.22)", borderRadius: 12, marginBottom: 18 }}>
+                <div style={{ display: "flex", gap: 12, padding: "13px 16px", background: "rgba(139,115,85,0.07)", border: "1px solid rgba(139,115,85,0.22)", borderRadius: 12, marginBottom: 18 }}>
                   <span style={{ fontSize: 16, flexShrink: 0, lineHeight: 1.4 }}>✈</span>
                   <div>
                     <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600, color: "var(--parchment)", margin: "0 0 3px" }}>Check your sizes before packing.</p>
@@ -534,12 +534,12 @@ function FlightModeModal({ products, activeMap, onClose }) {
             {skip.length > 0 && (
               <div style={{ marginBottom: 20 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-                  <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#c06060" }} />
-                  <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#c06060" }}>Leave Behind</span>
+                  <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#8b7355" }} />
+                  <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#8b7355" }}>Leave Behind</span>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {skip.map((item, i) => (
-                    <div key={i} style={{ padding: "13px 16px", background: "rgba(192,96,96,0.06)", border: "1px solid rgba(192,96,96,0.18)", borderRadius: 12 }}>
+                    <div key={i} style={{ padding: "13px 16px", background: "rgba(139,115,85,0.06)", border: "1px solid rgba(139,115,85,0.18)", borderRadius: 12 }}>
                       <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, color: "var(--parchment)", margin: "0 0 3px", fontWeight: 500 }}>{item.name}</p>
                       <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>{item.reason}</p>
                     </div>

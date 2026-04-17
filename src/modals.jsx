@@ -26,8 +26,8 @@ function ScanModal({ products, onAddToShelf, onClose }) {
 
   const verdictConfig = {
     pass:    { color: "#7a9070", bg: "rgba(122,144,112,0.10)", border: "rgba(122,144,112,0.35)", label: "Good fit" },
-    caution: { color: "#c49040", bg: "rgba(196,144,64,0.08)",  border: "rgba(196,144,64,0.30)",  label: "Use with care" },
-    skip:    { color: "#c06060", bg: "rgba(192,96,96,0.08)",   border: "rgba(192,96,96,0.30)",   label: "Skip this one" },
+    caution: { color: "#8b7355", bg: "rgba(139,115,85,0.08)",  border: "rgba(139,115,85,0.30)",  label: "Use with care" },
+    skip:    { color: "#8b7355", bg: "rgba(139,115,85,0.08)",   border: "rgba(139,115,85,0.30)",   label: "Skip this one" },
   };
   const vc = verdictConfig[verdict] || verdictConfig.pass;
 
@@ -252,7 +252,7 @@ function ScanModal({ products, onAddToShelf, onClose }) {
           <div>
             <input ref={fileRef} type="file" accept="image/*" capture="environment" style={{ display: "none" }} onChange={handleFile} />
             {scanError && (
-              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "#c06060", margin: "0 0 10px", padding: "8px 12px", background: "rgba(192,96,96,0.08)", border: "1px solid rgba(192,96,96,0.2)", borderRadius: 8 }}>{scanError}</p>
+              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "#8b7355", margin: "0 0 10px", padding: "8px 12px", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.2)", borderRadius: 8 }}>{scanError}</p>
             )}
             <button onClick={() => fileRef.current.click()}
               style={{ width: "100%", padding: "32px 0", background: "rgba(122,144,112,0.08)", border: "1px dashed rgba(122,144,112,0.35)", borderRadius: 14, cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
@@ -287,11 +287,11 @@ function ScanModal({ products, onAddToShelf, onClose }) {
 
             {/* Conflicts */}
             {scanned.conflicts && scanned.conflicts.length > 0 && (
-              <div style={{ padding: "12px 14px", background: "rgba(192,96,96,0.06)", borderRadius: 11, border: "1px solid rgba(192,96,96,0.2)", marginBottom: 10 }}>
-                <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "#c06060", margin: "0 0 6px" }}>Conflicts</p>
+              <div style={{ padding: "12px 14px", background: "rgba(139,115,85,0.06)", borderRadius: 11, border: "1px solid rgba(139,115,85,0.2)", marginBottom: 10 }}>
+                <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "#8b7355", margin: "0 0 6px" }}>Conflicts</p>
                 {scanned.conflicts.map((c, i) => (
                   <div key={i} style={{ display: "flex", gap: 7, alignItems: "flex-start", marginBottom: i < scanned.conflicts.length - 1 ? 4 : 0 }}>
-                    <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#c06060", marginTop: 6, flexShrink: 0 }} />
+                    <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#8b7355", marginTop: 6, flexShrink: 0 }} />
                     <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", lineHeight: 1.5 }}>{c}</span>
                   </div>
                 ))}
@@ -300,11 +300,11 @@ function ScanModal({ products, onAddToShelf, onClose }) {
 
             {/* Duplicates */}
             {scanned.duplicates && scanned.duplicates.length > 0 && (
-              <div style={{ padding: "12px 14px", background: "rgba(196,144,64,0.06)", borderRadius: 11, border: "1px solid rgba(196,144,64,0.25)", marginBottom: 10 }}>
-                <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "#c49040", margin: "0 0 6px" }}>Already covered by</p>
+              <div style={{ padding: "12px 14px", background: "rgba(139,115,85,0.06)", borderRadius: 11, border: "1px solid rgba(139,115,85,0.25)", marginBottom: 10 }}>
+                <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "#8b7355", margin: "0 0 6px" }}>Already covered by</p>
                 {scanned.duplicates.map((d, i) => (
                   <div key={i} style={{ display: "flex", gap: 7, alignItems: "center" }}>
-                    <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#c49040", flexShrink: 0 }} />
+                    <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#8b7355", flexShrink: 0 }} />
                     <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)" }}>{d}</span>
                   </div>
                 ))}
@@ -458,9 +458,9 @@ function assessRoutineFit(product, products, checkIns = [], user = {}) {
 
 const DEFER_TAG_CONFIG = {
   season:  { color: "#7a9070", bg: "rgba(122,144,112,0.10)", label: "Seasonal hold" },
-  ramp:    { color: "#c4a060", bg: "rgba(196,160,96,0.10)",  label: "Ritual at capacity" },
-  skin:    { color: "#c06060", bg: "rgba(192,96,96,0.10)",   label: "Skin recovery" },
-  overlap: { color: "#9a9688", bg: "rgba(154,150,136,0.10)", label: "Redundant active" },
+  ramp:    { color: "#8b7355", bg: "rgba(139,115,85,0.10)",  label: "Ritual at capacity" },
+  skin:    { color: "#8b7355", bg: "rgba(139,115,85,0.10)",   label: "Skin recovery" },
+  overlap: { color: "#8b7355", bg: "rgba(139,115,85,0.10)", label: "Redundant active" },
 };
 
 

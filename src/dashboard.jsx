@@ -202,12 +202,12 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             : daysSince === 0 ? "Check-in logged today."
             : daysSince < 7 ? `Last check-in ${daysSince}d ago.`
             : "Check-in overdue.";
-          const color = due ? (daysSince === null ? "var(--clay)" : "#c49040") : "#7a9070";
+          const color = due ? (daysSince === null ? "var(--clay)" : "#8b7355") : "#7a9070";
           return (
             <button onClick={() => setTab("progress")}
               style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20, background: "none", border: "none", padding: "4px 0", cursor: "pointer", fontFamily: "inherit" }}>
               <div style={{ width: 5, height: 5, borderRadius: "50%", background: color, flexShrink: 0 }} />
-              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", letterSpacing: "0.03em", textDecoration: "underline", textDecorationColor: "rgba(154,150,136,0.3)", textUnderlineOffset: 3 }}>{msg}</span>
+              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", letterSpacing: "0.03em", textDecoration: "underline", textDecorationColor: "rgba(139,115,85,0.3)", textUnderlineOffset: 3 }}>{msg}</span>
               <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", opacity: 0.6 }}>›</span>
             </button>
           );
@@ -277,7 +277,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 22 }}>
                   <span style={{ color: "#7a9070", opacity: 0.8 }}><Icon name={icon} size={15} /></span>
                   <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)" }}>{label} Routine</span>
-                  <span style={{ marginLeft: "auto", fontSize: 9, fontFamily: "Space Grotesk, sans-serif", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "#7a9070", background: "rgba(180,175,168,0.25)", padding: "3px 9px", borderRadius: 20 }}>Now</span>
+                  <span style={{ marginLeft: "auto", fontSize: 9, fontFamily: "Space Grotesk, sans-serif", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "#7a9070", background: "rgba(232,226,217,0.25)", padding: "3px 9px", borderRadius: 20 }}>Now</span>
                 </div>
                 <div style={{ display: "flex", alignItems: "flex-end", gap: 10, marginBottom: 8 }}>
                   <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 64, fontWeight: 200, color: "var(--parchment)", lineHeight: 0.9, letterSpacing: "-0.03em" }}>{steps.length}</span>
@@ -312,7 +312,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           </Section>
         )}
         {allAlerts.length === 0 && products.some(p => !p.isDemo) && (
-          <div style={{ display: "flex", gap: 12, padding: "14px 16px", background: "rgba(107,120,95,0.08)", borderRadius: 12, border: "1px solid rgba(107,120,95,0.2)", marginBottom: 24 }}>
+          <div style={{ display: "flex", gap: 12, padding: "14px 16px", background: "rgba(122,144,112,0.08)", borderRadius: 12, border: "1px solid rgba(122,144,112,0.2)", marginBottom: 24 }}>
             <span style={{ color: "#7a9070" }}><Icon name="check" size={15} /></span>
             <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, color: "var(--parchment)", margin: 0 }}>No conflicts detected. Your ritual is clean.</p>
           </div>

@@ -38,9 +38,9 @@ const SEASON_CONFIG = {
   winter: {
     label: "Winter",
     emoji: "❄",
-    accent: "#8aa8c4",
-    bg: "rgba(138,168,196,0.07)",
-    border: "rgba(138,168,196,0.2)",
+    accent: "#8b7355",
+    bg: "rgba(139,115,85,0.07)",
+    border: "rgba(139,115,85,0.2)",
     headline: "Your barrier works hardest now.",
     body: "Cold air and heating strip moisture faster than any other season. Skin needs more occlusion, less exfoliation.",
     shelfNudge: (products, activeMap) => {
@@ -57,9 +57,9 @@ const SEASON_CONFIG = {
   spring: {
     label: "Spring",
     emoji: "◌",
-    accent: "#9aaa80",
-    bg: "rgba(154,170,128,0.07)",
-    border: "rgba(154,170,128,0.2)",
+    accent: "#7a9070",
+    bg: "rgba(122,144,112,0.07)",
+    border: "rgba(122,144,112,0.2)",
     headline: "Skin is recovering. UV is rising.",
     body: "Barrier resilience returns as humidity climbs. Spring is the right window to reintroduce or increase actives — but SPF becomes non-negotiable.",
     shelfNudge: (products, activeMap) => {
@@ -75,9 +75,9 @@ const SEASON_CONFIG = {
   summer: {
     label: "Summer",
     emoji: "○",
-    accent: "#c4a060",
-    bg: "rgba(196,160,96,0.07)",
-    border: "rgba(196,160,96,0.2)",
+    accent: "#8b7355",
+    bg: "rgba(139,115,85,0.07)",
+    border: "rgba(139,115,85,0.2)",
     headline: "Heat changes everything.",
     body: "Humidity is up and sebum production rises with temperature. Heavier textures can clog. SPF degrades faster in heat.",
     shelfNudge: (products, activeMap) => {
@@ -94,9 +94,9 @@ const SEASON_CONFIG = {
   fall: {
     label: "Fall",
     emoji: "◑",
-    accent: "#b87a50",
-    bg: "rgba(184,122,80,0.07)",
-    border: "rgba(184,122,80,0.2)",
+    accent: "#8b7355",
+    bg: "rgba(139,115,85,0.07)",
+    border: "rgba(139,115,85,0.2)",
     headline: "The transition window.",
     body: "Skin shifts from oily summer mode back toward dry. This is the most strategic season to reintroduce or strengthen actives before winter.",
     shelfNudge: (products, activeMap) => {

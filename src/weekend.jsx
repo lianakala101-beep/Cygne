@@ -62,17 +62,17 @@ const WEEKEND_PHASE_CONFIG = {
     label: "The Weekend Is Near",
     sublabel: "Thursday · Friday",
     headline: "Prep your skin before the night.",
-    accent: "#9a8070",
-    bg: "rgba(154,128,112,0.07)",
-    border: "rgba(154,128,112,0.2)",
+    accent: "#8b7355",
+    bg: "rgba(139,115,85,0.07)",
+    border: "rgba(139,115,85,0.2)",
   },
   during: {
     label: "Weekend",
     sublabel: "Saturday",
     headline: "A few things worth remembering.",
-    accent: "#8090a4",
-    bg: "rgba(128,144,164,0.07)",
-    border: "rgba(128,144,164,0.2)",
+    accent: "#8b7355",
+    bg: "rgba(139,115,85,0.07)",
+    border: "rgba(139,115,85,0.2)",
   },
   after: {
     label: "Recovery Day",
@@ -106,7 +106,7 @@ function WeekendNudgeCard({ products, activeMap }) {
         <div style={{ marginBottom: 10 }}>
           {advice.skip.map((s, i) => (
             <div key={i} style={{ display: "flex", gap: 8, marginBottom: 6 }}>
-              <span style={{ color: "#c06060", fontSize: 10, flexShrink: 0, marginTop: 1 }}>—</span>
+              <span style={{ color: "#8b7355", fontSize: 10, flexShrink: 0, marginTop: 1 }}>—</span>
               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{s}</p>
             </div>
           ))}

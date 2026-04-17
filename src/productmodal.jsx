@@ -544,7 +544,7 @@ function ProductModal({ product, onSave, onClose, user }) {
             </div>
 
             {scanError && (
-              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "#c06060", margin: "0 0 10px", padding: "8px 12px", background: "rgba(192,96,96,0.08)", border: "1px solid rgba(192,96,96,0.2)", borderRadius: 8 }}>{scanError}</p>
+              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "#8b7355", margin: "0 0 10px", padding: "8px 12px", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.2)", borderRadius: 8 }}>{scanError}</p>
             )}
 
             <button onClick={() => setModalStep("form")}
@@ -687,9 +687,9 @@ function ProductModal({ product, onSave, onClose, user }) {
                 </p>
               )}
               {overuseWarning && (
-                <div style={{ display: "flex", gap: 10, marginTop: 10, padding: "10px 14px", background: "rgba(196,144,64,0.08)", border: "1px solid rgba(196,144,64,0.25)", borderRadius: 10 }}>
+                <div style={{ display: "flex", gap: 10, marginTop: 10, padding: "10px 14px", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.25)", borderRadius: 10 }}>
                   <span style={{ fontSize: 13, flexShrink: 0, lineHeight: 1.4 }}>⚠</span>
-                  <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "#c49040", margin: 0, lineHeight: 1.6 }}>{overuseWarning}</p>
+                  <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "#8b7355", margin: 0, lineHeight: 1.6 }}>{overuseWarning}</p>
                 </div>
               )}
             </div>
@@ -699,7 +699,7 @@ function ProductModal({ product, onSave, onClose, user }) {
               {locked ? (
                 <div>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                    <span style={{ padding: "5px 14px", borderRadius: 20, background: locked.session === "am" ? "rgba(196,144,64,0.12)" : "rgba(100,90,160,0.12)", border: "1px solid " + (locked.session === "am" ? "rgba(196,144,64,0.35)" : "rgba(100,90,160,0.3)"), fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 700, color: locked.session === "am" ? "#c49040" : "#9490c8" }}>{locked.session === "am" ? "AM only" : "PM only"}</span>
+                    <span style={{ padding: "5px 14px", borderRadius: 20, background: locked.session === "am" ? "rgba(122,144,112,0.14)" : "rgba(232,226,217,0.10)", border: "1px solid " + (locked.session === "am" ? "rgba(122,144,112,0.4)" : "rgba(232,226,217,0.3)"), fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 700, color: locked.session === "am" ? "var(--sage)" : "#e8e2d9" }}>{locked.session === "am" ? "AM only" : "PM only"}</span>
                     <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", opacity: 0.6 }}>locked by ingredients</span>
                   </div>
                   <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.5, opacity: 0.7 }}>{locked.reason}</p>

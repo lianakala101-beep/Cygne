@@ -245,10 +245,10 @@ function IngredientProfile({ user, onUpdateUser }) {
             <>
               {allergens.length > 0 && (
                 <div style={{ marginBottom: loved.length > 0 ? 12 : 0 }}>
-                  <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "#c06060", margin: "0 0 7px", opacity: 0.8 }}>Avoid</p>
+                  <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "#8b7355", margin: "0 0 7px", opacity: 0.8 }}>Avoid</p>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                     {allergens.map(a => (
-                      <span key={a} style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(192,96,96,0.08)", border: "1px solid rgba(192,96,96,0.22)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "#c06060" }}>{a}</span>
+                      <span key={a} style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.22)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "#8b7355" }}>{a}</span>
                     ))}
                   </div>
                 </div>
@@ -271,20 +271,20 @@ function IngredientProfile({ user, onUpdateUser }) {
 
           {/* Allergens */}
           <div style={{ marginBottom: 18 }}>
-            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "#c06060", margin: "0 0 10px", opacity: 0.9 }}>Avoid / Allergic to</p>
+            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "#8b7355", margin: "0 0 10px", opacity: 0.9 }}>Avoid / Allergic to</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }}>
               {COMMON_ALLERGENS.map(s => {
                 const on = draftAllergens.includes(s);
                 return (
                   <button key={s} onClick={() => toggleAllergen(s)}
-                    style={{ padding: "5px 12px", borderRadius: 20, border: `1px solid ${on ? "rgba(192,96,96,0.5)" : "var(--border)"}`, background: on ? "rgba(192,96,96,0.10)" : "transparent", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: on ? "#c06060" : "var(--clay)", fontWeight: on ? 600 : 400, cursor: "pointer", transition: "all 0.15s" }}>
+                    style={{ padding: "5px 12px", borderRadius: 20, border: `1px solid ${on ? "rgba(139,115,85,0.5)" : "var(--border)"}`, background: on ? "rgba(139,115,85,0.10)" : "transparent", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: on ? "#8b7355" : "var(--clay)", fontWeight: on ? 600 : 400, cursor: "pointer", transition: "all 0.15s" }}>
                     {s}
                   </button>
                 );
               })}
               {draftAllergens.filter(a => !COMMON_ALLERGENS.includes(a)).map(a => (
                 <button key={a} onClick={() => toggleAllergen(a)}
-                  style={{ padding: "5px 12px", borderRadius: 20, border: "1px solid rgba(192,96,96,0.5)", background: "rgba(192,96,96,0.10)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "#c06060", fontWeight: 600, cursor: "pointer" }}>
+                  style={{ padding: "5px 12px", borderRadius: 20, border: "1px solid rgba(139,115,85,0.5)", background: "rgba(139,115,85,0.10)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "#8b7355", fontWeight: 600, cursor: "pointer" }}>
                   {a} ×
                 </button>
               ))}
@@ -293,7 +293,7 @@ function IngredientProfile({ user, onUpdateUser }) {
               <input style={{ ...inputStyle, flex: 1 }} placeholder="Add custom e.g. Benzophenone"
                 value={customAllergen} onChange={e => setCustomAllergen(e.target.value)}
                 onKeyDown={e => e.key === "Enter" && addCustomAllergen()} />
-              <button onClick={addCustomAllergen} style={{ padding: "8px 14px", background: "rgba(192,96,96,0.08)", border: "1px solid rgba(192,96,96,0.25)", borderRadius: 8, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "#c06060", cursor: "pointer" }}>Add</button>
+              <button onClick={addCustomAllergen} style={{ padding: "8px 14px", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.25)", borderRadius: 8, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "#8b7355", cursor: "pointer" }}>Add</button>
             </div>
           </div>
 
@@ -422,7 +422,7 @@ function SkinHistory({ user, onUpdateUser }) {
               {(history.sensitivities||[]).length > 0 && (
                 <div style={{ ...rowStyle, flexWrap: "wrap", gap: 6, alignItems: "flex-start", paddingTop: 10 }}>
                   <span style={{ ...labelStyle, width: "100%", marginBottom: 6 }}>Sensitivities</span>
-                  {history.sensitivities.map(s => <span key={s} style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(192,96,96,0.08)", border: "1px solid rgba(192,96,96,0.2)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "#c06060" }}>{s}</span>)}
+                  {history.sensitivities.map(s => <span key={s} style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.2)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "#8b7355" }}>{s}</span>)}
                 </div>
               )}
               {(history.dermaVisits||[]).slice(0,2).map((v, i) => (
@@ -490,7 +490,7 @@ function SkinHistory({ user, onUpdateUser }) {
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
               {COMMON_SENSITIVITIES.map(s => {
                 const on = draft.sensitivities.includes(s);
-                return <button key={s} onClick={() => toggleSensitivity(s)} style={{ padding: "5px 12px", borderRadius: 20, border: `1px solid ${on ? "rgba(192,96,96,0.5)" : "var(--border)"}`, background: on ? "rgba(192,96,96,0.10)" : "transparent", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: on ? "#c06060" : "var(--clay)", fontWeight: on ? 600 : 400, cursor: "pointer", transition: "all 0.15s" }}>{s}</button>;
+                return <button key={s} onClick={() => toggleSensitivity(s)} style={{ padding: "5px 12px", borderRadius: 20, border: `1px solid ${on ? "rgba(139,115,85,0.5)" : "var(--border)"}`, background: on ? "rgba(139,115,85,0.10)" : "transparent", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: on ? "#8b7355" : "var(--clay)", fontWeight: on ? 600 : 400, cursor: "pointer", transition: "all 0.15s" }}>{s}</button>;
               })}
             </div>
           </div>
@@ -643,7 +643,7 @@ function ProfileSheet({ user, products, locationData, setLocationData, locationD
           {/* Sign out */}
           <button onClick={onLogout}
             style={{ width: "100%", padding: "12px 0", background: "none", color: "var(--clay)", border: "1px solid var(--border)", borderRadius: 10, fontFamily: "var(--sans)", fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", cursor: "pointer", transition: "border-color 0.2s, color 0.2s" }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = "#c06060"; e.currentTarget.style.color = "#c06060"; }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = "#8b7355"; e.currentTarget.style.color = "#8b7355"; }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--clay)"; }}>
             Sign Out
           </button>

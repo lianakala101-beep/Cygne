@@ -175,7 +175,7 @@ function buildInsights(products, activeMap) {
 }
 
 function InsightRow({ item }) {
-  const dot = item.severity === "warning" ? "#c06060" : item.severity === "caution" ? "#c49040" : item.severity === "ok" ? "#7a9070" : "var(--clay)";
+  const dot = item.severity === "warning" ? "#8b7355" : item.severity === "caution" ? "#8b7355" : item.severity === "ok" ? "#7a9070" : "var(--clay)";
   return (
     <div style={{ display: "flex", gap: 12, padding: "12px 0", borderBottom: "1px solid var(--border)" }}>
       <div style={{ width: 5, height: 5, borderRadius: "50%", background: dot, flexShrink: 0, marginTop: 6 }} />
@@ -222,7 +222,7 @@ function ClearAllButton({ onClearAll }) {
         if (confirming) { onClearAll(); setConfirming(false); }
         else { setConfirming(true); setTimeout(() => setConfirming(false), 3000); }
       }}
-      style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: confirming ? "#c06060" : "var(--clay)", opacity: confirming ? 1 : 0.35, background: "none", border: "none", cursor: "pointer", paddingTop: 8, transition: "all 0.2s" }}>
+      style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: confirming ? "#8b7355" : "var(--clay)", opacity: confirming ? 1 : 0.35, background: "none", border: "none", cursor: "pointer", paddingTop: 8, transition: "all 0.2s" }}>
       {confirming ? "Tap again to confirm" : "Clear all"}
     </button>
   );
@@ -284,13 +284,13 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo
               </p>
 
               {products.some(p => p.isDemo) && onClearDemo && (
-                <div style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(154,150,136,0.08)", border: "1px solid rgba(154,150,136,0.2)", borderRadius: 12, padding: "12px 14px", marginBottom: 14 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.2)", borderRadius: 12, padding: "12px 14px", marginBottom: 14 }}>
                   <span style={{ fontSize: 15, flexShrink: 0 }}>✦</span>
                   <div style={{ flex: 1 }}>
                     <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 600, color: "var(--parchment)", margin: "0 0 2px" }}>Sample vanity</p>
                     <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>These are example products to show you how Cygne works. Scan your own to replace them.</p>
                   </div>
-                  <button onClick={onClearDemo} style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600, background: "transparent", border: "1px solid rgba(154,150,136,0.3)", borderRadius: 8, color: "var(--clay)", padding: "6px 10px", cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}>Clear demo</button>
+                  <button onClick={onClearDemo} style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600, background: "transparent", border: "1px solid rgba(139,115,85,0.3)", borderRadius: 8, color: "var(--clay)", padding: "6px 10px", cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}>Clear demo</button>
                 </div>
               )}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 10 }}>

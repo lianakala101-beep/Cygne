@@ -88,8 +88,8 @@ function ShopScanModal({ products, user = {}, onClose }) {
 
   const verdictConfig = {
     love:  { color: "#7a9070",  bg: "rgba(122,144,112,0.08)", border: "rgba(122,144,112,0.25)", label: "Your skin would love this" },
-    maybe: { color: "#c49040",      bg: "rgba(196,144,64,0.08)",  border: "rgba(196,144,64,0.25)",  label: "Think twice" },
-    skip:  { color: "#c06060",      bg: "rgba(192,96,96,0.08)",   border: "rgba(192,96,96,0.25)",   label: "Not for you" },
+    maybe: { color: "#8b7355",      bg: "rgba(139,115,85,0.08)",  border: "rgba(139,115,85,0.25)",  label: "Think twice" },
+    skip:  { color: "#8b7355",      bg: "rgba(139,115,85,0.08)",   border: "rgba(139,115,85,0.25)",   label: "Not for you" },
   };
   const vc = result ? (verdictConfig[result.verdict] || verdictConfig.maybe) : null;
 
@@ -115,7 +115,7 @@ function ShopScanModal({ products, user = {}, onClose }) {
                 Photograph the ingredients list or product label. Cygne will check it against your skin type, concerns, and current vanity.
               </p>
               {scanError && (
-                <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "#c06060", margin: "0 0 12px", padding: "8px 12px", background: "rgba(192,96,96,0.08)", border: "1px solid rgba(192,96,96,0.2)", borderRadius: 8 }}>{scanError}</p>
+                <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "#8b7355", margin: "0 0 12px", padding: "8px 12px", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.2)", borderRadius: 8 }}>{scanError}</p>
               )}
               <input ref={fileRef} type="file" accept="image/*" capture="environment" style={{ display: "none" }} onChange={handleFile} />
               <button onClick={() => fileRef.current?.click()}
@@ -182,16 +182,16 @@ function ShopScanModal({ products, user = {}, onClose }) {
 
               {/* Conflicts */}
               {result.conflicts?.length > 0 && (
-                <div style={{ padding: "11px 14px", background: "rgba(192,96,96,0.06)", border: "1px solid rgba(192,96,96,0.2)", borderRadius: 10, marginBottom: 10 }}>
-                  <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "#c06060", margin: "0 0 6px" }}>Conflicts with your vanity</p>
+                <div style={{ padding: "11px 14px", background: "rgba(139,115,85,0.06)", border: "1px solid rgba(139,115,85,0.2)", borderRadius: 10, marginBottom: 10 }}>
+                  <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "#8b7355", margin: "0 0 6px" }}>Conflicts with your vanity</p>
                   {result.conflicts.map((c, i) => <p key={i} style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: "0 0 3px", lineHeight: 1.5 }}>· {c}</p>)}
                 </div>
               )}
 
               {/* Duplicates */}
               {result.duplicates?.length > 0 && (
-                <div style={{ padding: "11px 14px", background: "rgba(196,144,64,0.06)", border: "1px solid rgba(196,144,64,0.2)", borderRadius: 10, marginBottom: 10 }}>
-                  <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "#c49040", margin: "0 0 6px" }}>Already covered</p>
+                <div style={{ padding: "11px 14px", background: "rgba(139,115,85,0.06)", border: "1px solid rgba(139,115,85,0.2)", borderRadius: 10, marginBottom: 10 }}>
+                  <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "#8b7355", margin: "0 0 6px" }}>Already covered</p>
                   {result.duplicates.map((d, i) => <p key={i} style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: "0 0 3px", lineHeight: 1.5 }}>· {d}</p>)}
                 </div>
               )}

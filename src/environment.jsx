@@ -109,8 +109,8 @@ function EnvironmentStrip({ products, activeMap, locationData, tempUnit = "C" })
   const location = locationData;
 
   const nudges = buildEnvAdvice(env, products, activeMap);
-  const uvCol = env.uvIndex >= 8 ? "#c06060" : env.uvIndex >= 6 ? "#c49040" : env.uvIndex >= 3 ? "#c4a060" : "#7a9070";
-  const humCol = env.humidity < 30 ? "#c06060" : env.humidity < 45 ? "#c49040" : env.humidity > 75 ? "#8090a4" : "#7a9070";
+  const uvCol = env.uvIndex >= 8 ? "#8b7355" : env.uvIndex >= 6 ? "#8b7355" : env.uvIndex >= 3 ? "#8b7355" : "#7a9070";
+  const humCol = env.humidity < 30 ? "#8b7355" : env.humidity < 45 ? "#8b7355" : env.humidity > 75 ? "#8b7355" : "#7a9070";
 
   return (
     <div style={{ marginBottom: 20 }}>
@@ -145,7 +145,7 @@ function EnvironmentStrip({ products, activeMap, locationData, tempUnit = "C" })
             </div>
           )}
           {nudges.length > 0 && (
-            <div style={{ width: 5, height: 5, borderRadius: "50%", background: nudges[0].severity === "warning" ? "#c06060" : "#c49040" }} />
+            <div style={{ width: 5, height: 5, borderRadius: "50%", background: nudges[0].severity === "warning" ? "#8b7355" : "#8b7355" }} />
           )}
           <span style={{ color: "var(--clay)", opacity: 0.4, fontSize: 10, transform: expanded ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>›</span>
         </div>

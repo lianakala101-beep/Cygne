@@ -34,8 +34,7 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
   const hasPeptides = !!activeMap["peptides"];
   const hasExfoliant = cats.has("Exfoliant") || hasAHA || hasBHA;
 
-  // Cygne gold used for "Essential" tags — matches brand palette
-  const ESSENTIAL_GOLD = "#c4a060";
+  const ESSENTIAL_TAUPE = "#8b7355";
 
   // -- ADDITIONS -------------------------------------------------------------
   if (!hasSPF) recs.push({
@@ -44,7 +43,7 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
     title: "Add daily SPF",
     body: "No sun protection found. SPF is the single most evidence-backed step for preventing premature aging and skin damage — it belongs in every AM ritual.",
     tag: "Essential",
-    tagColor: ESSENTIAL_GOLD,
+    tagColor: ESSENTIAL_TAUPE,
     cygne: true,
     addCategory: "SPF",
     note: "Look for SPF 30–50, broad spectrum. Mineral or chemical — find one you'll actually use daily.",
@@ -56,7 +55,7 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
     title: "Add a gentle cleanser",
     body: "No cleanser detected. A pH-balanced cleanser removes pollutants and preps skin so your actives absorb properly — without stripping the barrier.",
     tag: "Essential",
-    tagColor: ESSENTIAL_GOLD,
+    tagColor: ESSENTIAL_TAUPE,
     cygne: true,
     addCategory: "Cleanser",
     note: "Choose a low-pH, sulfate-free formula. Gel for oilier skin, cream or milk for drier.",
@@ -68,7 +67,7 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
     title: "Add a moisturizer",
     body: "Without a moisturizer, actives can over-penetrate and cause irritation. A moisturizer seals in hydration and supports the skin barrier after every step.",
     tag: "Essential",
-    tagColor: ESSENTIAL_GOLD,
+    tagColor: ESSENTIAL_TAUPE,
     cygne: true,
     addCategory: "Moisturizer",
     note: "A fragrance-free ceramide cream or gel moisturizer works for most skin types.",
@@ -116,7 +115,7 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
     title: "Consider an eye cream",
     body: "The skin around the eyes is significantly thinner. A dedicated eye product prevents milia and accidental irritation from actives that migrate during application.",
     tag: "Optional",
-    tagColor: "#8a8278",
+    tagColor: "#8b7355",
     cygne: true,
     addCategory: "Eye Cream",
     note: "Apply with your ring finger using a gentle tapping motion. Peptide or caffeine formulas work well.",
@@ -129,7 +128,7 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
     title: "Split Vitamin C and Retinol by session",
     body: "You have both in your ritual — they work better and safer apart. Vitamin C is a morning antioxidant. Retinol is a nighttime regenerator. Layering them wastes both.",
     tag: "Conflict Fix",
-    tagColor: "#c49040",
+    tagColor: "#8b7355",
     action: "Move Vitamin C exclusively to AM. Use retinol PM only. Never layer same session.",
     cygne: false,
   });
@@ -140,7 +139,7 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
     title: "Alternate retinol and exfoliant nights",
     body: "Retinol and acid exfoliants on the same night will over-process your skin. Each is effective alone — combined nightly, they break down barrier integrity.",
     tag: "Conflict Fix",
-    tagColor: "#c49040",
+    tagColor: "#8b7355",
     action: "Retinol Mon / Wed / Fri. Exfoliant Tue / Thu. Leave weekends barrier-free.",
     cygne: false,
   });
@@ -165,7 +164,7 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
       type: "addition", priority: 4,
       title: "Add a ceramide moisturizer",
       body: "Dry skin loses moisture faster than it can replenish. Ceramides rebuild the lipid barrier that holds water in — they're not optional for dry skin types.",
-      tag: "Dry Skin", tagColor: "#8aa8c4", cygne: true, addCategory: "Moisturizer",
+      tag: "Dry Skin", tagColor: "#8b7355", cygne: true, addCategory: "Moisturizer",
       note: "Look for ceramides NP, AP, or EOP in the ingredients list. CeraVe, La Roche-Posay, and Avène are reliable.",
     });
   }
@@ -176,7 +175,7 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
       type: "addition", priority: 4,
       title: "Add a BHA exfoliant",
       body: "Salicylic acid is oil-soluble — it penetrates the pore lining where congestion starts. For oily or acne-prone skin it's the most targeted active available OTC.",
-      tag: skinType === "Oily" ? "Oily Skin" : "Acne", tagColor: "#c49040", cygne: true, addCategory: "Exfoliant",
+      tag: skinType === "Oily" ? "Oily Skin" : "Acne", tagColor: "#8b7355", cygne: true, addCategory: "Exfoliant",
       note: "2% salicylic acid, used 2–3× per week. Paula's Choice BHA is the benchmark.",
     });
   }
@@ -187,7 +186,7 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
       type: "addition", priority: 4,
       title: "Add Vitamin C for hyperpigmentation",
       body: "Vitamin C inhibits melanin production at the source. For hyperpigmentation concerns it's the most evidence-backed brightening active — especially paired with SPF.",
-      tag: "Hyperpigmentation", tagColor: "#c4a060", cygne: true, addCategory: "Serum",
+      tag: "Hyperpigmentation", tagColor: "#8b7355", cygne: true, addCategory: "Serum",
       note: "L-ascorbic acid 10–20% is most effective. Keep it in the fridge and replace when it turns orange.",
     });
     if (!hasSPF) recs.push({
@@ -195,7 +194,7 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
       type: "addition", priority: 1,
       title: "SPF is essential for hyperpigmentation",
       body: "Without daily SPF, UV exposure reverses brightening progress every morning. SPF is not optional when treating pigmentation — it's half the treatment.",
-      tag: "Essential", tagColor: ESSENTIAL_GOLD, cygne: true, addCategory: "SPF",
+      tag: "Essential", tagColor: ESSENTIAL_TAUPE, cygne: true, addCategory: "SPF",
       note: "SPF 50 broad-spectrum. Reapply every 2 hours outdoors.",
     });
   }
@@ -207,7 +206,7 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
       type: "simplify", priority: 1,
       title: "Reduce active load for sensitive skin",
       body: "Sensitive skin has a lower threshold for irritation. Running multiple actives simultaneously increases the risk of barrier disruption — simplifying is not a step back.",
-      tag: "Sensitive Skin", tagColor: "#9a8070",
+      tag: "Sensitive Skin", tagColor: "#8b7355",
       note: "Identify your one highest-priority active and hold others until skin is stable.",
     });
     if (!hasCeramides) recs.push({
@@ -215,7 +214,7 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
       type: "addition", priority: 4,
       title: "Add ceramides for barrier support",
       body: "Sensitive skin typically has a compromised barrier that allows irritants in. Ceramides are the primary repair ingredient — they rebuild the barrier from the inside out.",
-      tag: "Sensitive Skin", tagColor: "#9a8070", cygne: true, addCategory: "Moisturizer",
+      tag: "Sensitive Skin", tagColor: "#8b7355", cygne: true, addCategory: "Moisturizer",
       note: "Fragrance-free formula essential. CeraVe Moisturizing Cream is a reliable baseline.",
     });
   }
@@ -226,7 +225,7 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
       type: "addition", priority: 4,
       title: "Consider introducing a retinoid",
       body: "Retinoids are the most studied active for fine lines — they accelerate cell turnover and stimulate collagen production. Nothing else comes close in terms of evidence.",
-      tag: "Fine Lines", tagColor: "#9a8070", cygne: true, addCategory: "Treatment",
+      tag: "Fine Lines", tagColor: "#8b7355", cygne: true, addCategory: "Treatment",
       note: "Start at 0.025–0.05% retinol, 1–2× per week. Expect a 12-week adjustment period.",
     });
   }
@@ -237,7 +236,7 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
       type: "addition", priority: 4,
       title: "Add a chemical exfoliant for texture",
       body: "Texture is primarily a cell turnover issue. AHA (glycolic, lactic) dissolves the bonds between dead skin cells and resurfaces the top layer — physical scrubs can't match this.",
-      tag: "Texture", tagColor: "#9a8070", cygne: true, addCategory: "Exfoliant",
+      tag: "Texture", tagColor: "#8b7355", cygne: true, addCategory: "Exfoliant",
       note: "Lactic acid 5–10% is gentler and a good starting point. Use 2–3× per week, PM only.",
     });
   }
@@ -370,7 +369,7 @@ function buildRefinements(products, activeMap, conflicts) {
     if (prods.length > 1 && !["Serum"].includes(cat)) {
       refinements.push({
         verb: "Remove",
-        verbColor: "#c06060",
+        verbColor: "#8b7355",
         icon: "trash",
         title: `${prods.length} ${cat}s in your ritual`,
         body: `You have ${prods.map(p => `${p.brand} ${p.name}`).join(" and ")}. Layering two ${cat.toLowerCase()}s adds no benefit and can overload the skin.`,
@@ -385,7 +384,7 @@ function buildRefinements(products, activeMap, conflicts) {
     const conflictProducts = [...(c.productsA || []), ...(c.productsB || [])];
     refinements.push({
       verb: "Remove",
-      verbColor: "#c06060",
+      verbColor: "#8b7355",
       icon: "trash",
       title: `Resolve ${c.pair[0]} + ${c.pair[1]} conflict`,
       body: `These two actives are fighting each other in the same ritual. The combination can compromise your barrier and diminish both ingredients' effectiveness.`,
@@ -399,7 +398,7 @@ function buildRefinements(products, activeMap, conflicts) {
   if (activeCount >= 3) {
     refinements.push({
       verb: "Remove",
-      verbColor: "#c06060",
+      verbColor: "#8b7355",
       icon: "trash",
       title: "Active overload detected",
       body: `Your vanity contains ${activeCount} potent actives. Running them all simultaneously overwhelms the barrier's ability to recover between sessions.`,
@@ -417,7 +416,7 @@ function buildRefinements(products, activeMap, conflicts) {
   if (hasRetinol && (hasAHA || hasBHA)) {
     refinements.push({
       verb: "Reduce Frequency",
-      verbColor: "#c49040",
+      verbColor: "#8b7355",
       icon: "clock",
       title: "Retinoid + exfoliant stacking",
       body: "Using a retinoid and an exfoliant in the same session — or even on back-to-back nights — is the most common cause of compromised skin barriers.",
@@ -428,7 +427,7 @@ function buildRefinements(products, activeMap, conflicts) {
   if (exfoliants.length > 1 || (hasAHA && hasBHA)) {
     refinements.push({
       verb: "Reduce Frequency",
-      verbColor: "#c49040",
+      verbColor: "#8b7355",
       icon: "clock",
       title: "Multiple exfoliant sources",
       body: "AHA and BHA used together — or multiple exfoliant products — is excessive for most skin types and causes chronic low-grade barrier disruption over time.",
@@ -439,7 +438,7 @@ function buildRefinements(products, activeMap, conflicts) {
   if (activeCount >= 2 && hasRetinol) {
     refinements.push({
       verb: "Reduce Frequency",
-      verbColor: "#c49040",
+      verbColor: "#8b7355",
       icon: "clock",
       title: "High active intensity schedule",
       body: "Your current stack means your skin is processing potent actives most nights. This compounds risk of sensitization over weeks without visible day-to-day symptoms.",
@@ -503,7 +502,7 @@ function buildRefinements(products, activeMap, conflicts) {
   if (!hasSPF) {
     refinements.push({
       verb: "Add",
-      verbColor: "#c06060",
+      verbColor: "#8b7355",
       icon: "plus",
       title: "No SPF in AM ritual",
       body: "SPF is non-negotiable. Every active you apply — retinol, AHA, Vitamin C — becomes significantly less effective (and potentially harmful) without UV protection the following morning.",
@@ -516,7 +515,7 @@ function buildRefinements(products, activeMap, conflicts) {
   if (!hasMoisturizer) {
     refinements.push({
       verb: "Add",
-      verbColor: "#c06060",
+      verbColor: "#8b7355",
       icon: "plus",
       title: "No moisturizer detected",
       body: "Skipping moisturizer while using actives is a common mistake. Actives thin the barrier — moisturizer rebuilds it. Without it, you're in a constant cycle of damage.",
@@ -529,7 +528,7 @@ function buildRefinements(products, activeMap, conflicts) {
   if (!hasCleanser) {
     refinements.push({
       verb: "Add",
-      verbColor: "#c06060",
+      verbColor: "#8b7355",
       icon: "plus",
       title: "No cleanser in ritual",
       body: "Starting with unwashed skin means actives are applying on top of pollution, sebum, and residue — blocking absorption and increasing irritation risk.",
@@ -556,10 +555,10 @@ function RefinementsCard({ products, activeMap, conflicts }) {
 
   // Verb style map
   const verbStyle = {
-    "Remove":           { color: "#c06060", bg: "rgba(192,96,96,0.08)",  border: "rgba(192,96,96,0.28)" },
-    "Reduce Frequency": { color: "#c49040", bg: "rgba(196,144,64,0.08)", border: "rgba(196,144,64,0.28)" },
+    "Remove":           { color: "#8b7355", bg: "rgba(139,115,85,0.08)",  border: "rgba(139,115,85,0.28)" },
+    "Reduce Frequency": { color: "#8b7355", bg: "rgba(139,115,85,0.08)", border: "rgba(139,115,85,0.28)" },
     "Replace":          { color: "#7a9070", bg: "rgba(122,144,112,0.08)",border: "rgba(122,144,112,0.28)" },
-    "Add":              { color: "#c06060", bg: "rgba(192,96,96,0.08)",  border: "rgba(192,96,96,0.28)" },
+    "Add":              { color: "#8b7355", bg: "rgba(139,115,85,0.08)",  border: "rgba(139,115,85,0.28)" },
   };
 
   return (
@@ -570,9 +569,9 @@ function RefinementsCard({ products, activeMap, conflicts }) {
         onMouseEnter={e => { if (!open) e.currentTarget.style.borderColor = "rgba(122,144,112,0.4)"; }}
         onMouseLeave={e => { if (!open) e.currentTarget.style.borderColor = "var(--border)"; }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#c49040", flexShrink: 0 }} />
+          <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#8b7355", flexShrink: 0 }} />
           <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 600, color: "var(--parchment)", letterSpacing: "0.02em" }}>Refine Your Ritual</span>
-          <span style={{ fontSize: 10, fontFamily: "Space Grotesk, sans-serif", background: "rgba(196,144,64,0.14)", color: "#c49040", padding: "2px 8px", borderRadius: 20, letterSpacing: "0.06em" }}>{refinements.length}</span>
+          <span style={{ fontSize: 10, fontFamily: "Space Grotesk, sans-serif", background: "rgba(139,115,85,0.14)", color: "#8b7355", padding: "2px 8px", borderRadius: 20, letterSpacing: "0.06em" }}>{refinements.length}</span>
         </div>
         <span style={{ color: "var(--clay)", opacity: 0.6, display: "inline-block", transform: open ? "rotate(90deg)" : "none", transition: "transform 0.22s" }}>
           <Icon name="chevron" size={14} />
