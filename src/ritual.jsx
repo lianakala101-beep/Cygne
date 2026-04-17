@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Icon, Section, Wordmark } from "./components.jsx";
 import { detectActives, analyzeShelf, buildRoutine, isDampSkinProduct } from "./engine.js";
+import { FREQUENCIES } from "./constants.js";
 import { getLockedSession, getAutoSession } from "./productmodal.jsx";
 
 function SessionPicker({ productId, product, initial, onSession }) {
@@ -209,17 +210,22 @@ function getStepReason(step) {
   return STEP_REASONS[step.category] || null;
 }
 
-function RoutineStep({ step, index, isLast, checked, onCheck }) {
+function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }) {
   const activeKeys = Object.keys(detectActives(step.ingredients || []));
   const [expanded, setExpanded] = useState(false);
   const reason = getStepReason(step);
   const damp = isDampSkinProduct(step);
+  const freqLabel = step.frequency && step.frequency !== "daily"
+    ? (FREQUENCIES.find(f => f.id === step.frequency)?.label || step.frequency)
+    : null;
+  const nameColor = scheduled ? "var(--parchment)" : "var(--taupe)";
+  const ringColor = scheduled ? "#7a9070" : "var(--taupe)";
   return (
-    <div style={{ display: "flex", gap: 16, alignItems: "flex-start", opacity: checked ? 0.45 : 1, transition: "opacity 0.2s" }}>
+    <div style={{ display: "flex", gap: 16, alignItems: "flex-start", opacity: checked ? 0.45 : scheduled ? 1 : 0.55, transition: "opacity 0.2s" }}>
       <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center" }}>
         <div
           onClick={onCheck}
-          style={{ width: 28, height: 28, borderRadius: "50%", border: `1px solid ${checked ? "#7a9070" : "#7a9070"}`, background: checked ? "#7a9070" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.18s", flexShrink: 0 }}>
+          style={{ width: 28, height: 28, borderRadius: "50%", border: `1px solid ${ringColor}`, background: checked ? ringColor : "transparent", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.18s", flexShrink: 0 }}>
           {checked && <Icon name="check" size={13} />}
         </div>
         {!isLast && <div style={{ width: 1, flex: 1, background: "var(--border)", marginTop: 6, minHeight: 16 }} />}
@@ -232,12 +238,15 @@ function RoutineStep({ step, index, isLast, checked, onCheck }) {
           onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; }}>
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", marginBottom: 4 }}>{step.category}</div>
-              <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 22, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: "0 0 2px" }}>{step.name}</p>
+              <div style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", marginBottom: 4 }}>
+                {step.category}
+                {!scheduled && <span style={{ marginLeft: 8, color: "var(--taupe)", opacity: 0.75 }}>· Skipped today</span>}
+              </div>
+              <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 22, fontWeight: 400, letterSpacing: "0.02em", color: nameColor, margin: "0 0 2px" }}>{step.name}</p>
               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>
                 {step.brand}
-                {step.frequency && step.frequency !== "daily" && (
-                  <span style={{ marginLeft: 8, fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.6 }}>{step.frequency}</span>
+                {freqLabel && (
+                  <span style={{ marginLeft: 8, fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--taupe)", opacity: 0.85 }}>{freqLabel}</span>
                 )}
                 {step.session && step.session !== "auto" && (
                   <span style={{ marginLeft: 8, fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.6 }}>{step.session === "both" ? "AM + PM" : step.session === "am" ? "AM" : step.session === "pm" ? "PM" : step.session}</span>

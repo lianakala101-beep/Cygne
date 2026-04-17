@@ -71,14 +71,14 @@ function buildRoutine(products, { pausedActives = [] } = {}) {
     });
   }
   const am = [], pm = [];
-  // Periodic = classic exfoliant/mask categories OR any product explicitly set to weekly/2-3x/as-needed
+  // Periodic = only classic exfoliant/mask categories. Products with reduced
+  // frequency (2-3x, weekly, as-needed, alternating) stay in am/pm so they
+  // keep their routine step position on scheduled days — and render as
+  // skipped on off days.
   const periodic = products.filter(p =>
-    p.category === "Exfoliant" || p.category === "Mask" ||
-    ["2-3x", "weekly", "as-needed"].includes(p.frequency)
+    p.category === "Exfoliant" || p.category === "Mask"
   );
-  const daily = products.filter(p =>
-    !periodic.includes(p)
-  ); // includes daily, alternating, toning pads
+  const daily = products.filter(p => !periodic.includes(p));
   daily.forEach(p => {
     // User-specified session overrides all auto-detection
     if (p.session === "am")   { am.push(p); return; }

@@ -365,6 +365,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
               isLast={i === steps.length - 1}
               checked={completedSteps.includes(p.id)}
               onCheck={() => toggleStep(p.id)}
+              scheduled={isScheduledToday(p)}
             />)}</div>
           </Section>
         : <div style={{ padding: "32px 0 16px" }}><div style={{ display: "flex", alignItems: "flex-start", gap: 9, marginBottom: 8 }}><span style={{ fontSize: 15, lineHeight: 1.4, flexShrink: 0 }}>🦢</span><p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 19, color: "var(--clay)", margin: 0, lineHeight: 1.4 }}>Your ritual is waiting. Add products to your vanity and they'll appear here.</p></div></div>}
