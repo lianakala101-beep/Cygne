@@ -312,16 +312,6 @@ function RecommendationCard({ rec, onAdd, onDismiss, onEdit }) {
           </div>
           <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, color: "var(--parchment)", margin: 0, fontWeight: 500, lineHeight: 1.35 }}>{rec.title}</p>
         </div>
-        {rec.type === "addition" && onAdd && (
-          <button onClick={handleAdd}
-            title="Add to vanity"
-            style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(122,144,112,0.18)", border: "1px solid rgba(122,144,112,0.35)", display: "flex", alignItems: "center", justifyContent: "center", color: "#7a9070", cursor: "pointer", flexShrink: 0 }}>
-            <Icon name="plus" size={12} />
-          </button>
-        )}
-        <span style={{ color: "var(--clay)", opacity: 0.35, flexShrink: 0, marginTop: 5, display: "inline-block", transform: expanded ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>
-          <Icon name="chevron" size={13} />
-        </span>
       </div>
       {expanded && (
         <div style={{ marginTop: 13, paddingTop: 13, borderTop: "1px solid var(--border)" }}>
