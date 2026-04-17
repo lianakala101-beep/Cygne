@@ -50,11 +50,11 @@ function getNextUseLabel(product) {
 }
 
 const LAYER_ORDER = {
-  Cleanser: 1, Toner: 2, "Toning Pad": 2.3, Mist: 2.5, Essence: 3, Exfoliant: 4,
-  Serum: 5, Treatment: 5, Eye_Cream: 6, Moisturizer: 7, Oil: 8, SPF: 9,
-  "SPF Moisturizer": 9, Mask: 10, Lip: 11,
+  "Cleanser": 1, "Toner": 2, "Toning Pad": 2.3, "Mist": 2.5, "Essence": 3, "Exfoliant": 4,
+  "Serum": 5, "Eye Cream": 6, "Moisturizer": 7, "SPF Moisturizer": 7.5, "Oil": 8,
+  "Treatment": 8.5, "Prescription": 8.5, "SPF": 9, "Mask": 10, "Lip": 11,
 };
-const layerIndex = (cat) => LAYER_ORDER[cat.replace(" ", "_")] ?? 6;
+const layerIndex = (cat) => LAYER_ORDER[cat] ?? 6;
 
 const ACTIVE_RULES = {
   retinol:           { keywords: ["retinol", "retinyl palmitate", "tretinoin", "retinaldehyde", "bakuchiol"], pmOnly: true },

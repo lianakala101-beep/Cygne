@@ -1258,7 +1258,7 @@ function WeekAtAGlance({ checkIns, journals, products = [], pausedActives = [] }
                 {d.pm.length > 0 && (
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 3, justifyContent: "center" }}>
                     {d.pm.map((p, j) => (
-                      <div key={j} style={{ width: 6, height: 6, borderRadius: "50%", background: p.scheduled ? "rgba(100,90,160,0.7)" : "var(--border)", opacity: p.scheduled ? 0.85 : 0.35 }} />
+                      <div key={j} style={{ width: 6, height: 6, borderRadius: "50%", background: p.scheduled ? "var(--parchment)" : "var(--border)", opacity: p.scheduled ? 0.85 : 0.35 }} />
                     ))}
                   </div>
                 )}
@@ -1279,7 +1279,7 @@ function WeekAtAGlance({ checkIns, journals, products = [], pausedActives = [] }
           <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.6 }}>AM</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-          <div style={{ width: 6, height: 6, borderRadius: "50%", background: "rgba(100,90,160,0.7)", opacity: 0.85 }} />
+          <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--parchment)", opacity: 0.85 }} />
           <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.6 }}>PM</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
@@ -1302,7 +1302,7 @@ function WeekAtAGlance({ checkIns, journals, products = [], pausedActives = [] }
             </div>
           ) : (
             <div>
-              {[{ key: "am", label: "\u2600 Morning", items: selectedDayObj.am }, { key: "pm", label: "\u25D7 Evening", items: selectedDayObj.pm }].map(slot => {
+              {[{ key: "am", label: "\u2600 Morning", items: selectedDayObj.am }, { key: "pm", label: "\u263D Evening", items: selectedDayObj.pm }].map(slot => {
                 if (slot.items.length === 0) return null;
                 return (
                   <div key={slot.key} style={{ padding: "12px 16px", borderBottom: "1px solid var(--border)" }}>
@@ -1312,7 +1312,7 @@ function WeekAtAGlance({ checkIns, journals, products = [], pausedActives = [] }
                       const isAlternating = freq !== "daily";
                       return (
                         <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: j < slot.items.length - 1 ? 8 : 0, opacity: p.scheduled ? 1 : 0.35 }}>
-                          <div style={{ width: 8, height: 8, borderRadius: "50%", background: slot.key === "am" ? "var(--sage)" : "rgba(100,90,160,0.7)", flexShrink: 0, opacity: p.scheduled ? 1 : 0.4 }} />
+                          <div style={{ width: 8, height: 8, borderRadius: "50%", background: slot.key === "am" ? "var(--sage)" : "var(--parchment)", flexShrink: 0, opacity: p.scheduled ? 1 : 0.4 }} />
                           <div style={{ flex: 1 }}>
                             <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 500, color: "var(--parchment)", margin: "0 0 1px" }}>
                               {p.name}
