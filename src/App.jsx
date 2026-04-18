@@ -81,6 +81,7 @@ export default function App() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [waitingRoom, setWaitingRoom] = useLocalStorage("cygne_waitingroom", []);
   const [completedSteps, setCompletedSteps] = useLocalStorage("cygne_completedsteps", { date: null, steps: [] });
+  const [rampLog, setRampLog] = useLocalStorage("cygne_ramp_log", []);
   const [fitSheet, setFitSheet] = useState(null);
 
   // Track whether initial load from Supabase is done (prevents overwriting cloud data with empty localStorage)
@@ -113,6 +114,7 @@ export default function App() {
         setTreatments([]);
         setWaitingRoom([]);
         setCompletedSteps({ date: null, steps: [] });
+        setRampLog([]);
         setLocationData(null);
         setLocationDenied(false);
         setNotifDismissed(false);
@@ -191,6 +193,9 @@ export default function App() {
       // so pre-migration users don't see an empty vanity.
       if (meta.products && Array.isArray(meta.products)) {
         setProducts(meta.products);
+      }
+      if (meta.rampLog && Array.isArray(meta.rampLog)) {
+        setRampLog(meta.rampLog);
       }
       if (meta.waitingRoom && Array.isArray(meta.waitingRoom)) {
         setWaitingRoom(meta.waitingRoom);
@@ -275,6 +280,12 @@ export default function App() {
     if (!profileLoaded.current || !authSession) return;
     supabase.auth.updateUser({ data: { products } }).catch(() => {});
   }, [products]);
+
+  // -- Sync ramp log (Skin Handled It / Backing Off history) to Supabase -----
+  useEffect(() => {
+    if (!profileLoaded.current || !authSession) return;
+    supabase.auth.updateUser({ data: { rampLog } }).catch(e => console.error("[Cygne] rampLog sync failed:", e));
+  }, [rampLog]);
 
   // -- Sync waiting room to Supabase ------------------------------------------
   useEffect(() => {
@@ -363,27 +374,62 @@ export default function App() {
     }));
   };
 
-  const advanceRamp = (id) => {
-    setProducts(prev => prev.map(p => {
-      if (p.id !== id) return p;
-      const nextWeek = (p.rampWeek || 1) + 1;
-      const activeKey = p.category === "Toning Pad"
-        ? "toning pad"
-        : RAMP_ACTIVES.find(a => detectActives(p.ingredients || [])[a]);
-      const schedule = activeKey ? RAMP_SCHEDULES[activeKey] : null;
-      const maxWeek = schedule
-        ? Math.max(...schedule.phases[schedule.phases.length - 1].weeks)
-        : 12;
-      if (nextWeek > maxWeek) {
-        return { ...p, rampWeek: undefined, routineStartDate: undefined, rampHeld: false };
-      }
-      return { ...p, rampWeek: nextWeek, rampHeld: false };
-    }));
+  // Record a ramp action (Skin Handled It / Backing Off) and persist both the
+  // updated products list and an immutable audit log entry to Supabase
+  // immediately — so a reload restores the correct progression even if a later
+  // debounced sync is interrupted.
+  const recordRampAction = (id, status) => {
+    const product = products.find(p => p.id === id);
+    if (!product) return;
+    const currentWeek = product.rampWeek || 1;
+    const timestamp = new Date().toISOString();
+    const entry = {
+      userId: authSession?.user?.id || null,
+      productId: id,
+      week: currentWeek,
+      status,
+      timestamp,
+    };
+
+    let updatedProducts = products;
+    if (status === "handled") {
+      updatedProducts = products.map(p => {
+        if (p.id !== id) return p;
+        const nextWeek = currentWeek + 1;
+        const activeKey = p.category === "Toning Pad"
+          ? "toning pad"
+          : RAMP_ACTIVES.find(a => detectActives(p.ingredients || [])[a]);
+        const schedule = activeKey ? RAMP_SCHEDULES[activeKey] : null;
+        const maxWeek = schedule
+          ? Math.max(...schedule.phases[schedule.phases.length - 1].weeks)
+          : 12;
+        if (nextWeek > maxWeek) {
+          return { ...p, rampWeek: undefined, routineStartDate: undefined, rampHeld: false };
+        }
+        return { ...p, rampWeek: nextWeek, rampHeld: false };
+      });
+    } else if (status === "backing_off") {
+      updatedProducts = products.map(p => {
+        if (p.id !== id) return p;
+        // Drop frequency one phase and mark as holding so the card shows the
+        // "paused — repeat this week" state on next render.
+        const prevWeek = Math.max(1, currentWeek - 1);
+        return { ...p, rampWeek: prevWeek, rampHeld: true };
+      });
+    }
+
+    const updatedLog = [...rampLog, entry];
+    setProducts(updatedProducts);
+    setRampLog(updatedLog);
+
+    if (authSession) {
+      supabase.auth.updateUser({ data: { products: updatedProducts, rampLog: updatedLog } })
+        .catch(e => console.error("[Cygne] ramp action save failed:", e));
+    }
   };
 
-  const holdRamp = (id) => {
-    setProducts(prev => prev.map(p => p.id === id ? { ...p, rampHeld: true } : p));
-  };
+  const advanceRamp = (id) => recordRampAction(id, "handled");
+  const holdRamp = (id) => recordRampAction(id, "backing_off");
 
   // -- Loading state ----------------------------------------------------------
   if (authLoading) {

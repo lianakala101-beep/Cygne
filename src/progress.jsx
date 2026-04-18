@@ -1404,7 +1404,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
         if (primaryRamp.find(x => x.id === p.id)) return false;
         const actives = detectActives(p.ingredients || []);
         return reintroActives.some(a => actives[a]);
-      }).map(p => ({ ...p, __reintroducing: true, rampWeek: 1 }))
+      }).map(p => ({ ...p, __reintroducing: true, rampWeek: p.rampWeek || 1 }))
     : [];
 
   const rampProducts = [...primaryRamp, ...reintroRamp];
