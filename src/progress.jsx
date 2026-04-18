@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Icon, Section } from "./components.jsx";
-import { detectActives, analyzeShelf, detectConflicts, buildRoutine } from "./engine.js";
+import { detectActives, analyzeShelf, detectConflicts, buildRoutine, hasSPFCoverage } from "./engine.js";
 import { getAutoSession } from "./productmodal.jsx";
 import { RAMP_SCHEDULES, RAMP_ACTIVES, IntroduceSlowlyCard } from "./ramp.jsx";
 import { getCurrentCycleDay, getTreatmentElapsed, daysBetweenLocal } from "./utils.jsx";
@@ -18,8 +18,8 @@ function computeStabilityScore(products, checkIns, activeMap) {
   if (conflicts.length > 0) score -= conflicts.length * 8;
   if (exfoliantCount > 1) score -= 6;
   if (flags.some(f => f.severity === "warning")) score -= 4;
-  if (products.some(p => p.category === "SPF" || detectActives(p.ingredients || []).SPF)) score += 6;
-  if (products.some(p => p.category === "Moisturizer")) score += 5;
+  if (hasSPFCoverage(products, activeMap)) score += 6;
+  if (products.some(p => p.category === "Moisturizer" || p.category === "SPF Moisturizer")) score += 5;
   if (activeMap["ceramides"] || activeMap["hyaluronic acid"]) score += 4;
   if (conflicts.length === 0 && !flags.some(f => f.severity === "warning")) score += 8;
 
@@ -571,7 +571,7 @@ function buildTreatmentRoutineAdvice(phase, products, activeMap) {
   const hasAHA = !!activeMap["AHA"]?.length;
   const hasBHA = !!activeMap["BHA"]?.length;
   const hasVitC = !!activeMap["vitamin C"]?.length;
-  const hasSPF = products.some(p => p.category === "SPF");
+  const hasSPF = hasSPFCoverage(products, activeMap);
 
   const paused = [];
   const cleared = [];

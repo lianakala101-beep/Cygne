@@ -366,8 +366,8 @@ function assessRoutineFit(product, products, checkIns = [], user = {}) {
   if (!existingActives["hyaluronic acid"] && actives["hyaluronic acid"]) gaps.push("Adds hydration support your ritual is currently missing.");
   if (!existingActives["ceramides"] && actives["ceramides"]) gaps.push("Ceramides will strengthen your barrier — a gap in your current lineup.");
   if (!existingActives["BHA"] && actives["BHA"]) gaps.push("A BHA is a smart add for keeping pores clear between exfoliation sessions.");
-  if (!routineProducts.some(p => p.category === "SPF") && cat === "SPF") gaps.push("You don't have SPF in your ritual yet — this fills a real gap.");
-  if (!routineProducts.some(p => p.category === "Moisturizer") && cat === "Moisturizer") gaps.push("Your ritual is missing a moisturizer — this completes your barrier step.");
+  if (!routineProducts.some(p => p.category === "SPF" || p.category === "SPF Moisturizer") && cat === "SPF") gaps.push("You don't have SPF in your ritual yet — this fills a real gap.");
+  if (!routineProducts.some(p => p.category === "Moisturizer" || p.category === "SPF Moisturizer") && cat === "Moisturizer") gaps.push("Your ritual is missing a moisturizer — this completes your barrier step.");
 
   // -- Defer reasons ---------------------------------------------------------
   // Season

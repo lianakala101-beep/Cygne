@@ -185,7 +185,7 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
     const hasOcclusive = products.some(p =>
       (p.ingredients || []).some(i => /squalane|petrolatum|shea|ceramide|lanolin/i.test(i)) && p.inRoutine !== false
     );
-    const hasMoisturiser = products.some(p => p.category === "Moisturizer" && p.inRoutine !== false);
+    const hasMoisturiser = products.some(p => (p.category === "Moisturizer" || p.category === "SPF Moisturizer") && p.inRoutine !== false);
     if (!hasOcclusive && hasMoisturiser) {
       predictions.push({
         id: "winter_barrier",

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Icon } from "./components.jsx";
+import { hasSPFCoverage } from "./engine.js";
 
 
 function buildEnvAdvice(env, products, activeMap) {
@@ -7,8 +8,8 @@ function buildEnvAdvice(env, products, activeMap) {
   const hasVitC    = !!activeMap["vitamin C"]?.length;
   const hasRetinol = !!activeMap["retinol"]?.length;
   const hasAHA     = !!activeMap["AHA"]?.length;
-  const hasSPF     = products.some(p => p.category === "SPF");
-  const hasMoisturizer = products.some(p => p.category === "Moisturizer");
+  const hasSPF     = hasSPFCoverage(products, activeMap);
+  const hasMoisturizer = products.some(p => p.category === "Moisturizer" || p.category === "SPF Moisturizer");
   const hasCeramide = products.some(p => (p.ingredients || []).some(i => i.includes("ceramide")));
 
   const nudges = [];

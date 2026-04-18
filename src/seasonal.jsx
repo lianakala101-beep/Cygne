@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Icon } from "./components.jsx";
+import { hasSPFCoverage } from "./engine.js";
 
 // --- SEASONAL NUDGE -----------------------------------------------------------
 
@@ -64,7 +65,7 @@ const SEASON_CONFIG = {
     headline: "Skin is recovering. UV is rising.",
     body: "Barrier resilience returns as humidity climbs. Spring is the right window to reintroduce or increase actives — but SPF becomes non-negotiable.",
     shelfNudge: (products, activeMap) => {
-      const hasSPF     = products.some(p => p.category === "SPF") || !!activeMap["SPF"]?.length;
+      const hasSPF     = hasSPFCoverage(products, activeMap);
       const hasRetinol = !!activeMap["retinol"]?.length;
       const hasVitC    = !!activeMap["vitamin C"]?.length;
       if (!hasSPF) return "No SPF in your vanity. UV index is climbing — this is the most important product you're missing right now.";
@@ -82,7 +83,7 @@ const SEASON_CONFIG = {
     headline: "Heat changes everything.",
     body: "Humidity is up and sebum production rises with temperature. Heavier textures can clog. SPF degrades faster in heat.",
     shelfNudge: (products, activeMap) => {
-      const hasSPF       = products.some(p => p.category === "SPF") || !!activeMap["SPF"]?.length;
+      const hasSPF       = hasSPFCoverage(products, activeMap);
       const hasHeavyMoisturizer = products.some(p => p.category === "Moisturizer" && (p.price || 0) > 40);
       const hasBHA       = !!activeMap["BHA"]?.length;
       const hasRetinol   = !!activeMap["retinol"]?.length;

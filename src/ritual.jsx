@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Icon, Section, Wordmark } from "./components.jsx";
-import { detectActives, analyzeShelf, buildRoutine, isDampSkinProduct } from "./engine.js";
+import { detectActives, analyzeShelf, buildRoutine, isDampSkinProduct, hasSPFCoverage } from "./engine.js";
 import { FREQUENCIES } from "./constants.js";
 import { getLockedSession, getAutoSession } from "./productmodal.jsx";
 
@@ -432,8 +432,8 @@ function buildFlightEdit(products, activeMap) {
   const hasAHA       = !!activeMap["AHA"]?.length;
   const hasBHA       = !!activeMap["BHA"]?.length;
   const hasVitC      = !!activeMap["vitamin C"]?.length;
-  const hasSPF       = !!activeMap["SPF"]?.length || products.some(p => p.category === "SPF");
-  const hasMoisturizer = products.some(p => p.category === "Moisturizer");
+  const hasSPF       = hasSPFCoverage(products, activeMap);
+  const hasMoisturizer = products.some(p => p.category === "Moisturizer" || p.category === "SPF Moisturizer");
   const hasCleanser  = products.some(p => p.category === "Cleanser");
   const hasEssence   = products.some(p => p.category === "Essence" || p.category === "Mist");
 

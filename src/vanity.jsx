@@ -147,7 +147,7 @@ function buildInsights(products, activeMap) {
   }
 
   // No SPF — suggest adding one
-  if (!cats["SPF"] && !activeMap["SPF"]) {
+  if (!cats["SPF"] && !cats["SPF Moisturizer"] && !activeMap["SPF"]) {
     replaceItems.push({
       text: "No SPF detected. Adding a broad-spectrum SPF 30–50 as the final AM step is the single highest-impact change you can make.",
       severity: "warning",

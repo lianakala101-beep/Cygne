@@ -8,6 +8,15 @@ function getCurrentSession() {
 
 // --- ENGINE -------------------------------------------------------------------
 
+// Whether the user's vanity has any SPF coverage — dedicated SPF, SPF Moisturizer,
+// or a product with detected UV filters (via activeMap or ingredient scan).
+function hasSPFCoverage(products, activeMap) {
+  if (!Array.isArray(products)) return false;
+  if (products.some(p => p.category === "SPF" || p.category === "SPF Moisturizer")) return true;
+  if (activeMap && Array.isArray(activeMap["SPF"]) && activeMap["SPF"].length) return true;
+  return products.some(p => detectActives(p.ingredients).SPF);
+}
+
 function detectActives(ingredients) {
   const ingArr = Array.isArray(ingredients)
     ? ingredients
@@ -174,4 +183,4 @@ function calcSpending(products) {
 }
 
 
-export { isScheduledToday, getNextUseLabel, getCurrentSession, detectActives, buildRoutine, detectConflicts, analyzeShelf, calcSpending, isDampSkinProduct };
+export { isScheduledToday, getNextUseLabel, getCurrentSession, detectActives, buildRoutine, detectConflicts, analyzeShelf, calcSpending, isDampSkinProduct, hasSPFCoverage };

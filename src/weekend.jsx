@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Icon } from "./components.jsx";
+import { hasSPFCoverage } from "./engine.js";
 
 function getWeekendPhase() {
   const day = new Date().getDay(); // 0=Sun, 1=Mon ... 6=Sat
@@ -17,9 +18,9 @@ function buildWeekendAdvice(phase, products, activeMap) {
   const hasExfoliant  = hasAHA || !!activeMap["BHA"]?.length;
   const hasCeramide   = products.some(p => (p.ingredients || []).some(i => i.includes("ceramide")));
   const hasHA         = products.some(p => (p.ingredients || []).some(i => i.includes("hyaluronate") || i.includes("hyaluronic")));
-  const hasMoisturizer = products.some(p => p.category === "Moisturizer");
+  const hasMoisturizer = products.some(p => p.category === "Moisturizer" || p.category === "SPF Moisturizer");
   const hasCleanser   = products.some(p => p.category === "Cleanser");
-  const hasSPF        = products.some(p => p.category === "SPF") || !!activeMap["SPF"]?.length;
+  const hasSPF        = hasSPFCoverage(products, activeMap);
 
   if (phase === "before") {
     const skip = [];
