@@ -11,7 +11,7 @@ import { Progress } from "./progress.jsx";
 import { ProfileSheet } from "./profile.jsx";
 import { ScanModal } from "./modals.jsx";
 import { ProductModal, RoutineFitSheet } from "./productmodal.jsx";
-import { SwanWelcomeScreen, useLocalStorage, DEMO_PRODUCTS, DEMO_VERSION, getCurrentCycleDay } from "./utils.jsx";
+import { SwanWelcomeScreen, useLocalStorage, DEMO_PRODUCTS, DEMO_VERSION, getCurrentCycleDay, daysBetweenLocal, toLocalMidnight } from "./utils.jsx";
 import { WeekendNudgeCard } from "./weekend.jsx";
 import { SeasonalNudgeCard } from "./seasonal.jsx";
 import { AuthScreen } from "./auth.jsx";
@@ -378,10 +378,27 @@ export default function App() {
   // updated products list and an immutable audit log entry to Supabase
   // immediately — so a reload restores the correct progression even if a later
   // debounced sync is interrupted.
+  //
+  // Week progression itself is calendar-based: the week number is derived from
+  // routineStartDate (see getRampWeek in ramp.jsx), advancing exactly every 7
+  // local days. "Skin Handled It" does not jump the user ahead by a week — it
+  // records their confirmation at the current week, and only clears routine
+  // state when the user has already reached the schedule's last week (so the
+  // product graduates out of Introduce Slowly). "Backing Off" shifts the
+  // start date forward by 7 days, which effectively re-runs the current week.
   const recordRampAction = (id, status) => {
     const product = products.find(p => p.id === id);
     if (!product) return;
-    const currentWeek = product.rampWeek || 1;
+    const activeKey = product.category === "Toning Pad"
+      ? "toning pad"
+      : RAMP_ACTIVES.find(a => detectActives(product.ingredients || [])[a]);
+    const schedule = activeKey ? RAMP_SCHEDULES[activeKey] : null;
+    const maxWeek = schedule
+      ? Math.max(...schedule.phases[schedule.phases.length - 1].weeks)
+      : 12;
+    const currentWeek = product.routineStartDate
+      ? Math.max(1, Math.floor(daysBetweenLocal(product.routineStartDate) / 7) + 1)
+      : (product.rampWeek || 1);
     const timestamp = new Date().toISOString();
     const entry = {
       userId: authSession?.user?.id || null,
@@ -395,32 +412,32 @@ export default function App() {
     if (status === "handled") {
       updatedProducts = products.map(p => {
         if (p.id !== id) return p;
-        const nextWeek = currentWeek + 1;
-        const activeKey = p.category === "Toning Pad"
-          ? "toning pad"
-          : RAMP_ACTIVES.find(a => detectActives(p.ingredients || [])[a]);
-        const schedule = activeKey ? RAMP_SCHEDULES[activeKey] : null;
-        const maxWeek = schedule
-          ? Math.max(...schedule.phases[schedule.phases.length - 1].weeks)
-          : 12;
-        if (nextWeek > maxWeek) {
+        if (currentWeek >= maxWeek) {
+          // Final confirmation — graduate out of Introduce Slowly.
           return { ...p, rampWeek: undefined, routineStartDate: undefined, rampHeld: false };
         }
-        return { ...p, rampWeek: nextWeek, rampHeld: false };
+        // Calendar drives week progression; clear any held flag so the card
+        // continues to show the on-track state until the next 7-day boundary.
+        return { ...p, rampHeld: false };
       });
     } else if (status === "backing_off") {
       updatedProducts = products.map(p => {
         if (p.id !== id) return p;
-        // Drop frequency one phase and mark as holding so the card shows the
-        // "paused — repeat this week" state on next render.
-        const prevWeek = Math.max(1, currentWeek - 1);
-        return { ...p, rampWeek: prevWeek, rampHeld: true };
+        // Shift the start date forward by 7 days so the current week repeats,
+        // and mark as held so the card shows the paused state.
+        const base = p.routineStartDate ? toLocalMidnight(p.routineStartDate) : toLocalMidnight(new Date());
+        const shifted = new Date(base + 7 * 86400000);
+        const newStart = `${shifted.getFullYear()}-${String(shifted.getMonth() + 1).padStart(2, "0")}-${String(shifted.getDate()).padStart(2, "0")}`;
+        return { ...p, routineStartDate: newStart, rampHeld: true };
       });
     }
 
     const updatedLog = [...rampLog, entry];
     setProducts(updatedProducts);
     setRampLog(updatedLog);
+
+    // eslint-disable-next-line no-console
+    console.log("[Cygne ramp action]", entry);
 
     if (authSession) {
       supabase.auth.updateUser({ data: { products: updatedProducts, rampLog: updatedLog } })

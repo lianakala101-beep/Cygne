@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Icon } from "./components.jsx";
 import { detectActives } from "./engine.js";
+import { daysBetweenLocal } from "./utils.jsx";
 
 
 const RAMP_SCHEDULES = {
@@ -187,13 +188,58 @@ function getRampPhase(schedule, week) {
   return schedule.phases[schedule.phases.length - 1]; // Maintain forever
 }
 
-function IntroduceSlowlyCard({ product, schedule, weekNumber, onAdvance, onHold }) {
+// Compute the current Introduce Slowly week from the product's
+// routineStartDate. Week 1 starts on the start date; each subsequent week
+// begins exactly 7 local days later. Falls back to stored rampWeek only
+// when no start date is set.
+function getRampWeek(product) {
+  if (!product) return 1;
+  if (product.routineStartDate) {
+    const days = daysBetweenLocal(product.routineStartDate);
+    return Math.max(1, Math.floor(days / 7) + 1);
+  }
+  return product.rampWeek || 1;
+}
+
+const HANDLED_MESSAGE = "Noted. Check back next week — if your skin stays calm we'll increase frequency.";
+const BACKOFF_MESSAGE = "Understood. We'll slow the pace. Check back in a few days and let us know how your skin feels.";
+
+function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, onAdvance, onHold }) {
   const [expanded, setExpanded] = useState(false);
   const [justActioned, setJustActioned] = useState(null); // "advance" | "hold" | null
+  const weekNumber = weekNumberProp ?? getRampWeek(product);
   const phase = getRampPhase(schedule, weekNumber);
   const phaseIndex = schedule.phases.findIndex(p => p.weeks.includes(Math.min(weekNumber, 12)));
   const isHeld = product.rampHeld === true;
   const clampedPhaseIndex = Math.min(phaseIndex, schedule.phases.length - 1);
+
+  // Verify calendar-based progression at render time.
+  useEffect(() => {
+    if (product?.routineStartDate) {
+      // eslint-disable-next-line no-console
+      console.log("[Cygne ramp]", {
+        productId: product.id,
+        productName: product.name,
+        routineStartDate: product.routineStartDate,
+        daysSinceStart: daysBetweenLocal(product.routineStartDate),
+        currentWeek: weekNumber,
+        phase: phase.name,
+        isHeld,
+      });
+    }
+  }, [product?.id, product?.routineStartDate, weekNumber]);
+
+  // Auto-dismiss the contextual follow-up: 3 seconds, or on next scroll.
+  useEffect(() => {
+    if (!justActioned) return;
+    const timer = setTimeout(() => setJustActioned(null), 3000);
+    const onScroll = () => setJustActioned(null);
+    window.addEventListener("scroll", onScroll, { passive: true, once: true });
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [justActioned]);
 
   return (
     <div style={{ background: schedule.colorBg, border: `1px solid ${schedule.colorBorder}`, borderRadius: 14, marginBottom: 12, overflow: "hidden" }}>
@@ -238,13 +284,7 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber, onAdvance, onHold 
           </div>
 
           {/* Weekly response buttons */}
-          {justActioned ? (
-            <div style={{ padding: "12px 16px", background: justActioned === "advance" ? "rgba(122,144,112,0.12)" : "rgba(139,115,85,0.08)", border: `1px solid ${justActioned === "advance" ? "rgba(122,144,112,0.35)" : "rgba(139,115,85,0.25)"}`, borderRadius: 10, textAlign: "center" }}>
-              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600, color: justActioned === "advance" ? "#7a9070" : "#8b7355", margin: 0 }}>
-                {justActioned === "advance" ? "Logged — advancing to next phase" : "Logged — holding this week's frequency"}
-              </p>
-            </div>
-          ) : isHeld ? (
+          {isHeld ? (
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               <div style={{ padding: "12px 16px", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.22)", borderRadius: 10, textAlign: "center" }}>
                 <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600, color: "#8b7355", margin: "0 0 2px" }}>Paused — repeat this week</p>
@@ -272,6 +312,13 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber, onAdvance, onHold 
                 Backing off
               </button>
             </div>
+          )}
+
+          {/* Contextual follow-up — auto-dismisses after 3s or next scroll */}
+          {justActioned && (
+            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: "10px 2px 0", lineHeight: 1.6, opacity: 0.75, transition: "opacity 0.3s" }}>
+              {justActioned === "advance" ? HANDLED_MESSAGE : BACKOFF_MESSAGE}
+            </p>
           )}
         </div>
       )}
@@ -509,7 +556,7 @@ function WeeklyRitualCalendar({ rampProducts, products }) {
                         ? "toning pad"
                         : RAMP_ACTIVES.find(a => detectActives(p.ingredients || [])[a]);
                       const schedule = RAMP_SCHEDULES[activeKey];
-                      const phase = schedule ? getRampPhase(schedule, p.rampWeek || 1) : null;
+                      const phase = schedule ? getRampPhase(schedule, getRampWeek(p)) : null;
                       return (
                         <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: i < slotProducts.length - 1 ? 10 : 0 }}>
                           <div style={{ width: 8, height: 8, borderRadius: "50%", background: color, flexShrink: 0 }} />
@@ -517,7 +564,7 @@ function WeeklyRitualCalendar({ rampProducts, products }) {
                             <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 500, color: "var(--parchment)", margin: "0 0 1px" }}>{p.name}</p>
                             {phase && (
                               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color, margin: 0, letterSpacing: "0.04em" }}>
-                                Week {p.rampWeek || 1} · {phase.frequency}
+                                Week {getRampWeek(p)} · {phase.frequency}
                               </p>
                             )}
                           </div>
@@ -537,4 +584,4 @@ function WeeklyRitualCalendar({ rampProducts, products }) {
 
 // --- PROGRESS ----------------------------------------------------------------
 
-export { RAMP_SCHEDULES, RAMP_ACTIVES, IntroduceSlowlyCard, WeeklyRitualCalendar };
+export { RAMP_SCHEDULES, RAMP_ACTIVES, IntroduceSlowlyCard, WeeklyRitualCalendar, getRampWeek, getRampPhase };

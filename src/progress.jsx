@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Icon, Section } from "./components.jsx";
 import { detectActives, analyzeShelf, detectConflicts, buildRoutine, hasSPFCoverage } from "./engine.js";
 import { getAutoSession } from "./productmodal.jsx";
-import { RAMP_SCHEDULES, RAMP_ACTIVES, IntroduceSlowlyCard } from "./ramp.jsx";
+import { RAMP_SCHEDULES, RAMP_ACTIVES, IntroduceSlowlyCard, getRampWeek } from "./ramp.jsx";
 import { getCurrentCycleDay, getTreatmentElapsed, daysBetweenLocal } from "./utils.jsx";
 
 
@@ -1567,7 +1567,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
                 key={p.id}
                 product={p}
                 schedule={schedule}
-                weekNumber={p.rampWeek || 1}
+                weekNumber={getRampWeek(p)}
                 onAdvance={onAdvanceRamp}
                 onHold={onHoldRamp}
               />
