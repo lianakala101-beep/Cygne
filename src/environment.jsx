@@ -16,45 +16,45 @@ function buildEnvAdvice(env, products, activeMap) {
   // Humidity
   if (humidity !== null) {
     if (humidity < 30) {
-      nudges.push({ icon: "💧", text: hasCeramide ? "Very dry air today. Layer ceramides before your moisturizer to lock hydration in." : "Humidity is critically low. Your skin is losing moisture fast — occlusive moisturizer is essential right now.", severity: "warning" });
+      nudges.push({ icon: "drop", text: hasCeramide ? "Very dry air today. Layer ceramides before your moisturizer to lock hydration in." : "Humidity is critically low. Your skin is losing moisture fast — occlusive moisturizer is essential right now.", severity: "warning" });
     } else if (humidity < 45) {
-      nudges.push({ icon: "💧", text: "Low humidity. Apply hyaluronic acid on damp skin and seal immediately with moisturizer.", severity: "caution" });
+      nudges.push({ icon: "drop", text: "Low humidity. Apply hyaluronic acid on damp skin and seal immediately with moisturizer.", severity: "caution" });
     } else if (humidity > 75) {
-      nudges.push({ icon: "🌫", text: "High humidity today. Lighter textures will absorb better — skip heavy occlusives if skin feels congested.", severity: "info" });
+      nudges.push({ icon: "fog", text: "High humidity today. Lighter textures will absorb better — skip heavy occlusives if skin feels congested.", severity: "info" });
     }
   }
 
   // UV Index
   if (uvIndex !== null) {
     if (uvIndex >= 8) {
-      nudges.push({ icon: "☀", text: hasSPF ? "UV is extreme today. Reapply SPF every 90 minutes outdoors — no product lasts longer in this intensity." : "UV index is extreme and no SPF is on your vanity. This is your highest-risk day for UV damage.", severity: "warning" });
+      nudges.push({ icon: "sun", text: hasSPF ? "UV is extreme today. Reapply SPF every 90 minutes outdoors — no product lasts longer in this intensity." : "UV index is extreme and no SPF is on your vanity. This is your highest-risk day for UV damage.", severity: "warning" });
     } else if (uvIndex >= 6) {
-      nudges.push({ icon: "☀", text: hasSPF ? "High UV today. SPF is your most important step this morning." : "High UV and no SPF detected. Consider adding one — it's the highest-impact change you can make.", severity: "caution" });
+      nudges.push({ icon: "sun", text: hasSPF ? "High UV today. SPF is your most important step this morning." : "High UV and no SPF detected. Consider adding one — it's the highest-impact change you can make.", severity: "caution" });
     } else if (uvIndex >= 3 && !hasSPF) {
-      nudges.push({ icon: "☀", text: "Moderate UV. SPF still applies even on cloudy days.", severity: "info" });
+      nudges.push({ icon: "sun", text: "Moderate UV. SPF still applies even on cloudy days.", severity: "info" });
     }
   }
 
   // AQI
   if (aqi !== null) {
     if (aqi > 150) {
-      nudges.push({ icon: "🌫", text: hasVitC ? "Air quality is poor. Your Vitamin C is doing important work today — don't skip it." : "Air quality is poor. Pollution particles accelerate oxidative skin damage. Vitamin C would help significantly right now.", severity: "warning" });
+      nudges.push({ icon: "fog", text: hasVitC ? "Air quality is poor. Your Vitamin C is doing important work today — don't skip it." : "Air quality is poor. Pollution particles accelerate oxidative skin damage. Vitamin C would help significantly right now.", severity: "warning" });
     } else if (aqi > 100) {
-      nudges.push({ icon: "🌫", text: "Moderate pollution today. Cleansing thoroughly tonight removes particulate buildup.", severity: "caution" });
+      nudges.push({ icon: "fog", text: "Moderate pollution today. Cleansing thoroughly tonight removes particulate buildup.", severity: "caution" });
     }
   }
 
   // Altitude
   if (altitude !== null && altitude > 1500) {
-    nudges.push({ icon: "⛰", text: `At ${Math.round(altitude)}m elevation, UV is ${Math.round(altitude/1000*10)}% stronger than at sea level. SPF diligence matters more here.`, severity: "info" });
+    nudges.push({ icon: "mountain", text: `At ${Math.round(altitude)}m elevation, UV is ${Math.round(altitude/1000*10)}% stronger than at sea level. SPF diligence matters more here.`, severity: "info" });
   }
 
   // Temperature extremes
   if (temp !== null) {
     if (temp < 2) {
-      nudges.push({ icon: "❄", text: hasRetinol ? "Near-freezing temperatures increase retinol sensitivity. Apply a thin layer of moisturizer before your retinol tonight as a buffer." : "Very cold conditions stress the barrier. Prioritize occlusive hydration today.", severity: "caution" });
+      nudges.push({ icon: "snow", text: hasRetinol ? "Near-freezing temperatures increase retinol sensitivity. Apply a thin layer of moisturizer before your retinol tonight as a buffer." : "Very cold conditions stress the barrier. Prioritize occlusive hydration today.", severity: "caution" });
     } else if (temp > 35) {
-      nudges.push({ icon: "🌡", text: "Extreme heat increases product absorption and can amplify active irritation. Reduce AHA/retinol intensity today if you notice sensitivity.", severity: "caution" });
+      nudges.push({ icon: "thermo", text: "Extreme heat increases product absorption and can amplify active irritation. Reduce AHA/retinol intensity today if you notice sensitivity.", severity: "caution" });
     }
   }
 
@@ -129,13 +129,13 @@ function EnvironmentStrip({ products, activeMap, locationData, tempUnit = "C" })
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
           {env.humidity !== null && (
             <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              <span style={{ fontSize: 9, opacity: 0.5 }}>💧</span>
+              <span style={{ color: "var(--clay)", opacity: 0.5, display: "inline-flex" }}><Icon name="drop" size={10} /></span>
               <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: humCol, fontWeight: 500 }}>{env.humidity}%</span>
             </div>
           )}
           {env.uvIndex !== null && (
             <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              <span style={{ fontSize: 9, opacity: 0.5 }}>☀</span>
+              <span style={{ color: "var(--clay)", opacity: 0.5, display: "inline-flex" }}><Icon name="sun" size={10} /></span>
               <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: uvCol, fontWeight: 500 }}>UV {env.uvIndex}</span>
             </div>
           )}
@@ -147,7 +147,7 @@ function EnvironmentStrip({ products, activeMap, locationData, tempUnit = "C" })
           {nudges.length > 0 && (
             <div style={{ width: 5, height: 5, borderRadius: "50%", background: nudges[0].severity === "warning" ? "#8b7355" : "#8b7355" }} />
           )}
-          <span style={{ color: "var(--clay)", opacity: 0.4, fontSize: 10, transform: expanded ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>›</span>
+          <span style={{ color: "var(--clay)", opacity: 0.4, transform: expanded ? "rotate(90deg)" : "none", transition: "transform 0.2s", display: "inline-flex" }}><Icon name="chevron" size={10} /></span>
         </div>
       </button>
 
@@ -156,7 +156,7 @@ function EnvironmentStrip({ products, activeMap, locationData, tempUnit = "C" })
         <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderTop: "none", borderRadius: "0 0 12px 12px", overflow: "hidden" }}>
           {nudges.length > 0 ? nudges.map((n, i) => (
             <div key={i} style={{ display: "flex", gap: 11, padding: "12px 16px", borderTop: "1px solid var(--border)" }}>
-              <span style={{ fontSize: 12, flexShrink: 0, marginTop: 1 }}>{n.icon}</span>
+              <span style={{ color: "var(--clay)", flexShrink: 0, marginTop: 1, display: "inline-flex" }}><Icon name={n.icon} size={12} /></span>
               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.65 }}>{n.text}</p>
             </div>
           )) : (

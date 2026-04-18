@@ -338,7 +338,7 @@ function SwanSenseCard({ products, checkIns = [], user = {}, locationData = null
   return (
     <div style={{ marginBottom: 20 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-        <span style={{ fontSize: 14, lineHeight: 1 }}>🦢</span>
+        <span style={{ color: "var(--clay)", fontSize: 14 }}>🦢</span>
         <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)" }}>Swan Sense</span>
         <div style={{ flex: 1, height: 1, background: "var(--border)", marginLeft: 4 }} />
         <button onClick={() => setDismissed(true)} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", opacity: 0.4, padding: 4 }}><Icon name="x" size={12} /></button>
@@ -351,11 +351,11 @@ function SwanSenseCard({ products, checkIns = [], user = {}, locationData = null
             <div key={p.type}
               onClick={() => setExpanded(isExpanded ? null : p.type)}
               style={{ background: fb === "up" ? "rgba(122,144,112,0.1)" : p.bg, border: `1px solid ${fb ? "rgba(122,144,112,0.3)" : p.border}`, borderRadius: 12, padding: "13px 15px", cursor: "pointer", position: "relative", overflow: "hidden", transition: "all 0.2s" }}>
-              <div style={{ position: "absolute", bottom: 4, right: 10, opacity: 0.045, fontSize: 36, lineHeight: 1, pointerEvents: "none" }}>🦢</div>
+              <div style={{ position: "absolute", bottom: 6, right: 12, opacity: 0.06, fontSize: 36, pointerEvents: "none" }}>🦢</div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <div style={{ width: 5, height: 5, borderRadius: "50%", background: fb === "up" ? "#7a9070" : p.color, flexShrink: 0 }} />
                 <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--parchment)", margin: 0, flex: 1, lineHeight: 1.4 }}>{p.headline}</p>
-                <span style={{ color: "var(--clay)", opacity: 0.4, fontSize: 10, flexShrink: 0, transition: "transform 0.18s", transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)", display: "inline-block" }}>▾</span>
+                <span style={{ color: "var(--clay)", opacity: 0.4, flexShrink: 0, transition: "transform 0.18s", transform: isExpanded ? "rotate(-90deg)" : "rotate(90deg)", display: "inline-flex" }}><Icon name="chevron" size={10} /></span>
               </div>
               {isExpanded && (
                 <div>
@@ -366,12 +366,12 @@ function SwanSenseCard({ products, checkIns = [], user = {}, locationData = null
                       {fb ? (fb === "up" ? "Marked as helpful" : "Noted") : "Was this helpful?"}
                     </span>
                     <button onClick={e => giveFeedback(p.type, "up", e)}
-                      style={{ background: fb === "up" ? "rgba(122,144,112,0.25)" : "transparent", border: `1px solid ${fb === "up" ? "rgba(122,144,112,0.5)" : "var(--border)"}`, borderRadius: 20, padding: "4px 10px", cursor: "pointer", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: fb === "up" ? "#7a9070" : "var(--clay)", transition: "all 0.15s" }}>
-                      ↑ Yes
+                      style={{ display: "inline-flex", alignItems: "center", gap: 5, background: fb === "up" ? "rgba(122,144,112,0.25)" : "transparent", border: `1px solid ${fb === "up" ? "rgba(122,144,112,0.5)" : "var(--border)"}`, borderRadius: 20, padding: "4px 10px", cursor: "pointer", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: fb === "up" ? "#7a9070" : "var(--clay)", transition: "all 0.15s" }}>
+                      <Icon name="arrow-up" size={10} /> Yes
                     </button>
                     <button onClick={e => giveFeedback(p.type, "down", e)}
-                      style={{ background: fb === "down" ? "rgba(139,115,85,0.15)" : "transparent", border: `1px solid ${fb === "down" ? "rgba(139,115,85,0.4)" : "var(--border)"}`, borderRadius: 20, padding: "4px 10px", cursor: "pointer", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: fb === "down" ? "#8b7355" : "var(--clay)", transition: "all 0.15s" }}>
-                      ↓ Not really
+                      style={{ display: "inline-flex", alignItems: "center", gap: 5, background: fb === "down" ? "rgba(139,115,85,0.15)" : "transparent", border: `1px solid ${fb === "down" ? "rgba(139,115,85,0.4)" : "var(--border)"}`, borderRadius: 20, padding: "4px 10px", cursor: "pointer", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: fb === "down" ? "#8b7355" : "var(--clay)", transition: "all 0.15s" }}>
+                      <Icon name="arrow-down" size={10} /> Not really
                     </button>
                   </div>
                   )}

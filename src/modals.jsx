@@ -164,7 +164,7 @@ function ScanModal({ products, onAddToShelf, onClose }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {mode !== "choose" && (
-              <button onClick={reset} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", fontSize: 16, padding: "0 8px 0 0", opacity: 0.6 }}>←</button>
+              <button onClick={reset} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: "0 8px 0 0", opacity: 0.6, display: "inline-flex" }}><Icon name="arrow-left" size={16} /></button>
             )}
             <div>
               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 3px" }}>Shop Scan</p>
@@ -328,8 +328,8 @@ function ScanModal({ products, onAddToShelf, onClose }) {
                   {verdict === "skip" ? "Add anyway" : "Save to Vanity"}
                 </button>
               ) : (
-                <div style={{ flex: 1, padding: "13px 0", background: "rgba(122,144,112,0.1)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 12, textAlign: "center", fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "#7a9070" }}>
-                  ✓ Saved to Vanity
+                <div style={{ flex: 1, padding: "13px 0", background: "rgba(122,144,112,0.1)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 12, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "#7a9070" }}>
+                  <Icon name="check" size={12} /> Saved to Vanity
                 </div>
               )}
               <button onClick={reset}

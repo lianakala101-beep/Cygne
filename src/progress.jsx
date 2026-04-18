@@ -339,7 +339,7 @@ function CycleTracker({ products, activeMap, cycleDay: cycledayProp = 14, onSetC
     return (
       <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: "20px 20px", marginBottom: 28 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-          <span style={{ fontSize: 14 }}>◑</span>
+          <span style={{ color: "var(--clay)", display: "inline-flex" }}><Icon name="moon" size={14} /></span>
           <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)" }}>Sync Your Ritual With Your Rhythm</span>
           <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", color: "var(--clay)", background: "var(--surface)", border: "1px solid var(--border)", padding: "2px 8px", borderRadius: 20, letterSpacing: "0.06em" }}>Optional</span>
         </div>
@@ -947,7 +947,7 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
                     <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#7a9070" }} />
                     <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--parchment)", fontWeight: 500 }}>{zone.label}</span>
                   </div>
-                  <span style={{ color: "var(--clay)", opacity: 0.4, fontSize: 12, transform: open ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>›</span>
+                  <span style={{ color: "var(--clay)", opacity: 0.4, transform: open ? "rotate(90deg)" : "none", transition: "transform 0.2s", display: "inline-flex" }}><Icon name="chevron" size={12} /></span>
                 </button>
                 {open && (
                   <div style={{ padding: "0 18px 16px", borderTop: "1px solid var(--border)" }}>
@@ -1105,8 +1105,8 @@ function JournalFullView({ journals, onClose, onEditToday }) {
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 20px 12px", borderBottom: "1px solid var(--border)" }}>
         <button onClick={onClose}
-          style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", background: "none", border: "none", cursor: "pointer", padding: 0 }}>
-          ← Back
+          style={{ display: "inline-flex", alignItems: "center", gap: 5, fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+          <Icon name="arrow-left" size={12} /> Back
         </button>
         <h2 style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 30, fontWeight: 400, color: "var(--parchment)", margin: 0 }}>Skin Journal</h2>
         <button onClick={onEditToday}
@@ -1480,8 +1480,8 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
             {/* View all link */}
             {pastEntries.length > 0 && (
               <button onClick={() => setJournalFullView(true)}
-                style={{ width: "100%", padding: "9px 0", background: "var(--surface)", border: "1px solid var(--border)", borderTop: "none", marginTop: -1, borderRadius: "0 0 10px 10px", cursor: "pointer", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.08em", color: "#7a9070", textAlign: "center" }}>
-                View all {journals.length} entries →
+                style={{ width: "100%", padding: "9px 0", background: "var(--surface)", border: "1px solid var(--border)", borderTop: "none", marginTop: -1, borderRadius: "0 0 10px 10px", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.08em", color: "#7a9070" }}>
+                View all {journals.length} entries <Icon name="arrow-right" size={10} />
               </button>
             )}
           </div>
@@ -1500,7 +1500,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
               {daysSince === null ? "Log your first check-in to start tracking." : "Last check-in " + daysSince + " day" + (daysSince !== 1 ? "s" : "") + " ago."}
             </p>
           </div>
-          <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600, color: "#7a9070", flexShrink: 0, marginLeft: 12 }}>Check in →</span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600, color: "#7a9070", flexShrink: 0, marginLeft: 12 }}>Check in <Icon name="arrow-right" size={11} /></span>
         </button>
       ) : (
         <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "14px 18px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, marginBottom: 24 }}>
@@ -1670,7 +1670,7 @@ function LocationManager({ locationData, setLocationData, locationDenied, setLoc
       <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: "16px 18px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ fontSize: 14, opacity: 0.6 }}>◎</span>
+            <span style={{ color: "var(--clay)", opacity: 0.6, display: "inline-flex" }}><Icon name="target" size={14} /></span>
             <div>
               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, color: "var(--parchment)", margin: "0 0 2px", fontWeight: 500 }}>{locationData.city}{locationData.country ? `, ${locationData.country}` : ""}</p>
               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", margin: 0 }}>{locationData.lat.toFixed(3)}°, {locationData.lon.toFixed(3)}°</p>

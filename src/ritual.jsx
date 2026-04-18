@@ -135,10 +135,10 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
       {(allergenHits.length > 0 || lovedHits.length > 0) && (
         <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: activeKeys.length > 0 ? 5 : 0 }}>
           {allergenHits.map(a => (
-            <span key={a} style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.08em", color: "#8b7355", background: "rgba(139,115,85,0.08)", padding: "3px 8px", borderRadius: 20, border: "1px solid rgba(139,115,85,0.22)" }}>⚠ {a}</span>
+            <span key={a} style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.08em", color: "#8b7355", background: "rgba(139,115,85,0.08)", padding: "3px 8px", borderRadius: 20, border: "1px solid rgba(139,115,85,0.22)" }}><Icon name="warning" size={9} /> {a}</span>
           ))}
           {lovedHits.map(l => (
-            <span key={l} style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.08em", color: "#7a9070", background: "rgba(122,144,112,0.08)", padding: "3px 8px", borderRadius: 20, border: "1px solid rgba(122,144,112,0.2)" }}>✦ {l}</span>
+            <span key={l} style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.08em", color: "#7a9070", background: "rgba(122,144,112,0.08)", padding: "3px 8px", borderRadius: 20, border: "1px solid rgba(122,144,112,0.2)" }}><Icon name="sparkle" size={9} /> {l}</span>
           ))}
         </div>
       )}
@@ -259,12 +259,12 @@ function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }
               )}
             </div>
             {reason && (
-              <span style={{ color: "var(--clay)", opacity: 0.35, fontSize: 11, flexShrink: 0, marginTop: 2, display: "inline-block", transition: "transform 0.18s", transform: expanded ? "rotate(180deg)" : "rotate(0deg)" }}>▾</span>
+              <span style={{ color: "var(--clay)", opacity: 0.35, flexShrink: 0, marginTop: 2, display: "inline-flex", transition: "transform 0.18s", transform: expanded ? "rotate(-90deg)" : "rotate(90deg)" }}><Icon name="chevron" size={11} /></span>
             )}
           </div>
           {damp && (
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 10, padding: "6px 9px", borderRadius: 8, background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.2)" }}>
-              <span style={{ fontSize: 11 }}>💧</span>
+              <span style={{ color: "rgba(139,115,85,0.85)", display: "inline-flex" }}><Icon name="drop" size={11} /></span>
               <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "rgba(139,115,85,0.85)", letterSpacing: "0.02em" }}>Apply on damp skin for best absorption</span>
             </div>
           )}
@@ -335,7 +335,7 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
         }}>
           <div style={{ position: "absolute", inset: 0, borderRadius: 22, pointerEvents: "none", backgroundImage: grain, backgroundSize: "180px 180px", opacity: 0.7 }} />
           <div style={{ position: "absolute", inset: 0, borderRadius: 22, pointerEvents: "none", background: "radial-gradient(ellipse at 85% 15%, rgba(139,115,85,0.12) 0%, transparent 65%)" }} />
-          <div style={{ position: "absolute", bottom: 10, right: 14, opacity: 0.07, fontSize: 56, lineHeight: 1, fontFamily: "serif", color: "#e8e3d6", userSelect: "none", pointerEvents: "none" }}>🦢</div>
+          <div style={{ position: "absolute", bottom: 14, right: 18, opacity: 0.07, fontSize: 56, userSelect: "none", pointerEvents: "none" }}>🦢</div>
 
           <div style={{ textAlign: "center", marginBottom: 18 }}>
             <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(232,226,217,0.65)", margin: 0 }}>
@@ -385,7 +385,7 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
         border: "1px solid rgba(139,115,85,0.15)",
       }}>
         <div style={{ position: "absolute", inset: 0, borderRadius: 14, pointerEvents: "none", backgroundImage: grain, backgroundSize: "180px 180px", opacity: 0.6 }} />
-        <div style={{ position: "absolute", bottom: 6, right: 10, opacity: 0.06, fontSize: 44, lineHeight: 1, fontFamily: "serif", color: "#e8e3d6", userSelect: "none", pointerEvents: "none" }}>🦢</div>
+        <div style={{ position: "absolute", bottom: 8, right: 12, opacity: 0.06, fontSize: 44, userSelect: "none", pointerEvents: "none" }}>🦢</div>
 
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
           <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 8, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(232,226,217,0.55)", margin: 0 }}>Swan Song</p>
@@ -511,7 +511,7 @@ function FlightModeModal({ products, activeMap, onClose }) {
                 : unique.slice(0, -1).join(", ") + " and " + unique.slice(-1);
               return (
                 <div style={{ display: "flex", gap: 12, padding: "13px 16px", background: "rgba(139,115,85,0.07)", border: "1px solid rgba(139,115,85,0.22)", borderRadius: 12, marginBottom: 18 }}>
-                  <span style={{ fontSize: 16, flexShrink: 0, lineHeight: 1.4 }}>✈</span>
+                  <span style={{ color: "#8b7355", flexShrink: 0, marginTop: 2, display: "inline-flex" }}><Icon name="plane" size={16} /></span>
                   <div>
                     <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600, color: "var(--parchment)", margin: "0 0 3px" }}>Check your sizes before packing.</p>
                     <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>

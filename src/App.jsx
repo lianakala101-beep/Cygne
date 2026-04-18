@@ -480,10 +480,10 @@ export default function App() {
           <Wordmark size={42} theme={theme} />
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <button onClick={toggleTheme} title={isAuto ? "Auto theme" : theme === "dark" ? "Dark mode" : "Light mode"}
-              style={{ width: 32, height: 32, borderRadius: "50%", background: "var(--surface)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "border-color 0.2s", fontSize: 13, flexShrink: 0 }}
+              style={{ width: 32, height: 32, borderRadius: "50%", background: "var(--surface)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "border-color 0.2s", color: "var(--clay)", flexShrink: 0 }}
               onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(122,144,112,0.5)"}
               onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}>
-              {isAuto ? "⊙" : theme === "dark" ? "☽" : "☀"}
+              <Icon name={isAuto ? "auto" : theme === "dark" ? "moon" : "sun"} size={14} />
             </button>
             <button onClick={() => setProfileOpen(true)}
               style={{ width: 34, height: 34, borderRadius: "50%", background: "none", border: "none", cursor: "pointer", padding: 0, WebkitTapHighlightColor: "transparent" }}>

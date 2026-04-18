@@ -284,8 +284,8 @@ function IngredientProfile({ user, onUpdateUser }) {
               })}
               {draftAllergens.filter(a => !COMMON_ALLERGENS.includes(a)).map(a => (
                 <button key={a} onClick={() => toggleAllergen(a)}
-                  style={{ padding: "5px 12px", borderRadius: 20, border: "1px solid rgba(139,115,85,0.5)", background: "rgba(139,115,85,0.10)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "#8b7355", fontWeight: 600, cursor: "pointer" }}>
-                  {a} ×
+                  style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "5px 12px", borderRadius: 20, border: "1px solid rgba(139,115,85,0.5)", background: "rgba(139,115,85,0.10)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "#8b7355", fontWeight: 600, cursor: "pointer" }}>
+                  {a} <Icon name="x" size={9} />
                 </button>
               ))}
             </div>
@@ -312,8 +312,8 @@ function IngredientProfile({ user, onUpdateUser }) {
               })}
               {draftLoved.filter(l => !COMMON_LOVED.includes(l)).map(l => (
                 <button key={l} onClick={() => toggleLoved(l)}
-                  style={{ padding: "5px 12px", borderRadius: 20, border: "1px solid rgba(122,144,112,0.5)", background: "rgba(122,144,112,0.10)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "#7a9070", fontWeight: 600, cursor: "pointer" }}>
-                  {l} ×
+                  style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "5px 12px", borderRadius: 20, border: "1px solid rgba(122,144,112,0.5)", background: "rgba(122,144,112,0.10)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "#7a9070", fontWeight: 600, cursor: "pointer" }}>
+                  {l} <Icon name="x" size={9} />
                 </button>
               ))}
             </div>
@@ -473,7 +473,7 @@ function SkinHistory({ user, onUpdateUser }) {
             {draft.prescriptions.map((rx, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "6px 0" }}>
                 <span style={valStyle}>{rx.name}</span>
-                <button onClick={() => setDraft(d => ({ ...d, prescriptions: d.prescriptions.filter((_, j) => j !== i) }))} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", fontSize: 11, padding: "0 4px" }}>×</button>
+                <button onClick={() => setDraft(d => ({ ...d, prescriptions: d.prescriptions.filter((_, j) => j !== i) }))} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: "0 4px", display: "inline-flex", alignItems: "center" }}><Icon name="x" size={11} /></button>
               </div>
             ))}
             <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
@@ -501,7 +501,7 @@ function SkinHistory({ user, onUpdateUser }) {
             {draft.dermaVisits.slice(0,3).map((v, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "5px 0", borderBottom: "1px solid var(--border)" }}>
                 <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)" }}>{v.date}{v.note ? ` — ${v.note}` : ""}</span>
-                <button onClick={() => setDraft(d => ({ ...d, dermaVisits: d.dermaVisits.filter((_, j) => j !== i) }))} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", fontSize: 11, padding: "0 4px" }}>×</button>
+                <button onClick={() => setDraft(d => ({ ...d, dermaVisits: d.dermaVisits.filter((_, j) => j !== i) }))} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: "0 4px", display: "inline-flex", alignItems: "center" }}><Icon name="x" size={11} /></button>
               </div>
             ))}
             <div style={{ display: "flex", gap: 8, marginTop: 8 }}>

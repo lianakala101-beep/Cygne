@@ -191,7 +191,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
               style={{ display: "flex", alignItems: "center", gap: 8, padding: "13px 20px", background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 12, fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 600, color: "#7a9070", cursor: "pointer", letterSpacing: "0.08em", transition: "all 0.2s" }}
               onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.18)"}
               onMouseLeave={e => e.currentTarget.style.background = "rgba(122,144,112,0.08)"}>
-              <span style={{ fontSize: 14 }}>◎</span>
+              <Icon name="target" size={14} />
               {locationLoading ? "Requesting..." : "Enable Location"}
             </button>
             <button onClick={() => advance(1)}

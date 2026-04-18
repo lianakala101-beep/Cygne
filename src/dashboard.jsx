@@ -65,14 +65,14 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
       {/* -- Empty state ------------------------------------------------- */}
       {products.length === 0 && (() => {
         const emptySteps = [
-          { icon: "📦", label: "Add your products", sub: "Search by name or scan a photo - Cygne builds your ritual from what you already have.", action: () => setTab("shelf"), cta: "Go to Vanity" },
-          { icon: "🦢", label: "Swan Sense wakes up", sub: "Once your vanity is set, Cygne starts predicting - cycle windows, active streaks, barrier warnings.", action: null, cta: null },
-          { icon: "📓", label: "Log your first journal entry", sub: "Sleep, stress, skin condition. Takes 10 seconds and makes every prediction smarter.", action: () => setTab("progress"), cta: "Go to Progress" },
+          { icon: "box", label: "Add your products", sub: "Search by name or scan a photo - Cygne builds your ritual from what you already have.", action: () => setTab("shelf"), cta: "Go to Vanity" },
+          { icon: "swan", label: "Swan Sense wakes up", sub: "Once your vanity is set, Cygne starts predicting - cycle windows, active streaks, barrier warnings.", action: null, cta: null },
+          { icon: "book", label: "Log your first journal entry", sub: "Sleep, stress, skin condition. Takes 10 seconds and makes every prediction smarter.", action: () => setTab("progress"), cta: "Go to Progress" },
         ];
         return (
           <div>
             <div style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: 28 }}>
-              <span style={{ fontSize: 18, lineHeight: 1.4, flexShrink: 0 }}>🦢</span>
+              <span style={{ color: "var(--clay)", lineHeight: 1.4, flexShrink: 0, marginTop: 4, fontSize: 18 }}>🦢</span>
               <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 21, color: "var(--clay)", margin: 0, lineHeight: 1.5 }}>
                 Your ritual lives here. Let's build it around you.
               </p>
@@ -80,14 +80,14 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
               {emptySteps.map((s, i) => (
                 <div key={i} style={{ display: "flex", gap: 14, padding: "16px 18px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14 }}>
-                  <span style={{ fontSize: 18, lineHeight: 1, flexShrink: 0, marginTop: 2 }}>{s.icon}</span>
+                  <span style={{ color: "var(--clay)", flexShrink: 0, marginTop: 2, display: "inline-flex" }}><Icon name={s.icon} size={18} /></span>
                   <div style={{ flex: 1 }}>
                     <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.5 }}>Step {i + 1}</span>
                     <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, fontWeight: 600, color: "var(--parchment)", margin: "4px 0", lineHeight: 1.3 }}>{s.label}</p>
                     <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: s.cta ? "0 0 10px" : 0, lineHeight: 1.6 }}>{s.sub}</p>
                     {s.cta && (
-                      <button onClick={s.action} style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600, color: "#7a9070", background: "rgba(122,144,112,0.1)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 20, padding: "6px 14px", cursor: "pointer" }}>
-                        {s.cta} →
+                      <button onClick={s.action} style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600, color: "#7a9070", background: "rgba(122,144,112,0.1)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 20, padding: "6px 14px", cursor: "pointer" }}>
+                        {s.cta} <Icon name="arrow-right" size={11} />
                       </button>
                     )}
                   </div>
@@ -118,29 +118,29 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           const allDone = hasProducts && hasCheckin;
           if (allDone) return null;
           const steps = [
-            { label: "Add your products", done: hasProducts, action: () => setTab("shelf"), cta: "Vanity →" },
-            { label: "Log a check-in", done: hasCheckin, action: () => setTab("progress"), cta: "Progress →" },
+            { label: "Add your products", done: hasProducts, action: () => setTab("shelf"), cta: "Vanity" },
+            { label: "Log a check-in", done: hasCheckin, action: () => setTab("progress"), cta: "Progress" },
             { label: "Swan Sense activates", done: hasProducts && hasCheckin, action: null, cta: null },
           ];
           return (
             <div style={{ marginBottom: 24, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: "16px 18px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-                <span style={{ fontSize: 13 }}>🦢</span>
+                <span style={{ color: "var(--clay)", fontSize: 13 }}>🦢</span>
                 <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)", margin: 0 }}>Getting started</p>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {steps.map((s, i) => (
                   <div key={i} style={{ display: "flex", alignItems: "center", gap: 12 }}
                     onClick={s.action || undefined}>
-                    <div style={{ width: 20, height: 20, borderRadius: "50%", flexShrink: 0, background: s.done ? "#7a9070" : "var(--ink)", border: "1px solid " + (s.done ? "#7a9070" : "var(--border)"), display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      {s.done && <span style={{ color: "var(--ink)", fontSize: 10, fontWeight: 700 }}>✓</span>}
-                      {!s.done && <span style={{ color: "var(--clay)", fontSize: 9, opacity: 0.5 }}>{i + 1}</span>}
+                    <div style={{ width: 20, height: 20, borderRadius: "50%", flexShrink: 0, background: s.done ? "#7a9070" : "var(--ink)", border: "1px solid " + (s.done ? "#7a9070" : "var(--border)"), display: "flex", alignItems: "center", justifyContent: "center", color: s.done ? "var(--ink)" : "var(--clay)" }}>
+                      {s.done && <Icon name="check" size={10} />}
+                      {!s.done && <span style={{ fontSize: 9, opacity: 0.5 }}>{i + 1}</span>}
                     </div>
                     <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: s.done ? "var(--clay)" : "var(--parchment)", margin: 0, flex: 1, textDecoration: s.done ? "line-through" : "none", opacity: s.done ? 0.5 : 1 }}>{s.label}</p>
                     {!s.done && s.cta && (
                       <button onClick={e => { e.stopPropagation(); s.action(); }}
-                        style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 600, color: "#7a9070", background: "rgba(122,144,112,0.1)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 20, padding: "4px 12px", cursor: "pointer", whiteSpace: "nowrap" }}>
-                        {s.cta}
+                        style={{ display: "inline-flex", alignItems: "center", gap: 5, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 600, color: "#7a9070", background: "rgba(122,144,112,0.1)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 20, padding: "4px 12px", cursor: "pointer", whiteSpace: "nowrap" }}>
+                        {s.cta} <Icon name="arrow-right" size={10} />
                       </button>
                     )}
                   </div>
@@ -164,7 +164,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
               style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "7px 13px", background: phase.bg, border: `1px solid ${phase.border}`, borderRadius: 999, marginBottom: 20, cursor: "pointer", fontFamily: "inherit" }}>
               <div style={{ width: 5, height: 5, borderRadius: "50%", background: phase.dot, flexShrink: 0 }} />
               <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 500, color: "var(--parchment)", letterSpacing: "0.02em" }}>{phase.name} Phase · Day {currentCycleDay}</span>
-              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", opacity: 0.6, marginLeft: 2 }}>›</span>
+              <span style={{ color: "var(--clay)", opacity: 0.6, marginLeft: 2, display: "inline-flex" }}><Icon name="chevron" size={10} /></span>
             </button>
           );
         })()}
@@ -181,7 +181,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
                   <div style={{ width: 8, height: 8, borderRadius: "50%", background: phase.dot }} />
                   <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 14, fontWeight: 600, color: "var(--parchment)" }}>{phase.name} Phase</span>
                   <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", opacity: 0.7, marginLeft: "auto" }}>Day {currentCycleDay}</span>
-                  <button onClick={() => setCycleExpanded(false)} style={{ background: "none", border: "none", color: "var(--clay)", fontSize: 16, cursor: "pointer", marginLeft: 6 }}>✕</button>
+                  <button onClick={() => setCycleExpanded(false)} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", marginLeft: 6, display: "inline-flex", padding: 2 }}><Icon name="x" size={14} /></button>
                 </div>
                 <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", margin: "0 0 14px", lineHeight: 1.65 }}>{phase.description}</p>
                 <div style={{ padding: "12px 14px", background: "rgba(0,0,0,0.2)", borderRadius: 10 }}>
@@ -208,7 +208,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
               style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20, background: "none", border: "none", padding: "4px 0", cursor: "pointer", fontFamily: "inherit" }}>
               <div style={{ width: 5, height: 5, borderRadius: "50%", background: color, flexShrink: 0 }} />
               <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", letterSpacing: "0.03em", textDecoration: "underline", textDecorationColor: "rgba(139,115,85,0.3)", textUnderlineOffset: 3 }}>{msg}</span>
-              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", opacity: 0.6 }}>›</span>
+              <span style={{ color: "var(--clay)", opacity: 0.6, display: "inline-flex" }}><Icon name="chevron" size={10} /></span>
             </button>
           );
         })()}
@@ -216,14 +216,14 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         {/* Notification nudge banner */}
         {!notifDismissed && notifPermission === "default" && (
           <div style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.25)", borderRadius: 12, padding: "12px 14px", marginBottom: 20 }}>
-            <span style={{ fontSize: 16, flexShrink: 0 }}>🔔</span>
+            <span style={{ color: "#7a9070", flexShrink: 0, display: "inline-flex" }}><Icon name="bell" size={16} /></span>
             <div style={{ flex: 1 }}>
               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 600, color: "var(--parchment)", margin: "0 0 2px" }}>Stay on ritual</p>
               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>Get AM & PM reminders so your ritual stays consistent.</p>
             </div>
             <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
               <button onClick={onRequestNotif} style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600, background: "rgba(122,144,112,0.25)", border: "1px solid rgba(122,144,112,0.4)", borderRadius: 8, color: "var(--parchment)", padding: "6px 12px", cursor: "pointer" }}>Enable</button>
-              <button onClick={onDismissNotif} style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, background: "transparent", border: "none", color: "var(--clay)", cursor: "pointer", padding: "6px 4px" }}>✕</button>
+              <button onClick={onDismissNotif} style={{ background: "transparent", border: "none", color: "var(--clay)", cursor: "pointer", padding: "6px 4px", display: "inline-flex" }}><Icon name="x" size={12} /></button>
             </div>
           </div>
         )}
@@ -236,9 +236,9 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           const label = parts.length > 0 ? `Reminders on — ${parts.join(" & ")} daily.` : "Reminders enabled.";
           return (
             <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.2)", borderRadius: 12, padding: "10px 14px", marginBottom: 20 }}>
-              <span style={{ fontSize: 14 }}>✦</span>
+              <span style={{ color: "#7a9070", display: "inline-flex" }}><Icon name="sparkle" size={12} /></span>
               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>{label}</p>
-              <button onClick={onDismissNotif} style={{ marginLeft: "auto", fontFamily: "Space Grotesk, sans-serif", fontSize: 11, background: "transparent", border: "none", color: "var(--clay)", cursor: "pointer" }}>✕</button>
+              <button onClick={onDismissNotif} style={{ marginLeft: "auto", background: "transparent", border: "none", color: "var(--clay)", cursor: "pointer", display: "inline-flex", padding: 4 }}><Icon name="x" size={12} /></button>
             </div>
           );
         })()}
@@ -284,8 +284,8 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
                   <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 14, color: "var(--clay)", paddingBottom: 8, letterSpacing: "0.04em" }}>step{steps.length !== 1 ? "s" : ""} in order</span>
                 </div>
                 {steps.length > 0 && (
-                  <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "#7a9070", margin: "0 0 18px", letterSpacing: "0.06em" }}>
-                    {steps[0].category} → {steps[steps.length - 1].category}
+                  <p style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "#7a9070", margin: "0 0 18px", letterSpacing: "0.06em" }}>
+                    {steps[0].category} <Icon name="arrow-right" size={11} /> {steps[steps.length - 1].category}
                   </p>
                 )}
                 {steps.length > 0 && (

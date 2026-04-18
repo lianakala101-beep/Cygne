@@ -270,7 +270,7 @@ function ShelfLifeSection({ form, set }) {
     <div>
       <button onClick={() => setOpen(o => !o)} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", padding: "0 0 10px", cursor: "pointer" }}>
         <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.6 }}>Shelf life & expiry</span>
-        <span style={{ color: "var(--clay)", opacity: 0.4, fontSize: 10, display: "inline-block" }}>{open ? "▴" : "▾"}</span>
+        <span style={{ color: "var(--clay)", opacity: 0.4, display: "inline-flex", transform: open ? "rotate(-90deg)" : "rotate(90deg)", transition: "transform 0.18s" }}><Icon name="chevron" size={10} /></span>
       </button>
       {open && (
         <div>
@@ -483,7 +483,7 @@ function ProductModal({ product, onSave, onClose, user }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {modalStep === "form" && !(product && product.id) && (
-              <button onClick={() => setModalStep("choose")} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: "0 8px 0 0", opacity: 0.6, fontSize: 16 }}>←</button>
+              <button onClick={() => setModalStep("choose")} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: "0 8px 0 0", opacity: 0.6, display: "inline-flex" }}><Icon name="arrow-left" size={16} /></button>
             )}
             <h2 style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 28, fontWeight: 400, color: "var(--parchment)", margin: 0 }}>
               {product && product.id ? "Edit Product" : modalStep === "choose" ? "Add a Product" : "Product Details"}
@@ -629,8 +629,8 @@ function ProductModal({ product, onSave, onClose, user }) {
                                   toggleActive(active.key, active.options[0]);
                                 }
                               }}
-                                style={{ width: 22, height: 22, borderRadius: "50%", border: "1px solid " + (isOn ? "#7a9070" : "var(--border)"), background: isOn ? "#7a9070" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
-                                {isOn && <span style={{ color: "var(--ink)", fontSize: 11, fontWeight: 700 }}>✓</span>}
+                                style={{ width: 22, height: 22, borderRadius: "50%", border: "1px solid " + (isOn ? "#7a9070" : "var(--border)"), background: isOn ? "#7a9070" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0, color: "var(--ink)" }}>
+                                {isOn && <Icon name="check" size={11} />}
                               </button>
                             </div>
                             {isOn && (
@@ -688,7 +688,7 @@ function ProductModal({ product, onSave, onClose, user }) {
               )}
               {overuseWarning && (
                 <div style={{ display: "flex", gap: 10, marginTop: 10, padding: "10px 14px", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.25)", borderRadius: 10 }}>
-                  <span style={{ fontSize: 13, flexShrink: 0, lineHeight: 1.4 }}>⚠</span>
+                  <span style={{ color: "#8b7355", flexShrink: 0, marginTop: 1, display: "inline-flex" }}><Icon name="warning" size={13} /></span>
                   <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "#8b7355", margin: 0, lineHeight: 1.6 }}>{overuseWarning}</p>
                 </div>
               )}

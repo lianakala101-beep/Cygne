@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Icon } from "./components.jsx";
 
 // --- SEASONAL NUDGE -----------------------------------------------------------
 
@@ -37,7 +38,7 @@ function getSeasonForUser(locationData) {
 const SEASON_CONFIG = {
   winter: {
     label: "Winter",
-    emoji: "❄",
+    iconName: "snow",
     accent: "#8b7355",
     bg: "rgba(139,115,85,0.07)",
     border: "rgba(139,115,85,0.2)",
@@ -56,7 +57,7 @@ const SEASON_CONFIG = {
   },
   spring: {
     label: "Spring",
-    emoji: "◌",
+    iconName: "leaf",
     accent: "#7a9070",
     bg: "rgba(122,144,112,0.07)",
     border: "rgba(122,144,112,0.2)",
@@ -74,7 +75,7 @@ const SEASON_CONFIG = {
   },
   summer: {
     label: "Summer",
-    emoji: "○",
+    iconName: "sun",
     accent: "#8b7355",
     bg: "rgba(139,115,85,0.07)",
     border: "rgba(139,115,85,0.2)",
@@ -93,7 +94,7 @@ const SEASON_CONFIG = {
   },
   fall: {
     label: "Fall",
-    emoji: "◑",
+    iconName: "moon",
     accent: "#8b7355",
     bg: "rgba(139,115,85,0.07)",
     border: "rgba(139,115,85,0.2)",
@@ -142,16 +143,16 @@ function SeasonalNudgeCard({ products, activeMap }) {
         overflow: "hidden",
       }}>
         {/* Subtle season glyph watermark */}
-        <div style={{ position: "absolute", top: -8, right: 12, fontSize: 72, opacity: 0.04, color: cfg.accent, userSelect: "none", pointerEvents: "none", lineHeight: 1 }}>{cfg.emoji}</div>
+        <div style={{ position: "absolute", top: 8, right: 14, opacity: 0.08, color: cfg.accent, userSelect: "none", pointerEvents: "none", display: "inline-flex" }}><Icon name={cfg.iconName} size={72} /></div>
 
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-          <span style={{ fontSize: 11, opacity: 0.7 }}>{cfg.emoji}</span>
+          <span style={{ color: cfg.accent, opacity: 0.8, display: "inline-flex" }}><Icon name={cfg.iconName} size={11} /></span>
           <span style={{ fontFamily: "var(--sans)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: cfg.accent }}>{cfg.label}</span>
           <div style={{ flex: 1 }} />
-          <button onClick={handleDismiss} style={{ background: "none", border: "none", color: "var(--clay)", opacity: 0.35, cursor: "pointer", padding: "2px 4px", transition: "opacity 0.2s", fontSize: 12, lineHeight: 1 }}
+          <button onClick={handleDismiss} style={{ background: "none", border: "none", color: "var(--clay)", opacity: 0.35, cursor: "pointer", padding: "2px 4px", transition: "opacity 0.2s", display: "inline-flex" }}
             onMouseEnter={e => e.currentTarget.style.opacity = "0.7"}
-            onMouseLeave={e => e.currentTarget.style.opacity = "0.35"}>×</button>
+            onMouseLeave={e => e.currentTarget.style.opacity = "0.35"}><Icon name="x" size={12} /></button>
         </div>
 
         {/* Headline */}

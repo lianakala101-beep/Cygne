@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { LOGO_SRC } from "./components.jsx";
+import { Icon, LOGO_SRC } from "./components.jsx";
 
 /** Compress an image file to JPEG, max 800px on longest side, keeps output well under 1MB */
 export async function compressImage(file, maxDim = 800, quality = 0.7) {
@@ -35,7 +35,7 @@ function SwanWelcomeScreen({ user, onDone }) {
   return (
     <div style={{ position: "fixed", inset: 0, background: "#3a4134", display: "flex", flexDirection: "column", alignItems: "flex-start", justifyContent: "space-between", padding: "72px 36px 64px", zIndex: 500 }}>
       <div>
-        <span style={{ fontSize: 48, lineHeight: 1, display: "block", marginBottom: 32 }}>🦢</span>
+        <span style={{ display: "block", marginBottom: 32, fontSize: 48 }}>🦢</span>
         <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(232,226,217,0.5)", margin: "0 0 14px" }}>
           {name ? "Welcome, " + name + "." : "Welcome."}
         </p>
@@ -51,8 +51,8 @@ function SwanWelcomeScreen({ user, onDone }) {
           Takes about 2 minutes
         </p>
         <button onClick={onDone}
-          style={{ width: "100%", padding: "16px 0", background: "rgba(232,226,217,0.12)", border: "1px solid rgba(232,226,217,0.2)", borderRadius: 14, fontFamily: "Space Grotesk, sans-serif", fontSize: 14, fontWeight: 600, color: "rgba(232,226,217,0.9)", cursor: "pointer", letterSpacing: "0.04em" }}>
-          Add my products →
+          style={{ width: "100%", padding: "16px 0", background: "rgba(232,226,217,0.12)", border: "1px solid rgba(232,226,217,0.2)", borderRadius: 14, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, fontFamily: "Space Grotesk, sans-serif", fontSize: 14, fontWeight: 600, color: "rgba(232,226,217,0.9)", cursor: "pointer", letterSpacing: "0.04em" }}>
+          Add my products <Icon name="arrow-right" size={14} />
         </button>
       </div>
     </div>
