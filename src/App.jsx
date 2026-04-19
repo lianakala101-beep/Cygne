@@ -227,6 +227,17 @@ export default function App() {
       return next;
     });
   };
+  const updateTreatmentDate = (id, newDateIso = null) => {
+    const today = new Date();
+    const iso = newDateIso || `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+    setTreatments(prev => {
+      const next = prev.map(t => t.id === id ? { ...t, date: iso } : t);
+      // eslint-disable-next-line no-console
+      console.log("[Cygne treatment reset]", { treatmentId: id, newDate: iso });
+      if (authSession) supabase.auth.updateUser({ data: { treatments: next } }).catch(e => console.error("[Cygne] treatment reset save failed:", e));
+      return next;
+    });
+  };
 
   // -- Sync journals to Supabase when they change ----------------------------
   useEffect(() => {
@@ -448,6 +459,24 @@ export default function App() {
   const advanceRamp = (id) => recordRampAction(id, "handled");
   const holdRamp = (id) => recordRampAction(id, "backing_off");
 
+  // Reset the routineStartDate on a ramping product so week progression
+  // starts fresh from today. Used when a date got corrupted by earlier
+  // bugs and the displayed week no longer matches reality.
+  const resetRampStartDate = (id, newStartDateIso = null) => {
+    const today = new Date();
+    const iso = newStartDateIso || `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+    const updated = products.map(p =>
+      p.id === id ? { ...p, routineStartDate: iso, rampWeek: 1, rampHeld: false } : p
+    );
+    setProducts(updated);
+    // eslint-disable-next-line no-console
+    console.log("[Cygne ramp reset]", { productId: id, newStart: iso });
+    if (authSession) {
+      supabase.auth.updateUser({ data: { products: updated } })
+        .catch(e => console.error("[Cygne] ramp reset save failed:", e));
+    }
+  };
+
   // -- Loading state ----------------------------------------------------------
   if (authLoading) {
     return (
@@ -611,7 +640,7 @@ export default function App() {
           checkIns={checkIns}
           user={user}
         />}
-        {tab === "progress"  && <Progress products={products} checkIns={checkIns} setCheckIns={setCheckIns} treatments={treatments} setTreatments={setTreatments} saveTreatment={saveTreatment} removeTreatment={removeTreatment} user={user} onAdvanceRamp={advanceRamp} onHoldRamp={holdRamp} journals={journals} setJournals={setJournals} onUpdateUser={updateUser} />}
+        {tab === "progress"  && <Progress products={products} checkIns={checkIns} setCheckIns={setCheckIns} treatments={treatments} setTreatments={setTreatments} saveTreatment={saveTreatment} removeTreatment={removeTreatment} updateTreatmentDate={updateTreatmentDate} user={user} onAdvanceRamp={advanceRamp} onHoldRamp={holdRamp} onResetRampStart={resetRampStartDate} journals={journals} setJournals={setJournals} onUpdateUser={updateUser} />}
       </div>
 
       {/* Bottom nav */}

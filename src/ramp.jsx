@@ -204,14 +204,24 @@ function getRampWeek(product) {
 const HANDLED_MESSAGE = "Noted. Check back next week — if your skin stays calm we'll increase frequency.";
 const BACKOFF_MESSAGE = "Understood. We'll slow the pace. Check back in a few days and let us know how your skin feels.";
 
-function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, onAdvance, onHold }) {
+function formatStartedLabel(iso) {
+  if (!iso) return null;
+  const [y, m, d] = iso.split("-").map(Number);
+  if (!y || !m || !d) return null;
+  const dt = new Date(y, m - 1, d);
+  return `Started ${dt.toLocaleDateString("en-US", { month: "long", day: "numeric" })}`;
+}
+
+function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, onAdvance, onHold, onResetStart }) {
   const [expanded, setExpanded] = useState(false);
   const [justActioned, setJustActioned] = useState(null); // "advance" | "hold" | null
+  const [confirmReset, setConfirmReset] = useState(false);
   const weekNumber = weekNumberProp ?? getRampWeek(product);
   const phase = getRampPhase(schedule, weekNumber);
   const phaseIndex = schedule.phases.findIndex(p => p.weeks.includes(Math.min(weekNumber, 12)));
   const isHeld = product.rampHeld === true;
   const clampedPhaseIndex = Math.min(phaseIndex, schedule.phases.length - 1);
+  const startedLabel = formatStartedLabel(product.routineStartDate);
 
   // Verify calendar-based progression at render time.
   useEffect(() => {
@@ -253,6 +263,9 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, on
           </div>
           <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, fontWeight: 500, color: "var(--parchment)", margin: "0 0 2px" }}>{product.name}</p>
           <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: schedule.color, margin: 0, letterSpacing: "0.04em" }}>{phase.frequency}</p>
+          {startedLabel && (
+            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", margin: "4px 0 0", opacity: 0.6, letterSpacing: "0.04em" }}>{startedLabel}</p>
+          )}
         </div>
 
         {/* Phase dots */}
@@ -320,6 +333,28 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, on
               {justActioned === "advance" ? HANDLED_MESSAGE : BACKOFF_MESSAGE}
             </p>
           )}
+
+          {/* Reset start date — for correcting a corrupted date */}
+          <div style={{ marginTop: 14, paddingTop: 12, borderTop: "1px dashed var(--border)" }}>
+            {confirmReset ? (
+              <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", flex: 1 }}>Reset Week 1 to today?</span>
+                <button onClick={(e) => { e.stopPropagation(); onResetStart?.(product.id); setConfirmReset(false); }}
+                  style={{ padding: "6px 12px", background: "rgba(139,115,85,0.12)", border: "1px solid rgba(139,115,85,0.35)", borderRadius: 8, fontFamily: "Space Grotesk, sans-serif", fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#8b7355", cursor: "pointer" }}>
+                  Confirm
+                </button>
+                <button onClick={(e) => { e.stopPropagation(); setConfirmReset(false); }}
+                  style={{ padding: "6px 12px", background: "transparent", border: "1px solid var(--border)", borderRadius: 8, fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)", cursor: "pointer" }}>
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <button onClick={(e) => { e.stopPropagation(); setConfirmReset(true); }}
+                style={{ background: "none", border: "none", padding: 0, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", opacity: 0.6, cursor: "pointer", letterSpacing: "0.06em", textDecoration: "underline" }}>
+                Reset start date
+              </button>
+            )}
+          </div>
         </div>
       )}
     </div>

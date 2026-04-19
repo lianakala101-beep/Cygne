@@ -682,7 +682,8 @@ function AddTreatmentModal({ onSave, onClose }) {
   );
 }
 
-function TreatmentRecoveryCard({ treatment, products, activeMap, onDismiss }) {
+function TreatmentRecoveryCard({ treatment, products, activeMap, onDismiss, onResetDate }) {
+  const [confirmReset, setConfirmReset] = useState(false);
   const result = getTreatmentPhase(treatment);
   if (!result || !result.phase) return null;
 
@@ -692,6 +693,15 @@ function TreatmentRecoveryCard({ treatment, products, activeMap, onDismiss }) {
 
   const phaseIndex = type.phases.findIndex(p => p.label === phase.label);
   const progress = Math.min((elapsed / (type.phases[type.phases.length - 2]?.days[1] || 21)) * 100, 100);
+
+  // "Started April 7" — tolerant to both YYYY-MM-DD strings and full ISO timestamps
+  const startedLabel = (() => {
+    if (!treatment.date) return null;
+    const iso = String(treatment.date);
+    const [y, m, d] = iso.slice(0, 10).split("-").map(Number);
+    if (!y || !m || !d) return null;
+    return `Started ${new Date(y, m - 1, d).toLocaleDateString("en-US", { month: "long", day: "numeric" })}`;
+  })();
 
   return (
     <div style={{ marginBottom: 20 }}>
@@ -706,6 +716,9 @@ function TreatmentRecoveryCard({ treatment, products, activeMap, onDismiss }) {
               <div style={{ width: 5, height: 5, borderRadius: "50%", background: isLastPhase ? "#7a9070" : "#8b7355" }} />
               <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: isLastPhase ? "#7a9070" : "#8b7355", fontWeight: 600, letterSpacing: "0.06em" }}>{phase.label}</span>
             </div>
+            {startedLabel && (
+              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", margin: "5px 0 0", opacity: 0.6, letterSpacing: "0.04em" }}>{startedLabel}</p>
+            )}
           </div>
           {isLastPhase && (
             <button onClick={onDismiss} style={{ padding: "6px 12px", background: "rgba(232,226,217,0.18)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 8, fontFamily: "Space Grotesk, sans-serif", fontSize: 9, color: "#7a9070", cursor: "pointer", letterSpacing: "0.1em", textTransform: "uppercase" }}>
@@ -765,12 +778,36 @@ function TreatmentRecoveryCard({ treatment, products, activeMap, onDismiss }) {
           })}
         </div>
         <div style={{ height: 18 }} />
+
+        {/* Reset start date — for correcting a corrupted date */}
+        {onResetDate && (
+          <div style={{ marginTop: 6, paddingTop: 10, borderTop: "1px dashed var(--border)" }}>
+            {confirmReset ? (
+              <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", flex: 1 }}>Reset Day 1 to today?</span>
+                <button onClick={() => { onResetDate(); setConfirmReset(false); }}
+                  style={{ padding: "6px 12px", background: "rgba(139,115,85,0.12)", border: "1px solid rgba(139,115,85,0.35)", borderRadius: 8, fontFamily: "Space Grotesk, sans-serif", fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#8b7355", cursor: "pointer" }}>
+                  Confirm
+                </button>
+                <button onClick={() => setConfirmReset(false)}
+                  style={{ padding: "6px 12px", background: "transparent", border: "1px solid var(--border)", borderRadius: 8, fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)", cursor: "pointer" }}>
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <button onClick={() => setConfirmReset(true)}
+                style={{ background: "none", border: "none", padding: 0, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", opacity: 0.6, cursor: "pointer", letterSpacing: "0.06em", textDecoration: "underline" }}>
+                Reset start date
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
-function TreatmentSection({ treatments, saveTreatment, removeTreatment, products, activeMap }) {
+function TreatmentSection({ treatments, saveTreatment, removeTreatment, updateTreatmentDate = () => {}, products, activeMap }) {
   const [addOpen, setAddOpen] = useState(false);
   const activeTreatments = treatments.filter(t => {
     const r = getTreatmentPhase(t);
@@ -807,6 +844,7 @@ function TreatmentSection({ treatments, saveTreatment, removeTreatment, products
             products={products}
             activeMap={activeMap}
             onDismiss={() => removeTreatment(t.id)}
+            onResetDate={(newIso) => updateTreatmentDate(t.id, newIso)}
           />
         ))
       )}
@@ -1410,7 +1448,7 @@ function WeekAtAGlance({ checkIns, journals, products = [], pausedActives = [] }
 }
 
 
-function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatments, saveTreatment, removeTreatment, user = {}, onAdvanceRamp, onHoldRamp, journals = [], setJournals = () => {}, onUpdateUser = () => {} }) {
+function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatments, saveTreatment, removeTreatment, updateTreatmentDate = () => {}, user = {}, onAdvanceRamp, onHoldRamp, onResetRampStart = () => {}, journals = [], setJournals = () => {}, onUpdateUser = () => {} }) {
   const [showCheckIn, setShowCheckIn] = useState(false);
   const [showJournal, setShowJournal] = useState(false);
   const [journalFullView, setJournalFullView] = useState(false);
@@ -1613,6 +1651,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
                 weekNumber={getRampWeek(p)}
                 onAdvance={onAdvanceRamp}
                 onHold={onHoldRamp}
+                onResetStart={onResetRampStart}
               />
             );
           })
@@ -1628,7 +1667,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
       {/* -- Treatments --------------------------------------------------------- */}
       {sectionLabel("drop", "Treatments")}
       <div style={{ marginBottom: 28 }}>
-        <TreatmentSection treatments={treatments} saveTreatment={saveTreatment} removeTreatment={removeTreatment} products={products} activeMap={activeMap} />
+        <TreatmentSection treatments={treatments} saveTreatment={saveTreatment} removeTreatment={removeTreatment} updateTreatmentDate={updateTreatmentDate} products={products} activeMap={activeMap} />
       </div>
 
       {/* -- Body Acne --------------------------------------------------------- */}
