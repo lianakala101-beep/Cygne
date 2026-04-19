@@ -307,6 +307,29 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
     });
   }
 
+  // Hairline breakouts — often linked to hair/styling products
+  const recentZoned = checkIns.slice(-8).filter(c => Array.isArray(c.breakoutZones));
+  const hairlineCount = recentZoned.filter(c => c.breakoutZones.includes("Hairline")).length;
+  if (hairlineCount >= 2) {
+    predictions.push({
+      type: "hairline_breakouts",
+      level: "caution",
+      headline: "Repeated hairline breakouts",
+      detail: "Could be a hair product migrating to skin — check ingredients in your shampoo or styling products. Look for silicones, heavy oils, or fragrance that can transfer to the forehead during the day or on your pillowcase.",
+    });
+  }
+
+  // Perioral breakouts — often linked to toothpaste or lip products
+  const perioralCount = recentZoned.filter(c => c.breakoutZones.includes("Above lip")).length;
+  if (perioralCount >= 2) {
+    predictions.push({
+      type: "perioral_breakouts",
+      level: "caution",
+      headline: "Repeated breakouts around the mouth",
+      detail: "Perioral breakouts are often linked to toothpaste (SLS or fluoride) or lip products. Try switching to an SLS-free toothpaste for a couple of weeks and rinsing the mouth area after brushing to see if the pattern breaks.",
+    });
+  }
+
   // Bad window warning for anyone considering a treatment
   if (inBadWindow && (persistentDullness || persistentCongestion)) {
     predictions.push({
