@@ -216,6 +216,7 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, on
   const [expanded, setExpanded] = useState(false);
   const [justActioned, setJustActioned] = useState(null); // "advance" | "hold" | null
   const [confirmReset, setConfirmReset] = useState(false);
+  const [pickedDate, setPickedDate] = useState("");
   const weekNumber = weekNumberProp ?? getRampWeek(product);
   const phase = getRampPhase(schedule, weekNumber);
   const phaseIndex = schedule.phases.findIndex(p => p.weeks.includes(Math.min(weekNumber, 12)));
@@ -334,19 +335,31 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, on
             </p>
           )}
 
-          {/* Reset start date — for correcting a corrupted date */}
+          {/* Reset start date — pick any past date */}
           <div style={{ marginTop: 14, paddingTop: 12, borderTop: "1px dashed var(--border)" }}>
             {confirmReset ? (
-              <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", flex: 1 }}>Reset Week 1 to today?</span>
-                <button onClick={(e) => { e.stopPropagation(); onResetStart?.(product.id); setConfirmReset(false); }}
-                  style={{ padding: "6px 12px", background: "rgba(139,115,85,0.12)", border: "1px solid rgba(139,115,85,0.35)", borderRadius: 8, fontFamily: "Space Grotesk, sans-serif", fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#8b7355", cursor: "pointer" }}>
-                  Confirm
-                </button>
-                <button onClick={(e) => { e.stopPropagation(); setConfirmReset(false); }}
-                  style={{ padding: "6px 12px", background: "transparent", border: "1px solid var(--border)", borderRadius: 8, fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)", cursor: "pointer" }}>
-                  Cancel
-                </button>
+              <div>
+                <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", margin: "0 0 8px", opacity: 0.8 }}>Pick the date you actually started this product — the week will recalculate from there.</p>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                  <input
+                    type="date"
+                    value={pickedDate}
+                    max={(() => { const t = new Date(); return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`; })()}
+                    onClick={(e) => e.stopPropagation()}
+                    onChange={(e) => setPickedDate(e.target.value)}
+                    style={{ flex: 1, minWidth: 140, padding: "7px 10px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--parchment)", cursor: "pointer" }}
+                  />
+                  <button
+                    disabled={!pickedDate}
+                    onClick={(e) => { e.stopPropagation(); if (!pickedDate) return; onResetStart?.(product.id, pickedDate); setConfirmReset(false); setPickedDate(""); }}
+                    style={{ padding: "6px 12px", background: pickedDate ? "rgba(139,115,85,0.12)" : "transparent", border: `1px solid ${pickedDate ? "rgba(139,115,85,0.35)" : "var(--border)"}`, borderRadius: 8, fontFamily: "Space Grotesk, sans-serif", fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: pickedDate ? "#8b7355" : "var(--clay)", cursor: pickedDate ? "pointer" : "not-allowed", opacity: pickedDate ? 1 : 0.5 }}>
+                    Save
+                  </button>
+                  <button onClick={(e) => { e.stopPropagation(); setConfirmReset(false); setPickedDate(""); }}
+                    style={{ padding: "6px 12px", background: "transparent", border: "1px solid var(--border)", borderRadius: 8, fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)", cursor: "pointer" }}>
+                    Cancel
+                  </button>
+                </div>
               </div>
             ) : (
               <button onClick={(e) => { e.stopPropagation(); setConfirmReset(true); }}
