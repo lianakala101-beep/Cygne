@@ -47,8 +47,9 @@ function generateTimeline(baseScore, checkIns) {
   });
 }
 
-const FACE_ZONES = ["Forehead", "Hairline", "Temples", "T-zone", "Nose", "Left cheek", "Right cheek", "Above lip", "Chin", "Jawline"];
-const NECK_BEARD_ZONES = ["Neck", "Neck sides", "Under jaw", "Beard area", "Neckline"];
+const FACE_ZONES = ["Forehead", "Hairline", "Temples", "T-zone", "Nose", "Left cheek", "Right cheek", "Above lip", "Mustache area", "Sideburns", "Chin", "Jawline", "Beard/facial hair area"];
+const NECK_BEARD_ZONES = ["Neck", "Neck sides", "Under jaw", "Beard area", "Neck beard line", "Neckline"];
+const CHECKIN_BODY_ZONES = ["Chest", "Upper back", "Shoulders", "Scalp/hairline"];
 
 function CheckInModal({ onSubmit, onClose }) {
   const [irritation, setIrritation] = useState("none");
@@ -122,9 +123,29 @@ function CheckInModal({ onSubmit, onClose }) {
                   );
                 })}
               </div>
-              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, color: "var(--clay)", margin: "14px 0 8px", letterSpacing: "0.2em", textTransform: "uppercase", opacity: 0.55 }}>Neck / beard</p>
+              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, color: "var(--clay)", margin: "14px 0 8px", letterSpacing: "0.2em", textTransform: "uppercase", opacity: 0.55 }}>Neck</p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                 {NECK_BEARD_ZONES.map(z => {
+                  const active = breakoutZones.includes(z);
+                  return (
+                    <button key={z} onClick={() => toggleZone(z)} style={{
+                      padding: "6px 13px", borderRadius: 20,
+                      border: `1px solid ${active ? "rgba(139,115,85,0.55)" : "var(--border)"}`,
+                      background: active ? "rgba(139,115,85,0.12)" : "transparent",
+                      color: active ? "#8b7355" : "var(--clay)",
+                      fontFamily: "Space Grotesk, sans-serif", fontSize: 11,
+                      fontWeight: active ? 600 : 400,
+                      cursor: "pointer", transition: "all 0.15s",
+                      letterSpacing: "0.04em",
+                    }}>
+                      {z}
+                    </button>
+                  );
+                })}
+              </div>
+              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, color: "var(--clay)", margin: "14px 0 8px", letterSpacing: "0.2em", textTransform: "uppercase", opacity: 0.55 }}>Body</p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {CHECKIN_BODY_ZONES.map(z => {
                   const active = breakoutZones.includes(z);
                   return (
                     <button key={z} onClick={() => toggleZone(z)} style={{
