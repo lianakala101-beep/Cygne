@@ -206,6 +206,17 @@ export default function App() {
       }
       profileLoaded.current = true;
       setNeedsOnboarding(false);
+      console.log("[Cygne] profile restored from Supabase", {
+        userId: authUser.id,
+        products: (meta.products || []).length,
+        journals: (meta.journals || []).length,
+        checkIns: (meta.checkIns || []).length,
+        treatments: (meta.treatments || []).length,
+        rampLog: (meta.rampLog || []).length,
+        waitingRoom: (meta.waitingRoom || []).length,
+        cycleTracking: !!meta.cycleTrackingEnabled,
+        reminders: { am: meta.amReminderEnabled, pm: meta.pmReminderEnabled },
+      });
     } else {
       setUser(null);
       setNeedsOnboarding(true);
@@ -214,16 +225,25 @@ export default function App() {
 
   // -- Treatment CRUD with immediate Supabase persistence ----------------------
   const saveTreatment = (treatment) => {
+    if (!profileLoaded.current && authSession) {
+      console.warn("[Cygne] treatment save blocked — profile not loaded yet");
+      return;
+    }
     setTreatments(prev => {
       const next = [...prev, treatment];
-      if (authSession) supabase.auth.updateUser({ data: { treatments: next } }).catch(e => console.error("[Cygne] treatment save failed:", e));
+      console.log("[Cygne] saving treatment", treatment);
+      if (authSession) supabase.auth.updateUser({ data: { treatments: next } })
+        .then(() => console.log("[Cygne] treatment saved to Supabase"))
+        .catch(e => console.error("[Cygne] treatment save failed:", e));
       return next;
     });
   };
   const removeTreatment = (id) => {
     setTreatments(prev => {
       const next = prev.filter(t => t.id !== id);
-      if (authSession) supabase.auth.updateUser({ data: { treatments: next } }).catch(e => console.error("[Cygne] treatment remove failed:", e));
+      if (authSession) supabase.auth.updateUser({ data: { treatments: next } })
+        .then(() => console.log("[Cygne] treatment removed from Supabase"))
+        .catch(e => console.error("[Cygne] treatment remove failed:", e));
       return next;
     });
   };
@@ -232,9 +252,10 @@ export default function App() {
     const iso = newDateIso || `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
     setTreatments(prev => {
       const next = prev.map(t => t.id === id ? { ...t, date: iso } : t);
-      // eslint-disable-next-line no-console
       console.log("[Cygne treatment reset]", { treatmentId: id, newDate: iso });
-      if (authSession) supabase.auth.updateUser({ data: { treatments: next } }).catch(e => console.error("[Cygne] treatment reset save failed:", e));
+      if (authSession) supabase.auth.updateUser({ data: { treatments: next } })
+        .then(() => console.log("[Cygne] treatment date saved to Supabase"))
+        .catch(e => console.error("[Cygne] treatment reset save failed:", e));
       return next;
     });
   };
@@ -309,6 +330,17 @@ export default function App() {
     if (!profileLoaded.current || !authSession) return;
     supabase.auth.updateUser({ data: { swanPopupDismissed } }).catch(() => {});
   }, [swanPopupDismissed]);
+
+  // -- Defensive sync for the full user object (skin type, concerns, cycle,
+  //    reminders, ingredient prefs, medical history). All mutations should
+  //    flow through updateUser, but this belt-and-suspenders effect catches
+  //    any setUser call that forgot to hit Supabase.
+  useEffect(() => {
+    if (!profileLoaded.current || !authSession || !user) return;
+    const { email, cycleDay, ...profileData } = user;
+    supabase.auth.updateUser({ data: { ...profileData, onboarding_complete: true } })
+      .catch(e => console.error("[Cygne] user sync failed:", e));
+  }, [user]);
 
   // Save profile to Supabase user_metadata
   const saveUserProfile = async (profileData) => {
@@ -398,6 +430,10 @@ export default function App() {
   // product graduates out of Introduce Slowly). "Backing Off" shifts the
   // start date forward by 7 days, which effectively re-runs the current week.
   const recordRampAction = (id, status) => {
+    if (authSession && !profileLoaded.current) {
+      console.warn("[Cygne] ramp action blocked — profile not loaded yet");
+      return;
+    }
     const product = products.find(p => p.id === id);
     if (!product) return;
     const activeKey = product.category === "Toning Pad"
@@ -447,11 +483,11 @@ export default function App() {
     setProducts(updatedProducts);
     setRampLog(updatedLog);
 
-    // eslint-disable-next-line no-console
     console.log("[Cygne ramp action]", entry);
 
     if (authSession) {
       supabase.auth.updateUser({ data: { products: updatedProducts, rampLog: updatedLog } })
+        .then(() => console.log("[Cygne] ramp action saved to Supabase — entries:", updatedLog.length))
         .catch(e => console.error("[Cygne] ramp action save failed:", e));
     }
   };
@@ -463,16 +499,20 @@ export default function App() {
   // starts fresh from today. Used when a date got corrupted by earlier
   // bugs and the displayed week no longer matches reality.
   const resetRampStartDate = (id, newStartDateIso = null) => {
+    if (authSession && !profileLoaded.current) {
+      console.warn("[Cygne] ramp reset blocked — profile not loaded yet");
+      return;
+    }
     const today = new Date();
     const iso = newStartDateIso || `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
     const updated = products.map(p =>
       p.id === id ? { ...p, routineStartDate: iso, rampWeek: 1, rampHeld: false } : p
     );
     setProducts(updated);
-    // eslint-disable-next-line no-console
     console.log("[Cygne ramp reset]", { productId: id, newStart: iso });
     if (authSession) {
       supabase.auth.updateUser({ data: { products: updated } })
+        .then(() => console.log("[Cygne] ramp reset saved to Supabase"))
         .catch(e => console.error("[Cygne] ramp reset save failed:", e));
     }
   };
