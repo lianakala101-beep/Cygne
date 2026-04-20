@@ -383,28 +383,7 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
           <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 8, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(232,226,217,0.55)", margin: 0 }}>Swan Song</p>
         </div>
 
-        <p style={{ fontFamily: "var(--cursive)", fontSize: 22, fontWeight: 400, lineHeight: 1.5, color: "rgba(232,227,214,0.85)", letterSpacing: "0.02em", margin: hasMeaningful ? "0 0 6px" : 0 }}>{line}</p>
-
-        {/* SwanSense prediction details — static, always visible */}
-        {hasMeaningful && (
-          <div style={{ marginTop: 10, borderTop: "1px solid rgba(232,226,217,0.1)", paddingTop: 10 }}>
-            {meaningfulPredictions.map((p, i) => {
-              const key = p.id || p.type;
-              const dotColor = p.color || (p.level === "alert" ? "#8b7355" : p.level === "caution" ? "#8b7355" : p.level === "cycle" ? "#8b7355" : "#7a9070");
-              return (
-                <div key={key} style={{ padding: i > 0 ? "10px 0 0" : 0 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: p.detail ? 6 : 0 }}>
-                    <div style={{ width: 4, height: 4, borderRadius: "50%", background: dotColor, flexShrink: 0 }} />
-                    <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "rgba(232,227,214,0.8)", margin: 0, flex: 1, lineHeight: 1.4 }}>{p.headline}</p>
-                  </div>
-                  {p.detail && (
-                    <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "rgba(232,226,217,0.55)", margin: "0 0 0 11px", lineHeight: 1.65 }}>{p.detail}</p>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
+        <p style={{ fontFamily: "var(--cursive)", fontSize: 22, fontWeight: 400, lineHeight: 1.5, color: "rgba(232,227,214,0.85)", letterSpacing: "0.02em", margin: 0 }}>{line}</p>
       </div>
     </div>
   );
