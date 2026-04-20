@@ -113,21 +113,64 @@ function dataUrlToBlob(dataUrl) {
   return new Blob([arr], { type: mime });
 }
 
-// Upload the stitched triptych to Supabase Storage. Falls back to storing
-// the data URL inline on the entry if storage isn't configured.
+// Upload the stitched triptych to Supabase Storage and return a signed URL.
+// We prefer signed URLs so the gallery works with private buckets + RLS
+// (which is the right default for per-user photos). Falls back to a public
+// URL, then to the inline data URL if storage isn't configured at all.
 async function uploadTriptych(userId, entryId, dataUrl) {
+  const blob = dataUrlToBlob(dataUrl);
+  const path = `${userId}/${entryId}.jpg`;
+  console.log("[Cygne reflection] uploading to reflections/" + path, "| size:", blob.size, "bytes");
   try {
-    const blob = dataUrlToBlob(dataUrl);
-    const path = `${userId}/${entryId}.jpg`;
-    const { error } = await supabase.storage
+    const { data: upData, error: upErr } = await supabase.storage
       .from("reflections")
       .upload(path, blob, { contentType: "image/jpeg", upsert: true });
-    if (error) throw error;
-    const { data } = supabase.storage.from("reflections").getPublicUrl(path);
-    return { path, url: data?.publicUrl || null };
+    if (upErr) {
+      console.warn("[Cygne reflection] upload error:", upErr.message, upErr);
+      return { path: null, url: null, inline: dataUrl };
+    }
+    console.log("[Cygne reflection] upload ok:", upData);
+
+    // Signed URL — works for private buckets scoped by RLS.
+    const { data: signed, error: signedErr } = await supabase.storage
+      .from("reflections")
+      .createSignedUrl(path, 60 * 60 * 24 * 365); // 1 year
+    if (signed?.signedUrl) {
+      console.log("[Cygne reflection] signed URL:", signed.signedUrl);
+      return { path, url: signed.signedUrl };
+    }
+    console.warn("[Cygne reflection] createSignedUrl error:", signedErr?.message || "no url");
+
+    // Public URL fallback (only works if bucket is public).
+    const { data: pub } = supabase.storage.from("reflections").getPublicUrl(path);
+    if (pub?.publicUrl) {
+      console.log("[Cygne reflection] public URL:", pub.publicUrl);
+      return { path, url: pub.publicUrl };
+    }
+    console.warn("[Cygne reflection] no URL available after upload — falling back to inline");
+    return { path, url: null, inline: dataUrl };
   } catch (e) {
     console.warn("[Cygne reflection] storage upload failed, falling back to inline:", e?.message || e);
     return { path: null, url: null, inline: dataUrl };
+  }
+}
+
+// Re-generate a fresh signed URL for an entry on load. Signed URLs expire,
+// so we refresh them each session rather than trusting whatever was stored.
+async function refreshSignedUrl(path) {
+  if (!path) return null;
+  try {
+    const { data, error } = await supabase.storage
+      .from("reflections")
+      .createSignedUrl(path, 60 * 60 * 24 * 7); // 1 week
+    if (error) {
+      console.warn("[Cygne reflection] refresh signed URL error for", path, "|", error.message);
+      return null;
+    }
+    return data?.signedUrl || null;
+  } catch (e) {
+    console.warn("[Cygne reflection] refresh signed URL threw for", path, "|", e?.message || e);
+    return null;
   }
 }
 
@@ -297,6 +340,7 @@ function ExpandedEntry({ entry, onClose }) {
   }, [onClose]);
 
   const src = entry.url || entry.inline;
+  console.log("[Cygne reflection] expanded entry", { id: entry.id, path: entry.path, url: entry.url, hasInline: !!entry.inline });
 
   return (
     <div
@@ -333,6 +377,7 @@ function ExpandedEntry({ entry, onClose }) {
         }}>
         {src ? (
           <img src={src} alt={`Reflection for week ${entry.weekNumber}`}
+            onError={() => console.warn("[Cygne reflection] image failed to load:", src)}
             style={{ width: "100%", display: "block" }} />
         ) : (
           <div style={{ width: "100%", aspectRatio: "3/1.3", display: "flex", alignItems: "center", justifyContent: "center", color: CREAM_SOFT, fontFamily: "Space Grotesk, sans-serif", fontSize: 12 }}>
@@ -347,16 +392,9 @@ function ExpandedEntry({ entry, onClose }) {
           Swan Sense — this week
         </p>
         {entry.insight?.headline ? (
-          <>
-            <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 26, color: CREAM, margin: "0 0 10px", lineHeight: 1.35, textAlign: "center" }}>
-              {entry.insight.headline}
-            </p>
-            {entry.insight.detail && (
-              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: CREAM_SOFT, margin: 0, lineHeight: 1.75, textAlign: "center" }}>
-                {entry.insight.detail}
-              </p>
-            )}
-          </>
+          <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 28, color: CREAM, margin: 0, lineHeight: 1.35, textAlign: "center" }}>
+            {entry.insight.headline}
+          </p>
         ) : (
           <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: CREAM_SOFT, margin: 0, textAlign: "center", lineHeight: 1.7 }}>
             No insight recorded for this week.
@@ -421,9 +459,38 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
   const [expandedId, setExpandedId] = useState(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [signedUrls, setSignedUrls] = useState({}); // { [entryId]: signedUrl }
 
   const sorted = [...reflections].sort((a, b) => new Date(b.date) - new Date(a.date));
-  const expanded = sorted.find(e => e.id === expandedId) || null;
+
+  // Refresh signed URLs on mount / when the reflection set changes. Signed
+  // URLs expire; regenerating them per session keeps the gallery reliable.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const next = {};
+      for (const entry of sorted) {
+        if (!entry.path) continue;
+        if (signedUrls[entry.id]) {
+          next[entry.id] = signedUrls[entry.id];
+          continue;
+        }
+        const url = await refreshSignedUrl(entry.path);
+        if (cancelled) return;
+        if (url) next[entry.id] = url;
+      }
+      if (!cancelled) setSignedUrls(prev => ({ ...prev, ...next }));
+    })();
+    return () => { cancelled = true; };
+  }, [reflections.length]);
+
+  const decorate = (entry) => ({
+    ...entry,
+    url: signedUrls[entry.id] || entry.url,
+  });
+
+  const expanded = sorted.find(e => e.id === expandedId);
+  const expandedDecorated = expanded ? decorate(expanded) : null;
 
   const handleComplete = async (triptychDataUrl) => {
     setSaving(true);
@@ -525,7 +592,7 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
       {sorted.length > 0 && (
         <div style={{ maxWidth: 560, margin: "0 auto" }}>
           {sorted.map(entry => (
-            <GalleryEntry key={entry.id} entry={entry} onExpand={() => setExpandedId(entry.id)} />
+            <GalleryEntry key={entry.id} entry={decorate(entry)} onExpand={() => setExpandedId(entry.id)} />
           ))}
           <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 20, color: CREAM_FAINT, textAlign: "center", margin: "40px 0 0", letterSpacing: "0.02em" }}>
             The week is behind you.
@@ -539,8 +606,8 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
           onComplete={handleComplete}
         />
       )}
-      {expanded && (
-        <ExpandedEntry entry={expanded} onClose={() => setExpandedId(null)} />
+      {expandedDecorated && (
+        <ExpandedEntry entry={expandedDecorated} onClose={() => setExpandedId(null)} />
       )}
     </div>
   );
