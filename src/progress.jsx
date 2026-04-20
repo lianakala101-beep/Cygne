@@ -862,7 +862,108 @@ function TreatmentSection({ treatments, saveTreatment, removeTreatment, updateTr
 
 // --- BODY ACNE TRACKER --------------------------------------------------------
 
+const FACE_TRACKER_ZONES = [
+  {
+    id: "forehead",
+    label: "Forehead",
+    causes: ["Hair product transfer (especially at night)", "Sweat trapped under bangs or hats", "Stress and sebum overproduction"],
+    advice: "Keep hair off the forehead at night. A BHA toner applied with a cotton pad targets closed comedones without over-drying the rest of the face.",
+    products: ["BHA toner (salicylic acid)", "Oil-free moisturiser"],
+  },
+  {
+    id: "temples",
+    label: "Temples",
+    causes: ["Phone screen contact", "Sunglasses or headband friction", "Hair product migrating from the hairline"],
+    advice: "Clean your phone screen daily and rotate which side you press to your face. Wipe sunglasses arms with a micellar pad between uses.",
+    products: ["Micellar water wipes", "BHA spot treatment"],
+  },
+  {
+    id: "nose",
+    label: "Nose",
+    causes: ["High sebum concentration in the T-zone", "Closed comedones and blackheads", "Incomplete cleansing around the creases"],
+    advice: "Extend cleansing time on and around the nose — the creases trap sebum. A BHA toner 3–5x per week keeps pores clear without over-exfoliating.",
+    products: ["BHA toner (salicylic acid 2%)", "Clay mask 1x weekly"],
+  },
+  {
+    id: "cheeks",
+    label: "Cheeks",
+    causes: ["Pillowcase buildup", "Phone screen contact", "Hormonal fluctuations", "Heavier skincare occluding pores"],
+    advice: "Change pillowcases every 2–3 days. If only one side breaks out, that's your phone / sleep side. Lighten up on cheek-area creams during flare-ups.",
+    products: ["Silk or satin pillowcase", "Niacinamide serum", "Lightweight moisturiser"],
+  },
+  {
+    id: "chin",
+    label: "Chin",
+    causes: ["Hormonal — especially in the luteal phase", "Hand-to-face contact", "Mask friction or toothpaste residue"],
+    advice: "Chin breakouts are the classic hormonal pattern. BHA spot treatment in the week before your period helps. Rinse the chin after brushing your teeth.",
+    products: ["BHA spot treatment", "Niacinamide serum"],
+  },
+  {
+    id: "jawline",
+    label: "Jawline",
+    causes: ["Hormonal — progesterone-driven", "Phone contact", "Hair product running down from the hairline"],
+    advice: "If it tracks with your cycle, this is hormonal. Cleanse extending beyond the jaw into the neck, and keep hair off the jawline at night.",
+    products: ["Gentle cleanser", "BHA toner on a cotton pad"],
+  },
+  {
+    id: "perioral",
+    label: "Above lip / perioral",
+    causes: ["Toothpaste (SLS or fluoride) residue", "Lip balm ingredients migrating", "Mask friction"],
+    advice: "Switch to an SLS-free toothpaste for two weeks to test. Rinse the area thoroughly after brushing. Check lip product ingredients for known pore-cloggers.",
+    products: ["SLS-free toothpaste", "Fragrance-free lip balm"],
+  },
+  {
+    id: "mustache",
+    label: "Mustache area",
+    causes: ["Shaving irritation and ingrown hairs", "Lip balm or food residue", "Heavy creams absorbed into facial hair"],
+    advice: "Use a fresh blade and shave in the direction of hair growth. A thin BHA application after shaving helps prevent ingrowns turning into pustules.",
+    products: ["BHA toner post-shave", "Fragrance-free shave gel"],
+  },
+  {
+    id: "beard_area",
+    label: "Beard / facial hair area",
+    causes: ["Folliculitis from shaving", "Trapped oil and debris in facial hair", "Beard oil or balm build-up"],
+    advice: "Wash beard area with a gentle cleanser daily — product residue and sebum accumulate in the hair. Benzoyl peroxide 2.5% reduces folliculitis bacteria when used 3–4x weekly.",
+    products: ["Benzoyl peroxide 2.5% wash", "Lightweight beard oil (jojoba)"],
+  },
+  {
+    id: "sideburns",
+    label: "Sideburns",
+    causes: ["Hair product migration from styling", "Friction from headphones, hats, or eyewear", "Incomplete cleansing at the hair boundary"],
+    advice: "Rinse the sideburn area thoroughly when washing hair — conditioner often lingers here. Wipe headphone cushions weekly.",
+    products: ["Clarifying shampoo", "BHA toner on cotton pad"],
+  },
+  {
+    id: "hairline",
+    label: "Hairline",
+    causes: ["Shampoo or conditioner residue", "Styling products (gels, oils, sprays) migrating", "Sweat trapped under hair"],
+    advice: "Hairline breakouts almost always link to hair products. Rinse thoroughly, tilting your head back, and check for silicones or heavy oils in your products.",
+    products: ["Silicone-free shampoo", "BHA toner on cotton pad"],
+  },
+  {
+    id: "neck",
+    label: "Neck",
+    causes: ["Hair product running down after washing", "Laundry detergent or fabric softener residue on collars", "Sunscreen / fragrance sensitivity"],
+    advice: "Rinse the neck thoroughly after washing hair. Switch to fragrance-free detergent for two weeks to rule it out. Extend skincare onto the neck — don't stop at the jaw.",
+    products: ["Fragrance-free detergent", "Same moisturiser as face, extended"],
+  },
+  {
+    id: "neck_beard_line",
+    label: "Neck beard line",
+    causes: ["Shaving irritation and ingrown hairs at the beard boundary", "Friction from shirt collars", "Sweat trapped against the neckline"],
+    advice: "Shave with the grain at the neckline — not against it. BHA toner applied after shaving reduces ingrowns. Unbutton collars slightly when skin is flaring.",
+    products: ["BHA toner post-shave", "Fresh single-blade razor"],
+  },
+];
+
 const BODY_ZONES = [
+  {
+    id: "chest",
+    label: "Chest",
+    causes: ["Detergent or fabric softener residue", "Sweat and tight synthetic fabrics", "Hormonal fluctuations", "Heavy chest/décolleté skincare products"],
+    advice: "Switch to fragrance-free detergent. Natural fabrics breathe better. Avoid heavy creams on the chest — the skin here is more occlusion-sensitive than the face.",
+    products: ["Fragrance-free detergent", "BHA toner applied with cotton pad", "Lightweight non-comedogenic moisturizer"],
+  },
   {
     id: "upper_back",
     label: "Upper Back",
@@ -878,25 +979,11 @@ const BODY_ZONES = [
     products: ["AHA body lotion (lactic or glycolic)", "Lightweight non-comedogenic moisturizer"],
   },
   {
-    id: "chest",
-    label: "Chest",
-    causes: ["Detergent or fabric softener residue", "Sweat and tight synthetic fabrics", "Hormonal fluctuations", "Heavy chest/décolleté skincare products"],
-    advice: "Switch to fragrance-free detergent. Natural fabrics breathe better. Avoid heavy creams on the chest — the skin here is more occlusion-sensitive than the face.",
-    products: ["Fragrance-free detergent", "BHA toner applied with cotton pad", "Lightweight non-comedogenic moisturizer"],
-  },
-  {
     id: "shoulders",
     label: "Shoulders",
     causes: ["Friction from straps, bags, or seatbelts", "Sweat accumulation", "Hair product contact"],
     advice: "Friction acne responds well to consistent BHA use. Apply after showering while skin is still slightly damp. Switching bag sides can help if one shoulder is worse.",
     products: ["BHA body spray or wash", "Niacinamide body lotion"],
-  },
-  {
-    id: "jawline_neck",
-    label: "Jawline & Neck",
-    causes: ["Hormonal — especially luteal phase", "Phone screen contact", "Pillowcase accumulation", "Hair product contact on skin"],
-    advice: "Change pillowcases every 2–3 days. Clean your phone screen daily. If cycle-linked, this is a progesterone-driven pattern — BHA spot treatment in the luteal phase helps.",
-    products: ["BHA spot treatment", "Niacinamide serum", "Gentle face cleanser extended to jawline"],
   },
   {
     id: "arms",
@@ -911,6 +998,13 @@ const BODY_ZONES = [
     causes: ["Prolonged sitting and friction", "Sweat and occlusion from tight clothing", "Folliculitis from shaving or waxing", "Non-breathable fabric underwear"],
     advice: "Butt acne is usually folliculitis, not true acne. BHA or benzoyl peroxide wash used consistently helps. Wear breathable cotton underwear and shower promptly after sweating. Avoid sitting in damp workout clothes.",
     products: ["BHA body wash (salicylic acid 2%)", "Benzoyl peroxide wash 5%", "Lightweight non-comedogenic moisturizer"],
+  },
+  {
+    id: "scalp",
+    label: "Scalp",
+    causes: ["Build-up from silicones, oils, or dry shampoo", "Sweat trapped under hats or long hair", "Dandruff / seborrheic dermatitis feeding pityrosporum"],
+    advice: "Shampoo more often during flares, focusing the lather at the roots. A salicylic acid or ketoconazole scalp shampoo 2x weekly clears build-up and reduces yeast overgrowth.",
+    products: ["Salicylic acid scalp shampoo", "Ketoconazole 1% shampoo (2x weekly)"],
   },
 ];
 
@@ -1002,6 +1096,21 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
       {/* Zone selector */}
       <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: "16px 18px", marginBottom: 12 }}>
         <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 12px" }}>Where do you experience it?</p>
+
+        <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, color: "var(--clay)", margin: "0 0 8px", letterSpacing: "0.2em", textTransform: "uppercase", opacity: 0.55 }}>Face</p>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 7, marginBottom: 14 }}>
+          {FACE_TRACKER_ZONES.map(zone => {
+            const active = zones.includes(zone.id);
+            return (
+              <button key={zone.id} onClick={() => { toggleZone(zone.id); setExpandedZone(active ? null : zone.id); }}
+                style={{ padding: "9px 16px", borderRadius: 22, border: `1px solid ${active ? "rgba(122,144,112,0.5)" : "var(--border)"}`, background: active ? "rgba(122,144,112,0.10)" : "transparent", color: active ? "#7a9070" : "var(--clay)", fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: active ? 600 : 400, cursor: "pointer", transition: "all 0.18s" }}>
+                {zone.label}
+              </button>
+            );
+          })}
+        </div>
+
+        <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, color: "var(--clay)", margin: "0 0 8px", letterSpacing: "0.2em", textTransform: "uppercase", opacity: 0.55 }}>Body</p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
           {BODY_ZONES.map(zone => {
             const active = zones.includes(zone.id);
@@ -1018,7 +1127,7 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
       {/* Zone details */}
       {zones.length > 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
-          {BODY_ZONES.filter(z => zones.includes(z.id)).map(zone => {
+          {[...FACE_TRACKER_ZONES, ...BODY_ZONES].filter(z => zones.includes(z.id)).map(zone => {
             const open = expandedZone === zone.id;
             return (
               <div key={zone.id} style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, overflow: "hidden", transition: "all 0.2s" }}>
