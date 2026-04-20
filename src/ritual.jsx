@@ -309,10 +309,7 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
       ? meaningfulPredictions[0].headline
       : NO_DATA_LINE;
 
-  const ritualDone = currentSession === "pm";
-  const ritualStatus = ritualDone ? "Morning ritual complete" : "Morning ritual pending";
-
-  const grain = "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E\")";
+  const grain ="url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E\")";
 
   // -- POPUP version ---------------------------------------------------------
   if (asPopup) {
@@ -339,7 +336,7 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
 
           <div style={{ textAlign: "center", marginBottom: 18 }}>
             <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(232,226,217,0.65)", margin: 0 }}>
-              Swan Song{hasMeaningful ? " · Swan Sense" : ""}
+              Swan Song
             </p>
           </div>
           <div style={{ height: 1, background: "rgba(232,226,217,0.12)", marginBottom: 18 }} />
@@ -348,13 +345,8 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
 
           {/* Show first prediction detail in popup */}
           {hasMeaningful && meaningfulPredictions[0].detail && (
-            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "rgba(232,226,217,0.5)", margin: "0 0 16px", lineHeight: 1.65 }}>{meaningfulPredictions[0].detail}</p>
+            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "rgba(232,226,217,0.5)", margin: "0 0 22px", lineHeight: 1.65 }}>{meaningfulPredictions[0].detail}</p>
           )}
-
-          <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 22 }}>
-            <div style={{ width: 5, height: 5, borderRadius: "50%", background: ritualDone ? "rgba(122,144,112,0.9)" : "rgba(232,226,217,0.3)", flexShrink: 0 }} />
-            <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.1em", color: ritualDone ? "rgba(122,144,112,0.85)" : "rgba(232,226,217,0.4)" }}>{ritualStatus}</span>
-          </div>
 
           <button onClick={onDismissPopup} style={{
             width: "100%", padding: "11px 0",
@@ -387,13 +379,8 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
         <div style={{ position: "absolute", inset: 0, borderRadius: 14, pointerEvents: "none", backgroundImage: grain, backgroundSize: "180px 180px", opacity: 0.6 }} />
         <div style={{ position: "absolute", bottom: 8, right: 12, opacity: 0.06, fontSize: 44, userSelect: "none", pointerEvents: "none" }}>🦢</div>
 
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+        <div style={{ marginBottom: 10 }}>
           <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 8, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(232,226,217,0.55)", margin: 0 }}>Swan Song</p>
-          <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-            {hasMeaningful && <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 8, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(232,226,217,0.4)", marginRight: 4 }}>Swan Sense</span>}
-            <div style={{ width: 4, height: 4, borderRadius: "50%", background: ritualDone ? "rgba(122,144,112,0.8)" : "rgba(232,226,217,0.25)" }} />
-            <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, color: ritualDone ? "rgba(122,144,112,0.75)" : "rgba(232,226,217,0.35)", letterSpacing: "0.06em" }}>{ritualStatus}</span>
-          </div>
         </div>
 
         <p style={{ fontFamily: "var(--cursive)", fontSize: 22, fontWeight: 400, lineHeight: 1.5, color: "rgba(232,227,214,0.85)", letterSpacing: "0.02em", margin: hasMeaningful ? "0 0 6px" : 0 }}>{line}</p>
