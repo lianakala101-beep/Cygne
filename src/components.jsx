@@ -40,6 +40,7 @@ const Icon = ({ name, size = 20 }) => {
     "arrow-left":  "M19 12H5M11 19l-7-7 7-7",
     "arrow-up":    "M12 19V5M5 12l7-7 7 7",
     "arrow-down":  "M12 5v14M19 12l-7 7-7-7",
+    reflection:   "M12 3a7 7 0 100 14 7 7 0 000-14z M12 17v4 M9 21h6 M12 7v6 M10 10h4",
   };
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
