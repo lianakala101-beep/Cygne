@@ -1,0 +1,549 @@
+import { useEffect, useRef, useState } from "react";
+import { Icon } from "./components.jsx";
+import { supabase } from "./supabase.js";
+import { getSwanSensePredictions } from "./swansense.jsx";
+
+// ---------------------------------------------------------------------------
+// Reflection — a weekly triptych gallery of the user's skin journey.
+// Dark sage green page. Capture flow guides 3 angles, stitches into a strip,
+// uploads to Supabase Storage, and records a snapshot of the week's top
+// SwanSense insight alongside. Tapping an entry expands the full strip.
+// ---------------------------------------------------------------------------
+
+const SAGE_DEEP = "#3a4134";
+const SAGE_DEEPER = "#2e342a";
+const CREAM = "#e8e2d6";
+const CREAM_SOFT = "rgba(232,226,214,0.72)";
+const CREAM_FAINT = "rgba(232,226,214,0.28)";
+const CREAM_BORDER = "rgba(232,226,214,0.18)";
+
+const ANGLES = [
+  { key: "front", label: "Front", hint: "Face the lens. Chin level, shoulders soft." },
+  { key: "left",  label: "Tilt Left",  hint: "Turn your head gently to the left." },
+  { key: "right", label: "Tilt Right", hint: "Turn your head gently to the right." },
+];
+
+// ISO week of the year (1..53). Used as the per-entry week number so the
+// label wheel lines up with the seasons.
+export function isoWeekNumber(date = new Date()) {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const day = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - day);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
+}
+
+// Seasonal / lunar label for a given ISO week. The wheel is loosely calibrated
+// against northern-hemisphere seasons so Week 12 lands on the vernal equinox.
+export function weekLabel(weekNumber) {
+  const n = ((weekNumber - 1) % 52 + 52) % 52 + 1;
+  if (n === 1)              return "The First Light";
+  if (n >= 2  && n <= 4)    return "Deep Winter";
+  if (n >= 5  && n <= 7)    return "Stillness";
+  if (n >= 8  && n <= 10)   return "The Thaw";
+  if (n === 11)             return "First Stir";
+  if (n === 12 || n === 13) return "The Equinox";
+  if (n >= 14 && n <= 16)   return "First Bloom";
+  if (n >= 17 && n <= 19)   return "Soft Rain";
+  if (n >= 20 && n <= 24)   return "Long Days";
+  if (n === 25 || n === 26) return "The Solstice";
+  if (n >= 27 && n <= 30)   return "High Summer";
+  if (n >= 31 && n <= 34)   return "Golden Hour";
+  if (n >= 35 && n <= 37)   return "First Frost";
+  if (n === 38 || n === 39) return "The Equinox";
+  if (n >= 40 && n <= 43)   return "Leaves Falling";
+  if (n >= 44 && n <= 47)   return "Fading Light";
+  if (n >= 48 && n <= 50)   return "Deep Winter";
+  return "The Longest Night";
+}
+
+function formatDateLong(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" });
+}
+
+// Load an image element from a data URL or blob URL.
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+
+// Stitch 3 images into a horizontal triptych, returning a JPEG data URL.
+async function stitchTriptych(dataUrls, panelWidth = 520, panelHeight = 680) {
+  const canvas = document.createElement("canvas");
+  canvas.width = panelWidth * 3;
+  canvas.height = panelHeight;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "#0f120f";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  for (let i = 0; i < 3; i++) {
+    const img = await loadImage(dataUrls[i]);
+    const ratio = Math.max(panelWidth / img.width, panelHeight / img.height);
+    const w = img.width * ratio;
+    const h = img.height * ratio;
+    const x = i * panelWidth + (panelWidth - w) / 2;
+    const y = (panelHeight - h) / 2;
+    ctx.drawImage(img, x, y, w, h);
+  }
+  return canvas.toDataURL("image/jpeg", 0.82);
+}
+
+// Read a File into a data URL.
+function fileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result);
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
+
+// Convert a data URL to a Blob for upload.
+function dataUrlToBlob(dataUrl) {
+  const [header, b64] = dataUrl.split(",");
+  const mime = (header.match(/data:(.*?);/) || [])[1] || "image/jpeg";
+  const bin = atob(b64);
+  const arr = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return new Blob([arr], { type: mime });
+}
+
+// Upload the stitched triptych to Supabase Storage. Falls back to storing
+// the data URL inline on the entry if storage isn't configured.
+async function uploadTriptych(userId, entryId, dataUrl) {
+  try {
+    const blob = dataUrlToBlob(dataUrl);
+    const path = `${userId}/${entryId}.jpg`;
+    const { error } = await supabase.storage
+      .from("reflections")
+      .upload(path, blob, { contentType: "image/jpeg", upsert: true });
+    if (error) throw error;
+    const { data } = supabase.storage.from("reflections").getPublicUrl(path);
+    return { path, url: data?.publicUrl || null };
+  } catch (e) {
+    console.warn("[Cygne reflection] storage upload failed, falling back to inline:", e?.message || e);
+    return { path: null, url: null, inline: dataUrl };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// CAPTURE FLOW
+// ---------------------------------------------------------------------------
+
+function FaceGuide({ size = 240 }) {
+  return (
+    <svg width={size} height={size * 1.25} viewBox="0 0 120 150" fill="none"
+      style={{ pointerEvents: "none", opacity: 0.55 }}>
+      <ellipse cx="60" cy="72" rx="38" ry="52" stroke={CREAM} strokeWidth="0.9" strokeDasharray="2 3" />
+      <line x1="60" y1="20" x2="60" y2="124" stroke={CREAM} strokeWidth="0.4" strokeDasharray="1 3" />
+      <line x1="22" y1="72" x2="98" y2="72" stroke={CREAM} strokeWidth="0.4" strokeDasharray="1 3" />
+    </svg>
+  );
+}
+
+function CaptureFlow({ onClose, onComplete }) {
+  const [shots, setShots] = useState([]); // array of data URLs
+  const [busy, setBusy] = useState(false);
+  const inputRef = useRef(null);
+  const step = shots.length; // 0..3
+  const current = ANGLES[step] || ANGLES[2];
+  const done = step >= 3;
+
+  const pick = () => inputRef.current?.click();
+
+  const handleFile = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    try {
+      setBusy(true);
+      const url = await fileToDataUrl(file);
+      setShots(prev => [...prev, url]);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const finish = async () => {
+    if (shots.length < 3) return;
+    setBusy(true);
+    try {
+      const triptych = await stitchTriptych(shots);
+      await onComplete(triptych);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const retake = () => setShots(prev => prev.slice(0, -1));
+
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 400, background: SAGE_DEEPER,
+      display: "flex", flexDirection: "column",
+    }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 22px" }}>
+        <button onClick={onClose} style={{ background: "none", border: "none", color: CREAM_SOFT, cursor: "pointer", padding: 4, display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "Space Grotesk, sans-serif", fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+          <Icon name="x" size={14} /> Close
+        </button>
+        <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.28em", textTransform: "uppercase", color: CREAM_SOFT }}>Reflection</span>
+        <div style={{ width: 68 }} />
+      </div>
+
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 26px", textAlign: "center" }}>
+        {!done ? (
+          <>
+            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: CREAM_FAINT, margin: 0 }}>
+              Shot {step + 1} of 3
+            </p>
+            <h2 style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 46, color: CREAM, margin: "6px 0 6px", letterSpacing: "0.02em", lineHeight: 1.05 }}>
+              {current.label}
+            </h2>
+            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: CREAM_SOFT, margin: 0, maxWidth: 300, lineHeight: 1.6 }}>
+              {current.hint}
+            </p>
+
+            <div style={{ position: "relative", marginTop: 32, marginBottom: 32, width: 240, height: 300, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <FaceGuide size={240} />
+            </div>
+
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 28 }}>
+              {ANGLES.map((a, i) => (
+                <div key={a.key} style={{
+                  width: 9, height: 9, borderRadius: "50%",
+                  background: i < step ? CREAM : i === step ? "rgba(232,226,214,0.55)" : "transparent",
+                  border: `1px solid ${i <= step ? CREAM : CREAM_BORDER}`,
+                  transition: "all 0.2s",
+                }} />
+              ))}
+            </div>
+
+            <button onClick={pick} disabled={busy}
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 10,
+                padding: "14px 28px", borderRadius: 999,
+                background: CREAM, color: SAGE_DEEP, border: "none", cursor: busy ? "default" : "pointer",
+                fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 700,
+                letterSpacing: "0.18em", textTransform: "uppercase",
+                opacity: busy ? 0.5 : 1,
+              }}>
+              <Icon name="camera" size={14} />
+              {busy ? "Loading..." : step === 0 ? "Begin Capture" : "Next Shot"}
+            </button>
+
+            {step > 0 && (
+              <button onClick={retake}
+                style={{ marginTop: 16, background: "none", border: "none", color: CREAM_SOFT, cursor: "pointer", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", opacity: 0.7 }}>
+                Retake last shot
+              </button>
+            )}
+          </>
+        ) : (
+          <>
+            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: CREAM_FAINT, margin: 0 }}>
+              Your reflection
+            </p>
+            <h2 style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 44, color: CREAM, margin: "6px 0 18px", letterSpacing: "0.02em" }}>
+              A quiet moment.
+            </h2>
+
+            <div style={{ display: "flex", gap: 6, width: "100%", maxWidth: 420, marginBottom: 28, border: `1px solid ${CREAM_BORDER}`, padding: 4, background: SAGE_DEEP }}>
+              {shots.map((s, i) => (
+                <img key={i} src={s} alt={ANGLES[i].label}
+                  style={{ flex: 1, width: 0, aspectRatio: "3/4", objectFit: "cover", display: "block" }} />
+              ))}
+            </div>
+
+            <button onClick={finish} disabled={busy}
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 10,
+                padding: "14px 28px", borderRadius: 999,
+                background: CREAM, color: SAGE_DEEP, border: "none", cursor: busy ? "default" : "pointer",
+                fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 700,
+                letterSpacing: "0.18em", textTransform: "uppercase",
+                opacity: busy ? 0.5 : 1,
+              }}>
+              {busy ? "Saving..." : "Save reflection"}
+            </button>
+
+            <button onClick={retake} disabled={busy}
+              style={{ marginTop: 16, background: "none", border: "none", color: CREAM_SOFT, cursor: "pointer", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", opacity: 0.7 }}>
+              Retake last shot
+            </button>
+          </>
+        )}
+      </div>
+
+      <input ref={inputRef} type="file" accept="image/*" capture="user"
+        onChange={handleFile} style={{ display: "none" }} />
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// EXPANDED VIEW
+// ---------------------------------------------------------------------------
+
+function ExpandedEntry({ entry, onClose }) {
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  const src = entry.url || entry.inline;
+
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: "fixed", inset: 0, zIndex: 380,
+        background: "rgba(10,14,10,0.88)",
+        backdropFilter: "blur(14px)",
+        display: "flex", flexDirection: "column", alignItems: "center",
+        overflowY: "auto", padding: "44px 18px 60px",
+        animation: "fadeUp 0.3s ease",
+      }}>
+      <button onClick={onClose}
+        style={{ position: "absolute", top: 16, right: 18, background: "none", border: "none", color: CREAM_SOFT, cursor: "pointer", padding: 8 }}>
+        <Icon name="x" size={18} />
+      </button>
+
+      <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: CREAM_FAINT, margin: "0 0 6px" }}>
+        Week {entry.weekNumber}
+      </p>
+      <h2 style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 38, color: CREAM, margin: "0 0 4px", letterSpacing: "0.02em", textAlign: "center" }}>
+        {weekLabel(entry.weekNumber)}
+      </h2>
+      <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: CREAM_FAINT, margin: "0 0 26px" }}>
+        {formatDateLong(entry.date)}
+      </p>
+
+      <div onClick={(e) => e.stopPropagation()}
+        style={{
+          width: "100%", maxWidth: 720,
+          padding: 6, background: SAGE_DEEP,
+          border: `1px solid ${CREAM_BORDER}`,
+          boxShadow: "0 30px 80px rgba(0,0,0,0.55)",
+        }}>
+        {src ? (
+          <img src={src} alt={`Reflection for week ${entry.weekNumber}`}
+            style={{ width: "100%", display: "block" }} />
+        ) : (
+          <div style={{ width: "100%", aspectRatio: "3/1.3", display: "flex", alignItems: "center", justifyContent: "center", color: CREAM_SOFT, fontFamily: "Space Grotesk, sans-serif", fontSize: 12 }}>
+            Image unavailable
+          </div>
+        )}
+      </div>
+
+      <div onClick={(e) => e.stopPropagation()}
+        style={{ maxWidth: 560, width: "100%", marginTop: 30, padding: "20px 22px", borderTop: `1px solid ${CREAM_BORDER}`, borderBottom: `1px solid ${CREAM_BORDER}` }}>
+        <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.28em", textTransform: "uppercase", color: CREAM_FAINT, margin: "0 0 10px", textAlign: "center" }}>
+          Swan Sense — this week
+        </p>
+        {entry.insight?.headline ? (
+          <>
+            <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 26, color: CREAM, margin: "0 0 10px", lineHeight: 1.35, textAlign: "center" }}>
+              {entry.insight.headline}
+            </p>
+            {entry.insight.detail && (
+              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: CREAM_SOFT, margin: 0, lineHeight: 1.75, textAlign: "center" }}>
+                {entry.insight.detail}
+              </p>
+            )}
+          </>
+        ) : (
+          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: CREAM_SOFT, margin: 0, textAlign: "center", lineHeight: 1.7 }}>
+            No insight recorded for this week.
+          </p>
+        )}
+      </div>
+
+      <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: CREAM_FAINT, marginTop: 24, opacity: 0.7 }}>
+        Tap anywhere to close
+      </p>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// GALLERY ENTRY
+// ---------------------------------------------------------------------------
+
+function GalleryEntry({ entry, onExpand }) {
+  const src = entry.url || entry.inline;
+  return (
+    <button onClick={onExpand}
+      style={{
+        display: "block", width: "100%", margin: "0 auto 48px",
+        background: "none", border: "none", padding: 0, cursor: "pointer",
+        textAlign: "center",
+      }}>
+      <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: CREAM_FAINT, margin: "0 0 4px" }}>
+        Week {entry.weekNumber}
+      </p>
+      <h3 style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 32, color: CREAM, margin: "0 0 3px", letterSpacing: "0.02em" }}>
+        {weekLabel(entry.weekNumber)}
+      </h3>
+      <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: CREAM_FAINT, margin: "0 0 18px", opacity: 0.75 }}>
+        {formatDateLong(entry.date)}
+      </p>
+      <div style={{
+        width: "100%", maxWidth: 520, margin: "0 auto",
+        padding: 4, background: SAGE_DEEP,
+        border: `1px solid ${CREAM_BORDER}`,
+        boxShadow: "0 18px 44px rgba(0,0,0,0.35)",
+      }}>
+        {src ? (
+          <img src={src} alt={`Reflection week ${entry.weekNumber}`}
+            style={{ width: "100%", display: "block" }} />
+        ) : (
+          <div style={{ width: "100%", aspectRatio: "3/1.3", display: "flex", alignItems: "center", justifyContent: "center", color: CREAM_SOFT, fontFamily: "Space Grotesk, sans-serif", fontSize: 11 }}>
+            Image unavailable
+          </div>
+        )}
+      </div>
+    </button>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// MAIN REFLECTION SCREEN
+// ---------------------------------------------------------------------------
+
+function Reflection({ reflections = [], onAddReflection, products = [], checkIns = [], user = {}, locationData = null, journals = [] }) {
+  const [capturing, setCapturing] = useState(false);
+  const [expandedId, setExpandedId] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
+
+  const sorted = [...reflections].sort((a, b) => new Date(b.date) - new Date(a.date));
+  const expanded = sorted.find(e => e.id === expandedId) || null;
+
+  const handleComplete = async (triptychDataUrl) => {
+    setSaving(true);
+    setError(null);
+    try {
+      const now = new Date();
+      const date = now.toISOString();
+      const weekNumber = isoWeekNumber(now);
+      const userId = user?.id || "local";
+      const id = `${weekNumber}-${now.getFullYear()}-${Date.now()}`;
+
+      const predictions = getSwanSensePredictions(products, checkIns, user, locationData, journals);
+      const meaningful = predictions.find(p => {
+        const key = p.id || p.type;
+        return key && !String(key).startsWith("baseline_");
+      }) || predictions[0] || null;
+      const insight = meaningful ? { headline: meaningful.headline, detail: meaningful.detail } : null;
+
+      const { path, url, inline } = await uploadTriptych(userId, id, triptychDataUrl);
+
+      const entry = {
+        id, weekNumber, date,
+        path: path || null,
+        url: url || null,
+        inline: inline || null,
+        insight,
+      };
+      await onAddReflection(entry);
+      setCapturing(false);
+    } catch (e) {
+      console.error("[Cygne reflection] save failed:", e);
+      setError("Couldn't save that reflection. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div style={{
+      margin: "-32px -22px 0",
+      background: SAGE_DEEP, minHeight: "calc(100vh - 54px)",
+      padding: "44px 22px 80px",
+      color: CREAM,
+    }}>
+      {/* Header */}
+      <div style={{ maxWidth: 560, margin: "0 auto 36px", textAlign: "center" }}>
+        <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: CREAM_FAINT, margin: "0 0 8px" }}>
+          Reflection
+        </p>
+        <h1 style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 54, color: CREAM, margin: "0 0 10px", letterSpacing: "0.02em", lineHeight: 1.05 }}>
+          A living gallery.
+        </h1>
+        <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: CREAM_SOFT, margin: 0, lineHeight: 1.75, maxWidth: 360, marginLeft: "auto", marginRight: "auto" }}>
+          One triptych a week. A quiet record of how your skin is moving through the seasons.
+        </p>
+      </div>
+
+      {error && (
+        <div style={{ maxWidth: 520, margin: "0 auto 20px", padding: "12px 16px", background: "rgba(232,226,214,0.08)", border: `1px solid ${CREAM_BORDER}`, borderRadius: 10, textAlign: "center" }}>
+          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: CREAM_SOFT, margin: 0 }}>{error}</p>
+        </div>
+      )}
+
+      <div style={{ textAlign: "center", marginBottom: 48 }}>
+        <button onClick={() => setCapturing(true)} disabled={saving}
+          style={{
+            display: "inline-flex", alignItems: "center", gap: 10,
+            padding: "14px 26px", borderRadius: 999,
+            background: "rgba(232,226,214,0.1)", color: CREAM,
+            border: `1px solid ${CREAM_BORDER}`,
+            cursor: saving ? "default" : "pointer",
+            fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600,
+            letterSpacing: "0.18em", textTransform: "uppercase",
+            transition: "all 0.2s", opacity: saving ? 0.6 : 1,
+          }}
+          onMouseEnter={e => !saving && (e.currentTarget.style.background = "rgba(232,226,214,0.18)")}
+          onMouseLeave={e => !saving && (e.currentTarget.style.background = "rgba(232,226,214,0.1)")}>
+          <Icon name="camera" size={14} />
+          {saving ? "Saving..." : reflections.length === 0 ? "Capture your first reflection" : "Capture this week"}
+        </button>
+      </div>
+
+      {/* Empty state */}
+      {sorted.length === 0 && (
+        <div style={{ maxWidth: 460, margin: "20px auto 0", textAlign: "center", padding: "40px 24px", border: `1px solid ${CREAM_BORDER}`, borderRadius: 18 }}>
+          <div style={{ color: CREAM_SOFT, display: "inline-flex", marginBottom: 14 }}>
+            <Icon name="reflection" size={26} />
+          </div>
+          <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 26, color: CREAM, margin: "0 0 8px", letterSpacing: "0.02em" }}>
+            Your gallery is waiting.
+          </p>
+          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: CREAM_SOFT, margin: 0, lineHeight: 1.7 }}>
+            Every Sunday evening, step to the mirror. Three angles, one quiet moment — and the wheel of your year begins to turn.
+          </p>
+        </div>
+      )}
+
+      {/* Gallery */}
+      {sorted.length > 0 && (
+        <div style={{ maxWidth: 560, margin: "0 auto" }}>
+          {sorted.map(entry => (
+            <GalleryEntry key={entry.id} entry={entry} onExpand={() => setExpandedId(entry.id)} />
+          ))}
+          <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 20, color: CREAM_FAINT, textAlign: "center", margin: "40px 0 0", letterSpacing: "0.02em" }}>
+            The week is behind you.
+          </p>
+        </div>
+      )}
+
+      {capturing && (
+        <CaptureFlow
+          onClose={() => setCapturing(false)}
+          onComplete={handleComplete}
+        />
+      )}
+      {expanded && (
+        <ExpandedEntry entry={expanded} onClose={() => setExpandedId(null)} />
+      )}
+    </div>
+  );
+}
+
+export { Reflection };

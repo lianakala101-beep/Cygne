@@ -31,8 +31,9 @@ function OnboardingScreen({ onComplete, setLocationData }) {
   const [actives, setActives] = useState([]);
   const [locationLoading, setLocationLoading] = useState(false);
   const [locationSet, setLocationSet] = useState(false);
+  const [resetDay, setResetDay] = useState(0); // 0 = Sunday
 
-  const TOTAL_STEPS = 7;
+  const TOTAL_STEPS = 8;
 
   const advance = (n = 1) => {
     if (animating) return;
@@ -72,6 +73,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       concerns,
       knownActives: actives,
       skinAgeBracket: skinAge?.bracket || null,
+      resetDay,
     });
   };
 
@@ -203,7 +205,44 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       </div>
     </div>,
 
-    // 6 — All set
+    // 6 — Reset day
+    <div key="resetday" style={slideStyle}>
+      <p style={obEyebrow}>Your weekly reset</p>
+      <h2 style={obHeading}>When does your week end?</h2>
+      <p style={obSub}>Each week, Cygne will invite you to capture a reflection — a three-angle portrait that becomes part of your gallery. Choose the evening that feels like your reset.</p>
+      <div style={{ marginTop: 28, display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 }}>
+        {[
+          { d: 0, label: "Sun" },
+          { d: 1, label: "Mon" },
+          { d: 2, label: "Tue" },
+          { d: 3, label: "Wed" },
+          { d: 4, label: "Thu" },
+          { d: 5, label: "Fri" },
+          { d: 6, label: "Sat" },
+        ].map(({ d, label }) => {
+          const active = resetDay === d;
+          return (
+            <button key={d} onClick={() => setResetDay(d)}
+              style={{
+                padding: "14px 0", borderRadius: 12,
+                border: `1px solid ${active ? "rgba(122,144,112,0.7)" : "var(--border)"}`,
+                background: active ? "rgba(122,144,112,0.15)" : "var(--surface)",
+                color: active ? "#5a7a60" : "#6b5a43",
+                fontFamily: "Space Grotesk, sans-serif", fontSize: 12,
+                fontWeight: active ? 600 : 400, letterSpacing: "0.08em",
+                textTransform: "uppercase", cursor: "pointer", transition: "all 0.18s",
+              }}>
+              {label}
+            </button>
+          );
+        })}
+      </div>
+      <p style={{ ...obSub, marginTop: 18, fontSize: 11, opacity: 0.7 }}>
+        You'll get a gentle nudge that evening: "The week is behind you. Let's capture your reflection."
+      </p>
+    </div>,
+
+    // 7 — All set
     <div key="done" style={{ ...slideStyle, position: "fixed", inset: 0, background: "#3a4134", display: "flex", flexDirection: "column", justifyContent: "space-between", overflow: "hidden" }}>
 
       {/* Top — logo + welcome, matching splash layout */}
@@ -245,7 +284,8 @@ function OnboardingScreen({ onComplete, setLocationData }) {
     true,                          // 3 — concerns — optional
     true,                          // 4 — actives — optional
     true,                          // 5 — location — optional
-    true,                          // 6 — all set
+    true,                          // 6 — reset day (has a default)
+    true,                          // 7 — all set
   ];
 
   return (
@@ -277,7 +317,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
         {steps[step]}
       </div>
 
-      {/* Next button — not shown on location (step 5) or all-set (step 6) */}
+      {/* Next button — not shown on location (step 5) or all-set (step 7) */}
       {step >= 0 && step < 5 && (
         <div style={{ position: "sticky", bottom: 0, background: "#f5f2ee", padding: "16px 24px 32px", marginTop: "auto" }}>
           <button onClick={() => canAdvance[step] && advance(1)}
@@ -291,6 +331,14 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       )}
       {step === 5 && (
         <div style={{ maxWidth: 420, width: "100%", margin: "24px auto 0" }}>
+          <button onClick={() => advance(1)}
+            style={{ width: "100%", padding: "14px 0", background: "#7a9070", color: "#0d0f0d", border: "none", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}>
+            Continue
+          </button>
+        </div>
+      )}
+      {step === 6 && (
+        <div style={{ position: "sticky", bottom: 0, background: "#f5f2ee", padding: "16px 24px 32px", marginTop: "auto" }}>
           <button onClick={() => advance(1)}
             style={{ width: "100%", padding: "14px 0", background: "#7a9070", color: "#0d0f0d", border: "none", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}>
             Continue

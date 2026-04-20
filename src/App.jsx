@@ -15,6 +15,7 @@ import { SwanWelcomeScreen, useLocalStorage, DEMO_PRODUCTS, DEMO_VERSION, getCur
 import { WeekendNudgeCard } from "./weekend.jsx";
 import { SeasonalNudgeCard } from "./seasonal.jsx";
 import { AuthScreen } from "./auth.jsx";
+import { Reflection, isoWeekNumber } from "./reflection.jsx";
 import { supabase } from "./supabase.js";
 
 export default function App() {
@@ -83,6 +84,7 @@ export default function App() {
   const [completedSteps, setCompletedSteps] = useLocalStorage("cygne_completedsteps", { date: null, steps: [] });
   const [rampLog, setRampLog] = useLocalStorage("cygne_ramp_log", []);
   const [fitSheet, setFitSheet] = useState(null);
+  const [reflections, setReflections] = useLocalStorage("cygne_reflections", []);
 
   // Track whether initial load from Supabase is done (prevents overwriting cloud data with empty localStorage)
   const profileLoaded = useRef(false);
@@ -115,6 +117,7 @@ export default function App() {
         setWaitingRoom([]);
         setCompletedSteps({ date: null, steps: [] });
         setRampLog([]);
+        setReflections([]);
         setLocationData(null);
         setLocationDenied(false);
         setNotifDismissed(false);
@@ -151,6 +154,8 @@ export default function App() {
         pmReminderEnabled: meta.pmReminderEnabled !== undefined ? meta.pmReminderEnabled : (meta.notifEnabled || false),
         amReminderTime: meta.amReminderTime || "7:30",
         pmReminderTime: meta.pmReminderTime || "9:00",
+        resetDay: meta.resetDay !== undefined && meta.resetDay !== null ? meta.resetDay : 0,
+        reflectionReminderAt: meta.reflectionReminderAt || null,
         completedSteps: meta.completedSteps || null,
         // Profile data
         ingredientProfile: meta.ingredientProfile || null,
@@ -196,6 +201,9 @@ export default function App() {
       }
       if (meta.rampLog && Array.isArray(meta.rampLog)) {
         setRampLog(meta.rampLog);
+      }
+      if (meta.reflections && Array.isArray(meta.reflections)) {
+        setReflections(meta.reflections);
       }
       if (meta.waitingRoom && Array.isArray(meta.waitingRoom)) {
         setWaitingRoom(meta.waitingRoom);
@@ -331,6 +339,65 @@ export default function App() {
     supabase.auth.updateUser({ data: { swanPopupDismissed } }).catch(() => {});
   }, [swanPopupDismissed]);
 
+  // -- Reflection entries ------------------------------------------------------
+  // Persist immediately on save so a disconnect right after capture doesn't
+  // lose the week's triptych + insight snapshot.
+  const addReflection = async (entry) => {
+    if (!profileLoaded.current && authSession) {
+      console.warn("[Cygne] reflection save blocked — profile not loaded yet");
+      return;
+    }
+    // Replace any existing entry for the same ISO week so re-captures overwrite.
+    const next = [...reflections.filter(r => r.weekNumber !== entry.weekNumber || new Date(r.date).getFullYear() !== new Date(entry.date).getFullYear()), entry];
+    setReflections(next);
+    if (authSession) {
+      try {
+        await supabase.auth.updateUser({ data: { reflections: next } });
+        console.log("[Cygne] reflection saved to Supabase — total:", next.length);
+      } catch (e) {
+        console.error("[Cygne] reflection save failed:", e);
+      }
+    }
+  };
+
+  // Belt-and-suspenders sync for reflections.
+  useEffect(() => {
+    if (!profileLoaded.current || !authSession) return;
+    supabase.auth.updateUser({ data: { reflections } }).catch(() => {});
+  }, [reflections]);
+
+  // -- Weekly reflection reminder --------------------------------------------
+  // Fires a browser notification on the user's chosen reset day at 19:00 local,
+  // at most once per ISO week. We store the last-fired marker on the user
+  // profile so the nudge doesn't repeat across devices.
+  useEffect(() => {
+    if (!user || !authSession) return;
+    if (typeof window === "undefined" || !("Notification" in window)) return;
+    if (Notification.permission !== "granted") return;
+
+    const resetDay = typeof user.resetDay === "number" ? user.resetDay : 0;
+
+    const tick = () => {
+      const now = new Date();
+      if (now.getDay() !== resetDay) return;
+      if (now.getHours() < 19) return;
+      const isoWeek = `${now.getFullYear()}-W${isoWeekNumber(now)}`;
+      if (user.reflectionReminderAt === isoWeek) return;
+      try {
+        new Notification("Cygne", {
+          body: "The week is behind you. Let's capture your reflection.",
+          silent: false,
+        });
+      } catch (e) { /* ignore */ }
+      const updated = { ...user, reflectionReminderAt: isoWeek };
+      setUser(updated);
+    };
+
+    tick();
+    const id = setInterval(tick, 60 * 60 * 1000); // check hourly
+    return () => clearInterval(id);
+  }, [user?.resetDay, user?.reflectionReminderAt, authSession]);
+
   // -- Defensive sync for the full user object (skin type, concerns, cycle,
   //    reminders, ingredient prefs, medical history). All mutations should
   //    flow through updateUser, but this belt-and-suspenders effect catches
@@ -393,10 +460,11 @@ export default function App() {
   };
 
   const tabs = [
-    { id: "dashboard", icon: "home",     label: "Home" },
-    { id: "routine",   icon: "routine",  label: "Ritual" },
-    { id: "shelf",     icon: "shelf",    label: "Vanity" },
-    { id: "progress",  icon: "sparkle", label: "Progress" },
+    { id: "dashboard",  icon: "home",       label: "Home" },
+    { id: "routine",    icon: "routine",    label: "Ritual" },
+    { id: "shelf",      icon: "shelf",      label: "Vanity" },
+    { id: "reflection", icon: "reflection", label: "Reflection" },
+    { id: "progress",   icon: "sparkle",    label: "Progress" },
   ];
 
   const saveProduct = (p) => {
@@ -679,6 +747,15 @@ export default function App() {
           onDismissWaiting={(item) => setWaitingRoom(prev => prev.filter(x => x !== item))}
           checkIns={checkIns}
           user={user}
+        />}
+        {tab === "reflection" && <Reflection
+          reflections={reflections}
+          onAddReflection={addReflection}
+          products={products}
+          checkIns={checkIns}
+          user={{ ...(user || {}), id: authSession?.user?.id }}
+          locationData={locationData}
+          journals={journals}
         />}
         {tab === "progress"  && <Progress products={products} checkIns={checkIns} setCheckIns={setCheckIns} treatments={treatments} setTreatments={setTreatments} saveTreatment={saveTreatment} removeTreatment={removeTreatment} updateTreatmentDate={updateTreatmentDate} user={user} onAdvanceRamp={advanceRamp} onHoldRamp={holdRamp} onResetRampStart={resetRampStartDate} journals={journals} setJournals={setJournals} onUpdateUser={updateUser} />}
       </div>
