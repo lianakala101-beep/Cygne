@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Icon, Section, FlagCard } from "./components.jsx";
 import { detectActives, analyzeShelf, buildRoutine, detectConflicts, getCurrentSession, isScheduledToday } from "./engine.js";
 import { FREQUENCIES } from "./constants.js";
@@ -235,6 +235,100 @@ function getSwanGuidingLine(products, checkIns = [], user = {}, cycleDay = null,
   return "Your ritual is ready. Take your time with it.";
 }
 
+// --- SWAN SVG ---------------------------------------------------------------
+// Small stylized swan silhouette. No emoji. Used for the progress tracker
+// and the ritual-complete card.
+function SwanSvg({ size = 18, color = "currentColor" }) {
+  return (
+    <svg width={size} height={size * 0.9} viewBox="0 0 40 36" fill="none" aria-hidden="true"
+      style={{ display: "block", overflow: "visible" }}>
+      <path d="M4 26 C 8 20, 16 18, 22 20 C 28 22, 33 24, 36 24 L 36 28 C 28 30, 14 30, 4 28 Z"
+        fill={color} opacity="0.95" />
+      <path d="M22 20 C 22 16, 20 12, 23 9 C 25 7, 28 6, 30 7"
+        stroke={color} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="30.5" cy="7" r="2" fill={color} />
+      <path d="M32.5 7 L 35 6.8 L 32.5 8.4 Z" fill={color} />
+    </svg>
+  );
+}
+
+// --- BREATH TEXT ------------------------------------------------------------
+// Splits a heading into words and fades each one in, staggered, on mount.
+// Plays once — subsequent re-renders keep words settled.
+function BreathText({ text, style }) {
+  const [revealed, setRevealed] = useState(false);
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setRevealed(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+  const words = text.split(" ");
+  return (
+    <h1 style={style}>
+      {words.map((w, i) => (
+        <span key={i} style={{
+          display: "inline-block",
+          opacity: revealed ? 1 : 0,
+          transition: `opacity 600ms ease-out ${i * 120}ms`,
+          marginRight: i < words.length - 1 ? "0.24em" : 0,
+        }}>{w}</span>
+      ))}
+    </h1>
+  );
+}
+
+// --- RITUAL PROGRESS TRACKER -------------------------------------------------
+// Horizontal shoreline with a swan that glides from left to moon as the ritual
+// is checked off. Swan bobs continuously via etherealGlide and transitions
+// smoothly (400ms ease) to its completion-percentage position.
+function RitualProgressTracker({ completed, total }) {
+  if (total <= 0) return null;
+  const pct = Math.max(0, Math.min(1, completed / total));
+  const allDone = completed === total;
+  return (
+    <div style={{
+      position: "relative", height: 34, marginBottom: 22,
+      padding: "0 30px 0 10px",
+    }}>
+      {/* Shoreline ripple */}
+      <svg viewBox="0 0 300 12" preserveAspectRatio="none"
+        style={{ position: "absolute", left: 10, right: 30, top: "50%", transform: "translateY(-50%)", width: "calc(100% - 40px)", height: 12, pointerEvents: "none" }}>
+        <path
+          d="M0 6 C 25 2, 50 10, 75 6 C 100 2, 125 10, 150 6 C 175 2, 200 10, 225 6 C 250 2, 275 10, 300 6"
+          stroke="rgba(232,227,214,0.22)" strokeWidth="1" fill="none" strokeLinecap="round" />
+      </svg>
+
+      {/* Moon on the right */}
+      <div style={{
+        position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)",
+        color: allDone ? "#e8e2d9" : "rgba(232,227,214,0.4)",
+        transition: "color 400ms ease, text-shadow 400ms ease",
+        textShadow: allDone ? "0 0 10px rgba(232,227,214,0.35)" : "none",
+        display: "inline-flex",
+      }}>
+        <Icon name="moon" size={14} />
+      </div>
+
+      {/* Swan — slides along the shoreline, bobs continuously */}
+      <div style={{
+        position: "absolute", top: "50%",
+        left: `calc(10px + (100% - 50px) * ${pct})`,
+        transform: "translate(-50%, -50%)",
+        transition: "left 400ms ease",
+        pointerEvents: "none",
+      }}>
+        <span style={{
+          display: "inline-block",
+          color: allDone ? "#e8e2d9" : "#7a9070",
+          transition: "color 400ms ease",
+          animation: "etherealGlide 3s ease-in-out infinite",
+        }}>
+          <SwanSvg size={20} />
+        </span>
+      </div>
+    </div>
+  );
+}
+
 function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false, journals = [], checkIns = [], setCheckIns = () => {}, completedSteps: completedStepsProp, setCompletedSteps: setCompletedStepsProp, onUpdateUser, onAddProduct, onEditProduct, treatments = [] }) {
   const session = getCurrentSession();
   // Pause actives that are still under recovery from a logged treatment.
@@ -289,7 +383,10 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
 
       {/* -- Header ----------------------------------------------------------- */}
       <div style={{ marginBottom: 16 }}>
-        <h1 style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 42, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: 0, lineHeight: 1 }}>{user?.name ? `${user.name.split(" ")[0]}'s Ritual` : "Your Ritual"}</h1>
+        <BreathText
+          text={user?.name ? `${user.name.split(" ")[0]}'s Ritual` : "Your Ritual"}
+          style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 42, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: 0, lineHeight: 1 }}
+        />
       </div>
 
       {/* -- Swan guiding line ---------------------------------------------- */}
@@ -355,6 +452,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
       {/* Steps */}
       {steps.length > 0
         ? <Section title={`${steps.length} steps — apply in this order`} icon="layers">
+            <RitualProgressTracker completed={steps.filter(s => completedSteps.includes(s.id)).length} total={steps.length} />
             <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", opacity: 0.5, margin: "-4px 0 16px", lineHeight: 1.6, letterSpacing: "0.02em" }}>
               Tap the circle next to each step to check it off as you go.
             </p>
@@ -372,7 +470,13 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
       {allDone && steps.length > 0 && !todayCheckedIn && (
         <div style={{ margin: "16px 0", padding: "18px 18px", background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 14 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-            <span style={{ color: "#7a9070", fontSize: 16 }}>🦢</span>
+            <span style={{
+              color: "#7a9070",
+              display: "inline-flex",
+              animation: "etherealGlide 3s ease-in-out infinite",
+            }}>
+              <SwanSvg size={22} />
+            </span>
             <div>
               <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 22, color: "var(--parchment)", margin: "0 0 2px" }}>Ritual complete.</p>
               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>
