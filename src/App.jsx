@@ -656,6 +656,7 @@ export default function App() {
         .theme-light button:focus { outline: none; }
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+        @keyframes cygneCheckDraw { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
         .theme-dark option { background: #1a1c1a; color: #e8e2d9; }
         .theme-light option { background: #f7f4f0; color: #1a1612; }
         .theme-light input,
