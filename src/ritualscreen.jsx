@@ -297,26 +297,26 @@ function RitualProgressTracker({ completed, total }) {
       position: "relative", height: 34, marginBottom: 22,
       padding: "0 30px 0 10px",
     }}>
-      {/* Shoreline ripple */}
+      {/* Shoreline ripple — warm taupe, visible on cream */}
       <svg viewBox="0 0 300 12" preserveAspectRatio="none"
         style={{ position: "absolute", left: 10, right: 30, top: "50%", transform: "translateY(-50%)", width: "calc(100% - 40px)", height: 12, pointerEvents: "none" }}>
         <path
           d="M0 6 C 25 2, 50 10, 75 6 C 100 2, 125 10, 150 6 C 175 2, 200 10, 225 6 C 250 2, 275 10, 300 6"
-          stroke="rgba(232,227,214,0.22)" strokeWidth="1" fill="none" strokeLinecap="round" />
+          stroke="rgba(139,115,85,0.55)" strokeWidth="1.1" fill="none" strokeLinecap="round" />
       </svg>
 
-      {/* Moon on the right */}
+      {/* Moon on the right — dark sage */}
       <div style={{
         position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)",
-        color: allDone ? "#e8e2d9" : "rgba(232,227,214,0.4)",
+        color: "#3a4134",
         transition: "color 400ms ease, text-shadow 400ms ease",
-        textShadow: allDone ? "0 0 10px rgba(232,227,214,0.35)" : "none",
+        textShadow: allDone ? "0 0 10px rgba(58,65,52,0.35)" : "none",
         display: "inline-flex",
       }}>
         <Icon name="moon" size={14} />
       </div>
 
-      {/* Swan — slides along the shoreline, bobs continuously */}
+      {/* Swan — dark sage, bobs continuously, glides to the moon */}
       <div style={{
         position: "absolute", top: "50%",
         left: `calc(10px + (100% - 50px) * ${pct})`,
@@ -326,8 +326,7 @@ function RitualProgressTracker({ completed, total }) {
       }}>
         <span style={{
           display: "inline-block",
-          color: allDone ? "#e8e2d9" : "#7a9070",
-          transition: "color 400ms ease",
+          color: "#3a4134",
           animation: "etherealGlide 3s ease-in-out infinite",
         }}>
           <SwanSvg size={20} />
