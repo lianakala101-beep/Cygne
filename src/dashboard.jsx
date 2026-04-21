@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Icon, Section, FlagCard } from "./components.jsx";
 import { analyzeShelf, detectConflicts, buildRoutine, calcSpending, getCurrentSession } from "./engine.js";
 import { getSwanSensePredictions } from "./swansense.jsx";
@@ -19,6 +19,11 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
   const [flightOpen, setFlightOpen] = useState(false);
   const [shopScanOpen, setShopScanOpen] = useState(false);
   const [cycleExpanded, setCycleExpanded] = useState(false);
+  const [swanSongRevealed, setSwanSongRevealed] = useState(false);
+  useEffect(() => {
+    const id = setTimeout(() => setSwanSongRevealed(true), 200);
+    return () => clearTimeout(id);
+  }, []);
   const currentCycleDay = getCurrentCycleDay(user);
   const { activeMap } = analyzeShelf(products);
   const swanSensePredictions = getSwanSensePredictions(products, checkIns, user, locationData, journals);
@@ -151,7 +156,13 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         })()}
 
         {/* 1. Swan Song card (intelligence) — always fully visible */}
-        <div style={{ marginBottom: 20 }}>
+        <div style={{
+          marginBottom: 20,
+          opacity: swanSongRevealed ? 1 : 0,
+          transform: swanSongRevealed ? "translateY(0)" : "translateY(12px)",
+          transition: "opacity 500ms ease-out, transform 500ms ease-out",
+          willChange: "opacity, transform",
+        }}>
           <SwanSongCard currentSession={currentSession} asPopup={false} user={user} predictions={swanSensePredictions} />
         </div>
 
