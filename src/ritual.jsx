@@ -210,6 +210,25 @@ function getStepReason(step) {
   return STEP_REASONS[step.category] || null;
 }
 
+function DrawnCheck({ size = 14, color = "#0d0f0d" }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ display: "block" }}>
+      <path
+        d="M5 12.5 L10.2 17.5 L19 7.2"
+        stroke={color}
+        strokeWidth="2.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        style={{
+          strokeDasharray: 24,
+          strokeDashoffset: 24,
+          animation: "cygneCheckDraw 300ms ease-out forwards",
+        }}
+      />
+    </svg>
+  );
+}
+
 function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }) {
   const activeKeys = Object.keys(detectActives(step.ingredients || []));
   const [expanded, setExpanded] = useState(false);
@@ -221,12 +240,25 @@ function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }
   const nameColor = scheduled ? "var(--parchment)" : "var(--taupe)";
   const ringColor = scheduled ? "#7a9070" : "var(--taupe)";
   return (
-    <div style={{ display: "flex", gap: 16, alignItems: "flex-start", opacity: checked ? 0.45 : scheduled ? 1 : 0.55, transition: "opacity 0.2s" }}>
+    <div style={{
+      display: "flex", gap: 16, alignItems: "flex-start",
+      opacity: checked ? 0.7 : scheduled ? 1 : 0.55,
+      transform: checked ? "translateX(-4px)" : "translateX(0)",
+      transition: "opacity 280ms ease-out, transform 320ms ease-out",
+    }}>
       <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center" }}>
         <div
           onClick={onCheck}
-          style={{ width: 28, height: 28, borderRadius: "50%", border: `1px solid ${ringColor}`, background: checked ? ringColor : "transparent", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.18s", flexShrink: 0 }}>
-          {checked && <Icon name="check" size={13} />}
+          style={{
+            width: 28, height: 28, borderRadius: "50%",
+            border: `1px solid ${ringColor}`,
+            background: checked ? ringColor : "transparent",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            cursor: "pointer",
+            transition: "background-color 280ms ease-out, border-color 280ms ease-out",
+            flexShrink: 0,
+          }}>
+          {checked && <DrawnCheck size={14} />}
         </div>
         {!isLast && <div style={{ width: 1, flex: 1, background: "var(--border)", marginTop: 6, minHeight: 16 }} />}
       </div>
@@ -242,7 +274,15 @@ function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }
                 {step.category}
                 {!scheduled && <span style={{ marginLeft: 8, color: "var(--taupe)", opacity: 0.75 }}>· Skipped today</span>}
               </div>
-              <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 22, fontWeight: 400, letterSpacing: "0.02em", color: nameColor, margin: "0 0 2px" }}>{step.name}</p>
+              <p style={{
+                fontFamily: "Reenie Beanie, cursive", fontSize: 22, fontWeight: 400,
+                letterSpacing: "0.02em", color: nameColor, margin: "0 0 2px",
+                opacity: checked ? 0.6 : 1,
+                textDecoration: checked ? "line-through" : "none",
+                textDecorationColor: "rgba(232,226,217,0.45)",
+                textDecorationThickness: "1px",
+                transition: "opacity 280ms ease-out",
+              }}>{step.name}</p>
               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>
                 {step.brand}
                 {freqLabel && (
