@@ -657,6 +657,13 @@ export default function App() {
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
         @keyframes cygneCheckDraw { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
+        @keyframes etherealGlide {
+          0%   { transform: translateY(0px) rotate(0deg); }
+          25%  { transform: translateY(-3px) rotate(-1deg); }
+          50%  { transform: translateY(0px) rotate(0deg); }
+          75%  { transform: translateY(3px) rotate(1deg); }
+          100% { transform: translateY(0px) rotate(0deg); }
+        }
         .theme-dark option { background: #1a1c1a; color: #e8e2d9; }
         .theme-light option { background: #f7f4f0; color: #1a1612; }
         .theme-light input,
