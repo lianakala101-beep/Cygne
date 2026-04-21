@@ -329,6 +329,65 @@ function CaptureFlow({ onClose, onComplete }) {
 }
 
 // ---------------------------------------------------------------------------
+// TRIPTYCH REVEAL — splits the stitched image into 3 panels via background-
+// position and slides each in from the right with a staggered delay.
+// ---------------------------------------------------------------------------
+
+function TriptychImage({ src, alt, placeholderFontSize = 11 }) {
+  const [status, setStatus] = useState("loading"); // loading | ready | error
+  const [revealed, setRevealed] = useState(false);
+
+  useEffect(() => {
+    if (!src) { setStatus("error"); return; }
+    setStatus("loading");
+    setRevealed(false);
+    const img = new Image();
+    img.onload = () => setStatus("ready");
+    img.onerror = () => {
+      console.warn("[Cygne reflection] image failed to load:", src);
+      setStatus("error");
+    };
+    img.src = src;
+  }, [src]);
+
+  useEffect(() => {
+    if (status !== "ready") return;
+    const id = requestAnimationFrame(() => setRevealed(true));
+    return () => cancelAnimationFrame(id);
+  }, [status]);
+
+  if (!src || status === "error") {
+    return (
+      <div style={{
+        width: "100%", aspectRatio: "3/1.3",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        color: CREAM_SOFT, fontFamily: "Space Grotesk, sans-serif", fontSize: placeholderFontSize,
+      }}>
+        Image unavailable
+      </div>
+    );
+  }
+
+  return (
+    <div role="img" aria-label={alt}
+      style={{ display: "flex", width: "100%", aspectRatio: "1560 / 680", overflow: "hidden", background: "#0f120f" }}>
+      {[0, 1, 2].map((i) => (
+        <div key={i} style={{
+          flex: 1,
+          backgroundImage: `url(${src})`,
+          backgroundSize: "300% 100%",
+          backgroundPosition: `${i * 50}% 50%`,
+          opacity: revealed ? 1 : 0,
+          transform: revealed ? "translateX(0)" : "translateX(20px)",
+          transition: `opacity 400ms ease-out ${i * 150}ms, transform 400ms ease-out ${i * 150}ms`,
+          willChange: "opacity, transform",
+        }} />
+      ))}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // EXPANDED VIEW
 // ---------------------------------------------------------------------------
 
@@ -375,15 +434,7 @@ function ExpandedEntry({ entry, onClose }) {
           borderBottom: "1px solid rgba(232,226,214,0.14)",
           boxShadow: "0 30px 80px rgba(0,0,0,0.55)",
         }}>
-        {src ? (
-          <img src={src} alt={`Reflection for week ${entry.weekNumber}`}
-            onError={() => console.warn("[Cygne reflection] image failed to load:", src)}
-            style={{ width: "100%", display: "block" }} />
-        ) : (
-          <div style={{ width: "100%", aspectRatio: "3/1.3", display: "flex", alignItems: "center", justifyContent: "center", color: CREAM_SOFT, fontFamily: "Space Grotesk, sans-serif", fontSize: 12 }}>
-            Image unavailable
-          </div>
-        )}
+        <TriptychImage src={src} alt={`Reflection for week ${entry.weekNumber}`} placeholderFontSize={12} />
       </div>
 
       <div onClick={(e) => e.stopPropagation()}
@@ -437,14 +488,7 @@ function GalleryEntry({ entry, onExpand, caption }) {
         borderBottom: "1px solid rgba(232,226,214,0.14)",
         boxShadow: "0 18px 44px rgba(0,0,0,0.35)",
       }}>
-        {src ? (
-          <img src={src} alt={`Reflection week ${entry.weekNumber}`}
-            style={{ width: "100%", display: "block" }} />
-        ) : (
-          <div style={{ width: "100%", aspectRatio: "3/1.3", display: "flex", alignItems: "center", justifyContent: "center", color: CREAM_SOFT, fontFamily: "Space Grotesk, sans-serif", fontSize: 11 }}>
-            Image unavailable
-          </div>
-        )}
+        <TriptychImage src={src} alt={`Reflection week ${entry.weekNumber}`} />
       </div>
       {caption && (
         <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 22, color: CREAM_FAINT, textAlign: "center", margin: "12px 0 0", letterSpacing: "0.02em" }}>
