@@ -371,8 +371,8 @@ function ExpandedEntry({ entry, onClose }) {
       <div onClick={(e) => e.stopPropagation()}
         style={{
           width: "100%", maxWidth: 720,
-          padding: 6, background: SAGE_DEEP,
-          border: `1px solid ${CREAM_BORDER}`,
+          borderTop: "1px solid rgba(232,226,214,0.14)",
+          borderBottom: "1px solid rgba(232,226,214,0.14)",
           boxShadow: "0 30px 80px rgba(0,0,0,0.55)",
         }}>
         {src ? (
@@ -413,7 +413,7 @@ function ExpandedEntry({ entry, onClose }) {
 // GALLERY ENTRY
 // ---------------------------------------------------------------------------
 
-function GalleryEntry({ entry, onExpand }) {
+function GalleryEntry({ entry, onExpand, caption }) {
   const src = entry.url || entry.inline;
   return (
     <button onClick={onExpand}
@@ -433,8 +433,8 @@ function GalleryEntry({ entry, onExpand }) {
       </p>
       <div style={{
         width: "100%", maxWidth: 520, margin: "0 auto",
-        padding: 4, background: SAGE_DEEP,
-        border: `1px solid ${CREAM_BORDER}`,
+        borderTop: "1px solid rgba(232,226,214,0.14)",
+        borderBottom: "1px solid rgba(232,226,214,0.14)",
         boxShadow: "0 18px 44px rgba(0,0,0,0.35)",
       }}>
         {src ? (
@@ -446,6 +446,11 @@ function GalleryEntry({ entry, onExpand }) {
           </div>
         )}
       </div>
+      {caption && (
+        <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 22, color: CREAM_FAINT, textAlign: "center", margin: "12px 0 0", letterSpacing: "0.02em" }}>
+          {caption}
+        </p>
+      )}
     </button>
   );
 }
@@ -462,6 +467,16 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
   const [signedUrls, setSignedUrls] = useState({}); // { [entryId]: signedUrl }
 
   const sorted = [...reflections].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  // Does this ISO week already have a captured reflection?
+  const now = new Date();
+  const currentWeek = isoWeekNumber(now);
+  const currentYear = now.getFullYear();
+  const capturedThisWeek = reflections.some(r => {
+    if (r.weekNumber !== currentWeek) return false;
+    const d = new Date(r.date);
+    return d.getFullYear() === currentYear;
+  });
 
   // Refresh signed URLs on mount / when the reflection set changes. Signed
   // URLs expire; regenerating them per session keeps the gallery reliable.
@@ -555,22 +570,28 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
       )}
 
       <div style={{ textAlign: "center", marginBottom: 48 }}>
-        <button onClick={() => setCapturing(true)} disabled={saving}
-          style={{
-            display: "inline-flex", alignItems: "center", gap: 10,
-            padding: "14px 26px", borderRadius: 999,
-            background: "rgba(232,226,214,0.1)", color: CREAM,
-            border: `1px solid ${CREAM_BORDER}`,
-            cursor: saving ? "default" : "pointer",
-            fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600,
-            letterSpacing: "0.18em", textTransform: "uppercase",
-            transition: "all 0.2s", opacity: saving ? 0.6 : 1,
-          }}
-          onMouseEnter={e => !saving && (e.currentTarget.style.background = "rgba(232,226,214,0.18)")}
-          onMouseLeave={e => !saving && (e.currentTarget.style.background = "rgba(232,226,214,0.1)")}>
-          <Icon name="camera" size={14} />
-          {saving ? "Saving..." : reflections.length === 0 ? "Capture your first reflection" : "Capture this week"}
-        </button>
+        {capturedThisWeek ? (
+          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.24em", textTransform: "uppercase", color: CREAM_FAINT, margin: 0 }}>
+            Captured — return on your next reset day
+          </p>
+        ) : (
+          <button onClick={() => setCapturing(true)} disabled={saving}
+            style={{
+              display: "inline-flex", alignItems: "center", gap: 10,
+              padding: "14px 26px", borderRadius: 999,
+              background: "rgba(232,226,214,0.1)", color: CREAM,
+              border: `1px solid ${CREAM_BORDER}`,
+              cursor: saving ? "default" : "pointer",
+              fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600,
+              letterSpacing: "0.18em", textTransform: "uppercase",
+              transition: "all 0.2s", opacity: saving ? 0.6 : 1,
+            }}
+            onMouseEnter={e => !saving && (e.currentTarget.style.background = "rgba(232,226,214,0.18)")}
+            onMouseLeave={e => !saving && (e.currentTarget.style.background = "rgba(232,226,214,0.1)")}>
+            <Icon name="camera" size={14} />
+            {saving ? "Saving..." : reflections.length === 0 ? "Capture your first reflection" : "Capture this week"}
+          </button>
+        )}
       </div>
 
       {/* Empty state */}
@@ -591,12 +612,14 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
       {/* Gallery */}
       {sorted.length > 0 && (
         <div style={{ maxWidth: 560, margin: "0 auto" }}>
-          {sorted.map(entry => (
-            <GalleryEntry key={entry.id} entry={decorate(entry)} onExpand={() => setExpandedId(entry.id)} />
+          {sorted.map((entry, idx) => (
+            <GalleryEntry
+              key={entry.id}
+              entry={decorate(entry)}
+              onExpand={() => setExpandedId(entry.id)}
+              caption={idx === 0 ? "The week is behind you." : null}
+            />
           ))}
-          <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 20, color: CREAM_FAINT, textAlign: "center", margin: "40px 0 0", letterSpacing: "0.02em" }}>
-            The week is behind you.
-          </p>
         </div>
       )}
 
