@@ -5,17 +5,21 @@ import { getSwanSensePredictions } from "./swansense.jsx";
 
 // ---------------------------------------------------------------------------
 // Reflection — a weekly triptych gallery of the user's skin journey.
-// Dark sage green page. Capture flow guides 3 angles, stitches into a strip,
-// uploads to Supabase Storage, and records a snapshot of the week's top
-// SwanSense insight alongside. Tapping an entry expands the full strip.
+// Inherits the app's color system via CSS variables so it reads the same
+// in day/night mode as every other screen.
 // ---------------------------------------------------------------------------
 
-const SAGE_DEEP = "#3a4134";
-const SAGE_DEEPER = "#2e342a";
-const CREAM = "#e8e2d6";
-const CREAM_SOFT = "rgba(232,226,214,0.72)";
-const CREAM_FAINT = "rgba(232,226,214,0.28)";
-const CREAM_BORDER = "rgba(232,226,214,0.18)";
+// Theme tokens — proxied to the global CSS variables defined in App.jsx.
+const BG         = "var(--deep)";
+const SURFACE_BG = "var(--ink)";
+const TEXT       = "var(--parchment)";
+const TEXT_SOFT  = "var(--clay)";
+const BORDER     = "var(--border)";
+const OVERLAY    = "var(--overlay)";
+const CTA_BG     = "var(--cta)";
+const CTA_BORDER = "rgba(122,144,112,0.35)";
+const CURSIVE    = "var(--cursive)";
+const SANS       = "var(--sans)";
 
 const ANGLES = [
   { key: "front", label: "Front", hint: "Face the lens. Chin level, shoulders soft." },
@@ -180,12 +184,14 @@ async function refreshSignedUrl(path) {
 
 function FaceGuide({ size = 240 }) {
   return (
-    <svg width={size} height={size * 1.25} viewBox="0 0 120 150" fill="none"
-      style={{ pointerEvents: "none", opacity: 0.55 }}>
-      <ellipse cx="60" cy="72" rx="38" ry="52" stroke={CREAM} strokeWidth="0.9" strokeDasharray="2 3" />
-      <line x1="60" y1="20" x2="60" y2="124" stroke={CREAM} strokeWidth="0.4" strokeDasharray="1 3" />
-      <line x1="22" y1="72" x2="98" y2="72" stroke={CREAM} strokeWidth="0.4" strokeDasharray="1 3" />
-    </svg>
+    <div style={{ color: TEXT, opacity: 0.55, lineHeight: 0 }}>
+      <svg width={size} height={size * 1.25} viewBox="0 0 120 150" fill="none"
+        style={{ pointerEvents: "none" }}>
+        <ellipse cx="60" cy="72" rx="38" ry="52" stroke="currentColor" strokeWidth="0.9" strokeDasharray="2 3" />
+        <line x1="60" y1="20" x2="60" y2="124" stroke="currentColor" strokeWidth="0.4" strokeDasharray="1 3" />
+        <line x1="22" y1="72" x2="98" y2="72" stroke="currentColor" strokeWidth="0.4" strokeDasharray="1 3" />
+      </svg>
+    </div>
   );
 }
 
@@ -227,27 +233,27 @@ function CaptureFlow({ onClose, onComplete }) {
 
   return (
     <div style={{
-      position: "fixed", inset: 0, zIndex: 400, background: SAGE_DEEPER,
+      position: "fixed", inset: 0, zIndex: 400, background: SURFACE_BG,
       display: "flex", flexDirection: "column",
     }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 22px" }}>
-        <button onClick={onClose} style={{ background: "none", border: "none", color: CREAM_SOFT, cursor: "pointer", padding: 4, display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "Space Grotesk, sans-serif", fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+        <button onClick={onClose} style={{ background: "none", border: "none", color: TEXT_SOFT, cursor: "pointer", padding: 4, display: "inline-flex", alignItems: "center", gap: 6, fontFamily: SANS, fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase" }}>
           <Icon name="x" size={14} /> Close
         </button>
-        <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.28em", textTransform: "uppercase", color: CREAM_SOFT }}>Reflection</span>
+        <span style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.28em", textTransform: "uppercase", color: TEXT_SOFT }}>Reflection</span>
         <div style={{ width: 68 }} />
       </div>
 
       <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 26px", textAlign: "center" }}>
         {!done ? (
           <>
-            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: CREAM_FAINT, margin: 0 }}>
+            <p style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: 0 }}>
               Shot {step + 1} of 3
             </p>
-            <h2 style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 46, color: CREAM, margin: "6px 0 6px", letterSpacing: "0.02em", lineHeight: 1.05 }}>
+            <h2 style={{ fontFamily: CURSIVE, fontSize: 46, color: TEXT, margin: "6px 0 6px", letterSpacing: "0.02em", lineHeight: 1.05 }}>
               {current.label}
             </h2>
-            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: CREAM_SOFT, margin: 0, maxWidth: 300, lineHeight: 1.6 }}>
+            <p style={{ fontFamily: SANS, fontSize: 12, color: TEXT_SOFT, margin: 0, maxWidth: 300, lineHeight: 1.6 }}>
               {current.hint}
             </p>
 
@@ -259,8 +265,8 @@ function CaptureFlow({ onClose, onComplete }) {
               {ANGLES.map((a, i) => (
                 <div key={a.key} style={{
                   width: 9, height: 9, borderRadius: "50%",
-                  background: i < step ? CREAM : i === step ? "rgba(232,226,214,0.55)" : "transparent",
-                  border: `1px solid ${i <= step ? CREAM : CREAM_BORDER}`,
+                  background: i < step ? "var(--sage)" : i === step ? "rgba(122,144,112,0.45)" : "transparent",
+                  border: `1px solid ${i <= step ? "var(--sage)" : BORDER}`,
                   transition: "all 0.2s",
                 }} />
               ))}
@@ -269,9 +275,10 @@ function CaptureFlow({ onClose, onComplete }) {
             <button onClick={pick} disabled={busy}
               style={{
                 display: "inline-flex", alignItems: "center", gap: 10,
-                padding: "14px 28px", borderRadius: 999,
-                background: CREAM, color: SAGE_DEEP, border: "none", cursor: busy ? "default" : "pointer",
-                fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 700,
+                padding: "14px 28px", borderRadius: 11,
+                background: CTA_BG, color: TEXT, border: `1px solid ${CTA_BORDER}`,
+                cursor: busy ? "default" : "pointer",
+                fontFamily: SANS, fontSize: 11, fontWeight: 600,
                 letterSpacing: "0.18em", textTransform: "uppercase",
                 opacity: busy ? 0.5 : 1,
               }}>
@@ -281,21 +288,21 @@ function CaptureFlow({ onClose, onComplete }) {
 
             {step > 0 && (
               <button onClick={retake}
-                style={{ marginTop: 16, background: "none", border: "none", color: CREAM_SOFT, cursor: "pointer", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", opacity: 0.7 }}>
+                style={{ marginTop: 16, background: "none", border: "none", color: TEXT_SOFT, cursor: "pointer", fontFamily: SANS, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", opacity: 0.7 }}>
                 Retake last shot
               </button>
             )}
           </>
         ) : (
           <>
-            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: CREAM_FAINT, margin: 0 }}>
+            <p style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: 0 }}>
               Your reflection
             </p>
-            <h2 style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 44, color: CREAM, margin: "6px 0 18px", letterSpacing: "0.02em" }}>
+            <h2 style={{ fontFamily: CURSIVE, fontSize: 44, color: TEXT, margin: "6px 0 18px", letterSpacing: "0.02em" }}>
               A quiet moment.
             </h2>
 
-            <div style={{ display: "flex", gap: 6, width: "100%", maxWidth: 420, marginBottom: 28, border: `1px solid ${CREAM_BORDER}`, padding: 4, background: SAGE_DEEP }}>
+            <div style={{ display: "flex", gap: 6, width: "100%", maxWidth: 420, marginBottom: 28, border: `1px solid ${BORDER}`, padding: 4, background: "var(--surface)" }}>
               {shots.map((s, i) => (
                 <img key={i} src={s} alt={ANGLES[i].label}
                   style={{ flex: 1, width: 0, aspectRatio: "3/4", objectFit: "cover", display: "block" }} />
@@ -305,9 +312,10 @@ function CaptureFlow({ onClose, onComplete }) {
             <button onClick={finish} disabled={busy}
               style={{
                 display: "inline-flex", alignItems: "center", gap: 10,
-                padding: "14px 28px", borderRadius: 999,
-                background: CREAM, color: SAGE_DEEP, border: "none", cursor: busy ? "default" : "pointer",
-                fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 700,
+                padding: "14px 28px", borderRadius: 11,
+                background: CTA_BG, color: TEXT, border: `1px solid ${CTA_BORDER}`,
+                cursor: busy ? "default" : "pointer",
+                fontFamily: SANS, fontSize: 11, fontWeight: 600,
                 letterSpacing: "0.18em", textTransform: "uppercase",
                 opacity: busy ? 0.5 : 1,
               }}>
@@ -315,7 +323,7 @@ function CaptureFlow({ onClose, onComplete }) {
             </button>
 
             <button onClick={retake} disabled={busy}
-              style={{ marginTop: 16, background: "none", border: "none", color: CREAM_SOFT, cursor: "pointer", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", opacity: 0.7 }}>
+              style={{ marginTop: 16, background: "none", border: "none", color: TEXT_SOFT, cursor: "pointer", fontFamily: SANS, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", opacity: 0.7 }}>
               Retake last shot
             </button>
           </>
@@ -361,7 +369,7 @@ function TriptychImage({ src, alt, placeholderFontSize = 11 }) {
       <div style={{
         width: "100%", aspectRatio: "3/1.3",
         display: "flex", alignItems: "center", justifyContent: "center",
-        color: CREAM_SOFT, fontFamily: "Space Grotesk, sans-serif", fontSize: placeholderFontSize,
+        color: TEXT_SOFT, fontFamily: SANS, fontSize: placeholderFontSize,
       }}>
         Image unavailable
       </div>
@@ -370,7 +378,7 @@ function TriptychImage({ src, alt, placeholderFontSize = 11 }) {
 
   return (
     <div role="img" aria-label={alt}
-      style={{ display: "flex", width: "100%", aspectRatio: "1560 / 680", overflow: "hidden", background: "#0f120f" }}>
+      style={{ display: "flex", width: "100%", aspectRatio: "1560 / 680", overflow: "hidden", background: SURFACE_BG }}>
       {[0, 1, 2].map((i) => (
         <div key={i} style={{
           flex: 1,
@@ -406,54 +414,54 @@ function ExpandedEntry({ entry, onClose }) {
       onClick={onClose}
       style={{
         position: "fixed", inset: 0, zIndex: 380,
-        background: "rgba(10,14,10,0.88)",
+        background: OVERLAY,
         backdropFilter: "blur(14px)",
         display: "flex", flexDirection: "column", alignItems: "center",
         overflowY: "auto", padding: "44px 18px 60px",
         animation: "fadeUp 0.3s ease",
       }}>
       <button onClick={onClose}
-        style={{ position: "absolute", top: 16, right: 18, background: "none", border: "none", color: CREAM_SOFT, cursor: "pointer", padding: 8 }}>
+        style={{ position: "absolute", top: 16, right: 18, background: "none", border: "none", color: TEXT_SOFT, cursor: "pointer", padding: 8 }}>
         <Icon name="x" size={18} />
       </button>
 
-      <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: CREAM_FAINT, margin: "0 0 6px" }}>
+      <p style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: "0 0 6px" }}>
         Week {entry.weekNumber}
       </p>
-      <h2 style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 38, color: CREAM, margin: "0 0 4px", letterSpacing: "0.02em", textAlign: "center" }}>
+      <h2 style={{ fontFamily: CURSIVE, fontSize: 38, color: TEXT, margin: "0 0 4px", letterSpacing: "0.02em", textAlign: "center" }}>
         {weekLabel(entry.weekNumber)}
       </h2>
-      <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: CREAM_FAINT, margin: "0 0 26px" }}>
+      <p style={{ fontFamily: SANS, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: "0 0 26px" }}>
         {formatDateLong(entry.date)}
       </p>
 
       <div onClick={(e) => e.stopPropagation()}
         style={{
           width: "100%", maxWidth: 720,
-          borderTop: "1px solid rgba(232,226,214,0.14)",
-          borderBottom: "1px solid rgba(232,226,214,0.14)",
-          boxShadow: "0 30px 80px rgba(0,0,0,0.55)",
+          borderTop: `1px solid ${BORDER}`,
+          borderBottom: `1px solid ${BORDER}`,
+          boxShadow: "0 30px 80px rgba(0,0,0,0.3)",
         }}>
         <TriptychImage src={src} alt={`Reflection for week ${entry.weekNumber}`} placeholderFontSize={12} />
       </div>
 
       <div onClick={(e) => e.stopPropagation()}
-        style={{ maxWidth: 560, width: "100%", marginTop: 30, padding: "20px 22px", borderTop: `1px solid ${CREAM_BORDER}`, borderBottom: `1px solid ${CREAM_BORDER}` }}>
-        <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.28em", textTransform: "uppercase", color: CREAM_FAINT, margin: "0 0 10px", textAlign: "center" }}>
+        style={{ maxWidth: 560, width: "100%", marginTop: 30, padding: "20px 22px", borderTop: `1px solid ${BORDER}`, borderBottom: `1px solid ${BORDER}` }}>
+        <p style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.28em", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: "0 0 10px", textAlign: "center" }}>
           Swan Sense — this week
         </p>
         {entry.insight?.headline ? (
-          <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 28, color: CREAM, margin: 0, lineHeight: 1.35, textAlign: "center" }}>
+          <p style={{ fontFamily: CURSIVE, fontSize: 28, color: TEXT, margin: 0, lineHeight: 1.35, textAlign: "center" }}>
             {entry.insight.headline}
           </p>
         ) : (
-          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: CREAM_SOFT, margin: 0, textAlign: "center", lineHeight: 1.7 }}>
+          <p style={{ fontFamily: SANS, fontSize: 12, color: TEXT_SOFT, margin: 0, textAlign: "center", lineHeight: 1.7 }}>
             No insight recorded for this week.
           </p>
         )}
       </div>
 
-      <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: CREAM_FAINT, marginTop: 24, opacity: 0.7 }}>
+      <p style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: TEXT_SOFT, marginTop: 24, opacity: 0.7 }}>
         Tap anywhere to close
       </p>
     </div>
@@ -471,27 +479,27 @@ function GalleryEntry({ entry, onExpand, caption }) {
       style={{
         display: "block", width: "100%", margin: "0 auto 48px",
         background: "none", border: "none", padding: 0, cursor: "pointer",
-        textAlign: "center",
+        textAlign: "center", color: TEXT,
       }}>
-      <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: CREAM_FAINT, margin: "0 0 4px" }}>
+      <p style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: "0 0 4px" }}>
         Week {entry.weekNumber}
       </p>
-      <h3 style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 32, color: CREAM, margin: "0 0 3px", letterSpacing: "0.02em" }}>
+      <h3 style={{ fontFamily: CURSIVE, fontSize: 32, color: TEXT, margin: "0 0 3px", letterSpacing: "0.02em" }}>
         {weekLabel(entry.weekNumber)}
       </h3>
-      <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: CREAM_FAINT, margin: "0 0 18px", opacity: 0.75 }}>
+      <p style={{ fontFamily: SANS, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: TEXT_SOFT, margin: "0 0 18px", opacity: 0.7 }}>
         {formatDateLong(entry.date)}
       </p>
       <div style={{
         width: "100%", maxWidth: 520, margin: "0 auto",
-        borderTop: "1px solid rgba(232,226,214,0.14)",
-        borderBottom: "1px solid rgba(232,226,214,0.14)",
-        boxShadow: "0 18px 44px rgba(0,0,0,0.35)",
+        borderTop: `1px solid ${BORDER}`,
+        borderBottom: `1px solid ${BORDER}`,
+        boxShadow: "0 18px 44px rgba(0,0,0,0.2)",
       }}>
         <TriptychImage src={src} alt={`Reflection week ${entry.weekNumber}`} />
       </div>
       {caption && (
-        <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 22, color: CREAM_FAINT, textAlign: "center", margin: "12px 0 0", letterSpacing: "0.02em" }}>
+        <p style={{ fontFamily: CURSIVE, fontSize: 22, color: TEXT_SOFT, textAlign: "center", margin: "12px 0 0", letterSpacing: "0.02em", opacity: 0.85 }}>
           {caption}
         </p>
       )}
@@ -590,48 +598,47 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
   return (
     <div style={{
       margin: "-32px -22px 0",
-      background: SAGE_DEEP, minHeight: "calc(100vh - 54px)",
+      background: BG, minHeight: "calc(100vh - 54px)",
       padding: "44px 22px 80px",
-      color: CREAM,
+      color: TEXT,
     }}>
       {/* Header */}
       <div style={{ maxWidth: 560, margin: "0 auto 36px", textAlign: "center" }}>
-        <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: CREAM_FAINT, margin: "0 0 8px" }}>
+        <p style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: "0 0 8px" }}>
           Reflection
         </p>
-        <h1 style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 54, color: CREAM, margin: "0 0 10px", letterSpacing: "0.02em", lineHeight: 1.05 }}>
+        <h1 style={{ fontFamily: CURSIVE, fontSize: 54, color: TEXT, margin: "0 0 10px", letterSpacing: "0.02em", lineHeight: 1.05 }}>
           A living gallery.
         </h1>
-        <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: CREAM_SOFT, margin: 0, lineHeight: 1.75, maxWidth: 360, marginLeft: "auto", marginRight: "auto" }}>
+        <p style={{ fontFamily: SANS, fontSize: 12, color: TEXT_SOFT, margin: 0, lineHeight: 1.75, maxWidth: 360, marginLeft: "auto", marginRight: "auto" }}>
           One triptych a week. A quiet record of how your skin is moving through the seasons.
         </p>
       </div>
 
       {error && (
-        <div style={{ maxWidth: 520, margin: "0 auto 20px", padding: "12px 16px", background: "rgba(232,226,214,0.08)", border: `1px solid ${CREAM_BORDER}`, borderRadius: 10, textAlign: "center" }}>
-          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: CREAM_SOFT, margin: 0 }}>{error}</p>
+        <div style={{ maxWidth: 520, margin: "0 auto 20px", padding: "12px 16px", background: "var(--surface)", border: `1px solid ${BORDER}`, borderRadius: 10, textAlign: "center" }}>
+          <p style={{ fontFamily: SANS, fontSize: 11, color: TEXT_SOFT, margin: 0 }}>{error}</p>
         </div>
       )}
 
       <div style={{ textAlign: "center", marginBottom: 48 }}>
         {capturedThisWeek ? (
-          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.24em", textTransform: "uppercase", color: CREAM_FAINT, margin: 0 }}>
+          <p style={{ fontFamily: SANS, fontSize: 10, letterSpacing: "0.24em", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: 0 }}>
             Captured — return on your next reset day
           </p>
         ) : (
           <button onClick={() => setCapturing(true)} disabled={saving}
             style={{
               display: "inline-flex", alignItems: "center", gap: 10,
-              padding: "14px 26px", borderRadius: 999,
-              background: "rgba(232,226,214,0.1)", color: CREAM,
-              border: `1px solid ${CREAM_BORDER}`,
+              padding: "14px 26px", borderRadius: 11,
+              background: CTA_BG, color: TEXT,
+              border: `1px solid ${CTA_BORDER}`,
               cursor: saving ? "default" : "pointer",
-              fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600,
+              fontFamily: SANS, fontSize: 11, fontWeight: 600,
               letterSpacing: "0.18em", textTransform: "uppercase",
-              transition: "all 0.2s", opacity: saving ? 0.6 : 1,
-            }}
-            onMouseEnter={e => !saving && (e.currentTarget.style.background = "rgba(232,226,214,0.18)")}
-            onMouseLeave={e => !saving && (e.currentTarget.style.background = "rgba(232,226,214,0.1)")}>
+              transition: "border-color 0.2s, opacity 0.2s",
+              opacity: saving ? 0.6 : 1,
+            }}>
             <Icon name="camera" size={14} />
             {saving ? "Saving..." : reflections.length === 0 ? "Capture your first reflection" : "Capture this week"}
           </button>
@@ -640,14 +647,14 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
 
       {/* Empty state */}
       {sorted.length === 0 && (
-        <div style={{ maxWidth: 460, margin: "20px auto 0", textAlign: "center", padding: "40px 24px", border: `1px solid ${CREAM_BORDER}`, borderRadius: 18 }}>
-          <div style={{ color: CREAM_SOFT, display: "inline-flex", marginBottom: 14 }}>
+        <div style={{ maxWidth: 460, margin: "20px auto 0", textAlign: "center", padding: "40px 24px", background: "var(--surface)", border: `1px solid ${BORDER}`, borderRadius: 18 }}>
+          <div style={{ color: TEXT_SOFT, display: "inline-flex", marginBottom: 14 }}>
             <Icon name="reflection" size={26} />
           </div>
-          <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 26, color: CREAM, margin: "0 0 8px", letterSpacing: "0.02em" }}>
+          <p style={{ fontFamily: CURSIVE, fontSize: 26, color: TEXT, margin: "0 0 8px", letterSpacing: "0.02em" }}>
             Your gallery is waiting.
           </p>
-          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: CREAM_SOFT, margin: 0, lineHeight: 1.7 }}>
+          <p style={{ fontFamily: SANS, fontSize: 12, color: TEXT_SOFT, margin: 0, lineHeight: 1.7 }}>
             Every Sunday evening, step to the mirror. Three angles, one quiet moment — and the wheel of your year begins to turn.
           </p>
         </div>
