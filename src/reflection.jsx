@@ -474,12 +474,38 @@ function ExpandedEntry({ entry, onClose }) {
 
 function GalleryEntry({ entry, onExpand, caption }) {
   const src = entry.url || entry.inline;
+  // Reveal once the entry scrolls into view. Disconnects after the first
+  // intersection so the animation never replays on exit. Browsers without
+  // IntersectionObserver fall back to immediately-visible.
+  const ref = useRef(null);
+  const [revealed, setRevealed] = useState(false);
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+    if (typeof IntersectionObserver === "undefined") { setRevealed(true); return; }
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) {
+          setRevealed(true);
+          io.disconnect();
+          break;
+        }
+      }
+    }, { threshold: 0.15, rootMargin: "0px 0px -8% 0px" });
+    io.observe(node);
+    return () => io.disconnect();
+  }, []);
+
   return (
-    <button onClick={onExpand}
+    <button onClick={onExpand} ref={ref}
       style={{
         display: "block", width: "100%", margin: "0 auto 48px",
         background: "none", border: "none", padding: 0, cursor: "pointer",
         textAlign: "center", color: TEXT,
+        opacity: revealed ? 1 : 0,
+        transform: revealed ? "translateY(0)" : "translateY(16px)",
+        transition: "opacity 500ms ease-out, transform 500ms ease-out",
+        willChange: "opacity, transform",
       }}>
       <p style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: "0 0 4px" }}>
         Week {entry.weekNumber}
