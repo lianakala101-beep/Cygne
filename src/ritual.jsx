@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Icon, Section, Wordmark } from "./components.jsx";
+import { Icon, Section, Wordmark, SwanIcon } from "./components.jsx";
 import { detectActives, analyzeShelf, buildRoutine, isDampSkinProduct, hasSPFCoverage } from "./engine.js";
 import { FREQUENCIES } from "./constants.js";
 import { getLockedSession, getAutoSession } from "./productmodal.jsx";
@@ -372,7 +372,7 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
         }}>
           <div style={{ position: "absolute", inset: 0, borderRadius: 22, pointerEvents: "none", backgroundImage: grain, backgroundSize: "180px 180px", opacity: 0.7 }} />
           <div style={{ position: "absolute", inset: 0, borderRadius: 22, pointerEvents: "none", background: "radial-gradient(ellipse at 85% 15%, rgba(139,115,85,0.12) 0%, transparent 65%)" }} />
-          <div style={{ position: "absolute", bottom: 14, right: 18, opacity: 0.07, fontSize: 56, userSelect: "none", pointerEvents: "none" }}>🦢</div>
+          <div style={{ position: "absolute", bottom: 14, right: 18, opacity: 0.18, color: "rgba(232,220,180,0.9)", pointerEvents: "none" }}><SwanIcon size={56} /></div>
 
           <div style={{ textAlign: "center", marginBottom: 18 }}>
             <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(232,226,217,0.65)", margin: 0 }}>
@@ -417,7 +417,7 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
         border: "1px solid rgba(139,115,85,0.15)",
       }}>
         <div style={{ position: "absolute", inset: 0, borderRadius: 14, pointerEvents: "none", backgroundImage: grain, backgroundSize: "180px 180px", opacity: 0.6 }} />
-        <div style={{ position: "absolute", bottom: 8, right: 12, opacity: 0.06, fontSize: 44, userSelect: "none", pointerEvents: "none" }}>🦢</div>
+        <div style={{ position: "absolute", bottom: 8, right: 12, opacity: 0.18, color: "rgba(232,220,180,0.9)", pointerEvents: "none" }}><SwanIcon size={44} /></div>
 
         <div style={{ marginBottom: 10 }}>
           <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 8, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(232,226,217,0.55)", margin: 0 }}>Swan Song</p>

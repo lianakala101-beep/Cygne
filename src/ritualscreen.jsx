@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Icon, Section, FlagCard } from "./components.jsx";
+import { Icon, Section, FlagCard, SwanIcon } from "./components.jsx";
 import { detectActives, analyzeShelf, buildRoutine, detectConflicts, getCurrentSession, isScheduledToday } from "./engine.js";
 import { FREQUENCIES } from "./constants.js";
 import { buildRecommendations, buildRefinements } from "./intelligence.jsx";
@@ -235,31 +235,6 @@ function getSwanGuidingLine(products, checkIns = [], user = {}, cycleDay = null,
   return "Your ritual is ready. Take your time with it.";
 }
 
-// --- SWAN SVG ---------------------------------------------------------------
-// Minimal elegant swan: small oval head, long arching neck, streamlined
-// teardrop body low on the waterline. No legs. Used for the progress
-// tracker and the ritual-complete card. No emoji.
-function SwanSvg({ size = 18, color = "currentColor" }) {
-  return (
-    <svg width={size} height={size * 0.7} viewBox="0 0 40 28" fill="none" aria-hidden="true"
-      style={{ display: "block", overflow: "visible" }}>
-      {/* Streamlined teardrop body, low on the waterline */}
-      <path
-        d="M4 20 Q 9 15.8, 20 16 Q 28.5 16.4, 30 19 Q 27.5 21.4, 18 21.4 Q 8 21.4, 4 20 Z"
-        fill={color} />
-      {/* Long graceful neck arching forward */}
-      <path
-        d="M26 16.4 C 25 11, 27 6.8, 31.2 4.8"
-        stroke={color} strokeWidth="1.3" fill="none"
-        strokeLinecap="round" strokeLinejoin="round" />
-      {/* Small refined head */}
-      <circle cx="31.8" cy="4.4" r="1.35" fill={color} />
-      {/* Tiny beak */}
-      <path d="M33 4.6 L 34.9 4.2 L 33.1 5.6 Z" fill={color} />
-    </svg>
-  );
-}
-
 // --- BREATH TEXT ------------------------------------------------------------
 // Splits a heading into words and fades each one in, staggered, on mount.
 // Plays once — subsequent re-renders keep words settled.
@@ -329,7 +304,7 @@ function RitualProgressTracker({ completed, total }) {
           color: "#3a4134",
           animation: "etherealGlide 3s ease-in-out infinite",
         }}>
-          <SwanSvg size={20} />
+          <SwanIcon size={20} />
         </span>
       </div>
     </div>
@@ -399,7 +374,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
       {/* -- Swan guiding line ---------------------------------------------- */}
       {guidingLine && (
         <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 22 }}>
-          <span style={{ color: "var(--clay)", flexShrink: 0, fontSize: 14 }}>🦢</span>
+          <span style={{ color: "var(--clay)", flexShrink: 0, display: "inline-flex" }}><SwanIcon size={16} /></span>
           <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 19, fontWeight: 400, color: "var(--clay)", margin: 0, lineHeight: 1.4, letterSpacing: "0.01em" }}>{guidingLine}</p>
         </div>
       )}
@@ -473,7 +448,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
               scheduled={isScheduledToday(p)}
             />)}</div>
           </Section>
-        : <div style={{ padding: "32px 0 16px" }}><div style={{ display: "flex", alignItems: "flex-start", gap: 9, marginBottom: 8 }}><span style={{ color: "var(--clay)", flexShrink: 0, marginTop: 4, fontSize: 15 }}>🦢</span><p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 19, color: "var(--clay)", margin: 0, lineHeight: 1.4 }}>Your ritual is waiting. Add products to your vanity and they'll appear here.</p></div></div>}
+        : <div style={{ padding: "32px 0 16px" }}><div style={{ display: "flex", alignItems: "flex-start", gap: 9, marginBottom: 8 }}><span style={{ color: "var(--clay)", flexShrink: 0, marginTop: 4, display: "inline-flex" }}><SwanIcon size={16} /></span><p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 19, color: "var(--clay)", margin: 0, lineHeight: 1.4 }}>Your ritual is waiting. Add products to your vanity and they'll appear here.</p></div></div>}
       {allDone && steps.length > 0 && !todayCheckedIn && (
         <div style={{ margin: "16px 0", padding: "18px 18px", background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 14 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
@@ -482,7 +457,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
               display: "inline-flex",
               animation: "etherealGlide 3s ease-in-out infinite",
             }}>
-              <SwanSvg size={22} />
+              <SwanIcon size={22} />
             </span>
             <div>
               <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 22, color: "var(--parchment)", margin: "0 0 2px" }}>Ritual complete.</p>

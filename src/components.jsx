@@ -137,9 +137,29 @@ function Wordmark({ size = 28, theme = "dark" }) {
   );
 }
 
+// --- SWAN ICON ----------------------------------------------------------------
+// Minimal elegant swan: small oval head, long arching neck, streamlined
+// teardrop body low on the waterline. No legs, no emoji.
+function SwanIcon({ size = 18, color = "currentColor" }) {
+  return (
+    <svg width={size} height={size * 0.7} viewBox="0 0 40 28" fill="none" aria-hidden="true"
+      style={{ display: "block", overflow: "visible" }}>
+      <path
+        d="M4 20 Q 9 15.8, 20 16 Q 28.5 16.4, 30 19 Q 27.5 21.4, 18 21.4 Q 8 21.4, 4 20 Z"
+        fill={color} />
+      <path
+        d="M26 16.4 C 25 11, 27 6.8, 31.2 4.8"
+        stroke={color} strokeWidth="1.3" fill="none"
+        strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="31.8" cy="4.4" r="1.35" fill={color} />
+      <path d="M33 4.6 L 34.9 4.2 L 33.1 5.6 Z" fill={color} />
+    </svg>
+  );
+}
+
 // --- AUTH ---------------------------------------------------------------------
 
 // --- SPLASH SCREEN -----------------------------------------------------------
 
 
-export { Icon, Pill, Section, FlagCard, Wordmark, LOGO_SRC };
+export { Icon, Pill, Section, FlagCard, Wordmark, LOGO_SRC, SwanIcon };
