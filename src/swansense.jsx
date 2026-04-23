@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Icon } from "./components.jsx";
+import { Icon, SwanIcon } from "./components.jsx";
 import { analyzeShelf } from "./engine.js";
 import { getSeason } from "./seasonal.jsx";
 import { getCurrentCycleDay } from "./utils.jsx";
@@ -361,7 +361,7 @@ function SwanSenseCard({ products, checkIns = [], user = {}, locationData = null
   return (
     <div style={{ marginBottom: 20 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-        <span style={{ color: "var(--clay)", fontSize: 14 }}>🦢</span>
+        <span style={{ color: "var(--clay)", display: "inline-flex" }}><SwanIcon size={16} /></span>
         <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)" }}>Swan Sense</span>
         <div style={{ flex: 1, height: 1, background: "var(--border)", marginLeft: 4 }} />
         <button onClick={() => setDismissed(true)} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", opacity: 0.4, padding: 4 }}><Icon name="x" size={12} /></button>
@@ -374,7 +374,7 @@ function SwanSenseCard({ products, checkIns = [], user = {}, locationData = null
             <div key={p.type}
               onClick={() => setExpanded(isExpanded ? null : p.type)}
               style={{ background: fb === "up" ? "rgba(122,144,112,0.1)" : p.bg, border: `1px solid ${fb ? "rgba(122,144,112,0.3)" : p.border}`, borderRadius: 12, padding: "13px 15px", cursor: "pointer", position: "relative", overflow: "hidden", transition: "all 0.2s" }}>
-              <div style={{ position: "absolute", bottom: 6, right: 12, opacity: 0.06, fontSize: 36, pointerEvents: "none" }}>🦢</div>
+              <div style={{ position: "absolute", bottom: 6, right: 12, opacity: 0.16, color: "var(--clay)", pointerEvents: "none" }}><SwanIcon size={32} /></div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <div style={{ width: 5, height: 5, borderRadius: "50%", background: fb === "up" ? "#7a9070" : p.color, flexShrink: 0 }} />
                 <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--parchment)", margin: 0, flex: 1, lineHeight: 1.4 }}>{p.headline}</p>

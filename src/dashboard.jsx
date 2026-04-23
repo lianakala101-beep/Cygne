@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Icon, Section, FlagCard } from "./components.jsx";
+import { Icon, Section, FlagCard, SwanIcon } from "./components.jsx";
 import { analyzeShelf, detectConflicts, buildRoutine, calcSpending, getCurrentSession } from "./engine.js";
 import { getSwanSensePredictions } from "./swansense.jsx";
 import { SwanSongCard, FlightModeModal } from "./ritual.jsx";
@@ -77,7 +77,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         return (
           <div>
             <div style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: 28 }}>
-              <span style={{ color: "var(--clay)", lineHeight: 1.4, flexShrink: 0, marginTop: 4, fontSize: 18 }}>🦢</span>
+              <span style={{ color: "var(--clay)", flexShrink: 0, marginTop: 6, display: "inline-flex" }}><SwanIcon size={18} /></span>
               <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 21, color: "var(--clay)", margin: 0, lineHeight: 1.5 }}>
                 Your ritual lives here. Let's build it around you.
               </p>
@@ -130,7 +130,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           return (
             <div style={{ marginBottom: 24, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: "16px 18px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-                <span style={{ color: "var(--clay)", fontSize: 13 }}>🦢</span>
+                <span style={{ color: "var(--clay)", display: "inline-flex" }}><SwanIcon size={14} /></span>
                 <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)", margin: 0 }}>Getting started</p>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
