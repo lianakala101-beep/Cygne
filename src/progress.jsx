@@ -207,6 +207,14 @@ function SkinJournalModal({ onSubmit, onClose, existing = null }) {
   const [sleep,     setSleep]     = useState(existing?.sleep     ?? null); // "good"|"poor"|null
   const [stress,    setStress]    = useState(existing?.stress    ?? null); // "low"|"high"|null
   const [notes,     setNotes]     = useState(existing?.notes     || "");
+  // Which option is currently playing the soft pulse. Cleared on
+  // animation end so a re-tap can replay the pulse.
+  const [pulsing, setPulsing] = useState(null);
+
+  const pickCondition = (key) => {
+    setCondition(key);
+    setPulsing(key);
+  };
 
   const canSubmit = condition !== null;
 
@@ -231,12 +239,29 @@ function SkinJournalModal({ onSubmit, onClose, existing = null }) {
         <div style={{ marginBottom: 28 }}>
           <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 12px" }}>Skin condition</p>
           <div style={{ display: "flex", gap: 8 }}>
-            {SKIN_CONDITIONS.map(c => (
-              <button key={c.key} onClick={() => setCondition(c.key)}
-                style={{ flex: 1, padding: "12px 0", borderRadius: 11, border: `1px solid ${condition === c.key ? c.border : "var(--border)"}`, background: condition === c.key ? c.bg : "transparent", color: condition === c.key ? c.color : "var(--clay)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: condition === c.key ? 600 : 400, letterSpacing: "0.04em", cursor: "pointer", transition: "all 0.15s" }}>
-                {c.label}
-              </button>
-            ))}
+            {SKIN_CONDITIONS.map(c => {
+              const selected = condition === c.key;
+              const dimmed = condition !== null && !selected;
+              return (
+                <button key={c.key} onClick={() => pickCondition(c.key)}
+                  onAnimationEnd={() => { if (pulsing === c.key) setPulsing(null); }}
+                  style={{
+                    flex: 1, padding: "12px 0", borderRadius: 11,
+                    border: `1px solid ${selected ? c.border : "var(--border)"}`,
+                    background: selected ? c.bg : "transparent",
+                    color: selected ? c.color : "var(--clay)",
+                    fontFamily: "Space Grotesk, sans-serif", fontSize: 10,
+                    fontWeight: selected ? 600 : 400, letterSpacing: "0.04em",
+                    cursor: "pointer",
+                    opacity: dimmed ? 0.4 : 1,
+                    transition: "background 0.15s, border-color 0.15s, color 0.15s, opacity 0.25s ease-out",
+                    animation: pulsing === c.key ? "softPulse 400ms ease-in-out" : "none",
+                    willChange: pulsing === c.key ? "transform, opacity" : "auto",
+                  }}>
+                  {c.label}
+                </button>
+              );
+            })}
           </div>
         </div>
 

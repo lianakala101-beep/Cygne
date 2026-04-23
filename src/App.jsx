@@ -664,6 +664,11 @@ export default function App() {
           75%  { transform: translateY(3px) rotate(1deg); }
           100% { transform: translateY(0px) rotate(0deg); }
         }
+        @keyframes softPulse {
+          0%   { transform: scale(1); opacity: 1; }
+          50%  { transform: scale(1.06); opacity: 0.7; }
+          100% { transform: scale(1); opacity: 1; }
+        }
         .theme-dark option { background: #1a1c1a; color: #e8e2d9; }
         .theme-light option { background: #f7f4f0; color: #1a1612; }
         .theme-light input,
