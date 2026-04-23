@@ -56,13 +56,31 @@ function CheckInModal({ onSubmit, onClose }) {
   const [breakout, setBreakout] = useState(false);
   const [breakoutZones, setBreakoutZones] = useState([]);
   const [tight, setTight] = useState(false);
+  // idle → rippling (600ms) → closing (300ms) → onSubmit fires
+  const [submitState, setSubmitState] = useState("idle");
 
   const toggleZone = (z) => setBreakoutZones(prev => prev.includes(z) ? prev.filter(x => x !== z) : [...prev, z]);
+
+  const handleSubmit = () => {
+    if (submitState !== "idle") return;
+    const data = { irritation, breakout, breakoutZones: breakout ? breakoutZones : [], tight, date: new Date().toISOString() };
+    setSubmitState("rippling");
+    setTimeout(() => {
+      setSubmitState("closing");
+      setTimeout(() => onSubmit(data), 300);
+    }, 600);
+  };
 
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(8,10,9,0.82)", backdropFilter: "blur(10px)", zIndex: 100, display: "flex", alignItems: "flex-end", justifyContent: "center" }}
       >
-      <div style={{ background: "var(--ink)", width: "100%", maxWidth: 520, borderRadius: "20px 20px 0 0", padding: "30px 24px 52px", border: "1px solid var(--border)", borderBottom: "none" }}>
+      <div style={{
+        background: "var(--ink)", width: "100%", maxWidth: 520,
+        borderRadius: "20px 20px 0 0", padding: "30px 24px 52px",
+        border: "1px solid var(--border)", borderBottom: "none",
+        transformOrigin: "center bottom",
+        animation: submitState === "closing" ? "checkInClose 300ms ease-in forwards" : "none",
+      }}>
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
           <div>
@@ -180,9 +198,26 @@ function CheckInModal({ onSubmit, onClose }) {
           </div>
         </div>
 
-        <button onClick={() => onSubmit({ irritation, breakout, breakoutZones: breakout ? breakoutZones : [], tight, date: new Date().toISOString() })}
-          style={{ width: "100%", marginTop: 8, padding: "15px 0", background: "#7a9070", color: "#0d0f0d", border: "none", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}>
-          Submit Check-In
+        <button onClick={handleSubmit} disabled={submitState !== "idle"}
+          style={{
+            position: "relative",
+            width: "100%", marginTop: 8, padding: "15px 0",
+            background: "#7a9070", color: "#0d0f0d", border: "none", borderRadius: 10,
+            fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 700,
+            letterSpacing: "0.14em", textTransform: "uppercase",
+            cursor: submitState === "idle" ? "pointer" : "default",
+            overflow: "visible",
+          }}>
+          {submitState === "rippling" && (
+            <span aria-hidden="true" style={{
+              position: "absolute", top: "50%", left: "50%",
+              width: 80, height: 80, marginTop: -40, marginLeft: -40,
+              borderRadius: "50%", background: "#7a9070",
+              pointerEvents: "none",
+              animation: "checkInRipple 600ms ease-out forwards",
+            }} />
+          )}
+          <span style={{ position: "relative" }}>Submit Check-In</span>
         </button>
       </div>
     </div>
