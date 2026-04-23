@@ -270,31 +270,20 @@ function RitualProgressTracker({ completed, total }) {
   return (
     <div style={{
       position: "relative", height: 34, marginBottom: 22,
-      padding: "0 30px 0 10px",
+      padding: "0 10px",
     }}>
       {/* Shoreline ripple — warm taupe, visible on cream */}
       <svg viewBox="0 0 300 12" preserveAspectRatio="none"
-        style={{ position: "absolute", left: 10, right: 30, top: "50%", transform: "translateY(-50%)", width: "calc(100% - 40px)", height: 12, pointerEvents: "none" }}>
+        style={{ position: "absolute", left: 10, right: 10, top: "50%", transform: "translateY(-50%)", width: "calc(100% - 20px)", height: 12, pointerEvents: "none" }}>
         <path
           d="M0 6 C 25 2, 50 10, 75 6 C 100 2, 125 10, 150 6 C 175 2, 200 10, 225 6 C 250 2, 275 10, 300 6"
           stroke="rgba(139,115,85,0.55)" strokeWidth="1.1" fill="none" strokeLinecap="round" />
       </svg>
 
-      {/* Moon on the right — dark sage */}
-      <div style={{
-        position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)",
-        color: "#3a4134",
-        transition: "color 400ms ease, text-shadow 400ms ease",
-        textShadow: allDone ? "0 0 10px rgba(58,65,52,0.35)" : "none",
-        display: "inline-flex",
-      }}>
-        <Icon name="moon" size={14} />
-      </div>
-
-      {/* Swan — dark sage, bobs continuously, glides to the moon */}
+      {/* Swan — dark sage, bobs continuously, glides along the shoreline */}
       <div style={{
         position: "absolute", top: "50%",
-        left: `calc(10px + (100% - 50px) * ${pct})`,
+        left: `calc(10px + (100% - 30px) * ${pct})`,
         transform: "translate(-50%, -50%)",
         transition: "left 400ms ease",
         pointerEvents: "none",
@@ -373,10 +362,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
 
       {/* -- Swan guiding line ---------------------------------------------- */}
       {guidingLine && (
-        <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 22 }}>
-          <span style={{ color: "var(--clay)", flexShrink: 0, display: "inline-flex" }}><SwanIcon size={16} /></span>
-          <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 19, fontWeight: 400, color: "var(--clay)", margin: 0, lineHeight: 1.4, letterSpacing: "0.01em" }}>{guidingLine}</p>
-        </div>
+        <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 19, fontWeight: 400, color: "var(--clay)", margin: "0 0 22px", lineHeight: 1.4, letterSpacing: "0.01em" }}>{guidingLine}</p>
       )}
 
       {/* -- Ritual Mode Card ---------------------------------------------- */}
