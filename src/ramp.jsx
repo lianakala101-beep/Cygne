@@ -217,12 +217,34 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, on
   const [justActioned, setJustActioned] = useState(null); // "advance" | "hold" | null
   const [confirmReset, setConfirmReset] = useState(false);
   const [pickedDate, setPickedDate] = useState("");
+  const [graduating, setGraduating] = useState(false);
   const weekNumber = weekNumberProp ?? getRampWeek(product);
   const phase = getRampPhase(schedule, weekNumber);
   const phaseIndex = schedule.phases.findIndex(p => p.weeks.includes(Math.min(weekNumber, 12)));
   const isHeld = product.rampHeld === true;
   const clampedPhaseIndex = Math.min(phaseIndex, schedule.phases.length - 1);
   const startedLabel = formatStartedLabel(product.routineStartDate);
+
+  // Graduation: matches recordRampAction's "currentWeek >= maxWeek" guard,
+  // so a "handled" tap at the final week would clear routineStartDate and
+  // remove the product from Introduce Slowly. We intercept that single tap
+  // with a ceremonial confirmation before letting the parent's handler run.
+  const maxWeek = Math.max(...schedule.phases[schedule.phases.length - 1].weeks);
+  const isFinalWeek = weekNumber >= maxWeek;
+
+  const handleAdvanceClick = () => {
+    if (isFinalWeek) {
+      setGraduating(true);
+    } else {
+      onAdvance(product.id);
+      setJustActioned("advance");
+    }
+  };
+
+  const confirmGraduation = () => {
+    setGraduating(false);
+    onAdvance(product.id);
+  };
 
   // Verify calendar-based progression at render time.
   useEffect(() => {
@@ -304,7 +326,7 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, on
                 <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600, color: "#8b7355", margin: "0 0 2px" }}>Paused — repeat this week</p>
                 <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", margin: 0, opacity: 0.7 }}>When you're ready, mark as handled to advance.</p>
               </div>
-              <button onClick={() => { onAdvance(product.id); setJustActioned("advance"); }}
+              <button onClick={handleAdvanceClick}
                 style={{ width: "100%", padding: "10px 0", background: "rgba(122,144,112,0.12)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 10, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer", transition: "all 0.18s" }}
                 onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.2)"}
                 onMouseLeave={e => e.currentTarget.style.background = "rgba(122,144,112,0.12)"}>
@@ -313,7 +335,7 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, on
             </div>
           ) : (
             <div style={{ display: "flex", gap: 8 }}>
-              <button onClick={() => { onAdvance(product.id); setJustActioned("advance"); }}
+              <button onClick={handleAdvanceClick}
                 style={{ flex: 1, padding: "10px 0", background: "rgba(122,144,112,0.12)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 10, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer", transition: "all 0.18s" }}
                 onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.2)"}
                 onMouseLeave={e => e.currentTarget.style.background = "rgba(122,144,112,0.12)"}>
@@ -367,6 +389,55 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, on
                 Reset start date
               </button>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Graduation modal — appears once when the user marks the final
+          week as handled. No auto-dismiss; user must tap to confirm. */}
+      {graduating && (
+        <div style={{
+          position: "fixed", inset: 0, zIndex: 250,
+          background: "rgba(8,10,9,0.55)", backdropFilter: "blur(6px)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          padding: "0 24px",
+        }}>
+          <div style={{
+            background: "#2a3a2b",
+            color: "#e8e0c8",
+            border: "1px solid rgba(232,224,200,0.16)",
+            borderRadius: 18,
+            padding: "34px 28px 26px",
+            maxWidth: 360, width: "100%",
+            textAlign: "center",
+          }}>
+            <p style={{
+              fontFamily: "Reenie Beanie, cursive",
+              fontSize: 26, lineHeight: 1.4,
+              color: "#e8e0c8",
+              letterSpacing: "0.02em",
+              margin: "0 0 22px",
+              whiteSpace: "pre-line",
+            }}>
+              {"Your skin has made its peace with this one.\nIt's ready to stay."}
+            </p>
+            <button onClick={confirmGraduation}
+              style={{
+                padding: "12px 24px",
+                background: "rgba(122,144,112,0.22)",
+                color: "#e8e0c8",
+                border: "1px solid rgba(232,224,200,0.28)",
+                borderRadius: 10,
+                fontFamily: "Space Grotesk, sans-serif",
+                fontSize: 11, fontWeight: 600,
+                letterSpacing: "0.18em", textTransform: "uppercase",
+                cursor: "pointer",
+                transition: "background 0.18s",
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.32)"}
+              onMouseLeave={e => e.currentTarget.style.background = "rgba(122,144,112,0.22)"}>
+              Resume Routine
+            </button>
           </div>
         </div>
       )}
