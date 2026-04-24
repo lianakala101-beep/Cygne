@@ -681,12 +681,6 @@ export default function App() {
           from { opacity: 0; }
           to   { opacity: 1; }
         }
-        @keyframes waterLight {
-          0%   { background: #2a3a2b; }
-          33%  { background: #2e3f2f; }
-          66%  { background: #273827; }
-          100% { background: #2a3a2b; }
-        }
         .theme-dark option { background: #1a1c1a; color: #e8e2d9; }
         .theme-light option { background: #f7f4f0; color: #1a1612; }
         .theme-light input,
