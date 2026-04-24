@@ -323,6 +323,25 @@ function getDayIndex() {
 
 const NO_DATA_LINE = "Log a few check-ins and I'll have something for you soon.";
 
+// Split the SwanSense insight into lines (prefers explicit line breaks,
+// falls back to sentence boundaries) and stagger a fadeInLine animation
+// across each segment.
+function renderInsightLines(text) {
+  const raw = String(text || "");
+  const byBreak = raw.split(/\n+/).map(s => s.trim()).filter(Boolean);
+  const segments = byBreak.length > 1
+    ? byBreak
+    : raw.split(/(?<=[.!?])\s+/).map(s => s.trim()).filter(Boolean);
+  return segments.map((seg, i) => (
+    <span key={i} style={{
+      display: "block",
+      opacity: 0,
+      animation: "fadeInLine 0.8s ease-in forwards",
+      animationDelay: `${i * 0.5}s`,
+    }}>{seg}</span>
+  ));
+}
+
 function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = {}, predictions = [] }) {
   const now = new Date();
   const isBirthday = user.birthMonth && user.birthDay &&
@@ -381,7 +400,7 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
           </div>
           <div style={{ height: 1, background: "rgba(232,226,217,0.12)", marginBottom: 18 }} />
 
-          <p style={{ fontFamily: "var(--cursive)", fontSize: 32, fontWeight: 400, lineHeight: 1.5, color: "#e8e3d6", letterSpacing: "0.02em", margin: "0 0 18px" }}>{line}</p>
+          <p style={{ fontFamily: "var(--cursive)", fontSize: 32, fontWeight: 400, lineHeight: 1.5, color: "#e8e3d6", letterSpacing: "0.02em", margin: "0 0 18px" }}>{renderInsightLines(line)}</p>
 
           {/* Show first prediction detail in popup */}
           {hasMeaningful && meaningfulPredictions[0].detail && (
@@ -423,7 +442,7 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
           <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 8, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(232,226,217,0.55)", margin: 0 }}>Swan Song</p>
         </div>
 
-        <p style={{ fontFamily: "var(--cursive)", fontSize: 22, fontWeight: 400, lineHeight: 1.5, color: "rgba(232,227,214,0.85)", letterSpacing: "0.02em", margin: 0 }}>{line}</p>
+        <p style={{ fontFamily: "var(--cursive)", fontSize: 22, fontWeight: 400, lineHeight: 1.5, color: "rgba(232,227,214,0.85)", letterSpacing: "0.02em", margin: 0 }}>{renderInsightLines(line)}</p>
       </div>
     </div>
   );

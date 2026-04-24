@@ -677,6 +677,10 @@ export default function App() {
           from { transform: scale(1); opacity: 1; }
           to   { transform: scale(0.96); opacity: 0; }
         }
+        @keyframes fadeInLine {
+          from { opacity: 0; }
+          to   { opacity: 1; }
+        }
         .theme-dark option { background: #1a1c1a; color: #e8e2d9; }
         .theme-light option { background: #f7f4f0; color: #1a1612; }
         .theme-light input,
