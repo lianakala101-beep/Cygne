@@ -685,7 +685,6 @@ export default function App() {
           from { opacity: 0; transform: translateY(12px); }
           to   { opacity: 1; transform: translateY(0); }
         }
-        .cygne-home-bg { background: #2a3a2b; }
         .cygne-swansong-intro { animation: cygneSwanSongIntro 500ms 200ms ease-out both; }
         .theme-dark option { background: #1a1c1a; color: #e8e2d9; }
         .theme-light option { background: #f7f4f0; color: #1a1612; }
