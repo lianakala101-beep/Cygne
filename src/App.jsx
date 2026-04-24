@@ -81,7 +81,7 @@ export default function App() {
   const [locationDenied, setLocationDenied] = useLocalStorage("cygne_locationdenied", false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [waitingRoom, setWaitingRoom] = useLocalStorage("cygne_waitingroom", []);
-  const [completedSteps, setCompletedSteps] = useLocalStorage("cygne_completedsteps", { date: null, steps: [] });
+  const [completedSteps, setCompletedSteps] = useState({ date: null, steps: [] });
   const [rampLog, setRampLog] = useLocalStorage("cygne_ramp_log", []);
   const [fitSheet, setFitSheet] = useState(null);
   const [reflections, setReflections] = useLocalStorage("cygne_reflections", []);

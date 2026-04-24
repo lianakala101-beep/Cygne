@@ -89,26 +89,12 @@ function buildRoutine(products, { pausedActives = [] } = {}) {
   );
   const daily = products.filter(p => !periodic.includes(p));
   daily.forEach(p => {
-    // User-specified session overrides all auto-detection
-    if (p.session === "am")   { am.push(p); return; }
-    if (p.session === "pm")   { pm.push(p); return; }
-    if (p.session === "both") { am.push(p); pm.push(p); return; }
-
-    // Auto-detection fallback
-    const actives = detectActives(p.ingredients);
-    const isToningPad = p.category === "Toning Pad";
-    if (isToningPad) {
-      const hasBHA = actives["BHA"];
-      const hasAHA = actives["AHA"];
-      if (hasAHA && !hasBHA) { pm.push(p); }
-      else { am.push(p); pm.push(p); }
-      return;
-    }
-    const hasPMOnly = Object.keys(actives).some(a => ACTIVE_RULES[a]?.pmOnly);
-    const hasAMPref = Object.keys(actives).some(a => ACTIVE_SESSION[a] === "am");
-    if (hasPMOnly) { pm.push(p); }
-    else if (hasAMPref) { am.push(p); if (["Cleanser", "Moisturizer", "Toner", "Essence", "Mist"].includes(p.category)) pm.push(p); }
-    else { am.push(p); pm.push(p); }
+    // Strict filter by the product's assigned session. Any value other than
+    // "am" or "pm" — including undefined, null, "auto", or "both" — defaults
+    // to AM+PM so the product appears in both routines.
+    if (p.session === "am") { am.push(p); return; }
+    if (p.session === "pm") { pm.push(p); return; }
+    am.push(p); pm.push(p);
   });
   const sort = (arr, session) => {
     const seen = new Set();
