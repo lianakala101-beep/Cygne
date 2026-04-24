@@ -51,7 +51,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
   ];
 
   return (
-    <div>
+    <div style={{ background: "#2a3a2b", animation: "waterLight 8s ease-in-out infinite" }}>
       {/* Hero */}
       <div style={{ marginBottom: products.length === 0 ? 28 : 36 }}>
         <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 8px" }}>
