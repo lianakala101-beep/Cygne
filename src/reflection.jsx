@@ -629,16 +629,18 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
       color: TEXT,
     }}>
       {/* Header */}
-      <div style={{ maxWidth: 560, margin: "0 auto 36px", textAlign: "center" }}>
+      <div style={{ maxWidth: 560, margin: "0 auto 18px", textAlign: "center" }}>
         <p style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: "0 0 8px" }}>
           Reflection
         </p>
-        <h1 style={{ fontFamily: CURSIVE, fontSize: 54, color: TEXT, margin: "0 0 10px", letterSpacing: "0.02em", lineHeight: 1.05 }}>
+        <h1 style={{ fontFamily: CURSIVE, fontSize: 28, color: TEXT, margin: "0 0 10px", letterSpacing: "0.02em", lineHeight: 1.05 }}>
           A living gallery.
         </h1>
-        <p style={{ fontFamily: SANS, fontSize: 12, color: TEXT_SOFT, margin: 0, lineHeight: 1.75, maxWidth: 360, marginLeft: "auto", marginRight: "auto" }}>
-          One triptych a week. A quiet record of how your skin is moving through the seasons.
-        </p>
+        {reflections.length === 0 && (
+          <p style={{ fontFamily: SANS, fontSize: 12, color: TEXT_SOFT, margin: 0, lineHeight: 1.75, maxWidth: 360, marginLeft: "auto", marginRight: "auto" }}>
+            One triptych a week. A quiet record of how your skin is moving through the seasons.
+          </p>
+        )}
       </div>
 
       {error && (
@@ -647,9 +649,9 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
         </div>
       )}
 
-      <div style={{ textAlign: "center", marginBottom: 48 }}>
+      <div style={{ textAlign: "center", marginBottom: 24 }}>
         {capturedThisWeek ? (
-          <p style={{ fontFamily: SANS, fontSize: 10, letterSpacing: "0.24em", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: 0 }}>
+          <p style={{ fontFamily: CURSIVE, fontSize: 16, letterSpacing: "0.05em", color: TEXT_SOFT, opacity: 0.7, margin: 0 }}>
             Captured — return on your next reset day
           </p>
         ) : (
