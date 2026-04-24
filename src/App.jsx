@@ -669,9 +669,9 @@ export default function App() {
           50%  { transform: scale(1.06); opacity: 0.7; }
           100% { transform: scale(1); opacity: 1; }
         }
-        @keyframes checkInRipple {
-          from { transform: scale(1); opacity: 0.4; }
-          to   { transform: scale(2.5); opacity: 0; }
+        @keyframes checkInRing {
+          from { transform: scale(1); opacity: 1; }
+          to   { transform: scale(1.75); opacity: 0; }
         }
         @keyframes checkInClose {
           from { transform: scale(1); opacity: 1; }

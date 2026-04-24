@@ -209,13 +209,24 @@ function CheckInModal({ onSubmit, onClose }) {
             overflow: "visible",
           }}>
           {submitState === "rippling" && (
-            <span aria-hidden="true" style={{
-              position: "absolute", top: "50%", left: "50%",
-              width: 80, height: 80, marginTop: -40, marginLeft: -40,
-              borderRadius: "50%", background: "#7a9070",
-              pointerEvents: "none",
-              animation: "checkInRipple 600ms ease-out forwards",
-            }} />
+            <>
+              <span aria-hidden="true" style={{
+                position: "absolute", inset: 0,
+                borderRadius: 10,
+                border: "1.5px solid rgba(210,200,170,0.5)",
+                pointerEvents: "none",
+                transformOrigin: "center",
+                animation: "checkInRing 600ms ease-out forwards",
+              }} />
+              <span aria-hidden="true" style={{
+                position: "absolute", inset: 0,
+                borderRadius: 10,
+                border: "1.5px solid rgba(210,200,170,0.5)",
+                pointerEvents: "none",
+                transformOrigin: "center",
+                animation: "checkInRing 600ms ease-out 300ms forwards",
+              }} />
+            </>
           )}
           <span style={{ position: "relative" }}>Submit Check-In</span>
         </button>
