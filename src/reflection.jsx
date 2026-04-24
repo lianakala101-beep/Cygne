@@ -61,6 +61,20 @@ export function weekLabel(weekNumber) {
   return "The Longest Night";
 }
 
+// Lunar phase for a given date — names only, no glyphs.
+export function getMoonPhase(date) {
+  const phases = [
+    "New Moon", "Waxing Crescent", "First Quarter", "Waxing Gibbous",
+    "Full Moon", "Waning Gibbous", "Last Quarter", "Waning Crescent",
+  ];
+  const synodicMonth = 29.53058867;
+  const knownNewMoon = new Date("2000-01-06T18:14:00Z");
+  const daysSince = (date - knownNewMoon) / (1000 * 60 * 60 * 24);
+  const phase = ((daysSince % synodicMonth) + synodicMonth) % synodicMonth;
+  const index = Math.round(phase / (synodicMonth / 8)) % 8;
+  return phases[index];
+}
+
 function formatDateLong(iso) {
   const d = new Date(iso);
   return d.toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" });
@@ -429,7 +443,7 @@ function ExpandedEntry({ entry, onClose }) {
         Week {entry.weekNumber}
       </p>
       <h2 style={{ fontFamily: CURSIVE, fontSize: 38, color: TEXT, margin: "0 0 4px", letterSpacing: "0.02em", textAlign: "center" }}>
-        {weekLabel(entry.weekNumber)}
+        {getMoonPhase(new Date(entry.date))}
       </h2>
       <p style={{ fontFamily: SANS, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: "0 0 26px" }}>
         {formatDateLong(entry.date)}
@@ -511,7 +525,7 @@ function GalleryEntry({ entry, onExpand, caption }) {
         Week {entry.weekNumber}
       </p>
       <h3 style={{ fontFamily: CURSIVE, fontSize: 32, color: TEXT, margin: "0 0 3px", letterSpacing: "0.02em" }}>
-        {weekLabel(entry.weekNumber)}
+        {getMoonPhase(new Date(entry.date))}
       </h3>
       <p style={{ fontFamily: SANS, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: TEXT_SOFT, margin: "0 0 18px", opacity: 0.7 }}>
         {formatDateLong(entry.date)}
