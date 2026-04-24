@@ -324,8 +324,13 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
   const [showRitualCheckIn, setShowRitualCheckIn] = useState(false);
   const todayCheckedIn = checkIns.some(c => c.date === today);
   const completedSteps = todaySteps;
+  // Check-in state is isolated per session: each entry is stored as
+  // `${session}_${productId}` so AM and PM completion never overlap.
+  const stepKey = (id) => `${session}_${id}`;
+  const isStepChecked = (id) => completedSteps.includes(stepKey(id));
   const toggleStep = (id) => {
-    const updated = completedSteps.includes(id) ? completedSteps.filter(x => x !== id) : [...completedSteps, id];
+    const key = stepKey(id);
+    const updated = completedSteps.includes(key) ? completedSteps.filter(x => x !== key) : [...completedSteps, key];
     const newState = { date: today, steps: updated };
     if (setCompletedStepsProp) setCompletedStepsProp(newState);
     // Sync to Supabase via user metadata
@@ -336,7 +341,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
   const baseSteps = session === "am" ? am : pm;
   const steps = ritualMode.filterSteps(baseSteps);
   const filteredOut = baseSteps.filter(s => !steps.find(x => x.id === s.id));
-  const allDone = steps.length > 0 && steps.every(s => completedSteps.includes(s.id));
+  const allDone = steps.length > 0 && steps.every(s => isStepChecked(s.id));
   const sessionLabel = session === "am" ? "Morning" : "Evening";
   const sessionIcon  = session === "am" ? "sun" : "moon";
 
@@ -420,7 +425,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
       {/* Steps */}
       {steps.length > 0
         ? <Section title={`${steps.length} steps — apply in this order`} icon="layers">
-            <RitualProgressTracker completed={steps.filter(s => completedSteps.includes(s.id)).length} total={steps.length} />
+            <RitualProgressTracker completed={steps.filter(s => isStepChecked(s.id)).length} total={steps.length} />
             <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", opacity: 0.5, margin: "-4px 0 16px", lineHeight: 1.6, letterSpacing: "0.02em" }}>
               Tap the circle next to each step to check it off as you go.
             </p>
@@ -429,7 +434,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
               step={p}
               index={i}
               isLast={i === steps.length - 1}
-              checked={completedSteps.includes(p.id)}
+              checked={isStepChecked(p.id)}
               onCheck={() => toggleStep(p.id)}
               scheduled={isScheduledToday(p)}
             />)}</div>
