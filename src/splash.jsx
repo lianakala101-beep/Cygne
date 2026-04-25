@@ -14,7 +14,7 @@ function SplashScreen({ onDone }) {
     <div
       style={{
         position: "fixed", inset: 0, zIndex: 9999,
-        background: "#3a4134",
+        background: "#323d30",
         display: "flex", flexDirection: "column",
         justifyContent: "flex-start",
         opacity: fading ? 0 : 1,

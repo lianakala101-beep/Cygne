@@ -60,7 +60,7 @@ function AuthScreen({ onAuth }) {
   const handleKeyDown = (e) => { if (e.key === "Enter") handleSubmit(); };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#3a4134", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between", padding: "0 36px" }}>
+    <div style={{ minHeight: "100vh", background: "#323d30", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between", padding: "0 36px" }}>
 
       {/* Top — logo */}
       <div style={{ paddingTop: 72, width: "100%", maxWidth: 380 }}>

@@ -33,7 +33,7 @@ export async function compressImage(file, maxDim = 800, quality = 0.7) {
 function SwanWelcomeScreen({ user, onDone }) {
   const name = user?.name && user.name !== "Friend" ? user.name.split(" ")[0] : null;
   return (
-    <div style={{ position: "fixed", inset: 0, background: "#3a4134", display: "flex", flexDirection: "column", alignItems: "flex-start", justifyContent: "space-between", padding: "72px 36px 64px", zIndex: 500 }}>
+    <div style={{ position: "fixed", inset: 0, background: "#323d30", display: "flex", flexDirection: "column", alignItems: "flex-start", justifyContent: "space-between", padding: "72px 36px 64px", zIndex: 500 }}>
       <div>
         <div style={{ marginBottom: 32, color: "rgba(232,226,217,0.95)" }}><SwanIcon size={56} /></div>
         <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(232,226,217,0.5)", margin: "0 0 14px" }}>

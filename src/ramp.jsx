@@ -87,7 +87,7 @@ const RAMP_SCHEDULES = {
   },
   BHA: {
     label: "BHA Exfoliant",
-    color: "#7a9070",
+    color: "#6e8a72",
     colorBg: "rgba(122,144,112,0.08)",
     colorBorder: "rgba(122,144,112,0.22)",
     phases: [

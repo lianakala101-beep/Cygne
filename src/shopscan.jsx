@@ -87,7 +87,7 @@ function ShopScanModal({ products, user = {}, onClose }) {
   };
 
   const verdictConfig = {
-    love:  { color: "#7a9070",  bg: "rgba(122,144,112,0.08)", border: "rgba(122,144,112,0.25)", label: "Your skin would love this" },
+    love:  { color: "#6e8a72",  bg: "rgba(122,144,112,0.08)", border: "rgba(122,144,112,0.25)", label: "Your skin would love this" },
     maybe: { color: "#8b7355",      bg: "rgba(139,115,85,0.08)",  border: "rgba(139,115,85,0.25)",  label: "Think twice" },
     skip:  { color: "#8b7355",      bg: "rgba(139,115,85,0.08)",   border: "rgba(139,115,85,0.25)",   label: "Not for you" },
   };
@@ -131,7 +131,7 @@ function ShopScanModal({ products, user = {}, onClose }) {
                 <div style={{ marginTop: 16, padding: "12px 14px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10 }}>
                   <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 6px" }}>Checking against your skin</p>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-                    {user.skinType && <span style={{ fontSize: 10, fontFamily: "Space Grotesk, sans-serif", color: "#7a9070", background: "rgba(122,144,112,0.1)", border: "1px solid rgba(122,144,112,0.25)", padding: "2px 9px", borderRadius: 20 }}>{user.skinType}</span>}
+                    {user.skinType && <span style={{ fontSize: 10, fontFamily: "Space Grotesk, sans-serif", color: "#6e8a72", background: "rgba(122,144,112,0.1)", border: "1px solid rgba(122,144,112,0.25)", padding: "2px 9px", borderRadius: 20 }}>{user.skinType}</span>}
                     {(user.concerns || []).map((c, i) => <span key={i} style={{ fontSize: 10, fontFamily: "Space Grotesk, sans-serif", color: "var(--clay)", background: "var(--surface)", border: "1px solid var(--border)", padding: "2px 9px", borderRadius: 20 }}>{c}</span>)}
                   </div>
                 </div>
@@ -144,7 +144,7 @@ function ShopScanModal({ products, user = {}, onClose }) {
             <div style={{ textAlign: "center", padding: "40px 0" }}>
               {imgPreview && <img src={imgPreview} alt="" style={{ width: 120, height: 120, objectFit: "cover", borderRadius: 12, marginBottom: 20, opacity: 0.6 }} />}
               <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 10 }}>
-                <div style={{ width: 14, height: 14, border: "1.5px solid #7a9070", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+                <div style={{ width: 14, height: 14, border: "1.5px solid #6e8a72", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
                 <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)" }}>Reading the ingredients...</span>
               </div>
               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", opacity: 0.5, margin: 0 }}>Checking against your skin and vanity</p>
@@ -199,7 +199,7 @@ function ShopScanModal({ products, user = {}, onClose }) {
               {/* Fills a gap */}
               {result.fillsGap && result.gap && (
                 <div style={{ padding: "11px 14px", background: "rgba(122,144,112,0.06)", border: "1px solid rgba(122,144,112,0.2)", borderRadius: 10, marginBottom: 10 }}>
-                  <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "#7a9070", margin: "0 0 4px" }}>Fills a gap</p>
+                  <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "#6e8a72", margin: "0 0 4px" }}>Fills a gap</p>
                   <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{result.gap}</p>
                 </div>
               )}
@@ -219,7 +219,7 @@ function ShopScanModal({ products, user = {}, onClose }) {
                   Scan Another
                 </button>
                 <button onClick={onClose}
-                  style={{ flex: 1, padding: "12px 0", background: "#7a9070", border: "none", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "#0d0f0d", fontWeight: 700, cursor: "pointer", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                  style={{ flex: 1, padding: "12px 0", background: "#6e8a72", border: "none", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "#0d0f0d", fontWeight: 700, cursor: "pointer", letterSpacing: "0.1em", textTransform: "uppercase" }}>
                   Done
                 </button>
               </div>

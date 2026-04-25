@@ -25,7 +25,7 @@ function ScanModal({ products, onAddToShelf, onClose }) {
   const searchTimeout = useRef(null);
 
   const verdictConfig = {
-    pass:    { color: "#7a9070", bg: "rgba(122,144,112,0.10)", border: "rgba(122,144,112,0.35)", label: "Good fit" },
+    pass:    { color: "#6e8a72", bg: "rgba(122,144,112,0.10)", border: "rgba(122,144,112,0.35)", label: "Good fit" },
     caution: { color: "#8b7355", bg: "rgba(139,115,85,0.08)",  border: "rgba(139,115,85,0.30)",  label: "Use with care" },
     skip:    { color: "#8b7355", bg: "rgba(139,115,85,0.08)",   border: "rgba(139,115,85,0.30)",   label: "Skip this one" },
   };
@@ -267,7 +267,7 @@ function ScanModal({ products, onAddToShelf, onClose }) {
         {mode === "scanning" && (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "32px 0 24px", gap: 16 }}>
             {imgPreview && <img src={imgPreview} alt="" style={{ width: 100, height: 100, objectFit: "cover", borderRadius: 12, opacity: 0.7 }} />}
-            <div style={{ width: 28, height: 28, border: "2px solid #7a9070", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+            <div style={{ width: 28, height: 28, border: "2px solid #6e8a72", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
             <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", margin: 0 }}>Reading the label…</p>
           </div>
         )}
@@ -315,7 +315,7 @@ function ScanModal({ products, onAddToShelf, onClose }) {
             {scanned.actives && scanned.actives.length > 0 && (
               <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 16 }}>
                 {scanned.actives.map((a, i) => (
-                  <span key={i} style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", color: "#7a9070", background: "rgba(122,144,112,0.1)", padding: "3px 10px", borderRadius: 20, border: "1px solid rgba(122,144,112,0.25)", letterSpacing: "0.1em", textTransform: "uppercase" }}>{a}</span>
+                  <span key={i} style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", color: "#6e8a72", background: "rgba(122,144,112,0.1)", padding: "3px 10px", borderRadius: 20, border: "1px solid rgba(122,144,112,0.25)", letterSpacing: "0.1em", textTransform: "uppercase" }}>{a}</span>
                 ))}
               </div>
             )}
@@ -328,7 +328,7 @@ function ScanModal({ products, onAddToShelf, onClose }) {
                   {verdict === "skip" ? "Add anyway" : "Save to Vanity"}
                 </button>
               ) : (
-                <div style={{ flex: 1, padding: "13px 0", background: "rgba(122,144,112,0.1)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 12, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "#7a9070" }}>
+                <div style={{ flex: 1, padding: "13px 0", background: "rgba(122,144,112,0.1)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 12, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "#6e8a72" }}>
                   <Icon name="check" size={12} /> Saved to Vanity
                 </div>
               )}
@@ -457,7 +457,7 @@ function assessRoutineFit(product, products, checkIns = [], user = {}) {
 }
 
 const DEFER_TAG_CONFIG = {
-  season:  { color: "#7a9070", bg: "rgba(122,144,112,0.10)", label: "Seasonal hold" },
+  season:  { color: "#6e8a72", bg: "rgba(122,144,112,0.10)", label: "Seasonal hold" },
   ramp:    { color: "#8b7355", bg: "rgba(139,115,85,0.10)",  label: "Ritual at capacity" },
   skin:    { color: "#8b7355", bg: "rgba(139,115,85,0.10)",   label: "Skin recovery" },
   overlap: { color: "#8b7355", bg: "rgba(139,115,85,0.10)", label: "Redundant active" },
