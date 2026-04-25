@@ -35,7 +35,7 @@ function SplashScreen({ onDone }) {
           }}
         />
         <p style={{
-          fontFamily: "'Reenie Beanie', cursive",
+          fontFamily: "'Pinyon Script', cursive",
           fontSize: 22, fontWeight: 400,
           color: "rgba(232,227,214,0.95)",
           margin: "6px 0 0 130px",

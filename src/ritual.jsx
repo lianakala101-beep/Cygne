@@ -94,7 +94,7 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
         <div style={{ minWidth: 0 }}>
           <div style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--sage)", marginBottom: 6 }}>{product.category}</div>
-          <h3 style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 22, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: "0 0 2px", lineHeight: 1.15 }}>{product.name}</h3>
+          <h3 style={{ fontFamily: "Pinyon Script, cursive", fontSize: 22, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: "0 0 2px", lineHeight: 1.15 }}>{product.name}</h3>
           <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, letterSpacing: "0.04em" }}>{product.brand}</p>
         </div>
         <div ref={menuRef} style={{ position: "relative", flexShrink: 0, marginLeft: 8 }}>
@@ -275,7 +275,7 @@ function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }
                 {!scheduled && <span style={{ marginLeft: 8, color: "var(--taupe)", opacity: 0.75 }}>· Skipped today</span>}
               </div>
               <p style={{
-                fontFamily: "Reenie Beanie, cursive", fontSize: 22, fontWeight: 400,
+                fontFamily: "Pinyon Script, cursive", fontSize: 22, fontWeight: 400,
                 letterSpacing: "0.02em", color: nameColor, margin: "0 0 2px",
                 opacity: checked ? 0.6 : 1,
                 textDecoration: checked ? "line-through" : "none",
@@ -386,9 +386,20 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
           borderRadius: 22,
           padding: "28px 26px 24px",
           overflow: "hidden",
+          isolation: "isolate",
           boxShadow: "0 24px 60px rgba(0,0,0,0.7), 0 1px 0 rgba(232,220,180,0.06) inset",
           border: "1px solid rgba(139,115,85,0.22)",
         }}>
+          <span aria-hidden="true" style={{
+            position: "absolute", top: "50%", left: "50%",
+            transform: "translate(-50%, -50%)",
+            fontFamily: "'Pinyon Script', cursive",
+            fontSize: 160, lineHeight: 1,
+            color: "#f5f0e8", opacity: 0.07,
+            pointerEvents: "none", userSelect: "none",
+            whiteSpace: "nowrap",
+            zIndex: -1,
+          }}>Cygne</span>
           <div style={{ position: "absolute", inset: 0, borderRadius: 22, pointerEvents: "none", backgroundImage: grain, backgroundSize: "180px 180px", opacity: 0.7 }} />
           <div style={{ position: "absolute", inset: 0, borderRadius: 22, pointerEvents: "none", background: "radial-gradient(ellipse at 85% 15%, rgba(139,115,85,0.12) 0%, transparent 65%)" }} />
           <div style={{ position: "absolute", bottom: 14, right: 18, opacity: 0.18, color: "rgba(232,220,180,0.9)", pointerEvents: "none" }}><SwanIcon size={56} /></div>
@@ -432,9 +443,20 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
         borderRadius: 14,
         padding: "16px 18px 14px",
         overflow: "hidden",
+        isolation: "isolate",
         boxShadow: "0 4px 18px rgba(0,0,0,0.35)",
         border: "1px solid rgba(139,115,85,0.15)",
       }}>
+        <span aria-hidden="true" style={{
+          position: "absolute", top: "50%", left: "50%",
+          transform: "translate(-50%, -50%)",
+          fontFamily: "'Pinyon Script', cursive",
+          fontSize: 160, lineHeight: 1,
+          color: "#f5f0e8", opacity: 0.07,
+          pointerEvents: "none", userSelect: "none",
+          whiteSpace: "nowrap",
+          zIndex: -1,
+        }}>Cygne</span>
         <div style={{ position: "absolute", inset: 0, borderRadius: 14, pointerEvents: "none", backgroundImage: grain, backgroundSize: "180px 180px", opacity: 0.6 }} />
         <div style={{ position: "absolute", bottom: 8, right: 12, opacity: 0.18, color: "rgba(232,220,180,0.9)", pointerEvents: "none" }}><SwanIcon size={44} /></div>
 
@@ -500,7 +522,7 @@ function FlightModeModal({ products, activeMap, onClose }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
           <div>
             <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 5px" }}>Flight Day</p>
-            <h2 style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 22, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: 0, lineHeight: 1.1 }}>Your Ritual, Anywhere</h2>
+            <h2 style={{ fontFamily: "Pinyon Script, cursive", fontSize: 22, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: 0, lineHeight: 1.1 }}>Your Ritual, Anywhere</h2>
           </div>
           <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: 4 }}><Icon name="x" size={17} /></button>
         </div>

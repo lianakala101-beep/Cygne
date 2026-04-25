@@ -65,7 +65,7 @@ function AuthScreen({ onAuth }) {
       {/* Top — logo */}
       <div style={{ paddingTop: 72, width: "100%", maxWidth: 380 }}>
         <img src={LOGO_SRC} alt="Cygne" style={{ height: 140, width: "auto", display: "block", filter: "brightness(1.25) contrast(1.05)", mixBlendMode: "lighten" }} />
-        <p style={{ fontFamily: "'Reenie Beanie', cursive", fontSize: 22, fontWeight: 400, color: "rgba(232,227,214,0.95)", margin: "6px 0 0 110px", letterSpacing: "0.05em", lineHeight: 1 }}>built around you</p>
+        <p style={{ fontFamily: "'Pinyon Script', cursive", fontSize: 22, fontWeight: 400, color: "rgba(232,227,214,0.95)", margin: "6px 0 0 110px", letterSpacing: "0.05em", lineHeight: 1 }}>built around you</p>
       </div>
 
       {/* Form */}

@@ -42,7 +42,7 @@ export default function App() {
   useEffect(() => {
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Reenie+Beanie&display=swap";
+    link.href = "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Pinyon+Script&display=swap";
     document.head.appendChild(link);
   }, []);
 
@@ -614,12 +614,12 @@ export default function App() {
     <div className={`theme-${theme}`} style={{ minHeight: "100vh", background: "var(--deep)", paddingBottom: 88, transition: "background 0.4s ease, color 0.4s ease" }}>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-      <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Reenie+Beanie&display=swap" rel="stylesheet" />
+      <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Pinyon+Script&display=swap" rel="stylesheet" />
       <style>{`
         :root {
           --sage:      #6e8a72;
-          --script:    'Reenie Beanie', cursive;
-          --cursive:   'Reenie Beanie', cursive;
+          --script:    'Pinyon Script', cursive;
+          --cursive:   'Pinyon Script', cursive;
           --sans:      'Space Grotesk', sans-serif;
         }
         .theme-dark {
@@ -724,7 +724,7 @@ export default function App() {
                 display: "flex", alignItems: "center", justifyContent: "center",
               }}>
                 <span style={{
-                  fontFamily: "Reenie Beanie, cursive",
+                  fontFamily: "Pinyon Script, cursive",
                   fontSize: 22,
                   color: "var(--sage)",
                   lineHeight: 1,

@@ -412,7 +412,7 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, on
             textAlign: "center",
           }}>
             <p style={{
-              fontFamily: "Reenie Beanie, cursive",
+              fontFamily: "Pinyon Script, cursive",
               fontSize: 26, lineHeight: 1.4,
               color: "#e8e0c8",
               letterSpacing: "0.02em",
@@ -650,7 +650,7 @@ function WeeklyRitualCalendar({ rampProducts, products }) {
           marginTop: 4,
         }}>
           <div style={{ padding: "14px 16px 12px", borderBottom: "1px solid var(--border)" }}>
-            <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 22, color: "var(--parchment)", margin: 0 }}>
+            <p style={{ fontFamily: "Pinyon Script, cursive", fontSize: 22, color: "var(--parchment)", margin: 0 }}>
               {selectedDayObj.full}
             </p>
           </div>
