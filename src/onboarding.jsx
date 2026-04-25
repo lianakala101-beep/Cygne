@@ -108,7 +108,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       <h2 style={obHeading}>What should we call you?</h2>
       <p style={obSub}>Your ritual will be built around you.</p>
       <div style={{ marginTop: 32 }}>
-        <input style={{ ...inputSt, fontSize: 22, fontFamily: "Reenie Beanie, cursive", letterSpacing: "0.02em", padding: "14px 16px" }} value={name} onChange={e => setName(e.target.value)} placeholder="Your first name" autoFocus />
+        <input style={{ ...inputSt, fontSize: 22, fontFamily: "Pinyon Script, cursive", letterSpacing: "0.02em", padding: "14px 16px" }} value={name} onChange={e => setName(e.target.value)} placeholder="Your first name" autoFocus />
       </div>
     </div>,
 
@@ -252,15 +252,15 @@ function OnboardingScreen({ onComplete, setLocationData }) {
           alt="Cygne"
           style={{ height: 170, width: "auto", display: "block", filter: "brightness(1.25) contrast(1.05)", mixBlendMode: "lighten" }}
         />
-        <p style={{ fontFamily: "'Reenie Beanie', cursive", fontSize: 22, fontWeight: 400, color: "rgba(232,227,214,0.95)", margin: "6px 0 0 130px", letterSpacing: "0.05em", lineHeight: 1 }}>built around you</p>
+        <p style={{ fontFamily: "'Pinyon Script', cursive", fontSize: 22, fontWeight: 400, color: "rgba(232,227,214,0.95)", margin: "6px 0 0 130px", letterSpacing: "0.05em", lineHeight: 1 }}>built around you</p>
       </div>
 
       {/* Bottom — welcome message + skin age + Enter button */}
       <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", padding: "0 36px 72px" }}>
-        <p style={{ fontFamily: "'Reenie Beanie', cursive", fontSize: 32, fontWeight: 400, color: "rgba(232,227,214,0.95)", margin: "0 0 6px", letterSpacing: "0.02em", lineHeight: 1.2 }}>
+        <p style={{ fontFamily: "'Pinyon Script', cursive", fontSize: 32, fontWeight: 400, color: "rgba(232,227,214,0.95)", margin: "0 0 6px", letterSpacing: "0.02em", lineHeight: 1.2 }}>
           {name ? `Welcome, ${name}.` : "Welcome."}
         </p>
-        <p style={{ fontFamily: "'Reenie Beanie', cursive", fontSize: 22, fontWeight: 400, color: "rgba(232,227,214,0.6)", margin: "0 0 24px", letterSpacing: "0.02em" }}>Your ritual begins.</p>
+        <p style={{ fontFamily: "'Pinyon Script', cursive", fontSize: 22, fontWeight: 400, color: "rgba(232,227,214,0.6)", margin: "0 0 24px", letterSpacing: "0.02em" }}>Your ritual begins.</p>
         {skinAge && (
           <div style={{ padding: "12px 16px", background: "rgba(232,227,214,0.06)", border: "1px solid rgba(232,227,214,0.15)", borderRadius: 12, marginBottom: 28, width: "100%" }}>
             <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(122,144,112,0.9)", margin: "0 0 5px" }}>{skinAge.bracket}</p>
@@ -351,7 +351,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
 
 // Onboarding text styles
 const obEyebrow = { fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 10px" };
-const obHeading = { fontFamily: "Reenie Beanie, cursive", fontSize: 36, fontWeight: 400, color: "var(--parchment)", margin: "0 0 8px", letterSpacing: "0.01em", lineHeight: 1.15 };
+const obHeading = { fontFamily: "Pinyon Script, cursive", fontSize: 36, fontWeight: 400, color: "var(--parchment)", margin: "0 0 8px", letterSpacing: "0.01em", lineHeight: 1.15 };
 const obSub = { fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "#6b5338", margin: 0, lineHeight: 1.7, opacity: 0.8 };
 const inputSt = { width: "100%", padding: "12px 16px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 14, color: "var(--parchment)", outline: "none" };
 const labelSt = { fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", display: "block", marginBottom: 6 };

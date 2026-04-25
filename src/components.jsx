@@ -129,7 +129,7 @@ function Wordmark({ size = 28, theme = "dark" }) {
   const h = Math.round(size * 1.1);
   if (theme === "light") {
     return (
-      <span style={{ fontFamily: "'Reenie Beanie', cursive", fontSize: size * 0.9, fontWeight: 400, color: "#1a1814", letterSpacing: "0.04em", lineHeight: 1, display: "block" }}>Cygne</span>
+      <span style={{ fontFamily: "'Pinyon Script', cursive", fontSize: size * 0.9, fontWeight: 400, color: "#1a1814", letterSpacing: "0.04em", lineHeight: 1, display: "block" }}>Cygne</span>
     );
   }
   return (

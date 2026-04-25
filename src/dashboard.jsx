@@ -57,7 +57,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             return user?.name ? `Good evening, ${user.name.split(" ")[0]}.` : "Good evening.";
           })()}
         </p>
-        <h1 style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 52, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: "0 0 4px", lineHeight: 1.0 }}>
+        <h1 style={{ fontFamily: "Pinyon Script, cursive", fontSize: 52, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: "0 0 4px", lineHeight: 1.0 }}>
           {products.length === 0 ? "Welcome." : "Your\nRitual."}
         </h1>
       </div>
@@ -73,7 +73,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           <div>
             <div style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: 28 }}>
               <span style={{ color: "var(--clay)", flexShrink: 0, marginTop: 6, display: "inline-flex" }}><SwanIcon size={18} /></span>
-              <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 21, color: "var(--clay)", margin: 0, lineHeight: 1.5 }}>
+              <p style={{ fontFamily: "Pinyon Script, cursive", fontSize: 21, color: "var(--clay)", margin: 0, lineHeight: 1.5 }}>
                 Your ritual lives here. Let's build it around you.
               </p>
             </div>
