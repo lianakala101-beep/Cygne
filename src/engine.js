@@ -89,11 +89,13 @@ function buildRoutine(products, { pausedActives = [] } = {}) {
   );
   const daily = products.filter(p => !periodic.includes(p));
   daily.forEach(p => {
-    // Strict filter by the product's assigned session. Any value other than
-    // "am" or "pm" — including undefined, null, "auto", or "both" — defaults
-    // to AM+PM so the product appears in both routines.
-    if (p.session === "am") { am.push(p); return; }
-    if (p.session === "pm") { pm.push(p); return; }
+    // Strict filter by the product's assigned session, but tolerant of how
+    // the schedule is stored: "pm"/"PM"/"PM only", "am"/"AM"/"AM only",
+    // "both"/"AM + PM", an array like ["am","pm"] or ["pm"], or boolean
+    // columns amEnabled/pmEnabled. null/undefined/unknown → AM+PM.
+    const session = resolveSession(p);
+    if (session === "am") { am.push(p); return; }
+    if (session === "pm") { pm.push(p); return; }
     am.push(p); pm.push(p);
   });
   const sort = (arr, session) => {
@@ -103,6 +105,50 @@ function buildRoutine(products, { pausedActives = [] } = {}) {
       .sort((a, b) => effectiveLayer(a, session) - effectiveLayer(b, session));
   };
   return { am: sort(am, "am"), pm: sort(pm, "pm"), periodic };
+}
+
+// Normalize whatever the product record uses for its routine schedule into
+// one of "am" | "pm" | "both". Handles every storage shape we've seen so a
+// PM-only product never leaks into the AM list because of casing or shape.
+function resolveSession(p) {
+  if (!p) return "both";
+
+  // 1. Separate boolean flags (amEnabled / pmEnabled or am / pm).
+  const amFlag = typeof p.amEnabled === "boolean" ? p.amEnabled
+               : typeof p.am === "boolean" ? p.am : null;
+  const pmFlag = typeof p.pmEnabled === "boolean" ? p.pmEnabled
+               : typeof p.pm === "boolean" ? p.pm : null;
+  if (amFlag !== null || pmFlag !== null) {
+    const a = amFlag === true;
+    const m = pmFlag === true;
+    if (a && !m) return "am";
+    if (m && !a) return "pm";
+    return "both";
+  }
+
+  // 2. Array form on either field.
+  const arr = Array.isArray(p.session) ? p.session
+            : Array.isArray(p.schedule) ? p.schedule
+            : null;
+  if (arr) {
+    const tokens = arr.map(s => String(s).toLowerCase());
+    const hasAm = tokens.some(s => s.includes("am"));
+    const hasPm = tokens.some(s => s.includes("pm"));
+    if (hasPm && !hasAm) return "pm";
+    if (hasAm && !hasPm) return "am";
+    return "both";
+  }
+
+  // 3. String form, case-insensitive, trimmed.
+  const raw = p.session ?? p.schedule;
+  if (raw == null) return "both";
+  const s = String(raw).toLowerCase().trim().replace(/\./g, "");
+  if (!s || s === "auto") return "both";
+  const hasAm = /\bam\b/.test(s) || s.startsWith("am");
+  const hasPm = /\bpm\b/.test(s) || s.startsWith("pm");
+  if (hasPm && !hasAm) return "pm";
+  if (hasAm && !hasPm) return "am";
+  return "both";
 }
 
 function detectConflicts(products) {
