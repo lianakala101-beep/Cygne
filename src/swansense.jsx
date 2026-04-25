@@ -172,7 +172,7 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
           headline: "Resilience window opening soon.",
           detail: "Follicular phase starts in a couple of days — your skin will be at peak tolerance for retinol and AHA. A good moment to be consistent with actives.",
           level: "positive",
-          color: "#7a9070",
+          color: "#6e8a72",
           bg: "rgba(122,144,112,0.07)",
           border: "rgba(122,144,112,0.2)",
         });
@@ -223,7 +223,7 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
         headline: "Set your cycle day to unlock predictions.",
         detail: "Swan Sense can predict sensitivity windows, oil surges, and ideal active nights — but needs your cycle day to do it. Add it in the Progress tab.",
         level: "positive",
-        color: "#7a9070",
+        color: "#6e8a72",
         bg: "rgba(122,144,112,0.07)",
         border: "rgba(122,144,112,0.2)",
       });
@@ -243,7 +243,7 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
         headline: "Log your first check-in to activate predictions.",
         detail: "Swan Sense learns from your skin over time. After a few check-ins, it can flag irritation trends, barrier risk, and optimal active windows before they happen.",
         level: "positive",
-        color: "#7a9070",
+        color: "#6e8a72",
         bg: "rgba(122,144,112,0.07)",
         border: "rgba(122,144,112,0.2)",
       });
@@ -376,7 +376,7 @@ function SwanSenseCard({ products, checkIns = [], user = {}, locationData = null
               style={{ background: fb === "up" ? "rgba(122,144,112,0.1)" : p.bg, border: `1px solid ${fb ? "rgba(122,144,112,0.3)" : p.border}`, borderRadius: 12, padding: "13px 15px", cursor: "pointer", position: "relative", overflow: "hidden", transition: "all 0.2s" }}>
               <div style={{ position: "absolute", bottom: 6, right: 12, opacity: 0.16, color: "var(--clay)", pointerEvents: "none" }}><SwanIcon size={32} /></div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <div style={{ width: 5, height: 5, borderRadius: "50%", background: fb === "up" ? "#7a9070" : p.color, flexShrink: 0 }} />
+                <div style={{ width: 5, height: 5, borderRadius: "50%", background: fb === "up" ? "#6e8a72" : p.color, flexShrink: 0 }} />
                 <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--parchment)", margin: 0, flex: 1, lineHeight: 1.4 }}>{p.headline}</p>
                 <span style={{ color: "var(--clay)", opacity: 0.4, flexShrink: 0, transition: "transform 0.18s", transform: isExpanded ? "rotate(-90deg)" : "rotate(90deg)", display: "inline-flex" }}><Icon name="chevron" size={10} /></span>
               </div>
@@ -389,7 +389,7 @@ function SwanSenseCard({ products, checkIns = [], user = {}, locationData = null
                       {fb ? (fb === "up" ? "Marked as helpful" : "Noted") : "Was this helpful?"}
                     </span>
                     <button onClick={e => giveFeedback(p.type, "up", e)}
-                      style={{ display: "inline-flex", alignItems: "center", gap: 5, background: fb === "up" ? "rgba(122,144,112,0.25)" : "transparent", border: `1px solid ${fb === "up" ? "rgba(122,144,112,0.5)" : "var(--border)"}`, borderRadius: 20, padding: "4px 10px", cursor: "pointer", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: fb === "up" ? "#7a9070" : "var(--clay)", transition: "all 0.15s" }}>
+                      style={{ display: "inline-flex", alignItems: "center", gap: 5, background: fb === "up" ? "rgba(122,144,112,0.25)" : "transparent", border: `1px solid ${fb === "up" ? "rgba(122,144,112,0.5)" : "var(--border)"}`, borderRadius: 20, padding: "4px 10px", cursor: "pointer", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: fb === "up" ? "#6e8a72" : "var(--clay)", transition: "all 0.15s" }}>
                       <Icon name="arrow-up" size={10} /> Yes
                     </button>
                     <button onClick={e => giveFeedback(p.type, "down", e)}

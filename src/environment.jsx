@@ -100,7 +100,7 @@ function EnvironmentStrip({ products, activeMap, locationData, tempUnit = "C" })
   if (loading) {
     return (
       <div style={{ padding: "12px 16px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, marginBottom: 20, display: "flex", alignItems: "center", gap: 10 }}>
-        <div style={{ width: 14, height: 14, border: "1.5px solid #7a9070", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+        <div style={{ width: 14, height: 14, border: "1.5px solid #6e8a72", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
         <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)" }}>Reading local conditions...</span>
       </div>
     );
@@ -110,8 +110,8 @@ function EnvironmentStrip({ products, activeMap, locationData, tempUnit = "C" })
   const location = locationData;
 
   const nudges = buildEnvAdvice(env, products, activeMap);
-  const uvCol = env.uvIndex >= 8 ? "#8b7355" : env.uvIndex >= 6 ? "#8b7355" : env.uvIndex >= 3 ? "#8b7355" : "#7a9070";
-  const humCol = env.humidity < 30 ? "#8b7355" : env.humidity < 45 ? "#8b7355" : env.humidity > 75 ? "#8b7355" : "#7a9070";
+  const uvCol = env.uvIndex >= 8 ? "#8b7355" : env.uvIndex >= 6 ? "#8b7355" : env.uvIndex >= 3 ? "#8b7355" : "#6e8a72";
+  const humCol = env.humidity < 30 ? "#8b7355" : env.humidity < 45 ? "#8b7355" : env.humidity > 75 ? "#8b7355" : "#6e8a72";
 
   return (
     <div style={{ marginBottom: 20 }}>

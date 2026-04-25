@@ -175,7 +175,7 @@ function buildInsights(products, activeMap) {
 }
 
 function InsightRow({ item }) {
-  const dot = item.severity === "warning" ? "#8b7355" : item.severity === "caution" ? "#8b7355" : item.severity === "ok" ? "#7a9070" : "var(--clay)";
+  const dot = item.severity === "warning" ? "#8b7355" : item.severity === "caution" ? "#8b7355" : item.severity === "ok" ? "#6e8a72" : "var(--clay)";
   return (
     <div style={{ display: "flex", gap: 12, padding: "12px 0", borderBottom: "1px solid var(--border)" }}>
       <div style={{ width: 5, height: 5, borderRadius: "50%", background: dot, flexShrink: 0, marginTop: 6 }} />
@@ -350,8 +350,8 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo
                 <div key={idx} style={{ background: "var(--surface)", border: `1px solid ${nowReady ? "rgba(122,144,112,0.4)" : "var(--border)"}`, borderRadius: 14, padding: "16px", transition: "border-color 0.3s" }}>
                   {nowReady && (
                     <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
-                      <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#7a9070" }} />
-                      <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "#7a9070" }}>Ready to introduce</span>
+                      <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#6e8a72" }} />
+                      <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "#6e8a72" }}>Ready to introduce</span>
                     </div>
                   )}
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
@@ -366,7 +366,7 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo
                   <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: "0 0 14px", lineHeight: 1.6, opacity: 0.8 }}>{item.reason}</p>
                   <div style={{ display: "flex", gap: 8 }}>
                     <button onClick={() => onAddFromWaiting(item)}
-                      style={{ flex: 1, padding: "9px 0", background: nowReady ? "#7a9070" : "rgba(122,144,112,0.10)", color: nowReady ? "#0d0f0d" : "var(--sage)", border: `1px solid ${nowReady ? "#7a9070" : "rgba(122,144,112,0.3)"}`, borderRadius: 9, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s" }}>
+                      style={{ flex: 1, padding: "9px 0", background: nowReady ? "#6e8a72" : "rgba(122,144,112,0.10)", color: nowReady ? "#0d0f0d" : "var(--sage)", border: `1px solid ${nowReady ? "#6e8a72" : "rgba(122,144,112,0.3)"}`, borderRadius: 9, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s" }}>
                       Add to Ritual
                     </button>
                     <button onClick={() => onDismissWaiting(item)}

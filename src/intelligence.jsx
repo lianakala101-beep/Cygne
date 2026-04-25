@@ -79,7 +79,7 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
     title: "Consider a Vitamin C serum (AM)",
     body: "No antioxidant protection detected in your ritual. A stable Vitamin C serum each morning shields against free radical damage and supports brightness over time.",
     tag: "Recommended",
-    tagColor: "#7a9070",
+    tagColor: "#6e8a72",
     cygne: true,
     addCategory: "Serum",
     note: "Apply after cleansing, before moisturizer and SPF. Start with 10–15% L-ascorbic acid.",
@@ -91,7 +91,7 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
     title: "Consider a retinoid (PM)",
     body: "No retinoid detected. Retinoids remain the most studied active for cell turnover, texture, fine lines, and long-term skin health. Worth building into a PM ritual.",
     tag: "Recommended",
-    tagColor: "#7a9070",
+    tagColor: "#6e8a72",
     cygne: true,
     addCategory: "Treatment",
     note: "Start with retinol 0.025–0.1% two nights per week. Introduce gradually to avoid purging.",
@@ -103,7 +103,7 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
     title: "Add a barrier-support serum",
     body: "You're using active exfoliants or retinoids without any humectant or ceramide support. This increases transepidermal water loss (TEWL) and may slowly compromise your barrier.",
     tag: "Recommended",
-    tagColor: "#7a9070",
+    tagColor: "#6e8a72",
     cygne: true,
     addCategory: "Serum",
     note: "A hyaluronic acid or ceramide serum applied before moisturizer on active nights.",
@@ -149,7 +149,7 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
     title: "Consolidate your serum stack",
     body: `You have ${serumCount} serums. Layering more than 2–3 active serums causes pilling, reduces absorption of each, and adds unnecessary actives that can conflict.`,
     tag: "Simplify",
-    tagColor: "#7a9070",
+    tagColor: "#6e8a72",
     action: "Identify which actives overlap. Keep the best-formulated product per active. Retire duplicates.",
     cygne: false,
   });
@@ -248,7 +248,7 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
     title: `Reduce niacinamide sources (${niaCounts} products)`,
     body: "Niacinamide is beneficial at 2–10%, but accumulating it across multiple products pushes cumulative concentration higher than needed and adds cost without benefit.",
     tag: "Simplify",
-    tagColor: "#7a9070",
+    tagColor: "#6e8a72",
     action: "Keep one dedicated niacinamide product. Let others be supporting ingredients elsewhere.",
     cygne: false,
   });
@@ -258,7 +258,7 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
     title: "Choose one exfoliant type",
     body: "AHA (glycolic/lactic acid) works on the skin surface. BHA (salicylic) works inside pores. Both daily is excessive. Rotate, or choose the one that addresses your primary concern.",
     tag: "Simplify",
-    tagColor: "#7a9070",
+    tagColor: "#6e8a72",
     action: "Oily / acne-prone: lean BHA. Texture / dullness: lean AHA. Use the other max 1× per week.",
     cygne: false,
   });
@@ -268,7 +268,7 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
     title: "Separate peptides from retinol",
     body: "Some research suggests retinol may reduce peptide efficacy when layered. They're both valuable — but work better in different sessions or on alternating nights.",
     tag: "Optimize",
-    tagColor: "#7a9070",
+    tagColor: "#6e8a72",
     action: "Use peptides AM or on non-retinol nights for maximum benefit from both.",
     cygne: false,
   });
@@ -302,7 +302,7 @@ function RecommendationCard({ rec, onAdd, onDismiss, onEdit }) {
       onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(122,144,112,0.4)"}
       onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}>
       <div style={{ display: "flex", alignItems: "flex-start", gap: 11 }}>
-        <div style={{ width: 26, height: 26, borderRadius: "50%", background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.18)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "#7a9070", marginTop: 1 }}>
+        <div style={{ width: 26, height: 26, borderRadius: "50%", background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.18)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "#6e8a72", marginTop: 1 }}>
           <Icon name={typeIcon[rec.type]} size={12} />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
@@ -318,7 +318,7 @@ function RecommendationCard({ rec, onAdd, onDismiss, onEdit }) {
           <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", margin: "0 0 10px", lineHeight: 1.65 }}>{rec.body}</p>
           {rec.action && (
             <div style={{ display: "flex", gap: 8, padding: "9px 12px", background: "rgba(122,144,112,0.06)", borderRadius: 9, border: "1px solid rgba(122,144,112,0.14)", marginBottom: 8 }}>
-              <span style={{ color: "#7a9070", flexShrink: 0, marginTop: 1 }}><Icon name="check" size={11} /></span>
+              <span style={{ color: "#6e8a72", flexShrink: 0, marginTop: 1 }}><Icon name="check" size={11} /></span>
               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--parchment)", margin: 0, lineHeight: 1.6 }}>{rec.action}</p>
             </div>
           )}
@@ -331,7 +331,7 @@ function RecommendationCard({ rec, onAdd, onDismiss, onEdit }) {
           <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
             {rec.type === "addition" && onAdd && (
               <button onClick={handleAdd}
-                style={{ flex: 1, padding: "10px 14px", background: "rgba(122,144,112,0.15)", border: "1px solid rgba(122,144,112,0.35)", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600, color: "#7a9070", cursor: "pointer", letterSpacing: "0.06em" }}>
+                style={{ flex: 1, padding: "10px 14px", background: "rgba(122,144,112,0.15)", border: "1px solid rgba(122,144,112,0.35)", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600, color: "#6e8a72", cursor: "pointer", letterSpacing: "0.06em" }}>
                 + Add {rec.addCategory || "to vanity"}
               </button>
             )}
@@ -448,7 +448,7 @@ function buildRefinements(products, activeMap, conflicts) {
     if (overlap.length > 0) {
       refinements.push({
         verb: "Replace",
-        verbColor: "#7a9070",
+        verbColor: "#6e8a72",
         icon: "layers",
         title: "Overlapping serum actives",
         body: `${overlap.map(p => p.name).join(", ")} share active ingredients. A multi-active serum covering the same ground in one product would simplify your ritual and reduce layering risk.`,
@@ -463,7 +463,7 @@ function buildRefinements(products, activeMap, conflicts) {
   if (activeMap["vitamin C"] && hasRetinol && !products.find(p => detectActives(p.ingredients)["vitamin C"] && p.category !== "Treatment")) {
     refinements.push({
       verb: "Replace",
-      verbColor: "#7a9070",
+      verbColor: "#6e8a72",
       icon: "layers",
       title: "Vitamin C stability concern",
       body: "L-Ascorbic acid is unstable and degrades when exposed to heat, air, and especially alongside retinol. If your Vitamin C isn't in a dedicated AM product, it may not be delivering.",
@@ -547,7 +547,7 @@ function RefinementsCard({ products, activeMap, conflicts }) {
   const verbStyle = {
     "Remove":           { color: "#8b7355", bg: "rgba(139,115,85,0.08)",  border: "rgba(139,115,85,0.28)" },
     "Reduce Frequency": { color: "#8b7355", bg: "rgba(139,115,85,0.08)", border: "rgba(139,115,85,0.28)" },
-    "Replace":          { color: "#7a9070", bg: "rgba(122,144,112,0.08)",border: "rgba(122,144,112,0.28)" },
+    "Replace":          { color: "#6e8a72", bg: "rgba(122,144,112,0.08)",border: "rgba(122,144,112,0.28)" },
     "Add":              { color: "#8b7355", bg: "rgba(139,115,85,0.08)",  border: "rgba(139,115,85,0.28)" },
   };
 
@@ -578,7 +578,7 @@ function RefinementsCard({ products, activeMap, conflicts }) {
               All
             </button>
             {verbs.map(v => {
-              const vs = verbStyle[v] || { color: "#7a9070", bg: "transparent", border: "var(--border)" };
+              const vs = verbStyle[v] || { color: "#6e8a72", bg: "transparent", border: "var(--border)" };
               const isActive = activeVerb === v;
               return (
                 <button key={v} onClick={() => setActiveVerb(isActive ? null : v)}
@@ -591,7 +591,7 @@ function RefinementsCard({ products, activeMap, conflicts }) {
 
           {/* Refinement items */}
           {displayed.map((r, i) => {
-            const vs = verbStyle[r.verb] || { color: "#7a9070", bg: "transparent", border: "var(--border)" };
+            const vs = verbStyle[r.verb] || { color: "#6e8a72", bg: "transparent", border: "var(--border)" };
             return (
               <RefinementItem key={i} r={r} vs={vs} />
             );

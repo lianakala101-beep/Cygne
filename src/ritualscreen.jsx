@@ -72,7 +72,7 @@ const RITUAL_MODES = {
   follicular: {
     name: "actives ritual",
     tagline: "Your skin is resilient right now.",
-    color: "#7a9070",
+    color: "#6e8a72",
     bg: "rgba(122,144,112,0.08)",
     border: "rgba(122,144,112,0.22)",
     filterSteps: (steps) => steps,
@@ -110,7 +110,7 @@ const RITUAL_MODES = {
   standard: {
     name: null, // no named mode — just show normal steps
     tagline: null,
-    color: "#7a9070",
+    color: "#6e8a72",
     bg: "rgba(122,144,112,0.07)",
     border: "rgba(122,144,112,0.18)",
     filterSteps: (steps) => steps,
@@ -290,7 +290,7 @@ function RitualProgressTracker({ completed, total }) {
       }}>
         <span style={{
           display: "inline-block",
-          color: "#3a4134",
+          color: "#323d30",
           animation: "etherealGlide 3s ease-in-out infinite",
         }}>
           <SwanIcon size={20} />
@@ -419,7 +419,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
         <span style={{ color: "var(--clay)", opacity: 0.55 }}><Icon name={sessionIcon} size={15} /></span>
         <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)" }}>{sessionLabel} Ritual</span>
-        <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#7a9070", background: "rgba(122,144,112,0.14)", padding: "2px 8px", borderRadius: 20 }}>Now</span>
+        <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#6e8a72", background: "rgba(122,144,112,0.14)", padding: "2px 8px", borderRadius: 20 }}>Now</span>
       </div>
 
       {/* Steps */}
@@ -444,7 +444,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
         <div style={{ margin: "16px 0", padding: "18px 18px", background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 14 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
             <span style={{
-              color: "#7a9070",
+              color: "#6e8a72",
               display: "inline-flex",
               animation: "etherealGlide 3s ease-in-out infinite",
             }}>
@@ -480,7 +480,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
             {alternating.map(p => {
               const scheduledTonight = isScheduledToday(p);
               const label = scheduledTonight ? "Tonight" : "Tomorrow night";
-              const labelColor = scheduledTonight ? "#7a9070" : "var(--clay)";
+              const labelColor = scheduledTonight ? "#6e8a72" : "var(--clay)";
               return (
                 <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: "var(--surface)", border: `1px solid ${scheduledTonight ? "rgba(122,144,112,0.35)" : "var(--border)"}`, borderRadius: 12, marginBottom: 8, opacity: scheduledTonight ? 1 : 0.6 }}>
                   <div>
@@ -561,7 +561,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
               { id: "refine",    label: "Refine",   count: refinements.length,    icon: "sparkle" },
             ].filter(t => t.count > 0).map(t => (
               <button key={t.id} onClick={() => setRecTab(t.id)}
-                style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 12px", borderRadius: 20, border: `1px solid ${recTab === t.id ? "#7a9070" : "var(--border)"}`, background: recTab === t.id ? "rgba(122,144,112,0.11)" : "transparent", color: recTab === t.id ? "#7a9070" : "var(--clay)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: recTab === t.id ? 700 : 400, cursor: "pointer", letterSpacing: "0.1em", textTransform: "uppercase", transition: "all 0.16s" }}>
+                style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 12px", borderRadius: 20, border: `1px solid ${recTab === t.id ? "#6e8a72" : "var(--border)"}`, background: recTab === t.id ? "rgba(122,144,112,0.11)" : "transparent", color: recTab === t.id ? "#6e8a72" : "var(--clay)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: recTab === t.id ? 700 : 400, cursor: "pointer", letterSpacing: "0.1em", textTransform: "uppercase", transition: "all 0.16s" }}>
                 <Icon name={t.icon} size={11} />
                 {t.label}
                 <span style={{ fontSize: 9, background: recTab === t.id ? "rgba(122,144,112,0.2)" : "rgba(255,255,255,0.05)", borderRadius: 10, padding: "1px 5px" }}>{t.count}</span>
@@ -586,7 +586,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
                   <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.65 }}>{r.body}</p>
                   {r.action && (
                     <div style={{ display: "flex", gap: 8, padding: "9px 11px", background: "rgba(122,144,112,0.06)", borderRadius: 8, border: "1px solid rgba(122,144,112,0.15)", marginTop: 10 }}>
-                      <span style={{ color: "#7a9070", flexShrink: 0, marginTop: 1 }}><Icon name="check" size={11} /></span>
+                      <span style={{ color: "#6e8a72", flexShrink: 0, marginTop: 1 }}><Icon name="check" size={11} /></span>
                       <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--parchment)", margin: 0, lineHeight: 1.55 }}>{r.action}</p>
                     </div>
                   )}
@@ -594,7 +594,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 10 }}>
                       {targets.map(p => (
                         <button key={p.id} onClick={() => onEditProduct(p)}
-                          style={{ padding: "6px 11px", borderRadius: 20, background: "rgba(122,144,112,0.12)", border: "1px solid rgba(122,144,112,0.3)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 600, color: "#7a9070", cursor: "pointer", letterSpacing: "0.05em", display: "inline-flex", alignItems: "center", gap: 5 }}>
+                          style={{ padding: "6px 11px", borderRadius: 20, background: "rgba(122,144,112,0.12)", border: "1px solid rgba(122,144,112,0.3)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 600, color: "#6e8a72", cursor: "pointer", letterSpacing: "0.05em", display: "inline-flex", alignItems: "center", gap: 5 }}>
                           {p.name} <Icon name="chevron" size={10} />
                         </button>
                       ))}
@@ -603,7 +603,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
                   {targets.length === 0 && r.addCategory && onAddProduct && (
                     <div style={{ marginTop: 10 }}>
                       <button onClick={() => onAddProduct(r.addCategory)}
-                        style={{ padding: "8px 14px", borderRadius: 10, background: "rgba(122,144,112,0.15)", border: "1px solid rgba(122,144,112,0.35)", fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600, color: "#7a9070", cursor: "pointer", letterSpacing: "0.05em" }}>
+                        style={{ padding: "8px 14px", borderRadius: 10, background: "rgba(122,144,112,0.15)", border: "1px solid rgba(122,144,112,0.35)", fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600, color: "#6e8a72", cursor: "pointer", letterSpacing: "0.05em" }}>
                         + Add {r.addCategory}
                       </button>
                     </div>
@@ -618,7 +618,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
 
       {conflicts.length === 0 && flags.length === 0 && totalRecs === 0 && products.length > 0 && (
         <div style={{ display: "flex", gap: 11, padding: "13px 16px", background: "rgba(122,144,112,0.07)", borderRadius: 12, border: "1px solid rgba(122,144,112,0.18)" }}>
-          <span style={{ color: "#7a9070" }}><Icon name="check" size={14} /></span>
+          <span style={{ color: "#6e8a72" }}><Icon name="check" size={14} /></span>
           <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, color: "var(--parchment)", margin: 0 }}>No conflicts. Your ritual is well-balanced.</p>
         </div>
       )}

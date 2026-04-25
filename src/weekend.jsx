@@ -80,7 +80,7 @@ const WEEKEND_PHASE_CONFIG = {
     label: "Recovery Day",
     sublabel: "Sunday",
     headline: "Your skin needs a quiet day.",
-    accent: "#7a9070",
+    accent: "#6e8a72",
     bg: "rgba(122,144,112,0.07)",
     border: "rgba(122,144,112,0.2)",
   },

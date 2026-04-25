@@ -138,7 +138,7 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
             <span key={a} style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.08em", color: "#8b7355", background: "rgba(139,115,85,0.08)", padding: "3px 8px", borderRadius: 20, border: "1px solid rgba(139,115,85,0.22)" }}><Icon name="warning" size={9} /> {a}</span>
           ))}
           {lovedHits.map(l => (
-            <span key={l} style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.08em", color: "#7a9070", background: "rgba(122,144,112,0.08)", padding: "3px 8px", borderRadius: 20, border: "1px solid rgba(122,144,112,0.2)" }}><Icon name="sparkle" size={9} /> {l}</span>
+            <span key={l} style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.08em", color: "#6e8a72", background: "rgba(122,144,112,0.08)", padding: "3px 8px", borderRadius: 20, border: "1px solid rgba(122,144,112,0.2)" }}><Icon name="sparkle" size={9} /> {l}</span>
           ))}
         </div>
       )}
@@ -238,7 +238,7 @@ function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }
     ? (FREQUENCIES.find(f => f.id === step.frequency)?.label || step.frequency)
     : null;
   const nameColor = scheduled ? "var(--parchment)" : "var(--taupe)";
-  const ringColor = scheduled ? "#7a9070" : "var(--taupe)";
+  const ringColor = scheduled ? "#6e8a72" : "var(--taupe)";
   return (
     <div style={{
       display: "flex", gap: 16, alignItems: "flex-start",
@@ -513,7 +513,7 @@ function FlightModeModal({ products, activeMap, onClose }) {
         <div style={{ display: "flex", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10, padding: 3, marginBottom: 24 }}>
           {[{ id: "edit", label: "Your Edit" }, { id: "tips", label: "Flight Tips" }].map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
-              style={{ flex: 1, padding: "8px 0", borderRadius: 8, border: "none", background: tab === t.id ? "#7a9070" : "transparent", color: tab === t.id ? "#0d0f0d" : "var(--clay)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: tab === t.id ? 700 : 400, cursor: "pointer", letterSpacing: "0.12em", textTransform: "uppercase", transition: "all 0.18s" }}>
+              style={{ flex: 1, padding: "8px 0", borderRadius: 8, border: "none", background: tab === t.id ? "#6e8a72" : "transparent", color: tab === t.id ? "#0d0f0d" : "var(--clay)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: tab === t.id ? 700 : 400, cursor: "pointer", letterSpacing: "0.12em", textTransform: "uppercase", transition: "all 0.18s" }}>
               {t.label}
             </button>
           ))}
@@ -550,8 +550,8 @@ function FlightModeModal({ products, activeMap, onClose }) {
             {keep.length > 0 && (
               <div style={{ marginBottom: 20 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-                  <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#7a9070" }} />
-                  <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#7a9070" }}>Pack These</span>
+                  <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#6e8a72" }} />
+                  <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#6e8a72" }}>Pack These</span>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {keep.map((item, i) => (
@@ -600,7 +600,7 @@ function FlightModeModal({ products, activeMap, onClose }) {
 
             {/* Recovery note */}
             <div style={{ padding: "16px 18px", background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.25)", borderRadius: 12, marginTop: 4 }}>
-              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "#7a9070", margin: "0 0 6px" }}>Landing Day</p>
+              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "#6e8a72", margin: "0 0 6px" }}>Landing Day</p>
               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", margin: 0, lineHeight: 1.65 }}>
                 Give your skin 24h to re-acclimate before reintroducing actives. Cleanse, moisturize, SPF. Nothing else the first night.
               </p>

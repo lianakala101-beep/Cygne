@@ -588,7 +588,7 @@ export default function App() {
   // -- Loading state ----------------------------------------------------------
   if (authLoading) {
     return (
-      <div style={{ minHeight: "100vh", background: "#3a4134", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ minHeight: "100vh", background: "#323d30", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div style={{ width: 24, height: 24, border: "2px solid rgba(232,227,214,0.3)", borderTopColor: "rgba(232,227,214,0.8)", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
@@ -617,7 +617,7 @@ export default function App() {
       <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Reenie+Beanie&display=swap" rel="stylesheet" />
       <style>{`
         :root {
-          --sage:      #7a9070;
+          --sage:      #6e8a72;
           --script:    'Reenie Beanie', cursive;
           --cursive:   'Reenie Beanie', cursive;
           --sans:      'Space Grotesk', sans-serif;
@@ -632,7 +632,7 @@ export default function App() {
           --muted:     #6b5a43;
           --taupe:     #8b7355;
           --overlay:   rgba(8,12,8,0.72);
-          --cta:       #3a4134;
+          --cta:       #323d30;
         }
         .theme-light {
           --deep:      #f0ece6;
@@ -644,8 +644,8 @@ export default function App() {
           --muted:     #a8906c;
           --taupe:     #6b5338;
           --overlay:   rgba(30,25,20,0.5);
-          --sage:      #5a7060;
-          --cta:       #4a5e44;
+          --sage:      #526859;
+          --cta:       #3d5240;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         input, select, textarea { outline: none; }

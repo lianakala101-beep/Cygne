@@ -59,7 +59,7 @@ const SEASON_CONFIG = {
   spring: {
     label: "Spring",
     iconName: "leaf",
-    accent: "#7a9070",
+    accent: "#6e8a72",
     bg: "rgba(122,144,112,0.07)",
     border: "rgba(122,144,112,0.2)",
     headline: "Skin is recovering. UV is rising.",

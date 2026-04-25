@@ -28,7 +28,7 @@ function RoutineFitSheet({ product, assessment, onAddNow, onDefer, onClose }) {
         {assessment.positiveRead && (
           <div style={{ background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.2)", borderRadius: 12, padding: "13px 16px", marginBottom: 14 }}>
             <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-              <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#7a9070", marginTop: 5, flexShrink: 0 }} />
+              <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#6e8a72", marginTop: 5, flexShrink: 0 }} />
               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--parchment)", margin: 0, lineHeight: 1.6 }}>{assessment.positiveRead}</p>
             </div>
           </div>
@@ -52,7 +52,7 @@ function RoutineFitSheet({ product, assessment, onAddNow, onDefer, onClose }) {
           {isDefer ? (
             <>
               <button onClick={onDefer}
-                style={{ width: "100%", padding: "14px 0", background: "#7a9070", color: "#0d0f0d", border: "none", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}>
+                style={{ width: "100%", padding: "14px 0", background: "#6e8a72", color: "#0d0f0d", border: "none", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}>
                 Save for Later
               </button>
               <button onClick={onAddNow}
@@ -62,7 +62,7 @@ function RoutineFitSheet({ product, assessment, onAddNow, onDefer, onClose }) {
             </>
           ) : (
             <button onClick={onAddNow}
-              style={{ width: "100%", padding: "14px 0", background: "#7a9070", color: "#0d0f0d", border: "none", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}>
+              style={{ width: "100%", padding: "14px 0", background: "#6e8a72", color: "#0d0f0d", border: "none", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}>
               Add to Ritual
             </button>
           )}
@@ -629,7 +629,7 @@ function ProductModal({ product, onSave, onClose, user }) {
                                   toggleActive(active.key, active.options[0]);
                                 }
                               }}
-                                style={{ width: 22, height: 22, borderRadius: "50%", border: "1px solid " + (isOn ? "#7a9070" : "var(--border)"), background: isOn ? "#7a9070" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0, color: "var(--ink)" }}>
+                                style={{ width: 22, height: 22, borderRadius: "50%", border: "1px solid " + (isOn ? "#6e8a72" : "var(--border)"), background: isOn ? "#6e8a72" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0, color: "var(--ink)" }}>
                                 {isOn && <Icon name="check" size={11} />}
                               </button>
                             </div>
@@ -637,7 +637,7 @@ function ProductModal({ product, onSave, onClose, user }) {
                               <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
                                 {active.options.map(pct => (
                                   <button key={pct} onClick={() => toggleActive(active.key, pct)}
-                                    style={{ padding: "4px 12px", borderRadius: 20, border: "1px solid " + (selected === pct ? "#7a9070" : "var(--border)"), background: selected === pct ? "rgba(122,144,112,0.18)" : "transparent", fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: selected === pct ? "var(--parchment)" : "var(--clay)", cursor: "pointer" }}>
+                                    style={{ padding: "4px 12px", borderRadius: 20, border: "1px solid " + (selected === pct ? "#6e8a72" : "var(--border)"), background: selected === pct ? "rgba(122,144,112,0.18)" : "transparent", fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: selected === pct ? "var(--parchment)" : "var(--clay)", cursor: "pointer" }}>
                                     {pct}
                                   </button>
                                 ))}
