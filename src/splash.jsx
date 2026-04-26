@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { LOGO_SRC } from "./components.jsx";
 
 function SplashScreen({ onDone }) {
   const [fading, setFading] = useState(false);
 
-  const handleContinue = () => {
+  const handleTap = () => {
     if (fading) return;
     setFading(true);
     setTimeout(onDone, 600);
@@ -12,80 +11,57 @@ function SplashScreen({ onDone }) {
 
   return (
     <div
+      onClick={handleTap}
       style={{
-        position: "fixed", inset: 0, zIndex: 9999,
-        background: "var(--color-ivory)",
-        display: "flex", flexDirection: "column",
-        justifyContent: "flex-start",
+        position: "fixed",
+        inset: 0,
+        zIndex: 9999,
+        background: "#fdfcf9",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
         opacity: fading ? 0 : 1,
         transition: "opacity 0.6s ease",
-        overflow: "hidden",
+        cursor: "default",
+        userSelect: "none",
+        WebkitTapHighlightColor: "transparent",
       }}>
 
-      {/* Top — logo + tagline, left-aligned */}
-      <div style={{ padding: "72px 36px 0" }}>
-        <img
-          src={LOGO_SRC}
-          alt="Cygne"
-          style={{
-            height: 170, width: "auto",
-            display: "block",
-            filter: "brightness(1.25) contrast(1.05)",
-            mixBlendMode: "lighten",
-          }}
-        />
-        <p style={{
-          fontFamily: "var(--font-signature)",
-          fontSize: 22, fontWeight: 400,
-          color: "rgba(232,227,214,0.95)",
-          margin: "6px 0 0 130px",
-          letterSpacing: "0.05em",
-          lineHeight: 1,
-        }}>built around you</p>
-      </div>
+      {/* Logo — centered, ~60% screen width, satin silver gradient */}
+      <span style={{
+        fontFamily: "var(--font-signature, 'Hellasta Signature', cursive)",
+        fontSize: "clamp(72px, 18vw, 160px)",
+        fontWeight: 400,
+        lineHeight: 1,
+        letterSpacing: "0.02em",
+        display: "block",
+        background: "linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 30%, #a8a8a8 50%, #d4d4d4 70%, #b0b0b0 100%)",
+        WebkitBackgroundClip: "text",
+        WebkitTextFillColor: "transparent",
+        backgroundClip: "text",
+        textAlign: "center",
+        width: "60vw",
+        maxWidth: 440,
+      }}>Cygne</span>
 
-      {/* Below logo — description and button sitting just under the logo block */}
-      <div style={{
-        display: "flex", flexDirection: "column", alignItems: "center",
-        padding: "32px 36px 72px",
-      }}>
-        <p style={{
-          fontFamily: "var(--font-body)",
-          fontSize: 13,
-          color: "rgba(232,227,214,0.60)",
-          margin: "0 0 28px",
-          lineHeight: 1.75,
-          textAlign: "center",
-          maxWidth: 300,
-        }}>A ritual tracker that reads your vanity, your skin, and your life — and keeps up with all three.</p>
-
-        <button
-          onClick={handleContinue}
-          style={{
-            padding: "15px 0",
-            background: "rgba(232,227,214,0.12)",
-            color: "rgba(232,227,214,0.95)",
-            border: "1px solid rgba(232,227,214,0.28)",
-            borderRadius: 10,
-            fontFamily: "var(--font-body)",
-            fontSize: 10,
-            fontWeight: 600,
-            letterSpacing: "0.2em",
-            textTransform: "uppercase",
-            cursor: "pointer",
-            transition: "background 0.2s, border-color 0.2s",
-            width: "100%",
-          }}
-          onMouseEnter={e => { e.currentTarget.style.background = "rgba(232,227,214,0.2)"; e.currentTarget.style.borderColor = "rgba(232,227,214,0.5)"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = "rgba(232,227,214,0.12)"; e.currentTarget.style.borderColor = "rgba(232,227,214,0.28)"; }}>
-          Get Started
-        </button>
-      </div>
+      {/* Tagline — pinned to bottom, above safe area */}
+      <p style={{
+        position: "absolute",
+        bottom: "calc(60px + env(safe-area-inset-bottom, 0px))",
+        left: 0,
+        right: 0,
+        textAlign: "center",
+        fontFamily: "var(--font-display, 'Fungis', sans-serif)",
+        fontSize: 13,
+        fontWeight: 400,
+        letterSpacing: "0.15em",
+        textTransform: "uppercase",
+        color: "#a0a0a0",
+        margin: 0,
+      }}>Built Around You</p>
     </div>
   );
 }
-
-
-// --- ONBOARDING ---------------------------------------------------------------
 
 export { SplashScreen };
