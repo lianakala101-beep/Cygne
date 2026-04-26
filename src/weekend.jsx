@@ -99,7 +99,7 @@ function WeekendNudgeCard({ products, activeMap }) {
     <div style={{ marginBottom: 20, background: cfg.bg, border: `1px solid ${cfg.border}`, borderRadius: 16, padding: "18px 20px 16px", position: "relative" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
         <div>
-          <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: cfg.accent }}>{cfg.label}</span>
+          <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: cfg.accent }}>{cfg.label}</span>
           <p style={{ fontFamily: "var(--script)", fontSize: 20, fontWeight: 400, color: "var(--parchment)", margin: "2px 0 0", lineHeight: 1.2 }}>{cfg.headline}</p>
         </div>
         <button onClick={() => setDismissed(true)} style={{ background: "none", border: "none", color: "var(--clay)", opacity: 0.35, cursor: "pointer", padding: "2px 4px", display: "inline-flex" }}><Icon name="x" size={12} /></button>
@@ -109,7 +109,7 @@ function WeekendNudgeCard({ products, activeMap }) {
           {advice.skip.map((s, i) => (
             <div key={i} style={{ display: "flex", gap: 8, marginBottom: 6 }}>
               <span style={{ color: "#8b7355", fontSize: 10, flexShrink: 0, marginTop: 1 }}>—</span>
-              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{s}</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{s}</p>
             </div>
           ))}
         </div>
@@ -117,7 +117,7 @@ function WeekendNudgeCard({ products, activeMap }) {
       {advice.do.map((s, i) => (
         <div key={i} style={{ display: "flex", gap: 8, marginBottom: 6 }}>
           <span style={{ color: cfg.accent, fontSize: 10, flexShrink: 0, marginTop: 1 }}>+</span>
-          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{s}</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{s}</p>
         </div>
       ))}
     </div>

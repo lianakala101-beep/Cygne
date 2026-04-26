@@ -38,11 +38,11 @@ export default function App() {
   });
   const isAuto = themeOverride === null;
 
-  // Ensure fonts load
+  // Ensure Space Grotesk loads (custom fonts are loaded via src/index.css)
   useEffect(() => {
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Pinyon+Script&display=swap";
+    link.href = "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap";
     document.head.appendChild(link);
   }, []);
 
@@ -588,7 +588,7 @@ export default function App() {
   // -- Loading state ----------------------------------------------------------
   if (authLoading) {
     return (
-      <div style={{ minHeight: "100vh", background: "#323d30", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ minHeight: "100vh", background: "var(--color-ivory)", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div style={{ width: 24, height: 24, border: "2px solid rgba(232,227,214,0.3)", borderTopColor: "rgba(232,227,214,0.8)", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
@@ -784,7 +784,7 @@ export default function App() {
                 display: "flex", alignItems: "center", justifyContent: "center",
               }}>
                 <span style={{
-                  fontFamily: "Pinyon Script, cursive",
+                  fontFamily: "var(--font-signature)",
                   fontSize: 22,
                   color: "var(--sage)",
                   lineHeight: 1,

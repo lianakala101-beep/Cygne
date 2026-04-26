@@ -101,7 +101,7 @@ function EnvironmentStrip({ products, activeMap, locationData, tempUnit = "C" })
     return (
       <div style={{ padding: "12px 16px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, marginBottom: 20, display: "flex", alignItems: "center", gap: 10 }}>
         <div style={{ width: 14, height: 14, border: "1.5px solid #6e8a72", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
-        <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)" }}>Reading local conditions...</span>
+        <span style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)" }}>Reading local conditions...</span>
       </div>
     );
   }
@@ -122,7 +122,7 @@ function EnvironmentStrip({ products, activeMap, locationData, tempUnit = "C" })
         onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}>
 
         <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", letterSpacing: "0.04em" }}>
+          <span style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", letterSpacing: "0.04em" }}>
             {location?.city}{location?.country ? ` · ${location.country}` : ""}
           </span>
         </div>
@@ -131,18 +131,18 @@ function EnvironmentStrip({ products, activeMap, locationData, tempUnit = "C" })
           {env.humidity !== null && (
             <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
               <span style={{ color: "var(--clay)", opacity: 0.5, display: "inline-flex" }}><Icon name="drop" size={10} /></span>
-              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: humCol, fontWeight: 500 }}>{env.humidity}%</span>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: 11, color: humCol, fontWeight: 500 }}>{env.humidity}%</span>
             </div>
           )}
           {env.uvIndex !== null && (
             <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
               <span style={{ color: "var(--clay)", opacity: 0.5, display: "inline-flex" }}><Icon name="sun" size={10} /></span>
-              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: uvCol, fontWeight: 500 }}>UV {env.uvIndex}</span>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: 11, color: uvCol, fontWeight: 500 }}>UV {env.uvIndex}</span>
             </div>
           )}
           {env.temp !== null && (
             <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)" }}>{Math.round(tempUnit === "F" ? (env.temp * 9/5 + 32) : env.temp)}°{tempUnit}</span>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)" }}>{Math.round(tempUnit === "F" ? (env.temp * 9/5 + 32) : env.temp)}°{tempUnit}</span>
             </div>
           )}
           {nudges.length > 0 && (
@@ -158,11 +158,11 @@ function EnvironmentStrip({ products, activeMap, locationData, tempUnit = "C" })
           {nudges.length > 0 ? nudges.map((n, i) => (
             <div key={i} style={{ display: "flex", gap: 11, padding: "12px 16px", borderTop: "1px solid var(--border)" }}>
               <span style={{ color: "var(--clay)", flexShrink: 0, marginTop: 1, display: "inline-flex" }}><Icon name={n.icon} size={12} /></span>
-              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.65 }}>{n.text}</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.65 }}>{n.text}</p>
             </div>
           )) : (
             <div style={{ padding: "12px 16px", borderTop: "1px solid var(--border)" }}>
-              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>Conditions look good for your ritual today.</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0 }}>Conditions look good for your ritual today.</p>
             </div>
           )}
 

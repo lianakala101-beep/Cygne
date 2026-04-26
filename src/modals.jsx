@@ -167,8 +167,8 @@ function ScanModal({ products, onAddToShelf, onClose }) {
               <button onClick={reset} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: "0 8px 0 0", opacity: 0.6, display: "inline-flex" }}><Icon name="arrow-left" size={16} /></button>
             )}
             <div>
-              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 3px" }}>Shop Scan</p>
-              <h2 style={{ fontFamily: "Pinyon Script, cursive", fontSize: 22, fontWeight: 400, color: "var(--parchment)", margin: 0 }}>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 3px" }}>Shop Scan</p>
+              <h2 style={{ fontFamily: "var(--font-signature)", fontSize: 22, fontWeight: 400, color: "var(--parchment)", margin: 0 }}>
                 {mode === "choose" ? "Does this work for you?" :
                  mode === "search" ? "Search by name" :
                  mode === "scan" || mode === "scanning" ? "Scan the label" :
@@ -182,7 +182,7 @@ function ScanModal({ products, onAddToShelf, onClose }) {
         {/* CHOOSE MODE */}
         {mode === "choose" && (
           <div>
-            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", margin: "0 0 20px", lineHeight: 1.6 }}>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: "0 0 20px", lineHeight: 1.6 }}>
               Check if a product works with your vanity before you buy. Search by name or scan the label.
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -192,8 +192,8 @@ function ScanModal({ products, onAddToShelf, onClose }) {
                   <Icon name="search" size={16} color="var(--sage)" />
                 </div>
                 <div>
-                  <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, fontWeight: 600, color: "var(--parchment)", margin: "0 0 2px" }}>Search by name</p>
-                  <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>Type the product name — fastest in store.</p>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: 13, fontWeight: 600, color: "var(--parchment)", margin: "0 0 2px" }}>Search by name</p>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0 }}>Type the product name — fastest in store.</p>
                 </div>
               </button>
               <button onClick={() => { setMode("scan"); setTimeout(() => fileRef.current && fileRef.current.click(), 100); }}
@@ -202,8 +202,8 @@ function ScanModal({ products, onAddToShelf, onClose }) {
                   <Icon name="camera" size={16} color="var(--sage)" />
                 </div>
                 <div>
-                  <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, fontWeight: 600, color: "var(--parchment)", margin: "0 0 2px" }}>Scan the label</p>
-                  <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>Point at the ingredient list — AI reads it.</p>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: 13, fontWeight: 600, color: "var(--parchment)", margin: "0 0 2px" }}>Scan the label</p>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0 }}>Point at the ingredient list — AI reads it.</p>
                 </div>
               </button>
             </div>
@@ -217,7 +217,7 @@ function ScanModal({ products, onAddToShelf, onClose }) {
               <div style={{ display: "flex", alignItems: "center", gap: 10, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 11, padding: "12px 16px" }}>
                 <Icon name="search" size={16} color="var(--clay)" />
                 <input value={searchQuery} onChange={e => handleSearchInput(e.target.value)} placeholder="CeraVe, The Ordinary, Paula's Choice…" autoFocus
-                  style={{ flex: 1, background: "none", border: "none", outline: "none", fontFamily: "Space Grotesk, sans-serif", fontSize: 14, color: "var(--parchment)" }} />
+                  style={{ flex: 1, background: "none", border: "none", outline: "none", fontFamily: "var(--font-body)", fontSize: 14, color: "var(--parchment)" }} />
                 {searching && <div style={{ width: 14, height: 14, borderRadius: "50%", border: "1.5px solid var(--sage)", borderTopColor: "transparent", animation: "spin 0.7s linear infinite", flexShrink: 0 }} />}
                 {searchQuery && !searching && <button onClick={() => { setSearchQuery(""); setSearchResults([]); setSearchDone(false); }} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: 0 }}><Icon name="x" size={12} /></button>}
               </div>
@@ -228,19 +228,19 @@ function ScanModal({ products, onAddToShelf, onClose }) {
                       style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "flex-start", padding: "12px 16px", background: "none", border: "none", borderBottom: idx < searchResults.length - 1 ? "1px solid var(--border)" : "none", cursor: "pointer", textAlign: "left" }}
                       onMouseEnter={e => e.currentTarget.style.background = "var(--surface)"}
                       onMouseLeave={e => e.currentTarget.style.background = "none"}>
-                      <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, color: "var(--parchment)", lineHeight: 1.3 }}>{p.product_name}</span>
-                      <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", marginTop: 2 }}>{(p.brands || "").split(",")[0].trim()}</span>
+                      <span style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "var(--parchment)", lineHeight: 1.3 }}>{p.product_name}</span>
+                      <span style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", marginTop: 2 }}>{(p.brands || "").split(",")[0].trim()}</span>
                     </button>
                   ))}
                 </div>
               )}
               {searchDone && searchResults.length === 0 && (
-                <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: "8px 0 0", opacity: 0.6 }}>Not found — try scanning the label instead.</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: "8px 0 0", opacity: 0.6 }}>Not found — try scanning the label instead.</p>
               )}
             </div>
             {searchDone && searchResults.length === 0 && (
               <button onClick={() => setMode("scan")}
-                style={{ width: "100%", marginTop: 12, padding: "13px 0", background: "none", border: "1px solid var(--border)", borderRadius: 14, fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", cursor: "pointer" }}>
+                style={{ width: "100%", marginTop: 12, padding: "13px 0", background: "none", border: "1px solid var(--border)", borderRadius: 14, fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", cursor: "pointer" }}>
                 Scan the label instead
               </button>
             )}
@@ -252,13 +252,13 @@ function ScanModal({ products, onAddToShelf, onClose }) {
           <div>
             <input ref={fileRef} type="file" accept="image/*" capture="environment" style={{ display: "none" }} onChange={handleFile} />
             {scanError && (
-              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "#8b7355", margin: "0 0 10px", padding: "8px 12px", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.2)", borderRadius: 8 }}>{scanError}</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#8b7355", margin: "0 0 10px", padding: "8px 12px", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.2)", borderRadius: 8 }}>{scanError}</p>
             )}
             <button onClick={() => fileRef.current.click()}
               style={{ width: "100%", padding: "32px 0", background: "rgba(122,144,112,0.08)", border: "1px dashed rgba(122,144,112,0.35)", borderRadius: 14, cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
               <Icon name="camera" size={28} color="var(--sage)" />
-              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", letterSpacing: "0.06em" }}>Tap to open camera</span>
-              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", opacity: 0.5 }}>Point at the ingredient list for best results</span>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", letterSpacing: "0.06em" }}>Tap to open camera</span>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", opacity: 0.5 }}>Point at the ingredient list for best results</span>
             </button>
           </div>
         )}
@@ -268,7 +268,7 @@ function ScanModal({ products, onAddToShelf, onClose }) {
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "32px 0 24px", gap: 16 }}>
             {imgPreview && <img src={imgPreview} alt="" style={{ width: 100, height: 100, objectFit: "cover", borderRadius: 12, opacity: 0.7 }} />}
             <div style={{ width: 28, height: 28, border: "2px solid #6e8a72", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
-            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", margin: 0 }}>Reading the label…</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: 0 }}>Reading the label…</p>
           </div>
         )}
 
@@ -279,20 +279,20 @@ function ScanModal({ products, onAddToShelf, onClose }) {
             <div style={{ background: vc.bg, border: "1px solid " + vc.border, borderRadius: 14, padding: "18px 18px", marginBottom: 16 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
                 <div style={{ width: 8, height: 8, borderRadius: "50%", background: vc.color, flexShrink: 0 }} />
-                <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: vc.color, fontWeight: 700 }}>{vc.label}</span>
+                <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: vc.color, fontWeight: 700 }}>{vc.label}</span>
               </div>
-              <p style={{ fontFamily: "Pinyon Script, cursive", fontSize: 24, color: "var(--parchment)", margin: "0 0 6px" }}>{scanned.headline}</p>
-              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{scanned.reason}</p>
+              <p style={{ fontFamily: "var(--font-signature)", fontSize: 24, color: "var(--parchment)", margin: "0 0 6px" }}>{scanned.headline}</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{scanned.reason}</p>
             </div>
 
             {/* Conflicts */}
             {scanned.conflicts && scanned.conflicts.length > 0 && (
               <div style={{ padding: "12px 14px", background: "rgba(139,115,85,0.06)", borderRadius: 11, border: "1px solid rgba(139,115,85,0.2)", marginBottom: 10 }}>
-                <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "#8b7355", margin: "0 0 6px" }}>Conflicts</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "#8b7355", margin: "0 0 6px" }}>Conflicts</p>
                 {scanned.conflicts.map((c, i) => (
                   <div key={i} style={{ display: "flex", gap: 7, alignItems: "flex-start", marginBottom: i < scanned.conflicts.length - 1 ? 4 : 0 }}>
                     <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#8b7355", marginTop: 6, flexShrink: 0 }} />
-                    <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", lineHeight: 1.5 }}>{c}</span>
+                    <span style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", lineHeight: 1.5 }}>{c}</span>
                   </div>
                 ))}
               </div>
@@ -301,11 +301,11 @@ function ScanModal({ products, onAddToShelf, onClose }) {
             {/* Duplicates */}
             {scanned.duplicates && scanned.duplicates.length > 0 && (
               <div style={{ padding: "12px 14px", background: "rgba(139,115,85,0.06)", borderRadius: 11, border: "1px solid rgba(139,115,85,0.25)", marginBottom: 10 }}>
-                <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "#8b7355", margin: "0 0 6px" }}>Already covered by</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "#8b7355", margin: "0 0 6px" }}>Already covered by</p>
                 {scanned.duplicates.map((d, i) => (
                   <div key={i} style={{ display: "flex", gap: 7, alignItems: "center" }}>
                     <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#8b7355", flexShrink: 0 }} />
-                    <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)" }}>{d}</span>
+                    <span style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)" }}>{d}</span>
                   </div>
                 ))}
               </div>
@@ -315,7 +315,7 @@ function ScanModal({ products, onAddToShelf, onClose }) {
             {scanned.actives && scanned.actives.length > 0 && (
               <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 16 }}>
                 {scanned.actives.map((a, i) => (
-                  <span key={i} style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", color: "#6e8a72", background: "rgba(122,144,112,0.1)", padding: "3px 10px", borderRadius: 20, border: "1px solid rgba(122,144,112,0.25)", letterSpacing: "0.1em", textTransform: "uppercase" }}>{a}</span>
+                  <span key={i} style={{ fontSize: 9, fontFamily: "var(--font-body)", color: "#6e8a72", background: "rgba(122,144,112,0.1)", padding: "3px 10px", borderRadius: 20, border: "1px solid rgba(122,144,112,0.25)", letterSpacing: "0.1em", textTransform: "uppercase" }}>{a}</span>
                 ))}
               </div>
             )}
@@ -324,16 +324,16 @@ function ScanModal({ products, onAddToShelf, onClose }) {
             <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
               {!saved ? (
                 <button onClick={() => { onAddToShelf(scanned); setSaved(true); }}
-                  style={{ flex: 1, padding: "13px 0", background: verdict === "skip" ? "var(--surface)" : "var(--sage)", color: verdict === "skip" ? "var(--clay)" : "var(--ink)", border: "1px solid " + (verdict === "skip" ? "var(--border)" : "transparent"), borderRadius: 12, fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+                  style={{ flex: 1, padding: "13px 0", background: verdict === "skip" ? "var(--surface)" : "var(--sage)", color: verdict === "skip" ? "var(--clay)" : "var(--ink)", border: "1px solid " + (verdict === "skip" ? "var(--border)" : "transparent"), borderRadius: 12, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
                   {verdict === "skip" ? "Add anyway" : "Save to Vanity"}
                 </button>
               ) : (
-                <div style={{ flex: 1, padding: "13px 0", background: "rgba(122,144,112,0.1)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 12, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "#6e8a72" }}>
+                <div style={{ flex: 1, padding: "13px 0", background: "rgba(122,144,112,0.1)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 12, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontFamily: "var(--font-body)", fontSize: 12, color: "#6e8a72" }}>
                   <Icon name="check" size={12} /> Saved to Vanity
                 </div>
               )}
               <button onClick={reset}
-                style={{ padding: "13px 18px", background: "none", color: "var(--clay)", border: "1px solid var(--border)", borderRadius: 12, fontFamily: "Space Grotesk, sans-serif", fontSize: 12, cursor: "pointer" }}>
+                style={{ padding: "13px 18px", background: "none", color: "var(--clay)", border: "1px solid var(--border)", borderRadius: 12, fontFamily: "var(--font-body)", fontSize: 12, cursor: "pointer" }}>
                 Check another
               </button>
             </div>
