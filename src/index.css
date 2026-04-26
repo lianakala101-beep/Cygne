@@ -23,8 +23,71 @@
 }
 
 :root {
+  /* Fonts */
   --font-signature: 'Hellasta Signature', cursive;
   --font-display: 'Fungis', sans-serif;
   --font-body: 'Space Grotesk', sans-serif;
+
+  /* Font weights */
+  --font-weight-normal: 400;
+  --font-weight-heavy: 700;
+
+  /* Letter spacing - 15% for Fungis */
+  --tracking-fungis: 0.15em;
+
+  /* Colors */
   --color-ivory: #fdfcf9;
+  --color-ivory-shadow: #f0ebe0;
+  --color-text-primary: #1c1c1a;
+
+  /* Satin silver gradient for Heavy headings */
+  --gradient-satin: linear-gradient(
+    135deg,
+    #c0c0c0 0%,
+    #e8e8e8 30%,
+    #a8a8a8 50%,
+    #d4d4d4 70%,
+    #b0b0b0 100%
+  );
+}
+
+/* Base */
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-ivory);
+  color: var(--color-text-primary);
+}
+
+/* Typography roles */
+
+/* Hellasta Signature — brand moments only */
+.font-signature {
+  font-family: var(--font-signature);
+}
+
+/* Fungis Heavy — page titles, stats, CTA buttons */
+.font-display-heavy {
+  font-family: var(--font-display);
+  font-weight: var(--font-weight-heavy);
+  letter-spacing: var(--tracking-fungis);
+}
+
+/* Fungis Normal — body, labels, nav, subtext */
+.font-display-normal {
+  font-family: var(--font-display);
+  font-weight: var(--font-weight-normal);
+  letter-spacing: var(--tracking-fungis);
+}
+
+/* Satin silver text effect — use on Fungis Heavy only */
+.text-satin {
+  background: var(--gradient-satin);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Card/container depth using shadow ivory */
+.card {
+  background-color: var(--color-ivory-shadow);
 }
