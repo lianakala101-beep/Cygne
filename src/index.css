@@ -1,0 +1,30 @@
+@font-face {
+  font-family: 'Hellasta Signature';
+  src: url('/fonts/hellastasignature.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Fungis';
+  src: url('/fonts/FUNGIS Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Fungis';
+  src: url('/fonts/FUNGIS Heavy.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-signature: 'Hellasta Signature', cursive;
+  --font-display: 'Fungis', sans-serif;
+  --font-body: 'Space Grotesk', sans-serif;
+  --color-ivory: #fdfcf9;
+}

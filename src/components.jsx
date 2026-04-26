@@ -128,7 +128,7 @@ const LOGO_SRC = (
 function Wordmark({ size = 28, theme = "dark" }) {
   return (
     <span style={{
-      fontFamily: "'Pinyon Script', cursive",
+      fontFamily: "var(--font-signature, 'Hellasta Signature', cursive)",
       fontSize: size * 0.95,
       fontWeight: 400,
       letterSpacing: "0.04em",

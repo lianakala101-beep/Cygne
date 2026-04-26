@@ -618,12 +618,12 @@ export default function App() {
       <style>{`
         :root {
           --sage:      #6e8a72;
-          --script:    'Pinyon Script', cursive;
-          --cursive:   'Pinyon Script', cursive;
-          --sans:      'Space Grotesk', sans-serif;
-          --heading:   'Fungis', 'Space Grotesk', sans-serif;
+          --script:    var(--font-signature, 'Hellasta Signature', cursive);
+          --cursive:   var(--font-signature, 'Hellasta Signature', cursive);
+          --sans:      var(--font-body, 'Space Grotesk', sans-serif);
+          --heading:   var(--font-display, 'Fungis', sans-serif);
           --inky-moss: #1A1F16;
-          --ivory:     #F5F0E8;
+          --ivory:     var(--color-ivory, #fdfcf9);
         }
         .theme-dark {
           --deep:      #0e100d;
@@ -638,7 +638,7 @@ export default function App() {
           --cta:       #323d30;
         }
         .theme-light {
-          --deep:      #F5F0E8;
+          --deep:      var(--color-ivory, #fdfcf9);
           --ink:       #EDE8DE;
           --surface:   #F9F5EE;
           --border:    rgba(26,31,22,0.10);
