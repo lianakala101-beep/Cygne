@@ -1,12 +1,15 @@
 import { useState } from "react";
+import { Icon, SwanIcon } from "./components.jsx";
 import { analyzeShelf } from "./engine.js";
+import { getSeason } from "./seasonal.jsx";
+import { getCurrentCycleDay } from "./utils.jsx";
 
 // --- SWAN SENSE — PREDICTIVE SKIN ENGINE -------------------------------------
 
 function getSwanSensePredictions(products, checkIns = [], user = {}, locationData = null, journals = []) {
   const predictions = [];
   const season = getSeason();
-  const cycleDay = user?.cycleDay || null;
+  const cycleDay = getCurrentCycleDay(user);
   const activeMap = analyzeShelf(products).activeMap;
 
   // -- Journal-based predictions ----------------------------------------------
@@ -85,9 +88,9 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
           ? "Tretinoin is cumulative. After consecutive nights, the skin barrier can become compromised even before visible irritation appears. Consider a rest night."
           : "Strong actives used multiple nights in a row. Your skin may not show irritation yet, but risk is elevated — a rest night tonight can prevent it.",
         level: "caution",
-        color: "#c49040",
-        bg: "rgba(196,144,64,0.07)",
-        border: "rgba(196,144,64,0.2)",
+        color: "#8b7355",
+        bg: "rgba(139,115,85,0.07)",
+        border: "rgba(139,115,85,0.2)",
       });
     }
   }
@@ -113,9 +116,9 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
         headline: `Sensitivity window in ~${daysUntilMenstrual} day${daysUntilMenstrual === 1 ? "" : "s"}.`,
         detail: "Approaching menstruation, progesterone drops and barrier permeability increases. Consider easing up on exfoliants and actives over the next few days.",
         level: "cycle",
-        color: "#b06060",
-        bg: "rgba(176,96,96,0.07)",
-        border: "rgba(176,96,96,0.2)",
+        color: "#8b7355",
+        bg: "rgba(139,115,85,0.07)",
+        border: "rgba(139,115,85,0.2)",
       });
     } else if (daysUntilMenstrual === 0 && cycleDay <= 5) {
       predictions.push({
@@ -123,9 +126,9 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
         headline: "Elevated skin sensitivity right now.",
         detail: "During menstruation, barrier permeability is at its highest. Breakouts and irritation are more likely. A gentler ritual is recommended.",
         level: "cycle",
-        color: "#b06060",
-        bg: "rgba(176,96,96,0.07)",
-        border: "rgba(176,96,96,0.2)",
+        color: "#8b7355",
+        bg: "rgba(139,115,85,0.07)",
+        border: "rgba(139,115,85,0.2)",
       });
     }
 
@@ -135,9 +138,9 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
         headline: `Oil surge likely in ~${daysUntilLuteal} day${daysUntilLuteal === 1 ? "" : "s"}.`,
         detail: "Progesterone rise during luteal phase drives up sebum production. Your BHA will be especially useful this week — keep it consistent.",
         level: "cycle",
-        color: "#c49040",
-        bg: "rgba(196,144,64,0.07)",
-        border: "rgba(196,144,64,0.2)",
+        color: "#8b7355",
+        bg: "rgba(139,115,85,0.07)",
+        border: "rgba(139,115,85,0.2)",
       });
     }
 
@@ -149,9 +152,9 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
           headline: "Elevated breakout risk — late luteal phase.",
           detail: "Sebum is peaking and your recent check-ins flagged congestion. This is the highest-risk window. BHA and a lighter moisturiser will help.",
           level: "alert",
-          color: "#c06060",
-          bg: "rgba(192,96,96,0.08)",
-          border: "rgba(192,96,96,0.22)",
+          color: "#8b7355",
+          bg: "rgba(139,115,85,0.08)",
+          border: "rgba(139,115,85,0.22)",
         });
       }
     }
@@ -169,7 +172,7 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
           headline: "Resilience window opening soon.",
           detail: "Follicular phase starts in a couple of days — your skin will be at peak tolerance for retinol and AHA. A good moment to be consistent with actives.",
           level: "positive",
-          color: "#7a9070",
+          color: "#6e8a72",
           bg: "rgba(122,144,112,0.07)",
           border: "rgba(122,144,112,0.2)",
         });
@@ -182,16 +185,16 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
     const hasOcclusive = products.some(p =>
       (p.ingredients || []).some(i => /squalane|petrolatum|shea|ceramide|lanolin/i.test(i)) && p.inRoutine !== false
     );
-    const hasMoisturiser = products.some(p => p.category === "Moisturizer" && p.inRoutine !== false);
+    const hasMoisturiser = products.some(p => (p.category === "Moisturizer" || p.category === "SPF Moisturizer") && p.inRoutine !== false);
     if (!hasOcclusive && hasMoisturiser) {
       predictions.push({
         id: "winter_barrier",
         headline: season === "winter" ? "Barrier risk this week." : "Barrier risk as temperatures drop.",
         detail: "Cold air strips moisture faster than summer. Without an occlusive layer, your moisturiser's benefits will evaporate quickly. Consider adding a facial oil or balm as a final step.",
         level: "caution",
-        color: "#7a9aaa",
-        bg: "rgba(122,154,170,0.07)",
-        border: "rgba(122,154,170,0.2)",
+        color: "#8b7355",
+        bg: "rgba(139,115,85,0.07)",
+        border: "rgba(139,115,85,0.2)",
       });
     }
   }
@@ -204,9 +207,9 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
       headline: "Recurring irritation detected.",
       detail: "Two or more recent check-ins have flagged irritation. This may indicate an active is accumulating, a product isn't suiting you, or the barrier is compromised. A reset ritual for 3–5 nights can help identify the cause.",
       level: "alert",
-      color: "#c06060",
-      bg: "rgba(192,96,96,0.08)",
-      border: "rgba(192,96,96,0.22)",
+      color: "#8b7355",
+      bg: "rgba(139,115,85,0.08)",
+      border: "rgba(139,115,85,0.22)",
     });
   }
 
@@ -220,7 +223,7 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
         headline: "Set your cycle day to unlock predictions.",
         detail: "Swan Sense can predict sensitivity windows, oil surges, and ideal active nights — but needs your cycle day to do it. Add it in the Progress tab.",
         level: "positive",
-        color: "#7a9070",
+        color: "#6e8a72",
         bg: "rgba(122,144,112,0.07)",
         border: "rgba(122,144,112,0.2)",
       });
@@ -230,9 +233,9 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
         headline: season === "winter" ? "Winter is tough on skin barriers." : "Cooler air arriving — barrier watch.",
         detail: "As temperatures drop, transepidermal water loss increases. Check that you have a moisturiser and ideally an occlusive as your final PM step.",
         level: "caution",
-        color: "#7a9aaa",
-        bg: "rgba(122,154,170,0.07)",
-        border: "rgba(122,154,170,0.2)",
+        color: "#8b7355",
+        bg: "rgba(139,115,85,0.07)",
+        border: "rgba(139,115,85,0.2)",
       });
     } else {
       predictions.push({
@@ -240,7 +243,7 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
         headline: "Log your first check-in to activate predictions.",
         detail: "Swan Sense learns from your skin over time. After a few check-ins, it can flag irritation trends, barrier risk, and optimal active windows before they happen.",
         level: "positive",
-        color: "#7a9070",
+        color: "#6e8a72",
         bg: "rgba(122,144,112,0.07)",
         border: "rgba(122,144,112,0.2)",
       });
@@ -304,6 +307,29 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
     });
   }
 
+  // Hairline breakouts — often linked to hair/styling products
+  const recentZoned = checkIns.slice(-8).filter(c => Array.isArray(c.breakoutZones));
+  const hairlineCount = recentZoned.filter(c => c.breakoutZones.includes("Hairline")).length;
+  if (hairlineCount >= 2) {
+    predictions.push({
+      type: "hairline_breakouts",
+      level: "caution",
+      headline: "Repeated hairline breakouts",
+      detail: "Could be a hair product migrating to skin — check ingredients in your shampoo or styling products. Look for silicones, heavy oils, or fragrance that can transfer to the forehead during the day or on your pillowcase.",
+    });
+  }
+
+  // Perioral breakouts — often linked to toothpaste or lip products
+  const perioralCount = recentZoned.filter(c => c.breakoutZones.includes("Above lip")).length;
+  if (perioralCount >= 2) {
+    predictions.push({
+      type: "perioral_breakouts",
+      level: "caution",
+      headline: "Repeated breakouts around the mouth",
+      detail: "Perioral breakouts are often linked to toothpaste (SLS or fluoride) or lip products. Try switching to an SLS-free toothpaste for a couple of weeks and rinsing the mouth area after brushing to see if the pattern breaks.",
+    });
+  }
+
   // Bad window warning for anyone considering a treatment
   if (inBadWindow && (persistentDullness || persistentCongestion)) {
     predictions.push({
@@ -335,7 +361,7 @@ function SwanSenseCard({ products, checkIns = [], user = {}, locationData = null
   return (
     <div style={{ marginBottom: 20 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-        <span style={{ fontSize: 14, lineHeight: 1 }}>🦢</span>
+        <span style={{ color: "var(--clay)", display: "inline-flex" }}><SwanIcon size={16} /></span>
         <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)" }}>Swan Sense</span>
         <div style={{ flex: 1, height: 1, background: "var(--border)", marginLeft: 4 }} />
         <button onClick={() => setDismissed(true)} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", opacity: 0.4, padding: 4 }}><Icon name="x" size={12} /></button>
@@ -348,28 +374,30 @@ function SwanSenseCard({ products, checkIns = [], user = {}, locationData = null
             <div key={p.type}
               onClick={() => setExpanded(isExpanded ? null : p.type)}
               style={{ background: fb === "up" ? "rgba(122,144,112,0.1)" : p.bg, border: `1px solid ${fb ? "rgba(122,144,112,0.3)" : p.border}`, borderRadius: 12, padding: "13px 15px", cursor: "pointer", position: "relative", overflow: "hidden", transition: "all 0.2s" }}>
-              <div style={{ position: "absolute", bottom: 4, right: 10, opacity: 0.045, fontSize: 36, lineHeight: 1, pointerEvents: "none" }}>🦢</div>
+              <div style={{ position: "absolute", bottom: 6, right: 12, opacity: 0.16, color: "var(--clay)", pointerEvents: "none" }}><SwanIcon size={32} /></div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <div style={{ width: 5, height: 5, borderRadius: "50%", background: fb === "up" ? "#7a9070" : p.color, flexShrink: 0 }} />
+                <div style={{ width: 5, height: 5, borderRadius: "50%", background: fb === "up" ? "#6e8a72" : p.color, flexShrink: 0 }} />
                 <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--parchment)", margin: 0, flex: 1, lineHeight: 1.4 }}>{p.headline}</p>
-                <span style={{ color: "var(--clay)", opacity: 0.4, fontSize: 10, flexShrink: 0, transition: "transform 0.18s", transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)", display: "inline-block" }}>▾</span>
+                <span style={{ color: "var(--clay)", opacity: 0.4, flexShrink: 0, transition: "transform 0.18s", transform: isExpanded ? "rotate(-90deg)" : "rotate(90deg)", display: "inline-flex" }}><Icon name="chevron" size={10} /></span>
               </div>
               {isExpanded && (
                 <div>
                   <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: "10px 0 0", lineHeight: 1.65, paddingTop: 10, borderTop: "1px solid rgba(255,255,255,0.06)" }}>{p.detail}</p>
+                  {p.type && !(p.id && p.id.startsWith("baseline_")) && (
                   <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 12 }}>
                     <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.5, marginRight: 4 }}>
                       {fb ? (fb === "up" ? "Marked as helpful" : "Noted") : "Was this helpful?"}
                     </span>
                     <button onClick={e => giveFeedback(p.type, "up", e)}
-                      style={{ background: fb === "up" ? "rgba(122,144,112,0.25)" : "transparent", border: `1px solid ${fb === "up" ? "rgba(122,144,112,0.5)" : "var(--border)"}`, borderRadius: 20, padding: "4px 10px", cursor: "pointer", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: fb === "up" ? "#7a9070" : "var(--clay)", transition: "all 0.15s" }}>
-                      ↑ Yes
+                      style={{ display: "inline-flex", alignItems: "center", gap: 5, background: fb === "up" ? "rgba(122,144,112,0.25)" : "transparent", border: `1px solid ${fb === "up" ? "rgba(122,144,112,0.5)" : "var(--border)"}`, borderRadius: 20, padding: "4px 10px", cursor: "pointer", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: fb === "up" ? "#6e8a72" : "var(--clay)", transition: "all 0.15s" }}>
+                      <Icon name="arrow-up" size={10} /> Yes
                     </button>
                     <button onClick={e => giveFeedback(p.type, "down", e)}
-                      style={{ background: fb === "down" ? "rgba(192,96,96,0.15)" : "transparent", border: `1px solid ${fb === "down" ? "rgba(192,96,96,0.4)" : "var(--border)"}`, borderRadius: 20, padding: "4px 10px", cursor: "pointer", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: fb === "down" ? "#c06060" : "var(--clay)", transition: "all 0.15s" }}>
-                      ↓ Not really
+                      style={{ display: "inline-flex", alignItems: "center", gap: 5, background: fb === "down" ? "rgba(139,115,85,0.15)" : "transparent", border: `1px solid ${fb === "down" ? "rgba(139,115,85,0.4)" : "var(--border)"}`, borderRadius: 20, padding: "4px 10px", cursor: "pointer", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: fb === "down" ? "#8b7355" : "var(--clay)", transition: "all 0.15s" }}>
+                      <Icon name="arrow-down" size={10} /> Not really
                     </button>
                   </div>
+                  )}
                 </div>
               )}
             </div>

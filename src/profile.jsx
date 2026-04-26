@@ -3,7 +3,10 @@ import { useState, useRef } from "react";
 import { Icon, Section } from "./components.jsx";
 import { calcSpending } from "./engine.js";
 
-function Profile({ user, products, onLogout, locationData, setLocationData }) {
+const SKIN_TYPES = ["Dry", "Oily", "Combination", "Sensitive", "Normal"];
+const SKIN_CONCERNS = ["Acne", "Hyperpigmentation", "Redness", "Fine lines", "Texture", "Dehydration", "Dullness", "Sensitivity"];
+
+function Profile({ user, products, onLogout, locationData, setLocationData, locationDenied, setLocationDenied }) {
   const spending = calcSpending(products);
   return (
     <div>
@@ -27,7 +30,7 @@ function Profile({ user, products, onLogout, locationData, setLocationData }) {
             {user.skinType && (
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: user.concerns?.length > 0 ? 12 : 0, paddingBottom: user.concerns?.length > 0 ? 12 : 0, borderBottom: user.concerns?.length > 0 ? "1px solid var(--border)" : "none" }}>
                 <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)" }}>Skin Type</span>
-                <span style={{ padding: "4px 12px", borderRadius: 20, background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.3)", fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "#7a9070", fontWeight: 500 }}>{user.skinType}</span>
+                <span style={{ padding: "4px 12px", borderRadius: 20, background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.3)", fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "#6e8a72", fontWeight: 500 }}>{user.skinType}</span>
               </div>
             )}
             {user.concerns && user.concerns.length > 0 && (
@@ -56,7 +59,7 @@ function Profile({ user, products, onLogout, locationData, setLocationData }) {
       {/* Location */}
       <div style={{ marginBottom: 24 }}>
         <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", marginBottom: 12 }}>Your Environment</p>
-        <LocationManager locationData={locationData} setLocationData={setLocationData} />
+        <LocationManager locationData={locationData} setLocationData={setLocationData} locationDenied={locationDenied} setLocationDenied={setLocationDenied} />
       </div>
 
       <Section title="About Cygne" icon="leaf">
@@ -72,7 +75,7 @@ function Profile({ user, products, onLogout, locationData, setLocationData }) {
 
       <button onClick={onLogout}
         style={{ width: "100%", padding: "13px 0", background: "none", color: "var(--clay)", border: "1px solid var(--border)", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", cursor: "pointer", transition: "border-color 0.2s, color 0.2s" }}
-        onMouseEnter={e => { e.currentTarget.style.borderColor = "#7a9070"; e.currentTarget.style.color = "#7a9070"; }}
+        onMouseEnter={e => { e.currentTarget.style.borderColor = "#6e8a72"; e.currentTarget.style.color = "#6e8a72"; }}
         onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--clay)"; }}>
         Sign Out
       </button>
@@ -242,20 +245,20 @@ function IngredientProfile({ user, onUpdateUser }) {
             <>
               {allergens.length > 0 && (
                 <div style={{ marginBottom: loved.length > 0 ? 12 : 0 }}>
-                  <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "#c06060", margin: "0 0 7px", opacity: 0.8 }}>Avoid</p>
+                  <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "#8b7355", margin: "0 0 7px", opacity: 0.8 }}>Avoid</p>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                     {allergens.map(a => (
-                      <span key={a} style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(192,96,96,0.08)", border: "1px solid rgba(192,96,96,0.22)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "#c06060" }}>{a}</span>
+                      <span key={a} style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.22)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "#8b7355" }}>{a}</span>
                     ))}
                   </div>
                 </div>
               )}
               {loved.length > 0 && (
                 <div>
-                  <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "#7a9070", margin: "0 0 7px", opacity: 0.8 }}>Love</p>
+                  <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "#6e8a72", margin: "0 0 7px", opacity: 0.8 }}>Love</p>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                     {loved.map(l => (
-                      <span key={l} style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.22)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "#7a9070" }}>{l}</span>
+                      <span key={l} style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.22)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "#6e8a72" }}>{l}</span>
                     ))}
                   </div>
                 </div>
@@ -268,21 +271,21 @@ function IngredientProfile({ user, onUpdateUser }) {
 
           {/* Allergens */}
           <div style={{ marginBottom: 18 }}>
-            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "#c06060", margin: "0 0 10px", opacity: 0.9 }}>Avoid / Allergic to</p>
+            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "#8b7355", margin: "0 0 10px", opacity: 0.9 }}>Avoid / Allergic to</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }}>
               {COMMON_ALLERGENS.map(s => {
                 const on = draftAllergens.includes(s);
                 return (
                   <button key={s} onClick={() => toggleAllergen(s)}
-                    style={{ padding: "5px 12px", borderRadius: 20, border: `1px solid ${on ? "rgba(192,96,96,0.5)" : "var(--border)"}`, background: on ? "rgba(192,96,96,0.10)" : "transparent", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: on ? "#c06060" : "var(--clay)", fontWeight: on ? 600 : 400, cursor: "pointer", transition: "all 0.15s" }}>
+                    style={{ padding: "5px 12px", borderRadius: 20, border: `1px solid ${on ? "rgba(139,115,85,0.5)" : "var(--border)"}`, background: on ? "rgba(139,115,85,0.10)" : "transparent", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: on ? "#8b7355" : "var(--clay)", fontWeight: on ? 600 : 400, cursor: "pointer", transition: "all 0.15s" }}>
                     {s}
                   </button>
                 );
               })}
               {draftAllergens.filter(a => !COMMON_ALLERGENS.includes(a)).map(a => (
                 <button key={a} onClick={() => toggleAllergen(a)}
-                  style={{ padding: "5px 12px", borderRadius: 20, border: "1px solid rgba(192,96,96,0.5)", background: "rgba(192,96,96,0.10)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "#c06060", fontWeight: 600, cursor: "pointer" }}>
-                  {a} ×
+                  style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "5px 12px", borderRadius: 20, border: "1px solid rgba(139,115,85,0.5)", background: "rgba(139,115,85,0.10)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "#8b7355", fontWeight: 600, cursor: "pointer" }}>
+                  {a} <Icon name="x" size={9} />
                 </button>
               ))}
             </div>
@@ -290,27 +293,27 @@ function IngredientProfile({ user, onUpdateUser }) {
               <input style={{ ...inputStyle, flex: 1 }} placeholder="Add custom e.g. Benzophenone"
                 value={customAllergen} onChange={e => setCustomAllergen(e.target.value)}
                 onKeyDown={e => e.key === "Enter" && addCustomAllergen()} />
-              <button onClick={addCustomAllergen} style={{ padding: "8px 14px", background: "rgba(192,96,96,0.08)", border: "1px solid rgba(192,96,96,0.25)", borderRadius: 8, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "#c06060", cursor: "pointer" }}>Add</button>
+              <button onClick={addCustomAllergen} style={{ padding: "8px 14px", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.25)", borderRadius: 8, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "#8b7355", cursor: "pointer" }}>Add</button>
             </div>
           </div>
 
           {/* Loved */}
           <div style={{ marginBottom: 18 }}>
-            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "#7a9070", margin: "0 0 10px", opacity: 0.9 }}>Love</p>
+            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "#6e8a72", margin: "0 0 10px", opacity: 0.9 }}>Love</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }}>
               {COMMON_LOVED.map(s => {
                 const on = draftLoved.includes(s);
                 return (
                   <button key={s} onClick={() => toggleLoved(s)}
-                    style={{ padding: "5px 12px", borderRadius: 20, border: `1px solid ${on ? "rgba(122,144,112,0.5)" : "var(--border)"}`, background: on ? "rgba(122,144,112,0.10)" : "transparent", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: on ? "#7a9070" : "var(--clay)", fontWeight: on ? 600 : 400, cursor: "pointer", transition: "all 0.15s" }}>
+                    style={{ padding: "5px 12px", borderRadius: 20, border: `1px solid ${on ? "rgba(122,144,112,0.5)" : "var(--border)"}`, background: on ? "rgba(122,144,112,0.10)" : "transparent", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: on ? "#6e8a72" : "var(--clay)", fontWeight: on ? 600 : 400, cursor: "pointer", transition: "all 0.15s" }}>
                     {s}
                   </button>
                 );
               })}
               {draftLoved.filter(l => !COMMON_LOVED.includes(l)).map(l => (
                 <button key={l} onClick={() => toggleLoved(l)}
-                  style={{ padding: "5px 12px", borderRadius: 20, border: "1px solid rgba(122,144,112,0.5)", background: "rgba(122,144,112,0.10)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "#7a9070", fontWeight: 600, cursor: "pointer" }}>
-                  {l} ×
+                  style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "5px 12px", borderRadius: 20, border: "1px solid rgba(122,144,112,0.5)", background: "rgba(122,144,112,0.10)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "#6e8a72", fontWeight: 600, cursor: "pointer" }}>
+                  {l} <Icon name="x" size={9} />
                 </button>
               ))}
             </div>
@@ -318,7 +321,7 @@ function IngredientProfile({ user, onUpdateUser }) {
               <input style={{ ...inputStyle, flex: 1 }} placeholder="Add custom e.g. Tranexamic acid"
                 value={customLoved} onChange={e => setCustomLoved(e.target.value)}
                 onKeyDown={e => e.key === "Enter" && addCustomLoved()} />
-              <button onClick={addCustomLoved} style={{ padding: "8px 14px", background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.25)", borderRadius: 8, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "#7a9070", cursor: "pointer" }}>Add</button>
+              <button onClick={addCustomLoved} style={{ padding: "8px 14px", background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.25)", borderRadius: 8, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "#6e8a72", cursor: "pointer" }}>Add</button>
             </div>
           </div>
 
@@ -419,7 +422,7 @@ function SkinHistory({ user, onUpdateUser }) {
               {(history.sensitivities||[]).length > 0 && (
                 <div style={{ ...rowStyle, flexWrap: "wrap", gap: 6, alignItems: "flex-start", paddingTop: 10 }}>
                   <span style={{ ...labelStyle, width: "100%", marginBottom: 6 }}>Sensitivities</span>
-                  {history.sensitivities.map(s => <span key={s} style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(192,96,96,0.08)", border: "1px solid rgba(192,96,96,0.2)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "#c06060" }}>{s}</span>)}
+                  {history.sensitivities.map(s => <span key={s} style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.2)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "#8b7355" }}>{s}</span>)}
                 </div>
               )}
               {(history.dermaVisits||[]).slice(0,2).map((v, i) => (
@@ -470,7 +473,7 @@ function SkinHistory({ user, onUpdateUser }) {
             {draft.prescriptions.map((rx, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "6px 0" }}>
                 <span style={valStyle}>{rx.name}</span>
-                <button onClick={() => setDraft(d => ({ ...d, prescriptions: d.prescriptions.filter((_, j) => j !== i) }))} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", fontSize: 11, padding: "0 4px" }}>×</button>
+                <button onClick={() => setDraft(d => ({ ...d, prescriptions: d.prescriptions.filter((_, j) => j !== i) }))} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: "0 4px", display: "inline-flex", alignItems: "center" }}><Icon name="x" size={11} /></button>
               </div>
             ))}
             <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
@@ -487,7 +490,7 @@ function SkinHistory({ user, onUpdateUser }) {
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
               {COMMON_SENSITIVITIES.map(s => {
                 const on = draft.sensitivities.includes(s);
-                return <button key={s} onClick={() => toggleSensitivity(s)} style={{ padding: "5px 12px", borderRadius: 20, border: `1px solid ${on ? "rgba(192,96,96,0.5)" : "var(--border)"}`, background: on ? "rgba(192,96,96,0.10)" : "transparent", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: on ? "#c06060" : "var(--clay)", fontWeight: on ? 600 : 400, cursor: "pointer", transition: "all 0.15s" }}>{s}</button>;
+                return <button key={s} onClick={() => toggleSensitivity(s)} style={{ padding: "5px 12px", borderRadius: 20, border: `1px solid ${on ? "rgba(139,115,85,0.5)" : "var(--border)"}`, background: on ? "rgba(139,115,85,0.10)" : "transparent", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: on ? "#8b7355" : "var(--clay)", fontWeight: on ? 600 : 400, cursor: "pointer", transition: "all 0.15s" }}>{s}</button>;
               })}
             </div>
           </div>
@@ -498,7 +501,7 @@ function SkinHistory({ user, onUpdateUser }) {
             {draft.dermaVisits.slice(0,3).map((v, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "5px 0", borderBottom: "1px solid var(--border)" }}>
                 <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)" }}>{v.date}{v.note ? ` — ${v.note}` : ""}</span>
-                <button onClick={() => setDraft(d => ({ ...d, dermaVisits: d.dermaVisits.filter((_, j) => j !== i) }))} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", fontSize: 11, padding: "0 4px" }}>×</button>
+                <button onClick={() => setDraft(d => ({ ...d, dermaVisits: d.dermaVisits.filter((_, j) => j !== i) }))} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: "0 4px", display: "inline-flex", alignItems: "center" }}><Icon name="x" size={11} /></button>
               </div>
             ))}
             <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
@@ -520,7 +523,7 @@ function SkinHistory({ user, onUpdateUser }) {
   );
 }
 
-function ProfileSheet({ user, products, locationData, setLocationData, onUpdateUser, onLogout, onClose }) {
+function ProfileSheet({ user, products, locationData, setLocationData, locationDenied, setLocationDenied, onUpdateUser, onLogout, onClose }) {
   const [editingAccount, setEditingAccount] = useState(false);
   const [accountDraft, setAccountDraft] = useState({
     name: user?.name || "",
@@ -551,7 +554,7 @@ function ProfileSheet({ user, products, locationData, setLocationData, onUpdateU
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: editingAccount ? 16 : 0 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 <div style={{ width: 44, height: 44, borderRadius: "50%", flexShrink: 0, background: "rgba(122,144,112,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <span style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 28, color: "var(--sage)", lineHeight: 1 }}>
+                  <span style={{ fontFamily: "Pinyon Script, cursive", fontSize: 28, color: "var(--sage)", lineHeight: 1 }}>
                     {(accountDraft.name || user?.name || "?").trim()[0].toUpperCase()}
                   </span>
                 </div>
@@ -601,7 +604,7 @@ function ProfileSheet({ user, products, locationData, setLocationData, onUpdateU
                 </div>
                 <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
                   <button onClick={saveAccount}
-                    style={{ flex: 1, padding: "10px 0", background: "#7a9070", border: "none", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 600, color: "var(--ink)", cursor: "pointer" }}>
+                    style={{ flex: 1, padding: "10px 0", background: "#6e8a72", border: "none", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 600, color: "var(--ink)", cursor: "pointer" }}>
                     Save
                   </button>
                   <button onClick={() => setEditingAccount(false)}
@@ -634,13 +637,13 @@ function ProfileSheet({ user, products, locationData, setLocationData, onUpdateU
           {/* Location */}
           <div style={{ marginBottom: 20 }}>
             <p style={{ fontFamily: "var(--sans)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 10px" }}>Your Environment</p>
-            <LocationManager locationData={locationData} setLocationData={setLocationData} />
+            <LocationManager locationData={locationData} setLocationData={setLocationData} locationDenied={locationDenied} setLocationDenied={setLocationDenied} />
           </div>
 
           {/* Sign out */}
           <button onClick={onLogout}
             style={{ width: "100%", padding: "12px 0", background: "none", color: "var(--clay)", border: "1px solid var(--border)", borderRadius: 10, fontFamily: "var(--sans)", fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", cursor: "pointer", transition: "border-color 0.2s, color 0.2s" }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = "#c06060"; e.currentTarget.style.color = "#c06060"; }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = "#8b7355"; e.currentTarget.style.color = "#8b7355"; }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--clay)"; }}>
             Sign Out
           </button>

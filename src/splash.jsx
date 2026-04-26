@@ -14,7 +14,7 @@ function SplashScreen({ onDone }) {
     <div
       style={{
         position: "fixed", inset: 0, zIndex: 9999,
-        background: "#3a4134",
+        background: "#323d30",
         display: "flex", flexDirection: "column",
         justifyContent: "flex-start",
         opacity: fading ? 0 : 1,
@@ -35,7 +35,7 @@ function SplashScreen({ onDone }) {
           }}
         />
         <p style={{
-          fontFamily: "'Reenie Beanie', cursive",
+          fontFamily: "'Pinyon Script', cursive",
           fontSize: 22, fontWeight: 400,
           color: "rgba(232,227,214,0.95)",
           margin: "6px 0 0 130px",

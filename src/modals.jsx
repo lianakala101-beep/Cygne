@@ -1,6 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { Icon, Section, FlagCard } from "./components.jsx";
 import { detectActives, analyzeShelf } from "./engine.js";
+import { getSeason } from "./seasonal.jsx";
+import { supabase, invokeEdgeFunction } from "./supabase.js";
+import { compressImage } from "./utils.jsx";
 
 
 // SCAN MODAL
@@ -10,6 +13,7 @@ function ScanModal({ products, onAddToShelf, onClose }) {
   const [scanned, setScanned] = useState(null);
   const [verdict, setVerdict] = useState(null);
   const [saved, setSaved] = useState(false);
+  const [scanError, setScanError] = useState(null);
   const fileRef = useRef();
   const { activeMap } = analyzeShelf(products);
 
@@ -21,9 +25,9 @@ function ScanModal({ products, onAddToShelf, onClose }) {
   const searchTimeout = useRef(null);
 
   const verdictConfig = {
-    pass:    { color: "#7a9070", bg: "rgba(122,144,112,0.10)", border: "rgba(122,144,112,0.35)", label: "Good fit" },
-    caution: { color: "#c49040", bg: "rgba(196,144,64,0.08)",  border: "rgba(196,144,64,0.30)",  label: "Use with care" },
-    skip:    { color: "#c06060", bg: "rgba(192,96,96,0.08)",   border: "rgba(192,96,96,0.30)",   label: "Skip this one" },
+    pass:    { color: "#6e8a72", bg: "rgba(122,144,112,0.10)", border: "rgba(122,144,112,0.35)", label: "Good fit" },
+    caution: { color: "#8b7355", bg: "rgba(139,115,85,0.08)",  border: "rgba(139,115,85,0.30)",  label: "Use with care" },
+    skip:    { color: "#8b7355", bg: "rgba(139,115,85,0.08)",   border: "rgba(139,115,85,0.30)",   label: "Skip this one" },
   };
   const vc = verdictConfig[verdict] || verdictConfig.pass;
 
@@ -94,25 +98,53 @@ function ScanModal({ products, onAddToShelf, onClose }) {
 
   const analyze = async (file) => {
     setMode("scanning");
-    const base64 = await new Promise((res, rej) => {
-      const r = new FileReader(); r.onload = () => res(r.result.split(",")[1]); r.onerror = rej; r.readAsDataURL(file);
-    });
+    setScanError(null);
+    console.log("[Cygne vanity-scan] 1. image selected:", file.name, "size:", file.size, "type:", file.type);
     try {
+      console.log("[Cygne vanity-scan] 2. compressing image...");
+      const base64 = await compressImage(file);
+      console.log("[Cygne vanity-scan] 3. compressed base64 length:", base64.length, "(~" + Math.round(base64.length * 0.75 / 1024) + "KB)");
+
       const shelfSummary = products.map(p => ({ name: p.name, category: p.category, actives: Object.keys(detectActives(p.ingredients || [])) }));
-      const resp = await fetch("https://mxcefgbaaylddnyxrnao.supabase.co/functions/v1/rapid-action", {
-        method: "POST", headers: { "Content-Type": "application/json", "apikey": "sb_publishable_6kUbORFpskKo-zg6r0MZtA_x5ppPvin", "Authorization": "Bearer sb_publishable_6kUbORFpskKo-zg6r0MZtA_x5ppPvin" },
-        body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 1000, messages: [{ role: "user", content: [
-          { type: "image", source: { type: "base64", media_type: file.type, data: base64 } },
-          { type: "text", text: "Analyze this skincare product. User's vanity: " + JSON.stringify(shelfSummary) + ". Return ONLY JSON with fields: brand, name, ingredients array, actives array, verdict (pass/caution/skip), headline, reason, conflicts array, duplicates array." }
-        ]}] })
+      console.log("[Cygne vanity-scan] 4. calling rapid-action...");
+      const data = await invokeEdgeFunction("rapid-action", {
+        model: "claude-sonnet-4-20250514", max_tokens: 1500, messages: [{ role: "user", content: [
+          { type: "image", source: { type: "base64", media_type: "image/jpeg", data: base64 } },
+          { type: "text", text: "Analyze this skincare product image. You are an international product expert. Fully support: KOREAN (COSRX, Innisfree, Laneige, Sulwhasoo, Anua, Beauty of Joseon, Skin1004, Torriden, Tirtir, Numbuzin, Round Lab, Abib, Isntree, Mixsoon, Haruharu Wonder, Axis-Y, Some By Mi, Medicube, Dr. Jart, I'm From, Klairs, Purito, Benton, Mediheal) — read Hangul. JAPANESE (SK-II, Hada Labo, DHC, Shiseido, Tatcha, Rohto, Curel, Kose, Minon, Kanebo, Kiehl's Japan, Albion, Decorté, Kose Sekkisei) — read Kanji/Hiragana/Katakana. FRENCH PHARMACY/LUXURY (La Roche-Posay, Avène, Bioderma, Vichy, Uriage, A-Derma, Caudalie, Nuxe, Embryolisse, Filorga, Biotherm, Clarins, Sisley, Darphin). AUSTRALIAN (Aesop, Ultra Violette, Sand & Sky, Jurlique, Grown Alchemist, Frank Body, Bondi Sands, Alpha-H, Rationale, Medik8). BRITISH/EUROPEAN (The Ordinary, NIOD, Deciem, Pai, Emma Hardie, Liz Earle, Eve Lom, Weleda, Dr. Hauschka, Eucerin, Hydraluron, Allies of Skin). Recognize international categories: Korean essence/ampoule/sleeping mask/sheet mask/softener, Japanese milky lotion (nyuueki)/lotion (keshouisui, actually a hydrating toner)/emulsion, French eau thermale/eau micellaire (micellar water)/lait/crème, Australian SPF serums. INGREDIENT NORMALIZATION — map local names to INCI English: oxyde de zinc → zinc oxide, eau thermale → thermal spring water, acide hyaluronique → hyaluronic acid, melaleuca → tea tree oil, kakadu plum → Terminalia ferdinandiana, quandong → Santalum acuminatum, galactomyces/pitera → Galactomyces Ferment Filtrate, placenta extract → placental protein, fullerene → fullerenes, snail mucin → snail secretion filtrate, centella asiatica → Centella Asiatica Extract, madecassoside, asiaticoside, heartleaf → Houttuynia Cordata, mugwort → Artemisia, propolis, rice ferment → Rice Ferment Filtrate, birch sap → Betula Alba Juice, niacinamide, bifida ferment lysate. FLAG (do not warn) ingredients restricted in the US but common abroad: Tinosorb S/Bemotrizinol, Tinosorb M/Bisoctrizole, Mexoryl SX/Ecamsule, Mexoryl XL/Drometrizole Trisiloxane, Uvinul A Plus, Uvinul T 150, Enzacamene, Iscotrizinol, hydroquinone >2%, tranexamic acid (prescription in US). Add these to a 'flags' array as informational notes, NOT conflicts. CATEGORIZATION RULES — INGREDIENT-FIRST. Texture and ingredient profile ALWAYS override the product name. Priority: (1) primary active / functional ingredient, (2) format & texture, (3) product name LAST. INGREDIENT DECISION TREE: (a) Primary active is hyaluronic acid, niacinamide, vitamin C / ascorbic acid, retinol / retinoid, peptides, AHA, or BHA → Serum. A lightweight/watery HA-dominant 'lotion' or 'milk' is a SERUM, not a Moisturizer. (b) Primary base is ceramides, shea butter, squalane, or fatty acids in a THICK occlusive base → Moisturizer. (c) Lightweight with mostly humectants (glycerin, HA, panthenol) and no heavy active → Serum or Essence (Essence if watery/toner-adjacent, Serum if targeted). (d) Contains SPF 30+ → SPF (pure sunscreen) or SPF Moisturizer (combined with heavy hydration). (e) Contains surfactants / cleansing agents (sulfates, glucosides, betaines, micellar, amino-acid surfactants) → Cleanser. ASIAN FORMAT MAPPINGS (apply AFTER the ingredient tree): Korean/Japanese 'lotion', 'milky lotion', 'milk', '乳液/nyuueki', or '유액' with hydrating ingredients → Essence if watery, Moisturizer if creamy, Serum if HA/niacinamide-dominant — NEVER Cleanser. Korean 'skin' or 'softener' → Toner. 'Ampoule' → Serum. 'Emulsion' → lightweight Moisturizer. When uncertain, pick the category that best matches the ingredient profile. NEVER default to Serum without ingredient justification. SPF LOGIC: (1) If SPF 30+ and the product is primarily a sunscreen with minimal moisturizing claims → 'SPF'. (2) If SPF 15 or lower and the product is primarily a moisturizer with incidental sun protection → 'Moisturizer' (put the SPF value in the 'spf' field). (3) If SPF 30+ AND the product is marketed as a moisturizer/day cream with heavy hydration (ceramides, hyaluronic acid, shea butter, squalane, 'hydrating', 'moisturizing sunscreen', 'day cream SPF', 'SPF moisturizer') → 'SPF Moisturizer'. User's vanity: " + JSON.stringify(shelfSummary) + ". Return ONLY valid JSON (no markdown) with fields: brand, name, category (Cleanser/Toner/Essence/Serum/Eye Cream/Moisturizer/SPF Moisturizer/SPF/Oil/Exfoliant/Mask/Sleeping Mask/Sheet Mask/Treatment/Mist/Lip Care/Micellar Water), spf (numeric SPF level if present, else null), ingredients (array of INCI English strings), actives (array), verdict (pass/caution/skip), headline, reason, conflicts (array), duplicates (array), flags (array of informational notes)." }
+        ]}]
       });
-      const data = await resp.json();
-      const text = (data.content || []).map(c => c.text || "").join("") || "{}";
-      const parsed = JSON.parse(text.replace(/\x60\x60\x60json|\x60\x60\x60/g, "").trim());
+      console.log("[Cygne vanity-scan] 5. response:", JSON.stringify(data).slice(0, 500));
+
+      let text;
+      if (data && data.content && Array.isArray(data.content)) {
+        text = data.content.map(c => c.text || "").join("");
+      } else if (typeof data === "string") {
+        text = data;
+      } else {
+        text = JSON.stringify(data);
+      }
+      console.log("[Cygne vanity-scan] 7. extracted text:", text.slice(0, 300));
+
+      const clean = text.replace(/```json|```/g, "").trim();
+      const jsonStart = clean.indexOf("{");
+      const jsonEnd = clean.lastIndexOf("}");
+      if (jsonStart < 0 || jsonEnd < 0) {
+        console.error("[Cygne vanity-scan] 8. NO JSON in response:", clean.slice(0, 200));
+        setScanError("Unexpected response format. Check console.");
+        setMode("scan"); return;
+      }
+      const jsonStr = clean.slice(jsonStart, jsonEnd + 1);
+      const parsed = JSON.parse(jsonStr);
+      console.log("[Cygne vanity-scan] 8. parsed result:", parsed);
       setScanned(parsed);
-      setVerdict(parsed.verdict);
+      setVerdict(parsed.verdict || "pass");
       setMode("result");
-    } catch { setMode("scan"); }
+    } catch(err) {
+      console.error("[Cygne vanity-scan] EXCEPTION:", err);
+      console.error("[Cygne vanity-scan] stack:", err.stack);
+      setScanError("Scan failed: " + (err.message || "unknown error"));
+      setMode("scan");
+    }
   };
 
   const handleFile = (e) => {
@@ -132,11 +164,11 @@ function ScanModal({ products, onAddToShelf, onClose }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {mode !== "choose" && (
-              <button onClick={reset} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", fontSize: 16, padding: "0 8px 0 0", opacity: 0.6 }}>←</button>
+              <button onClick={reset} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: "0 8px 0 0", opacity: 0.6, display: "inline-flex" }}><Icon name="arrow-left" size={16} /></button>
             )}
             <div>
               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 3px" }}>Shop Scan</p>
-              <h2 style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 22, fontWeight: 400, color: "var(--parchment)", margin: 0 }}>
+              <h2 style={{ fontFamily: "Pinyon Script, cursive", fontSize: 22, fontWeight: 400, color: "var(--parchment)", margin: 0 }}>
                 {mode === "choose" ? "Does this work for you?" :
                  mode === "search" ? "Search by name" :
                  mode === "scan" || mode === "scanning" ? "Scan the label" :
@@ -219,6 +251,9 @@ function ScanModal({ products, onAddToShelf, onClose }) {
         {mode === "scan" && (
           <div>
             <input ref={fileRef} type="file" accept="image/*" capture="environment" style={{ display: "none" }} onChange={handleFile} />
+            {scanError && (
+              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "#8b7355", margin: "0 0 10px", padding: "8px 12px", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.2)", borderRadius: 8 }}>{scanError}</p>
+            )}
             <button onClick={() => fileRef.current.click()}
               style={{ width: "100%", padding: "32px 0", background: "rgba(122,144,112,0.08)", border: "1px dashed rgba(122,144,112,0.35)", borderRadius: 14, cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
               <Icon name="camera" size={28} color="var(--sage)" />
@@ -232,7 +267,7 @@ function ScanModal({ products, onAddToShelf, onClose }) {
         {mode === "scanning" && (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "32px 0 24px", gap: 16 }}>
             {imgPreview && <img src={imgPreview} alt="" style={{ width: 100, height: 100, objectFit: "cover", borderRadius: 12, opacity: 0.7 }} />}
-            <div style={{ width: 28, height: 28, border: "2px solid #7a9070", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+            <div style={{ width: 28, height: 28, border: "2px solid #6e8a72", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
             <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", margin: 0 }}>Reading the label…</p>
           </div>
         )}
@@ -246,17 +281,17 @@ function ScanModal({ products, onAddToShelf, onClose }) {
                 <div style={{ width: 8, height: 8, borderRadius: "50%", background: vc.color, flexShrink: 0 }} />
                 <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: vc.color, fontWeight: 700 }}>{vc.label}</span>
               </div>
-              <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 24, color: "var(--parchment)", margin: "0 0 6px" }}>{scanned.headline}</p>
+              <p style={{ fontFamily: "Pinyon Script, cursive", fontSize: 24, color: "var(--parchment)", margin: "0 0 6px" }}>{scanned.headline}</p>
               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{scanned.reason}</p>
             </div>
 
             {/* Conflicts */}
             {scanned.conflicts && scanned.conflicts.length > 0 && (
-              <div style={{ padding: "12px 14px", background: "rgba(192,96,96,0.06)", borderRadius: 11, border: "1px solid rgba(192,96,96,0.2)", marginBottom: 10 }}>
-                <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "#c06060", margin: "0 0 6px" }}>Conflicts</p>
+              <div style={{ padding: "12px 14px", background: "rgba(139,115,85,0.06)", borderRadius: 11, border: "1px solid rgba(139,115,85,0.2)", marginBottom: 10 }}>
+                <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "#8b7355", margin: "0 0 6px" }}>Conflicts</p>
                 {scanned.conflicts.map((c, i) => (
                   <div key={i} style={{ display: "flex", gap: 7, alignItems: "flex-start", marginBottom: i < scanned.conflicts.length - 1 ? 4 : 0 }}>
-                    <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#c06060", marginTop: 6, flexShrink: 0 }} />
+                    <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#8b7355", marginTop: 6, flexShrink: 0 }} />
                     <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", lineHeight: 1.5 }}>{c}</span>
                   </div>
                 ))}
@@ -265,11 +300,11 @@ function ScanModal({ products, onAddToShelf, onClose }) {
 
             {/* Duplicates */}
             {scanned.duplicates && scanned.duplicates.length > 0 && (
-              <div style={{ padding: "12px 14px", background: "rgba(196,144,64,0.06)", borderRadius: 11, border: "1px solid rgba(196,144,64,0.25)", marginBottom: 10 }}>
-                <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "#c49040", margin: "0 0 6px" }}>Already covered by</p>
+              <div style={{ padding: "12px 14px", background: "rgba(139,115,85,0.06)", borderRadius: 11, border: "1px solid rgba(139,115,85,0.25)", marginBottom: 10 }}>
+                <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "#8b7355", margin: "0 0 6px" }}>Already covered by</p>
                 {scanned.duplicates.map((d, i) => (
                   <div key={i} style={{ display: "flex", gap: 7, alignItems: "center" }}>
-                    <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#c49040", flexShrink: 0 }} />
+                    <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#8b7355", flexShrink: 0 }} />
                     <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)" }}>{d}</span>
                   </div>
                 ))}
@@ -280,7 +315,7 @@ function ScanModal({ products, onAddToShelf, onClose }) {
             {scanned.actives && scanned.actives.length > 0 && (
               <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 16 }}>
                 {scanned.actives.map((a, i) => (
-                  <span key={i} style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", color: "#7a9070", background: "rgba(122,144,112,0.1)", padding: "3px 10px", borderRadius: 20, border: "1px solid rgba(122,144,112,0.25)", letterSpacing: "0.1em", textTransform: "uppercase" }}>{a}</span>
+                  <span key={i} style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", color: "#6e8a72", background: "rgba(122,144,112,0.1)", padding: "3px 10px", borderRadius: 20, border: "1px solid rgba(122,144,112,0.25)", letterSpacing: "0.1em", textTransform: "uppercase" }}>{a}</span>
                 ))}
               </div>
             )}
@@ -293,8 +328,8 @@ function ScanModal({ products, onAddToShelf, onClose }) {
                   {verdict === "skip" ? "Add anyway" : "Save to Vanity"}
                 </button>
               ) : (
-                <div style={{ flex: 1, padding: "13px 0", background: "rgba(122,144,112,0.1)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 12, textAlign: "center", fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "#7a9070" }}>
-                  ✓ Saved to Vanity
+                <div style={{ flex: 1, padding: "13px 0", background: "rgba(122,144,112,0.1)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 12, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "#6e8a72" }}>
+                  <Icon name="check" size={12} /> Saved to Vanity
                 </div>
               )}
               <button onClick={reset}
@@ -331,8 +366,8 @@ function assessRoutineFit(product, products, checkIns = [], user = {}) {
   if (!existingActives["hyaluronic acid"] && actives["hyaluronic acid"]) gaps.push("Adds hydration support your ritual is currently missing.");
   if (!existingActives["ceramides"] && actives["ceramides"]) gaps.push("Ceramides will strengthen your barrier — a gap in your current lineup.");
   if (!existingActives["BHA"] && actives["BHA"]) gaps.push("A BHA is a smart add for keeping pores clear between exfoliation sessions.");
-  if (!routineProducts.some(p => p.category === "SPF") && cat === "SPF") gaps.push("You don't have SPF in your ritual yet — this fills a real gap.");
-  if (!routineProducts.some(p => p.category === "Moisturizer") && cat === "Moisturizer") gaps.push("Your ritual is missing a moisturizer — this completes your barrier step.");
+  if (!routineProducts.some(p => p.category === "SPF" || p.category === "SPF Moisturizer") && cat === "SPF") gaps.push("You don't have SPF in your ritual yet — this fills a real gap.");
+  if (!routineProducts.some(p => p.category === "Moisturizer" || p.category === "SPF Moisturizer") && cat === "Moisturizer") gaps.push("Your ritual is missing a moisturizer — this completes your barrier step.");
 
   // -- Defer reasons ---------------------------------------------------------
   // Season
@@ -422,11 +457,11 @@ function assessRoutineFit(product, products, checkIns = [], user = {}) {
 }
 
 const DEFER_TAG_CONFIG = {
-  season:  { color: "#7a9070", bg: "rgba(122,144,112,0.10)", label: "Seasonal hold" },
-  ramp:    { color: "#c4a060", bg: "rgba(196,160,96,0.10)",  label: "Ritual at capacity" },
-  skin:    { color: "#c06060", bg: "rgba(192,96,96,0.10)",   label: "Skin recovery" },
-  overlap: { color: "#9a9688", bg: "rgba(154,150,136,0.10)", label: "Redundant active" },
+  season:  { color: "#6e8a72", bg: "rgba(122,144,112,0.10)", label: "Seasonal hold" },
+  ramp:    { color: "#8b7355", bg: "rgba(139,115,85,0.10)",  label: "Ritual at capacity" },
+  skin:    { color: "#8b7355", bg: "rgba(139,115,85,0.10)",   label: "Skin recovery" },
+  overlap: { color: "#8b7355", bg: "rgba(139,115,85,0.10)", label: "Redundant active" },
 };
 
 
-export { ScanModal, assessRoutineFit };
+export { ScanModal, assessRoutineFit, DEFER_TAG_CONFIG };

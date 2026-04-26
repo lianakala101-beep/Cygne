@@ -1,76 +1,6 @@
 import { useState } from "react";
-
-  const phase = getWeekendPhase();
-  const [dismissed, setDismissed] = useState(false);
-  const [fading, setFading] = useState(false);
-
-  if (!phase || dismissed) return null;
-
-  const cfg = WEEKEND_PHASE_CONFIG[phase];
-  const advice = buildWeekendAdvice(phase, products, activeMap);
-
-  const handleDismiss = () => {
-    setFading(true);
-    setTimeout(() => setDismissed(true), 360);
-  };
-
-  return (
-    <div style={{
-      opacity: fading ? 0 : 1,
-      transform: fading ? "translateY(-4px)" : "none",
-      transition: "opacity 0.36s ease, transform 0.36s ease",
-      marginBottom: 20,
-    }}>
-      <div style={{
-        background: cfg.bg,
-        border: `1px solid ${cfg.border}`,
-        borderRadius: 16,
-        padding: "18px 20px 16px",
-        position: "relative",
-        overflow: "hidden",
-      }}>
-        {/* Header */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-          <div style={{ width: 5, height: 5, borderRadius: "50%", background: cfg.accent, flexShrink: 0 }} />
-          <div style={{ flex: 1 }}>
-            <span style={{ fontFamily: "var(--sans)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: cfg.accent }}>{cfg.label}</span>
-            <span style={{ fontFamily: "var(--sans)", fontSize: 9, color: "var(--clay)", marginLeft: 8, opacity: 0.6 }}>{cfg.sublabel}</span>
-          </div>
-          <button onClick={handleDismiss} style={{ background: "none", border: "none", color: "var(--clay)", opacity: 0.35, cursor: "pointer", padding: "2px 4px", transition: "opacity 0.2s", fontSize: 12, lineHeight: 1 }}
-            onMouseEnter={e => e.currentTarget.style.opacity = "0.7"}
-            onMouseLeave={e => e.currentTarget.style.opacity = "0.35"}>×</button>
-        </div>
-
-        {/* Headline */}
-        <p style={{ fontFamily: "var(--script)", fontSize: 22, fontWeight: 400, color: "var(--parchment)", margin: "0 0 12px", letterSpacing: "0.01em", lineHeight: 1.3 }}>{cfg.headline}</p>
-
-        {/* Skip list */}
-        {advice.skip.length > 0 && (
-          <div style={{ marginBottom: 10 }}>
-            {advice.skip.map((s, i) => (
-              <div key={i} style={{ display: "flex", gap: 10, marginBottom: 6 }}>
-                <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#c06060", flexShrink: 0, marginTop: 5 }} />
-                <p style={{ fontFamily: "var(--sans)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{s}</p>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Do list */}
-        {advice.do.length > 0 && (
-          <div>
-            {advice.do.map((d, i) => (
-              <div key={i} style={{ display: "flex", gap: 10, marginBottom: i < advice.do.length - 1 ? 6 : 0 }}>
-                <div style={{ width: 4, height: 4, borderRadius: "50%", background: cfg.accent, flexShrink: 0, marginTop: 5 }} />
-                <p style={{ fontFamily: "var(--sans)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{d}</p>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
+import { Icon } from "./components.jsx";
+import { hasSPFCoverage } from "./engine.js";
 
 // --- SEASONAL NUDGE -----------------------------------------------------------
 
@@ -109,10 +39,10 @@ function getSeasonForUser(locationData) {
 const SEASON_CONFIG = {
   winter: {
     label: "Winter",
-    emoji: "❄",
-    accent: "#8aa8c4",
-    bg: "rgba(138,168,196,0.07)",
-    border: "rgba(138,168,196,0.2)",
+    iconName: "snow",
+    accent: "#8b7355",
+    bg: "rgba(139,115,85,0.07)",
+    border: "rgba(139,115,85,0.2)",
     headline: "Your barrier works hardest now.",
     body: "Cold air and heating strip moisture faster than any other season. Skin needs more occlusion, less exfoliation.",
     shelfNudge: (products, activeMap) => {
@@ -128,14 +58,14 @@ const SEASON_CONFIG = {
   },
   spring: {
     label: "Spring",
-    emoji: "◌",
-    accent: "#9aaa80",
-    bg: "rgba(154,170,128,0.07)",
-    border: "rgba(154,170,128,0.2)",
+    iconName: "leaf",
+    accent: "#6e8a72",
+    bg: "rgba(122,144,112,0.07)",
+    border: "rgba(122,144,112,0.2)",
     headline: "Skin is recovering. UV is rising.",
     body: "Barrier resilience returns as humidity climbs. Spring is the right window to reintroduce or increase actives — but SPF becomes non-negotiable.",
     shelfNudge: (products, activeMap) => {
-      const hasSPF     = products.some(p => p.category === "SPF") || !!activeMap["SPF"]?.length;
+      const hasSPF     = hasSPFCoverage(products, activeMap);
       const hasRetinol = !!activeMap["retinol"]?.length;
       const hasVitC    = !!activeMap["vitamin C"]?.length;
       if (!hasSPF) return "No SPF in your vanity. UV index is climbing — this is the most important product you're missing right now.";
@@ -146,14 +76,14 @@ const SEASON_CONFIG = {
   },
   summer: {
     label: "Summer",
-    emoji: "○",
-    accent: "#c4a060",
-    bg: "rgba(196,160,96,0.07)",
-    border: "rgba(196,160,96,0.2)",
+    iconName: "sun",
+    accent: "#8b7355",
+    bg: "rgba(139,115,85,0.07)",
+    border: "rgba(139,115,85,0.2)",
     headline: "Heat changes everything.",
     body: "Humidity is up and sebum production rises with temperature. Heavier textures can clog. SPF degrades faster in heat.",
     shelfNudge: (products, activeMap) => {
-      const hasSPF       = products.some(p => p.category === "SPF") || !!activeMap["SPF"]?.length;
+      const hasSPF       = hasSPFCoverage(products, activeMap);
       const hasHeavyMoisturizer = products.some(p => p.category === "Moisturizer" && (p.price || 0) > 40);
       const hasBHA       = !!activeMap["BHA"]?.length;
       const hasRetinol   = !!activeMap["retinol"]?.length;
@@ -165,10 +95,10 @@ const SEASON_CONFIG = {
   },
   fall: {
     label: "Fall",
-    emoji: "◑",
-    accent: "#b87a50",
-    bg: "rgba(184,122,80,0.07)",
-    border: "rgba(184,122,80,0.2)",
+    iconName: "moon",
+    accent: "#8b7355",
+    bg: "rgba(139,115,85,0.07)",
+    border: "rgba(139,115,85,0.2)",
     headline: "The transition window.",
     body: "Skin shifts from oily summer mode back toward dry. This is the most strategic season to reintroduce or strengthen actives before winter.",
     shelfNudge: (products, activeMap) => {
@@ -214,16 +144,16 @@ function SeasonalNudgeCard({ products, activeMap }) {
         overflow: "hidden",
       }}>
         {/* Subtle season glyph watermark */}
-        <div style={{ position: "absolute", top: -8, right: 12, fontSize: 72, opacity: 0.04, color: cfg.accent, userSelect: "none", pointerEvents: "none", lineHeight: 1 }}>{cfg.emoji}</div>
+        <div style={{ position: "absolute", top: 8, right: 14, opacity: 0.08, color: cfg.accent, userSelect: "none", pointerEvents: "none", display: "inline-flex" }}><Icon name={cfg.iconName} size={72} /></div>
 
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-          <span style={{ fontSize: 11, opacity: 0.7 }}>{cfg.emoji}</span>
+          <span style={{ color: cfg.accent, opacity: 0.8, display: "inline-flex" }}><Icon name={cfg.iconName} size={11} /></span>
           <span style={{ fontFamily: "var(--sans)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: cfg.accent }}>{cfg.label}</span>
           <div style={{ flex: 1 }} />
-          <button onClick={handleDismiss} style={{ background: "none", border: "none", color: "var(--clay)", opacity: 0.35, cursor: "pointer", padding: "2px 4px", transition: "opacity 0.2s", fontSize: 12, lineHeight: 1 }}
+          <button onClick={handleDismiss} style={{ background: "none", border: "none", color: "var(--clay)", opacity: 0.35, cursor: "pointer", padding: "2px 4px", transition: "opacity 0.2s", display: "inline-flex" }}
             onMouseEnter={e => e.currentTarget.style.opacity = "0.7"}
-            onMouseLeave={e => e.currentTarget.style.opacity = "0.35"}>×</button>
+            onMouseLeave={e => e.currentTarget.style.opacity = "0.35"}><Icon name="x" size={12} /></button>
         </div>
 
         {/* Headline */}
@@ -242,4 +172,4 @@ function SeasonalNudgeCard({ products, activeMap }) {
 }
 
 
-export { SeasonalNudgeCard };
+export { SeasonalNudgeCard, getSeason, getSeasonForUser };

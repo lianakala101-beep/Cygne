@@ -23,8 +23,6 @@ function OnboardingScreen({ onComplete, setLocationData }) {
 
   // Form state
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [pass, setPass] = useState("");
   const [birthYear, setBirthYear] = useState("");
   const [birthMonth, setBirthMonth] = useState("");
   const [birthDay, setBirthDay] = useState("");
@@ -33,6 +31,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
   const [actives, setActives] = useState([]);
   const [locationLoading, setLocationLoading] = useState(false);
   const [locationSet, setLocationSet] = useState(false);
+  const [resetDay, setResetDay] = useState(0); // 0 = Sunday
 
   const TOTAL_STEPS = 8;
 
@@ -67,7 +66,6 @@ function OnboardingScreen({ onComplete, setLocationData }) {
     const skinAge = getSkinAgeContext(birthYear);
     onComplete({
       name: name || "Friend",
-      email,
       birthYear: birthYear || null,
       birthMonth: birthMonth || null,
       birthDay: birthDay || null,
@@ -75,6 +73,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       concerns,
       knownActives: actives,
       skinAgeBracket: skinAge?.bracket || null,
+      resetDay,
     });
   };
 
@@ -94,7 +93,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
         const active = single ? selected === opt : selected.includes(opt);
         return (
           <button key={opt} onClick={() => onToggle(opt)}
-            style={{ padding: "10px 18px", borderRadius: 24, border: `1px solid ${active ? "rgba(122,144,112,0.7)" : "var(--border)"}`, background: active ? "rgba(122,144,112,0.12)" : "var(--surface)", color: active ? "#5a7a60" : "#6a6560", fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: active ? 600 : 400, cursor: "pointer", transition: "all 0.18s", letterSpacing: "0.02em" }}>
+            style={{ padding: "10px 18px", borderRadius: 24, border: `1px solid ${active ? "rgba(122,144,112,0.7)" : "var(--border)"}`, background: active ? "rgba(122,144,112,0.12)" : "var(--surface)", color: active ? "#5a7a60" : "#6b5a43", fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: active ? 600 : 400, cursor: "pointer", transition: "all 0.18s", letterSpacing: "0.02em" }}>
             {opt}
           </button>
         );
@@ -103,29 +102,18 @@ function OnboardingScreen({ onComplete, setLocationData }) {
   );
 
   const steps = [
-    // 1 — Name
-    <div key={1} style={slideStyle}>
+    // 0 — Name
+    <div key="name" style={slideStyle}>
       <p style={obEyebrow}>Welcome to Cygne</p>
       <h2 style={obHeading}>What should we call you?</h2>
       <p style={obSub}>Your ritual will be built around you.</p>
       <div style={{ marginTop: 32 }}>
-        <input style={{ ...inputSt, fontSize: 22, fontFamily: "Reenie Beanie, cursive", letterSpacing: "0.02em", padding: "14px 16px" }} value={name} onChange={e => setName(e.target.value)} placeholder="Your first name" autoFocus />
+        <input style={{ ...inputSt, fontSize: 22, fontFamily: "Pinyon Script, cursive", letterSpacing: "0.02em", padding: "14px 16px" }} value={name} onChange={e => setName(e.target.value)} placeholder="Your first name" autoFocus />
       </div>
     </div>,
 
-    // 2 — Account
-    <div key={2} style={slideStyle}>
-      <p style={obEyebrow}>Almost there</p>
-      <h2 style={obHeading}>Save your ritual.</h2>
-      <p style={obSub}>Your products, routine, and skin history — always with you.</p>
-      <div style={{ display: "flex", flexDirection: "column", gap: 14, marginTop: 32 }}>
-        <div><label style={labelSt}>Email</label><input style={inputSt} type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="hello@example.com" /></div>
-        <div><label style={labelSt}>Password</label><input style={inputSt} type="password" value={pass} onChange={e => setPass(e.target.value)} placeholder="••••••••" /></div>
-      </div>
-    </div>,
-
-    // 2 — Birthday
-    <div key={2} style={slideStyle}>
+    // 1 — Birthday
+    <div key="birthday" style={slideStyle}>
       <p style={obEyebrow}>Your skin story</p>
       <h2 style={obHeading}>When were you born?</h2>
       <p style={obSub}>Your birth year helps calibrate advice to your skin's life stage. Month and day are optional — for a birthday message.</p>
@@ -141,14 +129,14 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       </div>
       {skinAge && (
         <div style={{ marginTop: 20, padding: "13px 16px", background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.25)", borderRadius: 12 }}>
-          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: "#7a9070", margin: "0 0 5px" }}>{skinAge.bracket}</p>
+          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: "#6e8a72", margin: "0 0 5px" }}>{skinAge.bracket}</p>
           <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.65 }}>{skinAge.note}</p>
         </div>
       )}
     </div>,
 
-    // 3 — Skin type
-    <div key={3} style={slideStyle}>
+    // 2 — Skin type
+    <div key="skintype" style={slideStyle}>
       <p style={obEyebrow}>Your skin</p>
       <h2 style={obHeading}>How does your skin behave?</h2>
       <p style={obSub}>Be honest — this is just between you and the swan.</p>
@@ -157,8 +145,8 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       </div>
     </div>,
 
-    // 4 — Concerns
-    <div key={4} style={slideStyle}>
+    // 3 — Concerns
+    <div key="concerns" style={slideStyle}>
       <p style={obEyebrow}>Your skin</p>
       <h2 style={obHeading}>What are you working on?</h2>
       <p style={obSub}>Select everything that applies. Cygne will flag gaps and tailor what it tells you.</p>
@@ -168,8 +156,8 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       </div>
     </div>,
 
-    // 5 — Current actives
-    <div key={5} style={slideStyle}>
+    // 4 — Current actives
+    <div key="actives" style={slideStyle}>
       <p style={obEyebrow}>Your ritual</p>
       <h2 style={obHeading}>Any actives already in your routine?</h2>
       <p style={obSub}>Even if you haven't added them yet. This helps Cygne understand where you're starting from.</p>
@@ -185,8 +173,8 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       </div>
     </div>,
 
-    // 6 — Location
-    <div key={6} style={slideStyle}>
+    // 5 — Location
+    <div key="location" style={slideStyle}>
       <p style={obEyebrow}>Your environment</p>
       <h2 style={obHeading}>Where are you based?</h2>
       <p style={obSub}>Cygne uses local humidity, UV index, and temperature to adjust your daily ritual advice. Your location is never shared.</p>
@@ -194,18 +182,18 @@ function OnboardingScreen({ onComplete, setLocationData }) {
         {locationSet ? (
           <div style={{ padding: "16px 18px", background: "rgba(122,144,112,0.1)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 14 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#7a9070" }} />
-              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, color: "#7a9070", margin: 0, fontWeight: 500 }}>Location enabled</p>
+              <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#6e8a72" }} />
+              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, color: "#6e8a72", margin: 0, fontWeight: 500 }}>Location enabled</p>
             </div>
             <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: "6px 0 0" }}>Your environment data will appear on the home screen.</p>
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <button onClick={requestLocation}
-              style={{ display: "flex", alignItems: "center", gap: 8, padding: "13px 20px", background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 12, fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 600, color: "#7a9070", cursor: "pointer", letterSpacing: "0.08em", transition: "all 0.2s" }}
+              style={{ display: "flex", alignItems: "center", gap: 8, padding: "13px 20px", background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 12, fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 600, color: "#6e8a72", cursor: "pointer", letterSpacing: "0.08em", transition: "all 0.2s" }}
               onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.18)"}
               onMouseLeave={e => e.currentTarget.style.background = "rgba(122,144,112,0.08)"}>
-              <span style={{ fontSize: 14 }}>◎</span>
+              <Icon name="target" size={14} />
               {locationLoading ? "Requesting..." : "Enable Location"}
             </button>
             <button onClick={() => advance(1)}
@@ -217,8 +205,45 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       </div>
     </div>,
 
+    // 6 — Reset day
+    <div key="resetday" style={slideStyle}>
+      <p style={obEyebrow}>Your weekly reset</p>
+      <h2 style={obHeading}>When does your week end?</h2>
+      <p style={obSub}>Each week, Cygne will invite you to capture a reflection — a three-angle portrait that becomes part of your gallery. Choose the evening that feels like your reset.</p>
+      <div style={{ marginTop: 28, display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 }}>
+        {[
+          { d: 0, label: "Sun" },
+          { d: 1, label: "Mon" },
+          { d: 2, label: "Tue" },
+          { d: 3, label: "Wed" },
+          { d: 4, label: "Thu" },
+          { d: 5, label: "Fri" },
+          { d: 6, label: "Sat" },
+        ].map(({ d, label }) => {
+          const active = resetDay === d;
+          return (
+            <button key={d} onClick={() => setResetDay(d)}
+              style={{
+                padding: "14px 0", borderRadius: 12,
+                border: `1px solid ${active ? "rgba(122,144,112,0.7)" : "var(--border)"}`,
+                background: active ? "rgba(122,144,112,0.15)" : "var(--surface)",
+                color: active ? "#5a7a60" : "#6b5a43",
+                fontFamily: "Space Grotesk, sans-serif", fontSize: 12,
+                fontWeight: active ? 600 : 400, letterSpacing: "0.08em",
+                textTransform: "uppercase", cursor: "pointer", transition: "all 0.18s",
+              }}>
+              {label}
+            </button>
+          );
+        })}
+      </div>
+      <p style={{ ...obSub, marginTop: 18, fontSize: 11, opacity: 0.7 }}>
+        You'll get a gentle nudge that evening: "The week is behind you. Let's capture your reflection."
+      </p>
+    </div>,
+
     // 7 — All set
-    <div key={7} style={{ ...slideStyle, position: "fixed", inset: 0, background: "#3a4134", display: "flex", flexDirection: "column", justifyContent: "space-between", overflow: "hidden" }}>
+    <div key="done" style={{ ...slideStyle, position: "fixed", inset: 0, background: "#323d30", display: "flex", flexDirection: "column", justifyContent: "space-between", overflow: "hidden" }}>
 
       {/* Top — logo + welcome, matching splash layout */}
       <div style={{ padding: "72px 36px 0" }}>
@@ -227,15 +252,15 @@ function OnboardingScreen({ onComplete, setLocationData }) {
           alt="Cygne"
           style={{ height: 170, width: "auto", display: "block", filter: "brightness(1.25) contrast(1.05)", mixBlendMode: "lighten" }}
         />
-        <p style={{ fontFamily: "'Reenie Beanie', cursive", fontSize: 22, fontWeight: 400, color: "rgba(232,227,214,0.95)", margin: "6px 0 0 130px", letterSpacing: "0.05em", lineHeight: 1 }}>built around you</p>
+        <p style={{ fontFamily: "'Pinyon Script', cursive", fontSize: 22, fontWeight: 400, color: "rgba(232,227,214,0.95)", margin: "6px 0 0 130px", letterSpacing: "0.05em", lineHeight: 1 }}>built around you</p>
       </div>
 
       {/* Bottom — welcome message + skin age + Enter button */}
       <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", padding: "0 36px 72px" }}>
-        <p style={{ fontFamily: "'Reenie Beanie', cursive", fontSize: 32, fontWeight: 400, color: "rgba(232,227,214,0.95)", margin: "0 0 6px", letterSpacing: "0.02em", lineHeight: 1.2 }}>
+        <p style={{ fontFamily: "'Pinyon Script', cursive", fontSize: 32, fontWeight: 400, color: "rgba(232,227,214,0.95)", margin: "0 0 6px", letterSpacing: "0.02em", lineHeight: 1.2 }}>
           {name ? `Welcome, ${name}.` : "Welcome."}
         </p>
-        <p style={{ fontFamily: "'Reenie Beanie', cursive", fontSize: 22, fontWeight: 400, color: "rgba(232,227,214,0.6)", margin: "0 0 24px", letterSpacing: "0.02em" }}>Your ritual begins.</p>
+        <p style={{ fontFamily: "'Pinyon Script', cursive", fontSize: 22, fontWeight: 400, color: "rgba(232,227,214,0.6)", margin: "0 0 24px", letterSpacing: "0.02em" }}>Your ritual begins.</p>
         {skinAge && (
           <div style={{ padding: "12px 16px", background: "rgba(232,227,214,0.06)", border: "1px solid rgba(232,227,214,0.15)", borderRadius: 12, marginBottom: 28, width: "100%" }}>
             <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(122,144,112,0.9)", margin: "0 0 5px" }}>{skinAge.bracket}</p>
@@ -254,12 +279,12 @@ function OnboardingScreen({ onComplete, setLocationData }) {
 
   const canAdvance = [
     name.trim().length > 0,        // 0 — name
-    email.length > 0,              // 1 — account
-    birthYear.length === 4,        // 2 — birthday
-    skinType.length > 0,           // 3 — skin type
-    true,                          // 4 — concerns — optional
-    true,                          // 5 — actives — optional
-    true,                          // 6 — location — optional
+    birthYear.length === 4,        // 1 — birthday
+    skinType.length > 0,           // 2 — skin type
+    true,                          // 3 — concerns — optional
+    true,                          // 4 — actives — optional
+    true,                          // 5 — location — optional
+    true,                          // 6 — reset day (has a default)
     true,                          // 7 — all set
   ];
 
@@ -267,20 +292,20 @@ function OnboardingScreen({ onComplete, setLocationData }) {
 
         <div style={{ minHeight: "100vh", background: "#f5f2ee", display: "flex", flexDirection: "column", padding: "0 24px 40px", position: "relative", overflow: "hidden" }}>
       {/* Background blobs */}
-      <div style={{ position: "absolute", top: "-20%", right: "-15%", width: 500, height: 500, borderRadius: "60% 40% 55% 45%", background: "rgba(180,175,168,0.25)", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", bottom: "-25%", left: "-10%", width: 440, height: 440, borderRadius: "45% 55% 40% 60%", background: "rgba(200,195,188,0.18)", pointerEvents: "none" }} />
+      <div style={{ position: "absolute", top: "-20%", right: "-15%", width: 500, height: 500, borderRadius: "60% 40% 55% 45%", background: "rgba(232,226,217,0.25)", pointerEvents: "none" }} />
+      <div style={{ position: "absolute", bottom: "-25%", left: "-10%", width: 440, height: 440, borderRadius: "45% 55% 40% 60%", background: "rgba(232,226,217,0.18)", pointerEvents: "none" }} />
 
       {/* Progress bar */}
       {step < TOTAL_STEPS - 1 && (
         <div style={{ position: "sticky", top: 0, zIndex: 10, paddingTop: 52, paddingBottom: 16, background: "#f5f2ee" }}>
           <div style={{ height: 1.5, background: "var(--border)", borderRadius: 2, overflow: "hidden" }}>
-            <div style={{ height: "100%", width: `${progress}%`, background: "#7a9070", borderRadius: 2, transition: "width 0.4s ease" }} />
+            <div style={{ height: "100%", width: `${progress}%`, background: "#6e8a72", borderRadius: 2, transition: "width 0.4s ease" }} />
           </div>
         </div>
       )}
 
       {/* Back button */}
-      {step > 0 && step < TOTAL_STEPS - 1 && step !== TOTAL_STEPS - 1 && (
+      {step > 0 && step < TOTAL_STEPS - 1 && (
         <button onClick={() => advance(-1)}
           style={{ position: "absolute", top: 52, left: 24, background: "none", border: "none", color: "var(--clay)", cursor: "pointer", fontFamily: "Space Grotesk, sans-serif", fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", display: "flex", alignItems: "center", gap: 6, zIndex: 11 }}>
           <Icon name="chevron" size={12} style={{ transform: "rotate(180deg)" }} /> Back
@@ -288,26 +313,34 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       )}
 
       {/* Step content */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: step === 0 || step === 7 ? "center" : "flex-start", paddingTop: step === 0 ? 0 : 20, maxWidth: 420, width: "100%", margin: "0 auto" }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: step === 0 || step === TOTAL_STEPS - 1 ? "center" : "flex-start", paddingTop: step === 0 ? 0 : 20, maxWidth: 420, width: "100%", margin: "0 auto" }}>
         {steps[step]}
       </div>
 
-      {/* Next button — not shown on location (step 5 has its own) or all-set (step 6) */}
-      {step >= 0 && step < 6 && (
+      {/* Next button — not shown on location (step 5) or all-set (step 7) */}
+      {step >= 0 && step < 5 && (
         <div style={{ position: "sticky", bottom: 0, background: "#f5f2ee", padding: "16px 24px 32px", marginTop: "auto" }}>
           <button onClick={() => canAdvance[step] && advance(1)}
-            style={{ width: "100%", padding: "14px 0", background: canAdvance[step] ? "#7a9070" : "#e0dbd5", color: canAdvance[step] ? "#0d0f0d" : "var(--clay)", border: `1px solid ${canAdvance[step] ? "transparent" : "var(--border)"}`, borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: canAdvance[step] ? "pointer" : "default", transition: "all 0.2s", opacity: canAdvance[step] ? 1 : 0.5 }}>
+            style={{ width: "100%", padding: "14px 0", background: canAdvance[step] ? "#6e8a72" : "#e0dbd5", color: canAdvance[step] ? "#0d0f0d" : "var(--clay)", border: `1px solid ${canAdvance[step] ? "transparent" : "var(--border)"}`, borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: canAdvance[step] ? "pointer" : "default", transition: "all 0.2s", opacity: canAdvance[step] ? 1 : 0.5 }}>
             Continue
           </button>
-          {step === 4 || step === 5 ? (
+          {step === 3 || step === 4 ? (
             <button onClick={() => advance(1)} style={{ width: "100%", marginTop: 10, background: "none", border: "none", fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", cursor: "pointer", padding: "8px 0", opacity: 0.5, letterSpacing: "0.06em" }}>Skip</button>
           ) : null}
         </div>
       )}
-      {step === 6 && (
+      {step === 5 && (
         <div style={{ maxWidth: 420, width: "100%", margin: "24px auto 0" }}>
           <button onClick={() => advance(1)}
-            style={{ width: "100%", padding: "14px 0", background: "#7a9070", color: "#0d0f0d", border: "none", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}>
+            style={{ width: "100%", padding: "14px 0", background: "#6e8a72", color: "#0d0f0d", border: "none", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}>
+            Continue
+          </button>
+        </div>
+      )}
+      {step === 6 && (
+        <div style={{ position: "sticky", bottom: 0, background: "#f5f2ee", padding: "16px 24px 32px", marginTop: "auto" }}>
+          <button onClick={() => advance(1)}
+            style={{ width: "100%", padding: "14px 0", background: "#6e8a72", color: "#0d0f0d", border: "none", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}>
             Continue
           </button>
         </div>
@@ -318,10 +351,10 @@ function OnboardingScreen({ onComplete, setLocationData }) {
 
 // Onboarding text styles
 const obEyebrow = { fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 10px" };
-const obHeading = { fontFamily: "Reenie Beanie, cursive", fontSize: 36, fontWeight: 400, color: "var(--parchment)", margin: "0 0 8px", letterSpacing: "0.01em", lineHeight: 1.15 };
-const obSub = { fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "#5a5550", margin: 0, lineHeight: 1.7, opacity: 0.8 };
+const obHeading = { fontFamily: "Pinyon Script, cursive", fontSize: 36, fontWeight: 400, color: "var(--parchment)", margin: "0 0 8px", letterSpacing: "0.01em", lineHeight: 1.15 };
+const obSub = { fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "#6b5338", margin: 0, lineHeight: 1.7, opacity: 0.8 };
+const inputSt = { width: "100%", padding: "12px 16px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 14, color: "var(--parchment)", outline: "none" };
+const labelSt = { fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", display: "block", marginBottom: 6 };
 
-
-// --- PRODUCT MODAL ------------------------------------------------------------
 
 export { OnboardingScreen };

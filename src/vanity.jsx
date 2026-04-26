@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Icon, Section } from "./components.jsx";
+import { Icon, Section, Pill } from "./components.jsx";
 import { detectActives, analyzeShelf, calcSpending } from "./engine.js";
-import { assessRoutineFit } from "./modals.jsx";
+import { assessRoutineFit, DEFER_TAG_CONFIG } from "./modals.jsx";
 import { ProductModal } from "./productmodal.jsx";
 import { ProductCard } from "./ritual.jsx";
 
@@ -147,7 +147,7 @@ function buildInsights(products, activeMap) {
   }
 
   // No SPF — suggest adding one
-  if (!cats["SPF"] && !activeMap["SPF"]) {
+  if (!cats["SPF"] && !cats["SPF Moisturizer"] && !activeMap["SPF"]) {
     replaceItems.push({
       text: "No SPF detected. Adding a broad-spectrum SPF 30–50 as the final AM step is the single highest-impact change you can make.",
       severity: "warning",
@@ -175,7 +175,7 @@ function buildInsights(products, activeMap) {
 }
 
 function InsightRow({ item }) {
-  const dot = item.severity === "warning" ? "#c06060" : item.severity === "caution" ? "#c49040" : item.severity === "ok" ? "#7a9070" : "var(--clay)";
+  const dot = item.severity === "warning" ? "#8b7355" : item.severity === "caution" ? "#8b7355" : item.severity === "ok" ? "#6e8a72" : "var(--clay)";
   return (
     <div style={{ display: "flex", gap: 12, padding: "12px 0", borderBottom: "1px solid var(--border)" }}>
       <div style={{ width: 5, height: 5, borderRadius: "50%", background: dot, flexShrink: 0, marginTop: 6 }} />
@@ -184,12 +184,6 @@ function InsightRow({ item }) {
         {item.meta && (
           <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 4 }}>
             {item.meta.map((m, i) => <span key={i} style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", color: "var(--clay)", background: "var(--surface)", padding: "2px 7px", borderRadius: 20, border: "1px solid var(--border)", letterSpacing: "0.04em" }}>{m}</span>)}
-          </div>
-        )}
-        {item.cygne && (
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 5, marginTop: 6, padding: "3px 9px", background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.2)", borderRadius: 20 }}>
-            <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#7a9070" }}>Cygne</span>
-            <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, color: "var(--clay)" }}>recommendations coming soon</span>
           </div>
         )}
       </div>
@@ -228,7 +222,7 @@ function ClearAllButton({ onClearAll }) {
         if (confirming) { onClearAll(); setConfirming(false); }
         else { setConfirming(true); setTimeout(() => setConfirming(false), 3000); }
       }}
-      style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: confirming ? "#c06060" : "var(--clay)", opacity: confirming ? 1 : 0.35, background: "none", border: "none", cursor: "pointer", paddingTop: 8, transition: "all 0.2s" }}>
+      style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: confirming ? "#8b7355" : "var(--clay)", opacity: confirming ? 1 : 0.35, background: "none", border: "none", cursor: "pointer", paddingTop: 8, transition: "all 0.2s" }}>
       {confirming ? "Tap again to confirm" : "Clear all"}
     </button>
   );
@@ -248,7 +242,7 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo
       {/* -- Header ----------------------------------------------------------- */}
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-          <h1 style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 42, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: "0 0 4px", lineHeight: 1 }}>Your Vanity</h1>
+          <h1 style={{ fontFamily: "Pinyon Script, cursive", fontSize: 42, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: "0 0 4px", lineHeight: 1 }}>Your Vanity</h1>
           {false && <ClearAllButton onClearAll={onClearAll} />}  {/* hidden — dev only */}
         </div>
         <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", margin: 0 }}>
@@ -271,7 +265,7 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo
         <>
           {products.length === 0 ? (
             <div style={{ textAlign: "center", padding: "60px 0 40px" }}>
-              <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 28, color: "var(--clay)", margin: "0 0 8px" }}>Your vanity is empty.</p>
+              <p style={{ fontFamily: "Pinyon Script, cursive", fontSize: 28, color: "var(--clay)", margin: "0 0 8px" }}>Your vanity is empty.</p>
               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", opacity: 0.6, margin: "0 0 28px", lineHeight: 1.6 }}>Scan a product to add it, or add one manually.</p>
               <button onClick={onAdd}
                 style={{ padding: "12px 28px", background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer" }}>
@@ -290,13 +284,13 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo
               </p>
 
               {products.some(p => p.isDemo) && onClearDemo && (
-                <div style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(154,150,136,0.08)", border: "1px solid rgba(154,150,136,0.2)", borderRadius: 12, padding: "12px 14px", marginBottom: 14 }}>
-                  <span style={{ fontSize: 15, flexShrink: 0 }}>✦</span>
+                <div style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.2)", borderRadius: 12, padding: "12px 14px", marginBottom: 14 }}>
+                  <span style={{ color: "#8b7355", flexShrink: 0, display: "inline-flex" }}><Icon name="sparkle" size={14} /></span>
                   <div style={{ flex: 1 }}>
                     <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 600, color: "var(--parchment)", margin: "0 0 2px" }}>Sample vanity</p>
                     <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>These are example products to show you how Cygne works. Scan your own to replace them.</p>
                   </div>
-                  <button onClick={onClearDemo} style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600, background: "transparent", border: "1px solid rgba(154,150,136,0.3)", borderRadius: 8, color: "var(--clay)", padding: "6px 10px", cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}>Clear demo</button>
+                  <button onClick={onClearDemo} style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600, background: "transparent", border: "1px solid rgba(139,115,85,0.3)", borderRadius: 8, color: "var(--clay)", padding: "6px 10px", cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}>Clear demo</button>
                 </div>
               )}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 10 }}>
@@ -356,8 +350,8 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo
                 <div key={idx} style={{ background: "var(--surface)", border: `1px solid ${nowReady ? "rgba(122,144,112,0.4)" : "var(--border)"}`, borderRadius: 14, padding: "16px", transition: "border-color 0.3s" }}>
                   {nowReady && (
                     <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
-                      <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#7a9070" }} />
-                      <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "#7a9070" }}>Ready to introduce</span>
+                      <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#6e8a72" }} />
+                      <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "#6e8a72" }}>Ready to introduce</span>
                     </div>
                   )}
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
@@ -372,7 +366,7 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo
                   <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: "0 0 14px", lineHeight: 1.6, opacity: 0.8 }}>{item.reason}</p>
                   <div style={{ display: "flex", gap: 8 }}>
                     <button onClick={() => onAddFromWaiting(item)}
-                      style={{ flex: 1, padding: "9px 0", background: nowReady ? "#7a9070" : "rgba(122,144,112,0.10)", color: nowReady ? "#0d0f0d" : "var(--sage)", border: `1px solid ${nowReady ? "#7a9070" : "rgba(122,144,112,0.3)"}`, borderRadius: 9, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s" }}>
+                      style={{ flex: 1, padding: "9px 0", background: nowReady ? "#6e8a72" : "rgba(122,144,112,0.10)", color: nowReady ? "#0d0f0d" : "var(--sage)", border: `1px solid ${nowReady ? "#6e8a72" : "rgba(122,144,112,0.3)"}`, borderRadius: 9, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s" }}>
                       Add to Ritual
                     </button>
                     <button onClick={() => onDismissWaiting(item)}

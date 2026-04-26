@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Icon } from "./components.jsx";
+import { hasSPFCoverage } from "./engine.js";
 
 function getWeekendPhase() {
   const day = new Date().getDay(); // 0=Sun, 1=Mon ... 6=Sat
@@ -16,9 +18,9 @@ function buildWeekendAdvice(phase, products, activeMap) {
   const hasExfoliant  = hasAHA || !!activeMap["BHA"]?.length;
   const hasCeramide   = products.some(p => (p.ingredients || []).some(i => i.includes("ceramide")));
   const hasHA         = products.some(p => (p.ingredients || []).some(i => i.includes("hyaluronate") || i.includes("hyaluronic")));
-  const hasMoisturizer = products.some(p => p.category === "Moisturizer");
+  const hasMoisturizer = products.some(p => p.category === "Moisturizer" || p.category === "SPF Moisturizer");
   const hasCleanser   = products.some(p => p.category === "Cleanser");
-  const hasSPF        = products.some(p => p.category === "SPF") || !!activeMap["SPF"]?.length;
+  const hasSPF        = hasSPFCoverage(products, activeMap);
 
   if (phase === "before") {
     const skip = [];
@@ -62,23 +64,23 @@ const WEEKEND_PHASE_CONFIG = {
     label: "The Weekend Is Near",
     sublabel: "Thursday · Friday",
     headline: "Prep your skin before the night.",
-    accent: "#9a8070",
-    bg: "rgba(154,128,112,0.07)",
-    border: "rgba(154,128,112,0.2)",
+    accent: "#8b7355",
+    bg: "rgba(139,115,85,0.07)",
+    border: "rgba(139,115,85,0.2)",
   },
   during: {
     label: "Weekend",
     sublabel: "Saturday",
     headline: "A few things worth remembering.",
-    accent: "#8090a4",
-    bg: "rgba(128,144,164,0.07)",
-    border: "rgba(128,144,164,0.2)",
+    accent: "#8b7355",
+    bg: "rgba(139,115,85,0.07)",
+    border: "rgba(139,115,85,0.2)",
   },
   after: {
     label: "Recovery Day",
     sublabel: "Sunday",
     headline: "Your skin needs a quiet day.",
-    accent: "#7a9070",
+    accent: "#6e8a72",
     bg: "rgba(122,144,112,0.07)",
     border: "rgba(122,144,112,0.2)",
   },
@@ -100,13 +102,13 @@ function WeekendNudgeCard({ products, activeMap }) {
           <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: cfg.accent }}>{cfg.label}</span>
           <p style={{ fontFamily: "var(--script)", fontSize: 20, fontWeight: 400, color: "var(--parchment)", margin: "2px 0 0", lineHeight: 1.2 }}>{cfg.headline}</p>
         </div>
-        <button onClick={() => setDismissed(true)} style={{ background: "none", border: "none", color: "var(--clay)", opacity: 0.35, cursor: "pointer", fontSize: 12, padding: "2px 4px" }}>×</button>
+        <button onClick={() => setDismissed(true)} style={{ background: "none", border: "none", color: "var(--clay)", opacity: 0.35, cursor: "pointer", padding: "2px 4px", display: "inline-flex" }}><Icon name="x" size={12} /></button>
       </div>
       {advice.skip.length > 0 && (
         <div style={{ marginBottom: 10 }}>
           {advice.skip.map((s, i) => (
             <div key={i} style={{ display: "flex", gap: 8, marginBottom: 6 }}>
-              <span style={{ color: "#c06060", fontSize: 10, flexShrink: 0, marginTop: 1 }}>—</span>
+              <span style={{ color: "#8b7355", fontSize: 10, flexShrink: 0, marginTop: 1 }}>—</span>
               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{s}</p>
             </div>
           ))}

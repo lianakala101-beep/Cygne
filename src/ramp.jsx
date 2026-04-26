@@ -1,14 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Icon } from "./components.jsx";
 import { detectActives } from "./engine.js";
+import { daysBetweenLocal } from "./utils.jsx";
 
 
 const RAMP_SCHEDULES = {
   retinol: {
     label: "Retinol",
-    color: "#c49040",
-    colorBg: "rgba(196,144,64,0.08)",
-    colorBorder: "rgba(196,144,64,0.22)",
+    color: "#8b7355",
+    colorBg: "rgba(139,115,85,0.08)",
+    colorBorder: "rgba(139,115,85,0.22)",
     phases: [
       {
         name: "Patch",
@@ -46,9 +47,9 @@ const RAMP_SCHEDULES = {
   },
   AHA: {
     label: "AHA Exfoliant",
-    color: "#9a8070",
-    colorBg: "rgba(154,128,112,0.08)",
-    colorBorder: "rgba(154,128,112,0.22)",
+    color: "#8b7355",
+    colorBg: "rgba(139,115,85,0.08)",
+    colorBorder: "rgba(139,115,85,0.22)",
     phases: [
       {
         name: "Patch",
@@ -86,7 +87,7 @@ const RAMP_SCHEDULES = {
   },
   BHA: {
     label: "BHA Exfoliant",
-    color: "#7a9070",
+    color: "#6e8a72",
     colorBg: "rgba(122,144,112,0.08)",
     colorBorder: "rgba(122,144,112,0.22)",
     phases: [
@@ -126,9 +127,9 @@ const RAMP_SCHEDULES = {
   },
   "vitamin C": {
     label: "Vitamin C",
-    color: "#c49040",
-    colorBg: "rgba(196,144,64,0.06)",
-    colorBorder: "rgba(196,144,64,0.18)",
+    color: "#8b7355",
+    colorBg: "rgba(139,115,85,0.06)",
+    colorBorder: "rgba(139,115,85,0.18)",
     phases: [
       {
         name: "Patch",
@@ -166,9 +167,9 @@ const RAMP_SCHEDULES = {
   },
   "toning pad": {
     label: "Toning Pad (BHA/AHA)",
-    color: "#8090a4",
-    colorBg: "rgba(128,144,164,0.08)",
-    colorBorder: "rgba(128,144,164,0.22)",
+    color: "#8b7355",
+    colorBg: "rgba(139,115,85,0.08)",
+    colorBorder: "rgba(139,115,85,0.22)",
     phases: [
       { name: "Patch", weeks: [1], frequency: "Patch test first", instruction: "Apply to your jawline or cheek for 2 nights before using all over. Daily-dose actives are gentler but still worth checking.", onTrack: "No reaction — you're clear to start daily use.", backOff: "Any irritation — give skin 3 days rest before trying again." },
       { name: "Introduce", weeks: [2, 3], frequency: "Daily — PM only", instruction: "Use once daily in the evening. Apply after cleansing, before serum. BHA pads can be used AM too once tolerated.", onTrack: "Skin feels smooth, no flaking or redness.", backOff: "Stinging or peeling — drop to every other night for a week." },
@@ -187,11 +188,91 @@ function getRampPhase(schedule, week) {
   return schedule.phases[schedule.phases.length - 1]; // Maintain forever
 }
 
-function IntroduceSlowlyCard({ product, schedule, weekNumber, onAdvance, onHold }) {
+// Compute the current Introduce Slowly week from the product's
+// routineStartDate. Week 1 starts on the start date; each subsequent week
+// begins exactly 7 local days later. Falls back to stored rampWeek only
+// when no start date is set.
+function getRampWeek(product) {
+  if (!product) return 1;
+  if (product.routineStartDate) {
+    const days = daysBetweenLocal(product.routineStartDate);
+    return Math.max(1, Math.floor(days / 7) + 1);
+  }
+  return product.rampWeek || 1;
+}
+
+const HANDLED_MESSAGE = "Noted. Check back next week — if your skin stays calm we'll increase frequency.";
+const BACKOFF_MESSAGE = "Understood. We'll slow the pace. Check back in a few days and let us know how your skin feels.";
+
+function formatStartedLabel(iso) {
+  if (!iso) return null;
+  const [y, m, d] = iso.split("-").map(Number);
+  if (!y || !m || !d) return null;
+  const dt = new Date(y, m - 1, d);
+  return `Started ${dt.toLocaleDateString("en-US", { month: "long", day: "numeric" })}`;
+}
+
+function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, onAdvance, onHold, onResetStart }) {
   const [expanded, setExpanded] = useState(false);
+  const [justActioned, setJustActioned] = useState(null); // "advance" | "hold" | null
+  const [confirmReset, setConfirmReset] = useState(false);
+  const [pickedDate, setPickedDate] = useState("");
+  const [graduating, setGraduating] = useState(false);
+  const weekNumber = weekNumberProp ?? getRampWeek(product);
   const phase = getRampPhase(schedule, weekNumber);
   const phaseIndex = schedule.phases.findIndex(p => p.weeks.includes(Math.min(weekNumber, 12)));
+  const isHeld = product.rampHeld === true;
   const clampedPhaseIndex = Math.min(phaseIndex, schedule.phases.length - 1);
+  const startedLabel = formatStartedLabel(product.routineStartDate);
+
+  // Graduation: matches recordRampAction's "currentWeek >= maxWeek" guard,
+  // so a "handled" tap at the final week would clear routineStartDate and
+  // remove the product from Introduce Slowly. We intercept that single tap
+  // with a ceremonial confirmation before letting the parent's handler run.
+  const maxWeek = Math.max(...schedule.phases[schedule.phases.length - 1].weeks);
+  const isFinalWeek = weekNumber >= maxWeek;
+
+  const handleAdvanceClick = () => {
+    if (isFinalWeek) {
+      setGraduating(true);
+    } else {
+      onAdvance(product.id);
+      setJustActioned("advance");
+    }
+  };
+
+  const confirmGraduation = () => {
+    setGraduating(false);
+    onAdvance(product.id);
+  };
+
+  // Verify calendar-based progression at render time.
+  useEffect(() => {
+    if (product?.routineStartDate) {
+      // eslint-disable-next-line no-console
+      console.log("[Cygne ramp]", {
+        productId: product.id,
+        productName: product.name,
+        routineStartDate: product.routineStartDate,
+        daysSinceStart: daysBetweenLocal(product.routineStartDate),
+        currentWeek: weekNumber,
+        phase: phase.name,
+        isHeld,
+      });
+    }
+  }, [product?.id, product?.routineStartDate, weekNumber]);
+
+  // Auto-dismiss the contextual follow-up: 3 seconds, or on next scroll.
+  useEffect(() => {
+    if (!justActioned) return;
+    const timer = setTimeout(() => setJustActioned(null), 3000);
+    const onScroll = () => setJustActioned(null);
+    window.addEventListener("scroll", onScroll, { passive: true, once: true });
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [justActioned]);
 
   return (
     <div style={{ background: schedule.colorBg, border: `1px solid ${schedule.colorBorder}`, borderRadius: 14, marginBottom: 12, overflow: "hidden" }}>
@@ -201,10 +282,13 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber, onAdvance, onHold 
         <div style={{ flex: 1 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5, flexWrap: "wrap" }}>
             <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: schedule.color, background: `${schedule.color}18`, padding: "2px 8px", borderRadius: 20 }}>{schedule.label}</span>
-            <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.7 }}>Week {weekNumber} · {phase.name}</span>
+            <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", color: isHeld ? "#8b7355" : "var(--clay)", opacity: 0.7 }}>Week {weekNumber} · {isHeld ? "Holding" : phase.name}</span>
           </div>
           <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, fontWeight: 500, color: "var(--parchment)", margin: "0 0 2px" }}>{product.name}</p>
           <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: schedule.color, margin: 0, letterSpacing: "0.04em" }}>{phase.frequency}</p>
+          {startedLabel && (
+            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", margin: "4px 0 0", opacity: 0.6, letterSpacing: "0.04em" }}>{startedLabel}</p>
+          )}
         </div>
 
         {/* Phase dots */}
@@ -229,25 +313,130 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber, onAdvance, onHold 
               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--sage)", margin: "0 0 4px" }}>On track</p>
               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>{phase.onTrack}</p>
             </div>
-            <div style={{ padding: "10px 12px", background: "rgba(192,96,96,0.06)", border: "1px solid rgba(192,96,96,0.18)", borderRadius: 10 }}>
-              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#c06060", margin: "0 0 4px" }}>Back off</p>
+            <div style={{ padding: "10px 12px", background: "rgba(139,115,85,0.06)", border: "1px solid rgba(139,115,85,0.18)", borderRadius: 10 }}>
+              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#8b7355", margin: "0 0 4px" }}>Back off</p>
               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>{phase.backOff}</p>
             </div>
           </div>
 
           {/* Weekly response buttons */}
-          <div style={{ display: "flex", gap: 8 }}>
-            <button onClick={() => onAdvance(product.id)}
-              style={{ flex: 1, padding: "10px 0", background: "rgba(122,144,112,0.12)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer", transition: "all 0.18s" }}
-              onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.2)"}
-              onMouseLeave={e => e.currentTarget.style.background = "rgba(122,144,112,0.12)"}>
-              Skin handled it ✓
-            </button>
-            <button onClick={() => onHold(product.id)}
-              style={{ flex: 1, padding: "10px 0", background: "rgba(192,96,96,0.06)", border: "1px solid rgba(192,96,96,0.18)", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#c06060", cursor: "pointer", transition: "all 0.18s" }}
-              onMouseEnter={e => e.currentTarget.style.background = "rgba(192,96,96,0.12)"}
-              onMouseLeave={e => e.currentTarget.style.background = "rgba(192,96,96,0.06)"}>
-              Backing off
+          {isHeld ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <div style={{ padding: "12px 16px", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.22)", borderRadius: 10, textAlign: "center" }}>
+                <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600, color: "#8b7355", margin: "0 0 2px" }}>Paused — repeat this week</p>
+                <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", margin: 0, opacity: 0.7 }}>When you're ready, mark as handled to advance.</p>
+              </div>
+              <button onClick={handleAdvanceClick}
+                style={{ width: "100%", padding: "10px 0", background: "rgba(122,144,112,0.12)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 10, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer", transition: "all 0.18s" }}
+                onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.2)"}
+                onMouseLeave={e => e.currentTarget.style.background = "rgba(122,144,112,0.12)"}>
+                Skin handled it — advance <Icon name="check" size={10} />
+              </button>
+            </div>
+          ) : (
+            <div style={{ display: "flex", gap: 8 }}>
+              <button onClick={handleAdvanceClick}
+                style={{ flex: 1, padding: "10px 0", background: "rgba(122,144,112,0.12)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 10, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer", transition: "all 0.18s" }}
+                onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.2)"}
+                onMouseLeave={e => e.currentTarget.style.background = "rgba(122,144,112,0.12)"}>
+                Skin handled it <Icon name="check" size={10} />
+              </button>
+              <button onClick={() => { onHold(product.id); setJustActioned("hold"); }}
+                style={{ flex: 1, padding: "10px 0", background: "rgba(139,115,85,0.06)", border: "1px solid rgba(139,115,85,0.18)", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#8b7355", cursor: "pointer", transition: "all 0.18s" }}
+                onMouseEnter={e => e.currentTarget.style.background = "rgba(139,115,85,0.12)"}
+                onMouseLeave={e => e.currentTarget.style.background = "rgba(139,115,85,0.06)"}>
+                Backing off
+              </button>
+            </div>
+          )}
+
+          {/* Contextual follow-up — auto-dismisses after 3s or next scroll */}
+          {justActioned && (
+            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: "10px 2px 0", lineHeight: 1.6, opacity: 0.75, transition: "opacity 0.3s" }}>
+              {justActioned === "advance" ? HANDLED_MESSAGE : BACKOFF_MESSAGE}
+            </p>
+          )}
+
+          {/* Reset start date — pick any past date */}
+          <div style={{ marginTop: 14, paddingTop: 12, borderTop: "1px dashed var(--border)" }}>
+            {confirmReset ? (
+              <div>
+                <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", margin: "0 0 8px", opacity: 0.8 }}>Pick the date you actually started this product — the week will recalculate from there.</p>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                  <input
+                    type="date"
+                    value={pickedDate}
+                    max={(() => { const t = new Date(); return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`; })()}
+                    onClick={(e) => e.stopPropagation()}
+                    onChange={(e) => setPickedDate(e.target.value)}
+                    style={{ flex: 1, minWidth: 140, padding: "7px 10px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--parchment)", cursor: "pointer" }}
+                  />
+                  <button
+                    disabled={!pickedDate}
+                    onClick={(e) => { e.stopPropagation(); if (!pickedDate) return; onResetStart?.(product.id, pickedDate); setConfirmReset(false); setPickedDate(""); }}
+                    style={{ padding: "6px 12px", background: pickedDate ? "rgba(139,115,85,0.12)" : "transparent", border: `1px solid ${pickedDate ? "rgba(139,115,85,0.35)" : "var(--border)"}`, borderRadius: 8, fontFamily: "Space Grotesk, sans-serif", fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: pickedDate ? "#8b7355" : "var(--clay)", cursor: pickedDate ? "pointer" : "not-allowed", opacity: pickedDate ? 1 : 0.5 }}>
+                    Save
+                  </button>
+                  <button onClick={(e) => { e.stopPropagation(); setConfirmReset(false); setPickedDate(""); }}
+                    style={{ padding: "6px 12px", background: "transparent", border: "1px solid var(--border)", borderRadius: 8, fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)", cursor: "pointer" }}>
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button onClick={(e) => { e.stopPropagation(); setConfirmReset(true); }}
+                style={{ background: "none", border: "none", padding: 0, fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", opacity: 0.6, cursor: "pointer", letterSpacing: "0.06em", textDecoration: "underline" }}>
+                Reset start date
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Graduation modal — appears once when the user marks the final
+          week as handled. No auto-dismiss; user must tap to confirm. */}
+      {graduating && (
+        <div style={{
+          position: "fixed", inset: 0, zIndex: 250,
+          background: "rgba(8,10,9,0.55)", backdropFilter: "blur(6px)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          padding: "0 24px",
+        }}>
+          <div style={{
+            background: "#2a3a2b",
+            color: "#e8e0c8",
+            border: "1px solid rgba(232,224,200,0.16)",
+            borderRadius: 18,
+            padding: "34px 28px 26px",
+            maxWidth: 360, width: "100%",
+            textAlign: "center",
+          }}>
+            <p style={{
+              fontFamily: "Pinyon Script, cursive",
+              fontSize: 26, lineHeight: 1.4,
+              color: "#e8e0c8",
+              letterSpacing: "0.02em",
+              margin: "0 0 22px",
+              whiteSpace: "pre-line",
+            }}>
+              {"Your skin has made its peace with this one.\nIt's ready to stay."}
+            </p>
+            <button onClick={confirmGraduation}
+              style={{
+                padding: "12px 24px",
+                background: "rgba(122,144,112,0.22)",
+                color: "#e8e0c8",
+                border: "1px solid rgba(232,224,200,0.28)",
+                borderRadius: 10,
+                fontFamily: "Space Grotesk, sans-serif",
+                fontSize: 11, fontWeight: 600,
+                letterSpacing: "0.18em", textTransform: "uppercase",
+                cursor: "pointer",
+                transition: "background 0.18s",
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.32)"}
+              onMouseLeave={e => e.currentTarget.style.background = "rgba(122,144,112,0.22)"}>
+              Resume Routine
             </button>
           </div>
         </div>
@@ -461,7 +650,7 @@ function WeeklyRitualCalendar({ rampProducts, products }) {
           marginTop: 4,
         }}>
           <div style={{ padding: "14px 16px 12px", borderBottom: "1px solid var(--border)" }}>
-            <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 22, color: "var(--parchment)", margin: 0 }}>
+            <p style={{ fontFamily: "Pinyon Script, cursive", fontSize: 22, color: "var(--parchment)", margin: 0 }}>
               {selectedDayObj.full}
             </p>
           </div>
@@ -477,8 +666,8 @@ function WeeklyRitualCalendar({ rampProducts, products }) {
                 if (slotProducts.length === 0) return null;
                 return (
                   <div key={slot} style={{ padding: "12px 16px", borderBottom: "1px solid var(--border)" }}>
-                    <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 10px", opacity: 0.55 }}>
-                      {slot === "am" ? "☀ Morning" : "◗ Evening"}
+                    <p style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "Space Grotesk, sans-serif", fontSize: 9, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 10px", opacity: 0.55 }}>
+                      <Icon name={slot === "am" ? "sun" : "moon"} size={10} /> {slot === "am" ? "Morning" : "Evening"}
                     </p>
                     {slotProducts.map((p, i) => {
                       const color = getColor(p);
@@ -486,7 +675,7 @@ function WeeklyRitualCalendar({ rampProducts, products }) {
                         ? "toning pad"
                         : RAMP_ACTIVES.find(a => detectActives(p.ingredients || [])[a]);
                       const schedule = RAMP_SCHEDULES[activeKey];
-                      const phase = schedule ? getRampPhase(schedule, p.rampWeek || 1) : null;
+                      const phase = schedule ? getRampPhase(schedule, getRampWeek(p)) : null;
                       return (
                         <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: i < slotProducts.length - 1 ? 10 : 0 }}>
                           <div style={{ width: 8, height: 8, borderRadius: "50%", background: color, flexShrink: 0 }} />
@@ -494,7 +683,7 @@ function WeeklyRitualCalendar({ rampProducts, products }) {
                             <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 500, color: "var(--parchment)", margin: "0 0 1px" }}>{p.name}</p>
                             {phase && (
                               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color, margin: 0, letterSpacing: "0.04em" }}>
-                                Week {p.rampWeek || 1} · {phase.frequency}
+                                Week {getRampWeek(p)} · {phase.frequency}
                               </p>
                             )}
                           </div>
@@ -514,4 +703,4 @@ function WeeklyRitualCalendar({ rampProducts, products }) {
 
 // --- PROGRESS ----------------------------------------------------------------
 
-export { RAMP_SCHEDULES, IntroduceSlowlyCard, WeeklyRitualCalendar };
+export { RAMP_SCHEDULES, RAMP_ACTIVES, IntroduceSlowlyCard, WeeklyRitualCalendar, getRampWeek, getRampPhase };

@@ -1,6 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import { Icon, Section } from "./components.jsx";
 import { detectActives, analyzeShelf } from "./engine.js";
+import { CATEGORIES, FREQUENCIES } from "./constants.js";
+import { DEFER_TAG_CONFIG } from "./modals.jsx";
+import { compressImage } from "./utils.jsx";
+import { supabase, invokeEdgeFunction } from "./supabase.js";
 
 function RoutineFitSheet({ product, assessment, onAddNow, onDefer, onClose }) {
   const isDefer = assessment.verdict === "defer";
@@ -15,7 +19,7 @@ function RoutineFitSheet({ product, assessment, onAddNow, onDefer, onClose }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 22 }}>
           <div>
             <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 5px" }}>Ritual Fit</p>
-            <h2 style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 22, fontWeight: 400, color: "var(--parchment)", margin: 0 }}>{product.name}</h2>
+            <h2 style={{ fontFamily: "Pinyon Script, cursive", fontSize: 22, fontWeight: 400, color: "var(--parchment)", margin: 0 }}>{product.name}</h2>
           </div>
           <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: 4 }}><Icon name="x" size={17} /></button>
         </div>
@@ -24,7 +28,7 @@ function RoutineFitSheet({ product, assessment, onAddNow, onDefer, onClose }) {
         {assessment.positiveRead && (
           <div style={{ background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.2)", borderRadius: 12, padding: "13px 16px", marginBottom: 14 }}>
             <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-              <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#7a9070", marginTop: 5, flexShrink: 0 }} />
+              <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#6e8a72", marginTop: 5, flexShrink: 0 }} />
               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--parchment)", margin: 0, lineHeight: 1.6 }}>{assessment.positiveRead}</p>
             </div>
           </div>
@@ -48,7 +52,7 @@ function RoutineFitSheet({ product, assessment, onAddNow, onDefer, onClose }) {
           {isDefer ? (
             <>
               <button onClick={onDefer}
-                style={{ width: "100%", padding: "14px 0", background: "#7a9070", color: "#0d0f0d", border: "none", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}>
+                style={{ width: "100%", padding: "14px 0", background: "#6e8a72", color: "#0d0f0d", border: "none", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}>
                 Save for Later
               </button>
               <button onClick={onAddNow}
@@ -58,7 +62,7 @@ function RoutineFitSheet({ product, assessment, onAddNow, onDefer, onClose }) {
             </>
           ) : (
             <button onClick={onAddNow}
-              style={{ width: "100%", padding: "14px 0", background: "#7a9070", color: "#0d0f0d", border: "none", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}>
+              style={{ width: "100%", padding: "14px 0", background: "#6e8a72", color: "#0d0f0d", border: "none", borderRadius: 10, fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}>
               Add to Ritual
             </button>
           )}
@@ -91,6 +95,171 @@ function getLockedSession(product) {
   return null;
 }
 
+// Soft auto-assignment: returns { session, reason } for products that aren't
+// hard-locked.  The user sees this as the default but can override freely.
+function getAutoSession(product) {
+  const cat = product.category || "Serum";
+  const actives = Object.keys(detectActives(product.ingredients || []));
+
+  // SPF categories — always AM
+  if (cat === "SPF" || cat === "SPF Moisturizer")
+    return { session: "am", reason: "SPF protects against daytime UV — AM only." };
+
+  // Prescription — PM
+  if (cat === "Prescription")
+    return { session: "pm", reason: "Prescription actives work best overnight." };
+
+  // Active-driven
+  if (actives.includes("vitamin C"))
+    return { session: "am", reason: "Vitamin C pairs with SPF for daytime antioxidant protection." };
+  if (actives.includes("retinol"))
+    return { session: "pm", reason: "Retinol is photosensitive — PM only." };
+  if (actives.includes("AHA"))
+    return { session: "pm", reason: "AHAs increase sun sensitivity — best used at night." };
+  if (actives.includes("BHA"))
+    return { session: "pm", reason: "BHA exfoliates inside the pore — PM lets skin recover." };
+  if (actives.includes("peptides"))
+    return { session: "pm", reason: "Peptides support overnight repair." };
+  if (actives.includes("benzoyl peroxide"))
+    return { session: "am", reason: "Benzoyl peroxide can bleach pillowcases — AM is safer." };
+
+  // Category-driven defaults
+  if (["Cleanser", "Moisturizer", "Toner", "Essence", "Eye Cream", "Mist"].includes(cat))
+    return { session: "both", reason: "A foundational step — use morning and night." };
+  if (cat === "Oil" || cat === "Balm")
+    return { session: "pm", reason: "Rich occlusives seal everything in overnight." };
+  if (cat === "Exfoliant" || cat === "Toning Pad")
+    return { session: "pm", reason: "Exfoliating steps are best used at night." };
+  if (cat === "Mask")
+    return { session: "pm", reason: "Masks work best in the evening on clean skin." };
+
+  // Hydrating serums with HA/ceramides/niacinamide — both
+  if (actives.includes("hyaluronic acid") || actives.includes("ceramides") || actives.includes("niacinamide"))
+    return { session: "both", reason: "Hydrating actives benefit from twice-daily use." };
+
+  // Default serum/treatment — both
+  return { session: "both", reason: null };
+}
+
+// --- FREQUENCY SUGGESTION -------------------------------------------------------
+
+function getSuggestedFrequency(product, user = {}) {
+  const cat = product.category || "Serum";
+  const actives = Object.keys(detectActives(product.ingredients || []));
+  const ing = Array.isArray(product.ingredients) ? product.ingredients : typeof product.ingredients === "string" ? product.ingredients.split(",").map(s => s.trim()).filter(Boolean) : [];
+  const lower = ing.map(i => i.toLowerCase());
+  const isSensitive = user.skinType === "Sensitive" || (user.medicalHistory?.sensitivities?.length > 0);
+  const onTret = user.medicalHistory?.onTretinoin;
+
+  // --- SPF: always daily AM ---
+  if (cat === "SPF" || cat === "SPF Moisturizer")
+    return { id: "daily", reason: "Every morning without exception — SPF is non-negotiable." };
+
+  // --- Prescription ---
+  if (cat === "Prescription")
+    return { id: "alternating", reason: "Start slow as prescribed — every other night, then build up." };
+
+  // --- Exfoliant ---
+  if (cat === "Exfoliant") {
+    // Check for high-strength AHA (>10%)
+    const pctMatch = lower.find(i => /glycolic|lactic|mandelic/.test(i) && /\d{2,}%/.test(i));
+    if (pctMatch)
+      return { id: "weekly", reason: "High-strength AHA — once a week max to protect your barrier." };
+    if (isSensitive)
+      return { id: "weekly", reason: "Sensitive skin does best with weekly exfoliation." };
+    return { id: "2-3x", reason: "2-3 times per week gives your barrier time to recover between uses." };
+  }
+
+  // --- Mask ---
+  if (cat === "Mask")
+    return { id: "weekly", reason: "1-2 times per week is ideal — masks are a treat, not a daily step." };
+
+  // --- Toning Pad ---
+  if (cat === "Toning Pad") {
+    if (isSensitive)
+      return { id: "2-3x", reason: "Start at 2-3x per week — sensitive skin needs time to adjust." };
+    return { id: "daily", reason: "Toning pads can be used daily — back off if you notice tightness." };
+  }
+
+  // --- Oil ---
+  if (cat === "Oil")
+    return { id: "daily", reason: "Facial oils work best as a nightly seal — daily PM use." };
+
+  // --- Cleanser with actives ---
+  if (cat === "Cleanser") {
+    if (actives.includes("AHA") || actives.includes("BHA"))
+      return { id: "2-3x", reason: "Exfoliating cleansers are best limited to 2-3x per week." };
+    return { id: "daily", reason: "Gentle cleanser — use morning and night." };
+  }
+
+  // --- Retinol serums/treatments ---
+  if (actives.includes("retinol")) {
+    if (onTret)
+      return { id: "alternating", reason: "On tretinoin — start every other night and build tolerance slowly." };
+    if (isSensitive)
+      return { id: "2-3x", reason: "Sensitive skin + retinol — start at 2x per week and build up." };
+    return { id: "alternating", reason: "Start every other night — retinol needs time for your skin to adapt." };
+  }
+
+  // --- Vitamin C ---
+  if (actives.includes("vitamin C"))
+    return { id: "daily", reason: "Vitamin C works best with consistent daily AM use alongside SPF." };
+
+  // --- AHA/BHA serums ---
+  if (actives.includes("AHA")) {
+    if (isSensitive)
+      return { id: "weekly", reason: "AHA on sensitive skin — start once a week, increase if tolerated." };
+    return { id: "2-3x", reason: "AHA serums 2-3 times per week — never layer with other exfoliants." };
+  }
+  if (actives.includes("BHA")) {
+    if (isSensitive)
+      return { id: "2-3x", reason: "BHA on sensitive skin — 2-3 times per week to start." };
+    return { id: "daily", reason: "BHA is generally gentle enough for daily use — reduce if irritated." };
+  }
+
+  // --- Benzoyl peroxide ---
+  if (actives.includes("benzoyl peroxide"))
+    return { id: "daily", reason: "Daily use is standard — apply PM, and always follow with moisturizer." };
+
+  // --- Default by category ---
+  if (["Moisturizer", "Eye Cream", "Toner", "Essence", "Mist"].includes(cat))
+    return { id: "daily", reason: "A foundational step — use daily, morning and night." };
+
+  if (cat === "Serum") {
+    if (actives.includes("peptides"))
+      return { id: "daily", reason: "Peptides work best with consistent daily PM use." };
+    return { id: "daily", reason: "Daily use — serums are most effective with consistent application." };
+  }
+
+  return { id: "daily", reason: null };
+}
+
+// Frequency ordering for overuse comparison (lower = less frequent)
+const FREQ_RANK = { "weekly": 1, "as-needed": 1, "2-3x": 2, "alternating": 3, "daily": 4 };
+
+function getOveruseWarning(chosenFreq, suggested, product) {
+  const chosenRank = FREQ_RANK[chosenFreq] || 0;
+  const suggestedRank = FREQ_RANK[suggested.id] || 0;
+  if (chosenRank <= suggestedRank) return null;
+
+  const actives = Object.keys(detectActives(product.ingredients || []));
+  const cat = product.category || "Serum";
+  const isHarsh = actives.includes("retinol") || actives.includes("AHA") || actives.includes("BHA") || cat === "Exfoliant" || cat === "Prescription";
+  if (!isHarsh) return null;
+
+  if (actives.includes("retinol"))
+    return "Daily retinol can cause irritation and peeling. Consider alternating nights while your skin builds tolerance.";
+  if (actives.includes("AHA"))
+    return "Daily use of AHA may compromise your barrier over time. Consider alternating nights.";
+  if (actives.includes("BHA") && cat === "Exfoliant")
+    return "Daily exfoliation can over-strip your skin. Give your barrier recovery time between uses.";
+  if (cat === "Exfoliant")
+    return "Daily exfoliation risks barrier damage. Most skin does better with 2-3 uses per week.";
+  if (cat === "Prescription")
+    return "Increasing frequency beyond your prescribed schedule can cause irritation. Follow your provider's guidance.";
+  return "Using this more frequently than recommended may irritate your skin. Adjust based on how your skin responds.";
+}
+
 // --- SESSION PICKER -----------------------------------------------------------
 
 function ShelfLifeSection({ form, set }) {
@@ -101,7 +270,7 @@ function ShelfLifeSection({ form, set }) {
     <div>
       <button onClick={() => setOpen(o => !o)} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", padding: "0 0 10px", cursor: "pointer" }}>
         <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.6 }}>Shelf life & expiry</span>
-        <span style={{ color: "var(--clay)", opacity: 0.4, fontSize: 10, display: "inline-block" }}>{open ? "▴" : "▾"}</span>
+        <span style={{ color: "var(--clay)", opacity: 0.4, display: "inline-flex", transform: open ? "rotate(-90deg)" : "rotate(90deg)", transition: "transform 0.18s" }}><Icon name="chevron" size={10} /></span>
       </button>
       {open && (
         <div>
@@ -130,9 +299,50 @@ function ShelfLifeSection({ form, set }) {
 function ProductModal({ product, onSave, onClose, user }) {
   const [form, setForm] = useState(product || { brand: "", name: "", category: "Serum", price: "", ingredients: "" });
   const [analyzing, setAnalyzing] = useState(false);
-  const [modalStep, setModalStep] = useState(product && product.id ? "form" : "choose");
+  const [scanError, setScanError] = useState(null);
+  const [modalStep, setModalStep] = useState(product && (product.id || product.brand) ? "form" : "choose");
   const fileRef = useRef();
+  const isEdit = !!(product && product.id);
+  const [freqTouched, setFreqTouched] = useState(isEdit);
+  const [sessionTouched, setSessionTouched] = useState(isEdit);
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  // Frequency suggestion based on category + ingredients + user profile
+  const freqSuggestion = getSuggestedFrequency(form, user);
+  const prevSuggestionRef = useRef(freqSuggestion.id);
+
+  // Session auto-assignment based on category + ingredients
+  const locked = getLockedSession({ ...form, id: product ? product.id : null });
+  const autoSession = getAutoSession(form);
+  // Resolve current effective session: locked > explicit user pick > auto
+  const effectiveSession = locked ? locked.session : (form.session && form.session !== "auto") ? form.session : autoSession.session;
+  const prevAutoRef = useRef(autoSession.session);
+
+  // Auto-apply frequency suggestion when it changes (new products only)
+  useEffect(() => {
+    if (isEdit) return;
+    if (freqSuggestion.id !== prevSuggestionRef.current) {
+      prevSuggestionRef.current = freqSuggestion.id;
+      if (!freqTouched) set("frequency", freqSuggestion.id);
+    }
+  }, [freqSuggestion.id]);
+
+  // Auto-apply session when it changes (new products, or user hasn't manually picked)
+  useEffect(() => {
+    if (isEdit) return;
+    if (autoSession.session !== prevAutoRef.current) {
+      prevAutoRef.current = autoSession.session;
+      if (!sessionTouched) set("session", autoSession.session);
+    }
+  }, [autoSession.session]);
+
+  // Set initial frequency + session for new products
+  useEffect(() => {
+    if (!isEdit && !form.frequency) set("frequency", freqSuggestion.id);
+    if (!isEdit && (!form.session || form.session === "auto")) set("session", autoSession.session);
+  }, []);
+
+  const overuseWarning = getOveruseWarning(form.frequency || "daily", freqSuggestion, form);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -197,36 +407,65 @@ function ProductModal({ product, onSave, onClose, user }) {
   const handleFile = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => {};
-    reader.readAsDataURL(file);
+    console.log("[Cygne scan] 1. image selected:", file.name, "size:", file.size, "type:", file.type);
     setAnalyzing(true);
+    setScanError(null);
     try {
-      const base64 = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result.split(",")[1]); r.onerror = rej; r.readAsDataURL(file); });
-      const resp = await fetch("https://mxcefgbaaylddnyxrnao.supabase.co/functions/v1/rapid-action", {
-        method: "POST", headers: { "Content-Type": "application/json", "apikey": "sb_publishable_6kUbORFpskKo-zg6r0MZtA_x5ppPvin", "Authorization": "Bearer sb_publishable_6kUbORFpskKo-zg6r0MZtA_x5ppPvin" },
-        body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 1000, messages: [{ role: "user", content: [
-          { type: "image", source: { type: "base64", media_type: file.type, data: base64 } },
-          { type: "text", text: "You are a skincare product analyst. Look at this product image and return ONLY a JSON object with these exact fields: brand (string), name (string), category (one of: Cleanser/Toner/Serum/Eye Cream/Moisturizer/SPF/Oil/Exfoliant/Mask/Treatment), ingredients (comma-separated string of ingredients if visible). No markdown, no explanation, just the JSON object." }
-        ]}] })
+      // Step 2: compress image
+      console.log("[Cygne scan] 2. compressing image...");
+      const base64 = await compressImage(file);
+      console.log("[Cygne scan] 3. compressed base64 length:", base64.length, "(~" + Math.round(base64.length * 0.75 / 1024) + "KB)");
+
+      // Step 3: call edge function via direct fetch (full error visibility)
+      console.log("[Cygne scan] 4. calling rapid-action...");
+      const data = await invokeEdgeFunction("rapid-action", {
+        model: "claude-sonnet-4-20250514", max_tokens: 1500, messages: [{ role: "user", content: [
+          { type: "image", source: { type: "base64", media_type: "image/jpeg", data: base64 } },
+          { type: "text", text: "You are an international skincare product analyst with expertise across K-beauty, J-beauty, French pharmacy, Australian, British, and Western brands. Identify the product from this image. Fully support: KOREAN (COSRX, Beauty of Joseon, Anua, Some By Mi, Isntree, Innisfree, Laneige, Sulwhasoo, Missha, Etude House, Tirtir, Torriden, Mixsoon, Haruharu Wonder, Round Lab, Skin1004, Klairs, Purito, Iunik, Abib, Axis-Y, By Wishtrend, Medicube, Numbuzin, Rovectin, Pyunkang Yul, Dr. Ceuracle, Dr. Jart, I'm From, Benton, Sioris, Ma:nyo, Hanyul, Sum37, Belif, Neogen, Mediheal). JAPANESE (SK-II, Hada Labo, DHC, Shiseido, Tatcha, Rohto, Curel, Kose, Minon, Albion, Decorté, Sekkisei, Kanebo). FRENCH PHARMACY/LUXURY (La Roche-Posay, Avène, Bioderma, Vichy, Uriage, A-Derma, Caudalie, Nuxe, Embryolisse, Filorga, Biotherm, Clarins, Sisley, Darphin). AUSTRALIAN (Aesop, Ultra Violette, Sand & Sky, Jurlique, Grown Alchemist, Frank Body, Bondi Sands, Alpha-H, Rationale, Medik8). BRITISH/EUROPEAN (The Ordinary, NIOD, Deciem, Pai, Emma Hardie, Liz Earle, Eve Lom, Weleda, Dr. Hauschka, Eucerin, Allies of Skin). Read Hangul, Kanji/Hiragana/Katakana, French, and English text on packaging. CATEGORIZATION RULES — INGREDIENT-FIRST. Texture and ingredient profile ALWAYS override the product name. Priority: (1) primary active / functional ingredient, (2) format & texture, (3) product name LAST. INGREDIENT DECISION TREE: (a) Primary active is hyaluronic acid, niacinamide, vitamin C / ascorbic acid, retinol / retinoid, peptides, AHA, or BHA → Serum. A lightweight/watery HA-dominant 'lotion' or 'milk' is a SERUM, not a Moisturizer. (b) Primary base is ceramides, shea butter, squalane, or fatty acids in a THICK occlusive base → Moisturizer. (c) Lightweight with mostly humectants (glycerin, HA, panthenol) and no heavy active → Serum or Essence (Essence if watery/toner-adjacent, Serum if targeted). (d) Contains SPF 30+ → SPF (pure sunscreen) or SPF Moisturizer (combined with heavy hydration). (e) Contains surfactants / cleansing agents (sulfates, glucosides, betaines, micellar, amino-acid surfactants) → Cleanser. ASIAN FORMAT MAPPINGS (apply AFTER the ingredient tree): Korean/Japanese 'lotion', 'milky lotion', 'milk', '乳液/nyuueki', or '유액' with hydrating ingredients → Essence if watery, Moisturizer if creamy, Serum if HA/niacinamide-dominant — NEVER Cleanser. Korean 'skin' or 'softener' → Toner. 'Ampoule' → Serum. 'Emulsion' → lightweight Moisturizer. When uncertain, pick the category that best matches the ingredient profile. NEVER default to Serum without ingredient justification. SPF LOGIC: SPF 30+ pure sunscreen → 'SPF'; SPF 15 or lower in a moisturizer where hydration is primary → 'Moisturizer' (put SPF value in 'spf' field); SPF 30+ marketed as both moisturizer and sunscreen with heavy hydrating ingredients (ceramides, hyaluronic acid, shea butter, squalane, 'SPF moisturizer', 'day cream SPF', 'hydrating sunscreen') → 'SPF Moisturizer'. Return ONLY a JSON object with these exact fields: brand (string), name (string), category (one of: Cleanser/Toner/Essence/Serum/Eye Cream/Moisturizer/SPF Moisturizer/SPF/Oil/Exfoliant/Mask/Sleeping Mask/Sheet Mask/Treatment/Mist/Lip Care/Micellar Water), spf (numeric SPF level if present, else null), ingredients (comma-separated string of all visible ingredients, normalized to INCI English — oxyde de zinc → zinc oxide, acide hyaluronique → hyaluronic acid, melaleuca → tea tree oil, eau thermale → thermal spring water, galactomyces/pitera → Galactomyces Ferment Filtrate, snail mucin → snail secretion filtrate, centella asiatica, madecassoside, mugwort → Artemisia, propolis, rice ferment, birch sap, niacinamide, fullerenes, kakadu plum → Terminalia ferdinandiana), flags (comma-separated string of informational notes about US-restricted ingredients common abroad — Tinosorb S, Tinosorb M, Mexoryl SX, Mexoryl XL, Uvinul A Plus/T 150, Enzacamene, hydroquinone, tranexamic acid — these are notes NOT warnings). No markdown, no explanation, just the JSON object." }
+        ]}]
       });
-      const data = await resp.json();
-      const text = (data.content || []).map(c => c.text || "").join("") || "{}";
-      const clean = text.replace(/\x60\x60\x60json|\x60\x60\x60/g, "").trim();
+      console.log("[Cygne scan] 5. response:", JSON.stringify(data).slice(0, 500));
+
+      // Step 6: parse response — handle both direct Anthropic format and wrapped
+      let text;
+      if (data && data.content && Array.isArray(data.content)) {
+        text = data.content.map(c => c.text || "").join("");
+      } else if (typeof data === "string") {
+        text = data;
+      } else {
+        text = JSON.stringify(data);
+      }
+      console.log("[Cygne scan] 7. extracted text:", text.slice(0, 300));
+
+      const clean = text.replace(/```json|```/g, "").trim();
       const jsonStart = clean.indexOf("{");
       const jsonEnd = clean.lastIndexOf("}");
-      const jsonStr = jsonStart >= 0 && jsonEnd >= 0 ? clean.slice(jsonStart, jsonEnd + 1) : "{}";
+      if (jsonStart < 0 || jsonEnd < 0) {
+        console.error("[Cygne scan] 8. NO JSON found in response:", clean.slice(0, 200));
+        setScanError("Scan returned unexpected format. Check console.");
+        setModalStep("form"); setAnalyzing(false); return;
+      }
+      const jsonStr = clean.slice(jsonStart, jsonEnd + 1);
       const parsed = JSON.parse(jsonStr);
+      console.log("[Cygne scan] 8. parsed product:", parsed);
+      const ing = Array.isArray(parsed.ingredients) ? parsed.ingredients.join(", ") : (parsed.ingredients || "");
       setForm(f => ({
         ...f,
         brand: parsed.brand || f.brand,
         name: parsed.name || f.name,
         category: parsed.category || f.category,
-        ingredients: parsed.ingredients || f.ingredients,
+        spf: parsed.spf || f.spf || null,
+        ingredients: ing || f.ingredients,
       }));
       setModalStep("form");
-    } catch (err) { console.error(err); setModalStep("form"); }
+    } catch (err) {
+      console.error("[Cygne scan] EXCEPTION:", err);
+      console.error("[Cygne scan] stack:", err.stack);
+      setScanError("Scan failed: " + (err.message || "unknown error"));
+      setModalStep("form");
+    }
     setAnalyzing(false);
+  };
 
   const save = () => {
     if (!form.brand || !form.name) return;
@@ -244,9 +483,9 @@ function ProductModal({ product, onSave, onClose, user }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {modalStep === "form" && !(product && product.id) && (
-              <button onClick={() => setModalStep("choose")} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: "0 8px 0 0", opacity: 0.6, fontSize: 16 }}>←</button>
+              <button onClick={() => setModalStep("choose")} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: "0 8px 0 0", opacity: 0.6, display: "inline-flex" }}><Icon name="arrow-left" size={16} /></button>
             )}
-            <h2 style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 28, fontWeight: 400, color: "var(--parchment)", margin: 0 }}>
+            <h2 style={{ fontFamily: "Pinyon Script, cursive", fontSize: 28, fontWeight: 400, color: "var(--parchment)", margin: 0 }}>
               {product && product.id ? "Edit Product" : modalStep === "choose" ? "Add a Product" : "Product Details"}
             </h2>
           </div>
@@ -303,6 +542,10 @@ function ProductModal({ product, onSave, onClose, user }) {
                 <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>Point at the product — Cygne reads the label.</p>
               </div>
             </div>
+
+            {scanError && (
+              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "#8b7355", margin: "0 0 10px", padding: "8px 12px", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.2)", borderRadius: 8 }}>{scanError}</p>
+            )}
 
             <button onClick={() => setModalStep("form")}
               style={{ width: "100%", padding: "13px 0", background: "none", border: "1px solid var(--border)", borderRadius: 14, fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", cursor: "pointer", marginTop: 4 }}>
@@ -386,15 +629,15 @@ function ProductModal({ product, onSave, onClose, user }) {
                                   toggleActive(active.key, active.options[0]);
                                 }
                               }}
-                                style={{ width: 22, height: 22, borderRadius: "50%", border: "1px solid " + (isOn ? "#7a9070" : "var(--border)"), background: isOn ? "#7a9070" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
-                                {isOn && <span style={{ color: "var(--ink)", fontSize: 11, fontWeight: 700 }}>✓</span>}
+                                style={{ width: 22, height: 22, borderRadius: "50%", border: "1px solid " + (isOn ? "#6e8a72" : "var(--border)"), background: isOn ? "#6e8a72" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0, color: "var(--ink)" }}>
+                                {isOn && <Icon name="check" size={11} />}
                               </button>
                             </div>
                             {isOn && (
                               <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
                                 {active.options.map(pct => (
                                   <button key={pct} onClick={() => toggleActive(active.key, pct)}
-                                    style={{ padding: "4px 12px", borderRadius: 20, border: "1px solid " + (selected === pct ? "#7a9070" : "var(--border)"), background: selected === pct ? "rgba(122,144,112,0.18)" : "transparent", fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: selected === pct ? "var(--parchment)" : "var(--clay)", cursor: "pointer" }}>
+                                    style={{ padding: "4px 12px", borderRadius: 20, border: "1px solid " + (selected === pct ? "#6e8a72" : "var(--border)"), background: selected === pct ? "rgba(122,144,112,0.18)" : "transparent", fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: selected === pct ? "var(--parchment)" : "var(--clay)", cursor: "pointer" }}>
                                     {pct}
                                   </button>
                                 ))}
@@ -427,45 +670,58 @@ function ProductModal({ product, onSave, onClose, user }) {
             <div style={{ marginBottom: 16 }}>
               <label style={labelSt}>Use frequency</label>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                {FREQUENCIES.map(f => (
-                  <button key={f.id} onClick={() => set("frequency", f.id)}
-                    style={{ padding: "7px 14px", borderRadius: 20, border: "1px solid " + ((form.frequency || "daily") === f.id ? "var(--sage)" : "var(--border)"), background: (form.frequency || "daily") === f.id ? "rgba(122,144,112,0.18)" : "transparent", color: (form.frequency || "daily") === f.id ? "var(--parchment)" : "var(--clay)", fontFamily: "Space Grotesk, sans-serif", fontSize: 11, cursor: "pointer" }}>
-                    {f.label}
-                  </button>
-                ))}
+                {FREQUENCIES.map(f => {
+                  const active = (form.frequency || "daily") === f.id;
+                  const isSuggested = f.id === freqSuggestion.id && !active;
+                  return (
+                    <button key={f.id} onClick={() => { setFreqTouched(true); set("frequency", f.id); }}
+                      style={{ padding: "7px 14px", borderRadius: 20, border: "1px solid " + (active ? "var(--sage)" : isSuggested ? "rgba(122,144,112,0.35)" : "var(--border)"), background: active ? "rgba(122,144,112,0.18)" : "transparent", color: active ? "var(--parchment)" : "var(--clay)", fontFamily: "Space Grotesk, sans-serif", fontSize: 11, cursor: "pointer", position: "relative" }}>
+                      {f.label}
+                    </button>
+                  );
+                })}
               </div>
+              {freqSuggestion.reason && (
+                <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--sage)", margin: "10px 0 0", lineHeight: 1.6, opacity: 0.85 }}>
+                  {freqSuggestion.reason}
+                </p>
+              )}
+              {overuseWarning && (
+                <div style={{ display: "flex", gap: 10, marginTop: 10, padding: "10px 14px", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.25)", borderRadius: 10 }}>
+                  <span style={{ color: "#8b7355", flexShrink: 0, marginTop: 1, display: "inline-flex" }}><Icon name="warning" size={13} /></span>
+                  <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "#8b7355", margin: 0, lineHeight: 1.6 }}>{overuseWarning}</p>
+                </div>
+              )}
             </div>
 
             <div style={{ marginBottom: 16 }}>
               <label style={labelSt}>Session</label>
-              {(() => {
-                const locked = getLockedSession({ ...form, id: product ? product.id : null });
-                if (locked) {
-                  const isAM = locked.session === "am";
-                  return (
-                    <div>
-                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                        <span style={{ padding: "5px 14px", borderRadius: 20, background: isAM ? "rgba(196,144,64,0.12)" : "rgba(100,90,160,0.12)", border: "1px solid " + (isAM ? "rgba(196,144,64,0.35)" : "rgba(100,90,160,0.3)"), fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 700, color: isAM ? "#c49040" : "#9490c8" }}>{isAM ? "AM only" : "PM only"}</span>
-                        <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", opacity: 0.6 }}>locked by ingredients</span>
-                      </div>
-                      <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.5, opacity: 0.7 }}>{locked.reason}</p>
-                    </div>
-                  );
-                }
-                return (
+              {locked ? (
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                    <span style={{ padding: "5px 14px", borderRadius: 20, background: locked.session === "am" ? "rgba(122,144,112,0.14)" : "rgba(232,226,217,0.10)", border: "1px solid " + (locked.session === "am" ? "rgba(122,144,112,0.4)" : "rgba(232,226,217,0.3)"), fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 700, color: locked.session === "am" ? "var(--sage)" : "#e8e2d9" }}>{locked.session === "am" ? "AM only" : "PM only"}</span>
+                    <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", opacity: 0.6 }}>locked by ingredients</span>
+                  </div>
+                  <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.5, opacity: 0.7 }}>{locked.reason}</p>
+                </div>
+              ) : (
+                <div>
                   <div style={{ display: "flex", gap: 8 }}>
-                    {[{ id: "am", label: "AM" }, { id: "pm", label: "PM" }, { id: "both", label: "Both" }, { id: "auto", label: "Auto" }].map(s => {
-                      const active = (form.session || "auto") === s.id;
+                    {[{ id: "am", label: "AM only" }, { id: "pm", label: "PM only" }, { id: "both", label: "AM + PM" }].map(s => {
+                      const active = effectiveSession === s.id;
                       return (
-                        <button key={s.id} onClick={() => set("session", s.id)}
+                        <button key={s.id} onClick={() => { setSessionTouched(true); set("session", s.id); }}
                           style={{ flex: 1, padding: "8px 0", borderRadius: 20, border: "1px solid " + (active ? "var(--sage)" : "var(--border)"), background: active ? "rgba(122,144,112,0.18)" : "transparent", color: active ? "var(--parchment)" : "var(--clay)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: active ? 600 : 400, cursor: "pointer" }}>
                           {s.label}
                         </button>
                       );
                     })}
                   </div>
-                );
-              })()}
+                  {autoSession.reason && (
+                    <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: "8px 0 0", lineHeight: 1.5, opacity: 0.6 }}>{autoSession.reason}</p>
+                  )}
+                </div>
+              )}
             </div>
 
             <div style={{ marginBottom: 20, borderTop: "1px solid var(--border)", paddingTop: 16 }}>
@@ -487,4 +743,4 @@ function ProductModal({ product, onSave, onClose, user }) {
 
 // --- SESSION LOCKED BY INGREDIENTS -------------------------------------------
 
-export { RoutineFitSheet, ProductModal, ShelfLifeSection };
+export { RoutineFitSheet, ProductModal, ShelfLifeSection, getLockedSession, getAutoSession };
