@@ -50,12 +50,12 @@ const Icon = ({ name, size = 20 }) => {
 };
 
 // --- SHARED -------------------------------------------------------------------
-const labelSt = { display: "block", fontFamily: "var(--sans)", fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", marginBottom: 8 };
-const inputSt = { width: "100%", padding: "12px 14px", background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 10, color: "var(--parchment)", fontFamily: "var(--sans)", fontSize: 14, outline: "none", boxSizing: "border-box" };
+const labelSt = { display: "block", fontFamily: "var(--heading)", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--clay)", marginBottom: 8 };
+const inputSt = { width: "100%", padding: "12px 14px", background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 0, color: "var(--parchment)", fontFamily: "var(--sans)", fontSize: 14, outline: "none", boxSizing: "border-box" };
 
 function Pill({ children, active, onClick }) {
   return (
-    <button onClick={onClick} style={{ flexShrink: 0, padding: "6px 15px", borderRadius: 20, border: `1px solid ${active ? "var(--sage)" : "var(--border)"}`, background: active ? "var(--sage)" : "transparent", color: active ? "var(--deep)" : "var(--clay)", fontFamily: "var(--sans)", fontSize: 11, cursor: "pointer", letterSpacing: "0.06em", whiteSpace: "nowrap", transition: "all 0.18s" }}>
+    <button onClick={onClick} style={{ flexShrink: 0, padding: "6px 16px", borderRadius: 0, border: `1px solid ${active ? "rgba(160,160,160,0.7)" : "var(--border)"}`, background: active ? "var(--cta)" : "transparent", color: active ? "#F5F0E8" : "var(--clay)", fontFamily: "var(--heading)", fontSize: 10, cursor: "pointer", letterSpacing: "0.12em", textTransform: "uppercase", whiteSpace: "nowrap", transition: "all 0.18s" }}>
       {children}
     </button>
   );
@@ -66,7 +66,7 @@ function Section({ title, icon, children }) {
     <div style={{ marginBottom: 32 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
         {icon && <span style={{ color: "var(--clay)", opacity: 0.7 }}><Icon name={icon} size={13} /></span>}
-        <span style={{ fontFamily: "var(--sans)", fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)" }}>{title}</span>
+        <span style={{ fontFamily: "var(--heading)", fontSize: 10, letterSpacing: "0.20em", textTransform: "uppercase", color: "var(--clay)" }}>{title}</span>
         <div style={{ flex: 1, height: 1, background: "var(--border)", marginLeft: 8 }} />
       </div>
       {children}
@@ -126,14 +126,19 @@ const LOGO_SRC = (
 );
 
 function Wordmark({ size = 28, theme = "dark" }) {
-  const h = Math.round(size * 1.1);
-  if (theme === "light") {
-    return (
-      <span style={{ fontFamily: "'Pinyon Script', cursive", fontSize: size * 0.9, fontWeight: 400, color: "#1a1814", letterSpacing: "0.04em", lineHeight: 1, display: "block" }}>Cygne</span>
-    );
-  }
   return (
-    <img src={LOGO_SRC} alt="Cygne" style={{ height: h, width: "auto", display: "block", objectFit: "contain", mixBlendMode: "lighten", filter: "brightness(1.15) contrast(1.1)" }} />
+    <span style={{
+      fontFamily: "'Pinyon Script', cursive",
+      fontSize: size * 0.95,
+      fontWeight: 400,
+      letterSpacing: "0.04em",
+      lineHeight: 1,
+      display: "block",
+      background: "linear-gradient(135deg, #505050 0%, #B8B8B8 22%, #EBEBEB 38%, #C4C4C4 55%, #909090 70%, #D8D8D8 85%, #585858 100%)",
+      WebkitBackgroundClip: "text",
+      WebkitTextFillColor: "transparent",
+      backgroundClip: "text",
+    }}>Cygne</span>
   );
 }
 

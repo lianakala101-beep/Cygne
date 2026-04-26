@@ -1682,8 +1682,8 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
     <div>
 
       {/* -- Header ----------------------------------------------------------- */}
-      <div style={{ marginBottom: 20 }}>
-        <h1 style={{ fontFamily: "Pinyon Script, cursive", fontSize: 42, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: 0, lineHeight: 1 }}>Your Progress</h1>
+      <div style={{ marginBottom: 20, paddingTop: 44 }}>
+        <h1 style={{ fontFamily: "var(--heading)", fontSize: 38, fontWeight: 400, letterSpacing: "0.20em", textTransform: "uppercase", color: "var(--parchment)", margin: 0, lineHeight: 1.15 }}>Your Progress</h1>
       </div>
 
       {/* -- Skin Journal ------------------------------------------------------ */}

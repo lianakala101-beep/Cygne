@@ -240,9 +240,9 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo
   return (
     <div>
       {/* -- Header ----------------------------------------------------------- */}
-      <div style={{ marginBottom: 24 }}>
+      <div style={{ marginBottom: 24, paddingTop: 44 }}>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-          <h1 style={{ fontFamily: "Pinyon Script, cursive", fontSize: 42, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: "0 0 4px", lineHeight: 1 }}>Your Vanity</h1>
+          <h1 style={{ fontFamily: "var(--heading)", fontSize: 38, fontWeight: 400, letterSpacing: "0.20em", textTransform: "uppercase", color: "var(--parchment)", margin: "0 0 4px", lineHeight: 1.15 }}>Your Vanity</h1>
           {false && <ClearAllButton onClearAll={onClearAll} />}  {/* hidden — dev only */}
         </div>
         <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", margin: 0 }}>
@@ -251,10 +251,10 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo
       </div>
 
       {/* -- View Toggle ------------------------------------------------------- */}
-      <div style={{ display: "flex", background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 10, padding: 3, marginBottom: 24 }}>
+      <div style={{ display: "flex", background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 0, padding: 2, marginBottom: 24 }}>
         {[{ id: "shelf", label: "Products" }, { id: "insights", label: "Insights" }].map(v => (
           <button key={v.id} onClick={() => setView(v.id)}
-            style={{ flex: 1, padding: "9px 0", borderRadius: 8, border: "none", background: view === v.id ? "var(--sage)" : "transparent", color: view === v.id ? "#0d0f0d" : "var(--clay)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: view === v.id ? 700 : 400, cursor: "pointer", letterSpacing: "0.12em", textTransform: "uppercase", transition: "all 0.18s" }}>
+            style={{ flex: 1, padding: "9px 0", borderRadius: 0, border: "none", background: view === v.id ? "var(--cta)" : "transparent", color: view === v.id ? "#F5F0E8" : "var(--clay)", fontFamily: "var(--heading)", fontSize: 10, fontWeight: view === v.id ? 700 : 400, cursor: "pointer", letterSpacing: "0.15em", textTransform: "uppercase", transition: "all 0.18s" }}>
             {v.label}
           </button>
         ))}

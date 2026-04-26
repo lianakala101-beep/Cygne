@@ -48,8 +48,8 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
   return (
     <div>
       {/* Hero */}
-      <div style={{ marginBottom: products.length === 0 ? 28 : 36 }}>
-        <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 8px" }}>
+      <div style={{ marginBottom: products.length === 0 ? 28 : 36, paddingTop: 44 }}>
+        <p style={{ fontFamily: "var(--heading)", fontSize: 9, letterSpacing: "0.28em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 12px", opacity: 0.8 }}>
           {(() => {
             const h = new Date().getHours();
             if (h >= 5  && h < 12) return user?.name ? `Good morning, ${user.name.split(" ")[0]}.` : "Good morning.";
@@ -57,8 +57,8 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             return user?.name ? `Good evening, ${user.name.split(" ")[0]}.` : "Good evening.";
           })()}
         </p>
-        <h1 style={{ fontFamily: "Pinyon Script, cursive", fontSize: 52, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: "0 0 4px", lineHeight: 1.0 }}>
-          {products.length === 0 ? "Welcome." : "Your\nRitual."}
+        <h1 style={{ fontFamily: "var(--heading)", fontSize: 46, fontWeight: 400, letterSpacing: "0.20em", textTransform: "uppercase", color: "var(--parchment)", margin: "0 0 4px", lineHeight: 1.15 }}>
+          {products.length === 0 ? "Welcome." : "Your Ritual."}
         </h1>
       </div>
 

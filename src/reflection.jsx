@@ -17,7 +17,7 @@ const TEXT_SOFT  = "var(--clay)";
 const BORDER     = "var(--border)";
 const OVERLAY    = "var(--overlay)";
 const CTA_BG     = "var(--cta)";
-const CTA_BORDER = "rgba(122,144,112,0.35)";
+const CTA_BORDER = "rgba(160,160,160,0.40)";
 const CURSIVE    = "var(--cursive)";
 const SANS       = "var(--sans)";
 
@@ -644,11 +644,11 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
     }}>
       {/* Header */}
       <div style={{ maxWidth: 560, margin: "0 auto 18px", textAlign: "center" }}>
-        <p style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: "0 0 8px" }}>
+        <p style={{ fontFamily: "var(--heading)", fontSize: 9, letterSpacing: "0.30em", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: "0 0 12px" }}>
           Reflection
         </p>
-        <h1 style={{ fontFamily: CURSIVE, fontSize: 28, color: TEXT, margin: "0 0 10px", letterSpacing: "0.02em", lineHeight: 1.05 }}>
-          A living gallery.
+        <h1 style={{ fontFamily: "var(--heading)", fontSize: 34, fontWeight: 400, color: TEXT, margin: "0 0 10px", letterSpacing: "0.20em", textTransform: "uppercase", lineHeight: 1.2 }}>
+          A Living Gallery.
         </h1>
         {reflections.length === 0 && (
           <p style={{ fontFamily: SANS, fontSize: 12, color: TEXT_SOFT, margin: 0, lineHeight: 1.75, maxWidth: 360, marginLeft: "auto", marginRight: "auto" }}>

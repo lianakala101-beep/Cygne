@@ -358,10 +358,10 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
     <div>
 
       {/* -- Header ----------------------------------------------------------- */}
-      <div style={{ marginBottom: 16 }}>
+      <div style={{ marginBottom: 16, paddingTop: 44 }}>
         <BreathText
           text={user?.name ? `${user.name.split(" ")[0]}'s Ritual` : "Your Ritual"}
-          style={{ fontFamily: "Pinyon Script, cursive", fontSize: 42, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: 0, lineHeight: 1 }}
+          style={{ fontFamily: "var(--heading)", fontSize: 42, fontWeight: 400, letterSpacing: "0.20em", textTransform: "uppercase", color: "var(--parchment)", margin: 0, lineHeight: 1.15 }}
         />
       </div>
 

@@ -611,7 +611,7 @@ export default function App() {
 
   // -- Main app ---------------------------------------------------------------
   return (
-    <div className={`theme-${theme}`} style={{ minHeight: "100vh", background: "var(--deep)", paddingBottom: 88, transition: "background 0.4s ease, color 0.4s ease" }}>
+    <div className={`theme-${theme} app-texture`} style={{ minHeight: "100vh", background: "var(--deep)", paddingBottom: 88, transition: "background 0.4s ease, color 0.4s ease" }}>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Pinyon+Script&display=swap" rel="stylesheet" />
@@ -621,6 +621,9 @@ export default function App() {
           --script:    'Pinyon Script', cursive;
           --cursive:   'Pinyon Script', cursive;
           --sans:      'Space Grotesk', sans-serif;
+          --heading:   'Fungis', 'Space Grotesk', sans-serif;
+          --inky-moss: #1A1F16;
+          --ivory:     #F5F0E8;
         }
         .theme-dark {
           --deep:      #0e100d;
@@ -635,17 +638,17 @@ export default function App() {
           --cta:       #323d30;
         }
         .theme-light {
-          --deep:      #f0ece6;
-          --ink:       #f7f4f0;
-          --surface:   #ffffff;
-          --border:    rgba(0,0,0,0.10);
-          --parchment: #1a1612;
-          --clay:      #6b5338;
-          --muted:     #a8906c;
-          --taupe:     #6b5338;
-          --overlay:   rgba(30,25,20,0.5);
-          --sage:      #526859;
-          --cta:       #3d5240;
+          --deep:      #F5F0E8;
+          --ink:       #EDE8DE;
+          --surface:   #F9F5EE;
+          --border:    rgba(26,31,22,0.10);
+          --parchment: #1A1F16;
+          --clay:      #4A5140;
+          --muted:     #7A8270;
+          --taupe:     #4A5140;
+          --overlay:   rgba(26,31,22,0.6);
+          --sage:      #4A5140;
+          --cta:       #1A1F16;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         input, select, textarea { outline: none; }
@@ -654,6 +657,63 @@ export default function App() {
         ::-webkit-scrollbar { display: none; }
         .theme-light ::-webkit-scrollbar { display: none; }
         .theme-light button:focus { outline: none; }
+
+        /* Paper texture — place IMG_5640 as public/assets/paper-texture.jpg */
+        .app-texture::before {
+          content: '';
+          position: fixed;
+          inset: 0;
+          background-image: url('/assets/paper-texture.jpg');
+          background-repeat: repeat;
+          background-size: 600px 600px;
+          opacity: 0.17;
+          pointer-events: none;
+          z-index: 0;
+          mix-blend-mode: multiply;
+        }
+
+        /* Silver liquid chrome gradient utility */
+        .silver-chrome {
+          background: linear-gradient(135deg, #505050 0%, #B8B8B8 22%, #EBEBEB 38%, #C4C4C4 55%, #909090 70%, #D8D8D8 85%, #585858 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        /* Ghost button: thin silver outline, sharp corners, no border-radius */
+        .btn-ghost {
+          background: transparent;
+          border: 1px solid rgba(160,160,160,0.55);
+          border-radius: 0;
+          color: var(--parchment);
+          font-family: var(--heading);
+          font-size: 10px;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          cursor: pointer;
+          padding: 10px 20px;
+          transition: border-color 0.2s, background 0.2s;
+        }
+        .btn-ghost:hover {
+          border-color: rgba(192,192,192,0.8);
+          background: rgba(192,192,192,0.05);
+        }
+
+        /* Solid moss button: inky moss background, sharp corners */
+        .btn-solid-moss {
+          background: var(--inky-moss, #1A1F16);
+          border: 1px solid var(--inky-moss, #1A1F16);
+          border-radius: 0;
+          color: #F5F0E8;
+          font-family: var(--heading);
+          font-size: 10px;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          cursor: pointer;
+          padding: 10px 20px;
+          transition: opacity 0.2s;
+        }
+
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
         @keyframes cygneCheckDraw { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
@@ -687,25 +747,25 @@ export default function App() {
         }
         .cygne-swansong-intro { animation: cygneSwanSongIntro 500ms 200ms ease-out both; }
         .theme-dark option { background: #1a1c1a; color: #e8e2d9; }
-        .theme-light option { background: #f7f4f0; color: #1a1612; }
+        .theme-light option { background: #F5F0E8; color: #1A1F16; }
         .theme-light input,
         .theme-light select,
         .theme-light textarea {
-          background: #f7f4f0 !important;
-          color: #1a1612 !important;
+          background: #EDE8DE !important;
+          color: #1A1F16 !important;
         }
         .theme-light .modal-bg {
-          background: rgba(232,226,217,0.55) !important;
+          background: rgba(245,240,232,0.55) !important;
         }
         .theme-light option {
-          background: #f7f4f0;
-          color: #1a1612;
+          background: #F5F0E8;
+          color: #1A1F16;
         }
-        .theme-light .modal-bg { background: rgba(232,226,217,0.5) !important; }
+        .theme-light .modal-bg { background: rgba(245,240,232,0.5) !important; }
       `}</style>
 
       {/* Header */}
-      <div style={{ position: "sticky", top: 0, zIndex: 50, background: theme === "dark" ? "rgba(13,15,13,0.94)" : "rgba(240,236,230,0.94)", backdropFilter: "blur(16px)", borderBottom: "1px solid var(--border)", padding: "0 22px" }}>
+      <div style={{ position: "sticky", top: 0, zIndex: 50, background: theme === "dark" ? "rgba(13,15,13,0.94)" : "rgba(245,240,232,0.92)", backdropFilter: "blur(20px)", borderBottom: "1px solid var(--border)", padding: "0 22px" }}>
         <div style={{ maxWidth: 600, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: 54 }}>
           <Wordmark size={42} theme={theme} />
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -791,14 +851,14 @@ export default function App() {
       </div>
 
       {/* Bottom nav */}
-      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: theme === "dark" ? "rgba(13,15,13,0.97)" : "rgba(240,236,230,0.97)", backdropFilter: "blur(16px)", borderTop: "1px solid var(--border)", zIndex: 50 }}>
+      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: theme === "dark" ? "rgba(13,15,13,0.97)" : "rgba(245,240,232,0.97)", backdropFilter: "blur(20px)", borderTop: "1px solid var(--border)", zIndex: 50 }}>
         <div style={{ maxWidth: 600, margin: "0 auto", display: "flex" }}>
           {tabs.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
-              style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", padding: "12px 0 18px", background: "none", border: "none", cursor: "pointer", color: tab === t.id ? "var(--sage)" : "var(--clay)", transition: "color 0.2s", gap: 5, position: "relative", opacity: tab === t.id ? 1 : 0.65 }}>
+              style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", padding: "12px 0 18px", background: "none", border: "none", cursor: "pointer", color: tab === t.id ? "var(--parchment)" : "var(--clay)", transition: "color 0.2s", gap: 5, position: "relative", opacity: tab === t.id ? 1 : 0.5 }}>
               <Icon name={t.icon} size={tab === t.id ? 20 : 18} />
-              <span style={{ fontFamily: "var(--sans)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", fontWeight: tab === t.id ? 600 : 400 }}>{t.label}</span>
-              {tab === t.id && <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 18, height: 1, background: "var(--sage)" }} />}
+              <span style={{ fontFamily: "var(--heading)", fontSize: 9, letterSpacing: "0.15em", textTransform: "uppercase", fontWeight: tab === t.id ? 600 : 400 }}>{t.label}</span>
+              {tab === t.id && <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 24, height: 1.5, background: "linear-gradient(90deg, transparent, #C0C0C0, #EEEEEE, #C0C0C0, transparent)" }} />}
             </button>
           ))}
         </div>
