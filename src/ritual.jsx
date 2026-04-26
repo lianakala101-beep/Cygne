@@ -94,7 +94,7 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
         <div style={{ minWidth: 0 }}>
           <div style={{ fontSize: 9, fontFamily: "var(--font-body)", letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--sage)", marginBottom: 6 }}>{product.category}</div>
-          <h3 style={{ fontFamily: "var(--font-signature)", fontSize: 22, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: "0 0 2px", lineHeight: 1.15 }}>{product.name}</h3>
+          <h3 style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 400, letterSpacing: "0.08em", color: "var(--parchment)", margin: "0 0 2px", lineHeight: 1.2 }}>{product.name}</h3>
           <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, letterSpacing: "0.04em" }}>{product.brand}</p>
         </div>
         <div ref={menuRef} style={{ position: "relative", flexShrink: 0, marginLeft: 8 }}>
@@ -275,8 +275,8 @@ function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }
                 {!scheduled && <span style={{ marginLeft: 8, color: "var(--taupe)", opacity: 0.75 }}>· Skipped today</span>}
               </div>
               <p style={{
-                fontFamily: "var(--font-signature)", fontSize: 22, fontWeight: 400,
-                letterSpacing: "0.02em", color: nameColor, margin: "0 0 2px",
+                fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 400,
+                letterSpacing: "0.08em", color: nameColor, margin: "0 0 2px",
                 opacity: checked ? 0.6 : 1,
                 textDecoration: checked ? "line-through" : "none",
                 textDecorationColor: "rgba(232,226,217,0.45)",
@@ -522,7 +522,7 @@ function FlightModeModal({ products, activeMap, onClose }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
           <div>
             <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 5px" }}>Flight Day</p>
-            <h2 style={{ fontFamily: "var(--font-signature)", fontSize: 22, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: 0, lineHeight: 1.1 }}>Your Ritual, Anywhere</h2>
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--parchment)", margin: 0, lineHeight: 1.1 }}>Your Ritual, Anywhere</h2>
           </div>
           <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: 4 }}><Icon name="x" size={17} /></button>
         </div>

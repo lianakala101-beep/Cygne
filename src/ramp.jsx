@@ -412,8 +412,8 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, on
             textAlign: "center",
           }}>
             <p style={{
-              fontFamily: "var(--font-signature)",
-              fontSize: 26, lineHeight: 1.4,
+              fontFamily: "var(--font-display)",
+              fontSize: 18, fontWeight: 400, letterSpacing: "0.05em", lineHeight: 1.5,
               color: "#e8e0c8",
               letterSpacing: "0.02em",
               margin: "0 0 22px",
@@ -650,7 +650,7 @@ function WeeklyRitualCalendar({ rampProducts, products }) {
           marginTop: 4,
         }}>
           <div style={{ padding: "14px 16px 12px", borderBottom: "1px solid var(--border)" }}>
-            <p style={{ fontFamily: "var(--font-signature)", fontSize: 22, color: "var(--parchment)", margin: 0 }}>
+            <p style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 400, letterSpacing: "0.08em", color: "var(--parchment)", margin: 0 }}>
               {selectedDayObj.full}
             </p>
           </div>

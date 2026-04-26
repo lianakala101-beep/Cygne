@@ -168,7 +168,7 @@ function ScanModal({ products, onAddToShelf, onClose }) {
             )}
             <div>
               <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 3px" }}>Shop Scan</p>
-              <h2 style={{ fontFamily: "var(--font-signature)", fontSize: 22, fontWeight: 400, color: "var(--parchment)", margin: 0 }}>
+              <h2 style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--parchment)", margin: 0 }}>
                 {mode === "choose" ? "Does this work for you?" :
                  mode === "search" ? "Search by name" :
                  mode === "scan" || mode === "scanning" ? "Scan the label" :
@@ -281,7 +281,7 @@ function ScanModal({ products, onAddToShelf, onClose }) {
                 <div style={{ width: 8, height: 8, borderRadius: "50%", background: vc.color, flexShrink: 0 }} />
                 <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: vc.color, fontWeight: 700 }}>{vc.label}</span>
               </div>
-              <p style={{ fontFamily: "var(--font-signature)", fontSize: 24, color: "var(--parchment)", margin: "0 0 6px" }}>{scanned.headline}</p>
+              <p style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 400, letterSpacing: "0.08em", color: "var(--parchment)", margin: "0 0 6px" }}>{scanned.headline}</p>
               <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{scanned.reason}</p>
             </div>
 

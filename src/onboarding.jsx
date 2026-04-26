@@ -108,7 +108,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       <h2 style={obHeading}>What should we call you?</h2>
       <p style={obSub}>Your ritual will be built around you.</p>
       <div style={{ marginTop: 32 }}>
-        <input style={{ ...inputSt, fontSize: 22, fontFamily: "var(--font-signature)", letterSpacing: "0.02em", padding: "14px 16px" }} value={name} onChange={e => setName(e.target.value)} placeholder="Your first name" autoFocus />
+        <input style={{ ...inputSt, fontSize: 18, fontFamily: "var(--font-display)", fontWeight: 400, letterSpacing: "0.08em", padding: "14px 16px" }} value={name} onChange={e => setName(e.target.value)} placeholder="Your first name" autoFocus />
       </div>
     </div>,
 
@@ -257,10 +257,10 @@ function OnboardingScreen({ onComplete, setLocationData }) {
 
       {/* Bottom — welcome message + skin age + Enter button */}
       <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", padding: "0 36px 72px" }}>
-        <p style={{ fontFamily: "var(--font-signature)", fontSize: 32, fontWeight: 400, color: "rgba(232,227,214,0.95)", margin: "0 0 6px", letterSpacing: "0.02em", lineHeight: 1.2 }}>
+        <p style={{ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(232,227,214,0.95)", margin: "0 0 8px", lineHeight: 1.2 }}>
           {name ? `Welcome, ${name}.` : "Welcome."}
         </p>
-        <p style={{ fontFamily: "var(--font-signature)", fontSize: 22, fontWeight: 400, color: "rgba(232,227,214,0.6)", margin: "0 0 24px", letterSpacing: "0.02em" }}>Your ritual begins.</p>
+        <p style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 400, letterSpacing: "0.12em", color: "rgba(232,227,214,0.6)", margin: "0 0 24px" }}>Your ritual begins.</p>
         {skinAge && (
           <div style={{ padding: "12px 16px", background: "rgba(232,227,214,0.06)", border: "1px solid rgba(232,227,214,0.15)", borderRadius: 12, marginBottom: 28, width: "100%" }}>
             <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(122,144,112,0.9)", margin: "0 0 5px" }}>{skinAge.bracket}</p>
@@ -351,7 +351,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
 
 // Onboarding text styles
 const obEyebrow = { fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 10px" };
-const obHeading = { fontFamily: "var(--font-signature)", fontSize: 36, fontWeight: 400, color: "var(--parchment)", margin: "0 0 8px", letterSpacing: "0.01em", lineHeight: 1.15 };
+const obHeading = { fontFamily: "var(--font-display)", fontSize: 28, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--parchment)", margin: "0 0 12px", lineHeight: 1.2 };
 const obSub = { fontFamily: "var(--font-body)", fontSize: 12, color: "#6b5338", margin: 0, lineHeight: 1.7, opacity: 0.8 };
 const inputSt = { width: "100%", padding: "12px 16px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 14, color: "var(--parchment)", outline: "none" };
 const labelSt = { fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", display: "block", marginBottom: 6 };

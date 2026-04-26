@@ -39,7 +39,7 @@ function SwanWelcomeScreen({ user, onDone }) {
         <p style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(232,226,217,0.5)", margin: "0 0 14px" }}>
           {name ? "Welcome, " + name + "." : "Welcome."}
         </p>
-        <h1 style={{ fontFamily: "var(--font-signature)", fontSize: 44, fontWeight: 400, color: "rgba(232,226,217,0.95)", margin: "0 0 20px", lineHeight: 1.15 }}>
+        <h1 style={{ fontFamily: "var(--font-display)", fontSize: 38, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(232,226,217,0.95)", margin: "0 0 20px", lineHeight: 1.2 }}>
           Your ritual starts here.
         </h1>
         <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "rgba(232,226,217,0.55)", lineHeight: 1.7, maxWidth: 320 }}>

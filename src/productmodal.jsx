@@ -19,7 +19,7 @@ function RoutineFitSheet({ product, assessment, onAddNow, onDefer, onClose }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 22 }}>
           <div>
             <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 5px" }}>Ritual Fit</p>
-            <h2 style={{ fontFamily: "var(--font-signature)", fontSize: 22, fontWeight: 400, color: "var(--parchment)", margin: 0 }}>{product.name}</h2>
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 400, letterSpacing: "0.08em", color: "var(--parchment)", margin: 0 }}>{product.name}</h2>
           </div>
           <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: 4 }}><Icon name="x" size={17} /></button>
         </div>
@@ -485,7 +485,7 @@ function ProductModal({ product, onSave, onClose, user }) {
             {modalStep === "form" && !(product && product.id) && (
               <button onClick={() => setModalStep("choose")} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: "0 8px 0 0", opacity: 0.6, display: "inline-flex" }}><Icon name="arrow-left" size={16} /></button>
             )}
-            <h2 style={{ fontFamily: "var(--font-signature)", fontSize: 28, fontWeight: 400, color: "var(--parchment)", margin: 0 }}>
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--parchment)", margin: 0 }}>
               {product && product.id ? "Edit Product" : modalStep === "choose" ? "Add a Product" : "Product Details"}
             </h2>
           </div>

@@ -242,7 +242,7 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo
       {/* -- Header ----------------------------------------------------------- */}
       <div style={{ marginBottom: 24, paddingTop: 44 }}>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-          <h1 style={{ fontFamily: "var(--heading)", fontSize: 38, fontWeight: 400, letterSpacing: "0.20em", textTransform: "uppercase", color: "var(--parchment)", margin: "0 0 4px", lineHeight: 1.15 }}>Your Vanity</h1>
+          <h1 style={{ fontFamily: "var(--heading)", fontSize: 38, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--parchment)", margin: "0 0 4px", lineHeight: 1.15 }}>Your Vanity</h1>
           {false && <ClearAllButton onClearAll={onClearAll} />}  {/* hidden — dev only */}
         </div>
         <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: 0 }}>
@@ -265,7 +265,7 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo
         <>
           {products.length === 0 ? (
             <div style={{ textAlign: "center", padding: "60px 0 40px" }}>
-              <p style={{ fontFamily: "var(--font-signature)", fontSize: 28, color: "var(--clay)", margin: "0 0 8px" }}>Your vanity is empty.</p>
+              <p style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 400, letterSpacing: "0.08em", color: "var(--clay)", margin: "0 0 8px" }}>Your vanity is empty.</p>
               <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", opacity: 0.6, margin: "0 0 28px", lineHeight: 1.6 }}>Scan a product to add it, or add one manually.</p>
               <button onClick={onAdd}
                 style={{ padding: "12px 28px", background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer" }}>

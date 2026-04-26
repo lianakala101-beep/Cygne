@@ -12,7 +12,7 @@ function Profile({ user, products, onLogout, locationData, setLocationData, loca
     <div>
       <div style={{ marginBottom: 32 }}>
         <p style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", marginBottom: 6 }}>account</p>
-        <h2 style={{ fontFamily: "var(--font-body)", fontSize: 32, fontWeight: 300, letterSpacing: "0.12em", color: "var(--parchment)", margin: "0 0 2px" }}>{user.name}</h2>
+        <h2 style={{ fontFamily: "var(--font-display)", fontSize: 28, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--parchment)", margin: "0 0 2px" }}>{user.name}</h2>
         <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", letterSpacing: "0.04em" }}>{user.email}</p>
       </div>
 

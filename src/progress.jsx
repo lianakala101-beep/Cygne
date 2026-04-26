@@ -85,7 +85,7 @@ function CheckInModal({ onSubmit, onClose }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
           <div>
             <p style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 6px" }}>Weekly Check-In</p>
-            <h2 style={{ fontFamily: "var(--font-signature)", fontSize: 22, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: 0 }}>How is your skin?</h2>
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--parchment)", margin: 0 }}>How is your skin?</h2>
           </div>
           <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: 4, marginTop: 2 }}><Icon name="x" size={17} /></button>
         </div>
@@ -273,7 +273,7 @@ function SkinJournalModal({ onSubmit, onClose, existing = null }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
           <div>
             <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 4px" }}>SKIN JOURNAL</p>
-            <h2 style={{ fontFamily: "var(--font-signature)", fontSize: 26, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: 0 }}>How is your skin today?</h2>
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--parchment)", margin: 0 }}>How is your skin today?</h2>
           </div>
           <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: 4 }}>
             <Icon name="x" size={16} />
@@ -718,7 +718,7 @@ function AddTreatmentModal({ onSave, onClose }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
           <div>
             <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 5px" }}>Log Treatment</p>
-            <h2 style={{ fontFamily: "var(--font-signature)", fontSize: 22, fontWeight: 400, color: "var(--parchment)", margin: 0, lineHeight: 1.1 }}>What did you get?</h2>
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--parchment)", margin: 0, lineHeight: 1.1 }}>What did you get?</h2>
           </div>
           <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: 4 }}><Icon name="x" size={17} /></button>
         </div>
@@ -782,7 +782,7 @@ function TreatmentRecoveryCard({ treatment, products, activeMap, onDismiss, onRe
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 12 }}>
           <div>
             <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 3px" }}>Recovery — Day {elapsed}</p>
-            <p style={{ fontFamily: "var(--font-signature)", fontSize: 22, fontWeight: 400, color: "var(--parchment)", margin: "0 0 2px", lineHeight: 1.2 }}>{type.label}</p>
+            <p style={{ fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 400, letterSpacing: "0.08em", color: "var(--parchment)", margin: "0 0 2px", lineHeight: 1.2 }}>{type.label}</p>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <div style={{ width: 5, height: 5, borderRadius: "50%", background: isLastPhase ? "#6e8a72" : "#8b7355" }} />
               <span style={{ fontFamily: "var(--font-body)", fontSize: 10, color: isLastPhase ? "#6e8a72" : "#8b7355", fontWeight: 600, letterSpacing: "0.06em" }}>{phase.label}</span>
@@ -1312,7 +1312,7 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
               <div>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 4px" }}>Log</p>
-                <h2 style={{ fontFamily: "var(--font-signature)", fontSize: 22, fontWeight: 400, color: "var(--parchment)", margin: 0 }}>What happened today?</h2>
+                <h2 style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--parchment)", margin: 0 }}>What happened today?</h2>
               </div>
               <button onClick={() => setShowTriggerModal(false)} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: 4 }}><Icon name="x" size={17} /></button>
             </div>
@@ -1369,7 +1369,7 @@ function JournalFullView({ journals, onClose, onEditToday }) {
           style={{ display: "inline-flex", alignItems: "center", gap: 5, fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", background: "none", border: "none", cursor: "pointer", padding: 0 }}>
           <Icon name="arrow-left" size={12} /> Back
         </button>
-        <h2 style={{ fontFamily: "var(--font-signature)", fontSize: 30, fontWeight: 400, color: "var(--parchment)", margin: 0 }}>Skin Journal</h2>
+        <h2 style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--parchment)", margin: 0 }}>Skin Journal</h2>
         <button onClick={onEditToday}
           style={{ fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 600, color: "#6e8a72", background: "none", border: "none", cursor: "pointer", padding: 0 }}>
           + Log
@@ -1555,7 +1555,7 @@ function WeekAtAGlance({ checkIns, journals, products = [], pausedActives = [] }
       {selectedDayObj && (
         <div style={{ background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 14, overflow: "hidden", marginBottom: 14 }}>
           <div style={{ padding: "14px 16px 12px", borderBottom: "1px solid var(--border)" }}>
-            <p style={{ fontFamily: "var(--font-signature)", fontSize: 22, color: "var(--parchment)", margin: 0 }}>{selectedDayObj.full}</p>
+            <p style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 400, letterSpacing: "0.08em", color: "var(--parchment)", margin: 0 }}>{selectedDayObj.full}</p>
           </div>
           {selectedDayObj.am.length === 0 && selectedDayObj.pm.length === 0 ? (
             <div style={{ padding: "18px 16px" }}>
@@ -1597,17 +1597,17 @@ function WeekAtAGlance({ checkIns, journals, products = [], pausedActives = [] }
       {/* Stats row */}
       <div style={{ display: "flex", justifyContent: "space-between", gap: 12, paddingTop: 12, borderTop: "1px solid var(--border)" }}>
         <div style={{ textAlign: "center", flex: 1 }}>
-          <p style={{ fontFamily: "var(--font-signature)", fontSize: 22, color: "var(--parchment)", margin: 0, lineHeight: 1 }}>{weekJournals}<span style={{ fontSize: 13, color: "var(--clay)", opacity: 0.6 }}>/7</span></p>
+          <p style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700, letterSpacing: "0.05em", color: "var(--parchment)", margin: 0, lineHeight: 1 }}>{weekJournals}<span style={{ fontSize: 13, color: "var(--clay)", opacity: 0.6 }}>/7</span></p>
           <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", margin: "4px 0 0", opacity: 0.6 }}>Journaled</p>
         </div>
         <div style={{ width: 1, background: "var(--border)" }} />
         <div style={{ textAlign: "center", flex: 1 }}>
-          <p style={{ fontFamily: "var(--font-signature)", fontSize: 22, color: "var(--parchment)", margin: 0, lineHeight: 1 }}>{weekCheckIns}</p>
+          <p style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700, letterSpacing: "0.05em", color: "var(--parchment)", margin: 0, lineHeight: 1 }}>{weekCheckIns}</p>
           <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", margin: "4px 0 0", opacity: 0.6 }}>Check-ins</p>
         </div>
         <div style={{ width: 1, background: "var(--border)" }} />
         <div style={{ textAlign: "center", flex: 1 }}>
-          <p style={{ fontFamily: "var(--font-signature)", fontSize: 22, color: "var(--parchment)", margin: 0, lineHeight: 1 }}>{adherencePct}<span style={{ fontSize: 13, color: "var(--clay)", opacity: 0.6 }}>%</span></p>
+          <p style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700, letterSpacing: "0.05em", color: "var(--parchment)", margin: 0, lineHeight: 1 }}>{adherencePct}<span style={{ fontSize: 13, color: "var(--clay)", opacity: 0.6 }}>%</span></p>
           <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", margin: "4px 0 0", opacity: 0.6 }}>Adherence</p>
         </div>
       </div>
@@ -1683,7 +1683,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
 
       {/* -- Header ----------------------------------------------------------- */}
       <div style={{ marginBottom: 20, paddingTop: 44 }}>
-        <h1 style={{ fontFamily: "var(--heading)", fontSize: 38, fontWeight: 400, letterSpacing: "0.20em", textTransform: "uppercase", color: "var(--parchment)", margin: 0, lineHeight: 1.15 }}>Your Progress</h1>
+        <h1 style={{ fontFamily: "var(--heading)", fontSize: 38, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--parchment)", margin: 0, lineHeight: 1.15 }}>Your Progress</h1>
       </div>
 
       {/* -- Skin Journal ------------------------------------------------------ */}
@@ -1702,7 +1702,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
                 style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "15px 18px", background: "rgba(122,144,112,0.07)", border: "1px solid rgba(122,144,112,0.18)", borderRadius: 14, cursor: "pointer" }}>
                 <div style={{ textAlign: "left" }}>
                   <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 4px" }}>Skin Journal</p>
-                  <p style={{ fontFamily: "var(--font-signature)", fontSize: 20, color: "var(--parchment)", margin: 0 }}>How is your skin today?</p>
+                  <p style={{ fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 400, letterSpacing: "0.08em", color: "var(--parchment)", margin: 0 }}>How is your skin today?</p>
                 </div>
                 <span style={{ fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 600, color: "#6e8a72", letterSpacing: "0.06em" }}>+ Log</span>
               </button>
@@ -1711,7 +1711,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
                 style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "13px 18px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, cursor: "pointer" }}>
                 <div>
                   <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 3px" }}>Today</p>
-                  <p style={{ fontFamily: "var(--font-signature)", fontSize: 20, color: cond ? cond.color : "var(--parchment)", margin: 0 }}>{cond ? cond.label : todayEntry.condition}</p>
+                  <p style={{ fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 400, letterSpacing: "0.08em", color: cond ? cond.color : "var(--parchment)", margin: 0 }}>{cond ? cond.label : todayEntry.condition}</p>
                 </div>
                 <div style={{ display: "flex", gap: 6 }}>
                   {todayEntry.sleep && <span style={{ fontSize: 9, fontFamily: "var(--font-body)", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)", background: "var(--ink)", padding: "3px 8px", borderRadius: 20 }}>Sleep {todayEntry.sleep}</span>}
@@ -1756,7 +1756,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
           style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 20px", background: "rgba(122,144,112,0.09)", border: "1px solid rgba(122,144,112,0.28)", borderRadius: 14, marginBottom: 24, cursor: "pointer", textAlign: "left" }}>
           <div>
             <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 4px" }}>Ritual Check-in</p>
-            <p style={{ fontFamily: "var(--font-signature)", fontSize: 22, color: "var(--parchment)", margin: "0 0 4px", lineHeight: 1 }}>How did your skin respond?</p>
+            <p style={{ fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 400, letterSpacing: "0.08em", color: "var(--parchment)", margin: "0 0 4px", lineHeight: 1 }}>How did your skin respond?</p>
             <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0 }}>
               {daysSince === null ? "Log your first check-in to start tracking." : "Last check-in " + daysSince + " day" + (daysSince !== 1 ? "s" : "") + " ago."}
             </p>

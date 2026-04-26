@@ -57,7 +57,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             return user?.name ? `Good evening, ${user.name.split(" ")[0]}.` : "Good evening.";
           })()}
         </p>
-        <h1 style={{ fontFamily: "var(--heading)", fontSize: 46, fontWeight: 400, letterSpacing: "0.20em", textTransform: "uppercase", color: "var(--parchment)", margin: "0 0 4px", lineHeight: 1.15 }}>
+        <h1 style={{ fontFamily: "var(--heading)", fontSize: 46, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--parchment)", margin: "0 0 4px", lineHeight: 1.15 }}>
           {products.length === 0 ? "Welcome." : "Your Ritual."}
         </h1>
       </div>
@@ -73,7 +73,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           <div>
             <div style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: 28 }}>
               <span style={{ color: "var(--clay)", flexShrink: 0, marginTop: 6, display: "inline-flex" }}><SwanIcon size={18} /></span>
-              <p style={{ fontFamily: "var(--font-signature)", fontSize: 21, color: "var(--clay)", margin: 0, lineHeight: 1.5 }}>
+              <p style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 400, letterSpacing: "0.05em", color: "var(--clay)", margin: 0, lineHeight: 1.7 }}>
                 Your ritual lives here. Let's build it around you.
               </p>
             </div>

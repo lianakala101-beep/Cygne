@@ -18,7 +18,7 @@ const BORDER     = "var(--border)";
 const OVERLAY    = "var(--overlay)";
 const CTA_BG     = "var(--cta)";
 const CTA_BORDER = "rgba(160,160,160,0.40)";
-const CURSIVE    = "var(--cursive)";
+const CURSIVE    = "var(--font-display)";
 const SANS       = "var(--sans)";
 
 const ANGLES = [
@@ -264,7 +264,7 @@ function CaptureFlow({ onClose, onComplete }) {
             <p style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: 0 }}>
               Shot {step + 1} of 3
             </p>
-            <h2 style={{ fontFamily: CURSIVE, fontSize: 46, color: TEXT, margin: "6px 0 6px", letterSpacing: "0.02em", lineHeight: 1.05 }}>
+            <h2 style={{ fontFamily: CURSIVE, fontSize: 36, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: TEXT, margin: "6px 0 10px", lineHeight: 1.15 }}>
               {current.label}
             </h2>
             <p style={{ fontFamily: SANS, fontSize: 12, color: TEXT_SOFT, margin: 0, maxWidth: 300, lineHeight: 1.6 }}>
@@ -312,7 +312,7 @@ function CaptureFlow({ onClose, onComplete }) {
             <p style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: 0 }}>
               Your reflection
             </p>
-            <h2 style={{ fontFamily: CURSIVE, fontSize: 44, color: TEXT, margin: "6px 0 18px", letterSpacing: "0.02em" }}>
+            <h2 style={{ fontFamily: CURSIVE, fontSize: 34, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: TEXT, margin: "6px 0 18px" }}>
               A quiet moment.
             </h2>
 
@@ -442,7 +442,7 @@ function ExpandedEntry({ entry, onClose }) {
       <p style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: "0 0 6px" }}>
         Week {entry.weekNumber}
       </p>
-      <h2 style={{ fontFamily: CURSIVE, fontSize: 38, color: TEXT, margin: "0 0 4px", letterSpacing: "0.02em", textAlign: "center" }}>
+      <h2 style={{ fontFamily: CURSIVE, fontSize: 28, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: TEXT, margin: "0 0 6px", textAlign: "center" }}>
         {getMoonPhase(new Date(entry.date))}
       </h2>
       <p style={{ fontFamily: SANS, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: "0 0 26px" }}>
@@ -524,7 +524,7 @@ function GalleryEntry({ entry, onExpand, caption }) {
       <p style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: "0 0 4px" }}>
         Week {entry.weekNumber}
       </p>
-      <h3 style={{ fontFamily: CURSIVE, fontSize: 32, color: TEXT, margin: "0 0 3px", letterSpacing: "0.02em" }}>
+      <h3 style={{ fontFamily: CURSIVE, fontSize: 24, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: TEXT, margin: "0 0 4px" }}>
         {getMoonPhase(new Date(entry.date))}
       </h3>
       <p style={{ fontFamily: SANS, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: TEXT_SOFT, margin: "0 0 18px", opacity: 0.7 }}>
@@ -647,7 +647,7 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
         <p style={{ fontFamily: "var(--heading)", fontSize: 9, letterSpacing: "0.30em", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: "0 0 12px" }}>
           Reflection
         </p>
-        <h1 style={{ fontFamily: "var(--heading)", fontSize: 34, fontWeight: 400, color: TEXT, margin: "0 0 10px", letterSpacing: "0.20em", textTransform: "uppercase", lineHeight: 1.2 }}>
+        <h1 style={{ fontFamily: "var(--heading)", fontSize: 34, fontWeight: 700, color: TEXT, margin: "0 0 10px", letterSpacing: "0.15em", textTransform: "uppercase", lineHeight: 1.2 }}>
           A Living Gallery.
         </h1>
         {reflections.length === 0 && (

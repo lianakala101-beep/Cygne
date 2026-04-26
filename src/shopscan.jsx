@@ -102,7 +102,7 @@ function ShopScanModal({ products, user = {}, onClose }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "24px 24px 0" }}>
           <div>
             <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 4px" }}>Shopping</p>
-            <h2 style={{ fontFamily: "var(--font-signature)", fontSize: 32, fontWeight: 400, color: "var(--parchment)", margin: 0, letterSpacing: "0.01em" }}>Would my skin like this?</h2>
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--parchment)", margin: 0 }}>Would my skin like this?</h2>
           </div>
           <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: 4, marginTop: 2 }}><Icon name="x" size={17} /></button>
         </div>
@@ -159,7 +159,7 @@ function ShopScanModal({ products, user = {}, onClose }) {
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 8 }}>
                   <div>
                     <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: vc.color, margin: "0 0 5px" }}>{vc.label}</p>
-                    <p style={{ fontFamily: "var(--font-signature)", fontSize: 32, fontWeight: 400, color: "var(--parchment)", margin: 0, lineHeight: 1.2, letterSpacing: "0.01em" }}>{result.headline}</p>
+                    <p style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 400, letterSpacing: "0.08em", color: "var(--parchment)", margin: 0, lineHeight: 1.3 }}>{result.headline}</p>
                   </div>
                   {imgPreview && <img src={imgPreview} alt="" style={{ width: 52, height: 52, objectFit: "cover", borderRadius: 8, flexShrink: 0, marginLeft: 12 }} />}
                 </div>
