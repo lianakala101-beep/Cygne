@@ -614,7 +614,7 @@ export default function App() {
     <div className={`theme-${theme} app-texture`} style={{ minHeight: "100vh", background: "var(--deep)", paddingBottom: 88, transition: "background 0.4s ease, color 0.4s ease" }}>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-      <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Pinyon+Script&display=swap" rel="stylesheet" />
+      <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
       <style>{`
         :root {
           --sage:      #6e8a72;
