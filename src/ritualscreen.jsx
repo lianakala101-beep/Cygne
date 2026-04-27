@@ -360,8 +360,8 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
       {/* -- Header ----------------------------------------------------------- */}
       <div style={{ marginBottom: 16, paddingTop: 44 }}>
         <BreathText
-          text={user?.name ? `${user.name.split(" ")[0]}'s Ritual` : "Your Ritual"}
-          style={{ fontFamily: "var(--heading)", fontSize: 42, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--parchment)", margin: 0, lineHeight: 1.15 }}
+          text="Ritual"
+          style={{ fontFamily: "var(--heading)", fontSize: 42, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#4a5c47", margin: 0, lineHeight: 1.15 }}
         />
       </div>
 
@@ -424,21 +424,20 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
 
       {/* Steps */}
       {steps.length > 0
-        ? <Section title={`${steps.length} steps — apply in this order`} icon="layers">
+        ? <div style={{ marginBottom: 8 }}>
             <RitualProgressTracker completed={steps.filter(s => isStepChecked(s.id)).length} total={steps.length} />
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", opacity: 0.5, margin: "-4px 0 16px", lineHeight: 1.6, letterSpacing: "0.02em" }}>
-              Tap the circle next to each step to check it off as you go.
-            </p>
-            <div>{steps.map((p, i) => <RoutineStep
-              key={p.id}
-              step={p}
-              index={i}
-              isLast={i === steps.length - 1}
-              checked={isStepChecked(p.id)}
-              onCheck={() => toggleStep(p.id)}
-              scheduled={isScheduledToday(p)}
-            />)}</div>
-          </Section>
+            <div>
+              {steps.map((p, i) => <RoutineStep
+                key={p.id}
+                step={p}
+                index={i}
+                isLast={i === steps.length - 1}
+                checked={isStepChecked(p.id)}
+                onCheck={() => toggleStep(p.id)}
+                scheduled={isScheduledToday(p)}
+              />)}
+            </div>
+          </div>
         : <div style={{ padding: "32px 0 16px" }}><div style={{ display: "flex", alignItems: "flex-start", gap: 9, marginBottom: 8 }}><span style={{ color: "var(--clay)", flexShrink: 0, marginTop: 4, display: "inline-flex" }}><SwanIcon size={16} /></span><p style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 400, letterSpacing: "0.05em", color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>Your ritual is waiting. Add products to your vanity and they'll appear here.</p></div></div>}
       {allDone && steps.length > 0 && !todayCheckedIn && (
         <div style={{ margin: "16px 0", padding: "18px 18px", background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 14 }}>

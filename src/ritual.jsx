@@ -199,6 +199,33 @@ const STEP_REASONS = {
   Prescription:  "Applied after cleansing, before moisturiser. PM only — prescription actives like tretinoin are photosensitive and work best overnight.",
 };
 
+const STEP_VERB = {
+  Cleanser:    "Cleanse",
+  Toner:       "Tone",
+  Serum:       "Treat",
+  Essence:     "Essence",
+  Moisturizer: "Moisturize",
+  SPF:         "Protect",
+  "Eye Cream": "Eye Cream",
+  Oil:         "Oil",
+  Mask:        "Mask",
+  Exfoliant:   "Exfoliate",
+  "Toning Pad":"Exfoliate",
+  Mist:        "Mist",
+  Balm:        "Seal",
+  Treatment:   "Treat",
+  Prescription:"Treat",
+};
+
+const DEEP_MOSS = "#4a5c47";
+const SILVER_GRADIENT = "linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 30%, #a8a8a8 50%, #d4d4d4 70%, #b0b0b0 100%)";
+
+function silverText(checked) {
+  return checked
+    ? { background: SILVER_GRADIENT, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }
+    : { color: DEEP_MOSS, WebkitTextFillColor: DEEP_MOSS };
+}
+
 function getStepReason(step) {
   const actives = Object.keys(detectActives(step.ingredients || []));
   if (actives.includes("retinol"))     return "Applied last in the PM active layers. Photosensitive — breaks down in sunlight, so PM only.";
@@ -210,109 +237,112 @@ function getStepReason(step) {
   return STEP_REASONS[step.category] || null;
 }
 
-function DrawnCheck({ size = 14, color = "#0d0f0d" }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ display: "block" }}>
-      <path
-        d="M5 12.5 L10.2 17.5 L19 7.2"
-        stroke={color}
-        strokeWidth="2.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        style={{
-          strokeDasharray: 24,
-          strokeDashoffset: 24,
-          animation: "cygneCheckDraw 300ms ease-out forwards",
-        }}
-      />
-    </svg>
-  );
-}
-
 function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }) {
-  const activeKeys = Object.keys(detectActives(step.ingredients || []));
   const [expanded, setExpanded] = useState(false);
   const reason = getStepReason(step);
-  const damp = isDampSkinProduct(step);
   const freqLabel = step.frequency && step.frequency !== "daily"
     ? (FREQUENCIES.find(f => f.id === step.frequency)?.label || step.frequency)
     : null;
-  const nameColor = scheduled ? "var(--parchment)" : "var(--taupe)";
-  const ringColor = scheduled ? "#6e8a72" : "var(--taupe)";
+  const stepLabel = `Step ${String(index + 1).padStart(2, "0")}`;
+  const stepVerb = STEP_VERB[step.category] || step.category;
+
   return (
-    <div style={{
-      display: "flex", gap: 16, alignItems: "flex-start",
-      opacity: checked ? 0.7 : scheduled ? 1 : 0.55,
-      transform: checked ? "translateX(-4px)" : "translateX(0)",
-      transition: "opacity 280ms ease-out, transform 320ms ease-out",
-    }}>
-      <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <div
-          onClick={onCheck}
-          style={{
-            width: 28, height: 28, borderRadius: "50%",
-            border: `1px solid ${ringColor}`,
-            background: checked ? ringColor : "transparent",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            cursor: "pointer",
-            transition: "background-color 280ms ease-out, border-color 280ms ease-out",
-            flexShrink: 0,
-          }}>
-          {checked && <DrawnCheck size={14} />}
-        </div>
-        {!isLast && <div style={{ width: 1, flex: 1, background: "var(--border)", marginTop: 6, minHeight: 16 }} />}
+    <div
+      style={{
+        paddingTop: 20,
+        paddingBottom: 20,
+        position: "relative",
+        opacity: scheduled ? 1 : 0.4,
+        WebkitTapHighlightColor: "transparent",
+      }}
+    >
+      {/* STEP 01 */}
+      <p style={{
+        fontFamily: "var(--heading, 'Fungis', sans-serif)",
+        fontSize: 10,
+        fontWeight: 700,
+        letterSpacing: "0.2em",
+        textTransform: "uppercase",
+        margin: "0 0 5px",
+        transition: "all 0.4s ease",
+        ...silverText(checked),
+      }}>
+        {stepLabel}
+      </p>
+
+      {/* CLEANSE — tap row to complete, silver strikethrough when done */}
+      <div
+        onClick={onCheck}
+        style={{ position: "relative", cursor: "pointer", display: "inline-block", width: "100%" }}
+      >
+        <p style={{
+          fontFamily: "var(--heading, 'Fungis', sans-serif)",
+          fontSize: 18,
+          fontWeight: 700,
+          letterSpacing: "0.15em",
+          textTransform: "uppercase",
+          margin: 0,
+          lineHeight: 1.2,
+          transition: "all 0.4s ease",
+          ...silverText(checked),
+        }}>
+          {stepVerb}
+        </p>
+        {checked && (
+          <div style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            top: "50%",
+            height: 1,
+            background: SILVER_GRADIENT,
+            transform: "translateY(-50%)",
+            pointerEvents: "none",
+          }} />
+        )}
       </div>
-      <div style={{ flex: 1, marginBottom: isLast ? 0 : 12 }}>
-        <div
-          style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 13, padding: "13px 15px", cursor: reason ? "pointer" : "default", transition: "border-color 0.15s" }}
-          onClick={() => reason && setExpanded(e => !e)}
-          onMouseEnter={e => { if (reason) e.currentTarget.style.borderColor = "rgba(122,144,112,0.35)"; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; }}>
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 9, fontFamily: "var(--font-body)", letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", marginBottom: 4 }}>
-                {step.category}
-                {!scheduled && <span style={{ marginLeft: 8, color: "var(--taupe)", opacity: 0.75 }}>· Skipped today</span>}
-              </div>
-              <p style={{
-                fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 400,
-                letterSpacing: "0.08em", color: nameColor, margin: "0 0 2px",
-                opacity: checked ? 0.6 : 1,
-                textDecoration: checked ? "line-through" : "none",
-                textDecorationColor: "rgba(232,226,217,0.45)",
-                textDecorationThickness: "1px",
-                transition: "opacity 280ms ease-out",
-              }}>{step.name}</p>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0 }}>
-                {step.brand}
-                {freqLabel && (
-                  <span style={{ marginLeft: 8, fontSize: 9, fontFamily: "var(--font-body)", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--taupe)", opacity: 0.85 }}>{freqLabel}</span>
-                )}
-                {step.session && step.session !== "auto" && (
-                  <span style={{ marginLeft: 8, fontSize: 9, fontFamily: "var(--font-body)", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.6 }}>{step.session === "both" ? "AM + PM" : step.session === "am" ? "AM" : step.session === "pm" ? "PM" : step.session}</span>
-                )}
-              </p>
-              {activeKeys.length > 0 && (
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 9 }}>
-                  {activeKeys.map(a => <span key={a} style={{ fontSize: 9, fontFamily: "var(--font-body)", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)", background: "var(--ink)", padding: "3px 8px", borderRadius: 20, border: "1px solid var(--border)" }}>{a}</span>)}
-                </div>
-              )}
-            </div>
-            {reason && (
-              <span style={{ color: "var(--clay)", opacity: 0.35, flexShrink: 0, marginTop: 2, display: "inline-flex", transition: "transform 0.18s", transform: expanded ? "rotate(-90deg)" : "rotate(90deg)" }}><Icon name="chevron" size={11} /></span>
-            )}
-          </div>
-          {damp && (
-            <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 10, padding: "6px 9px", borderRadius: 8, background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.2)" }}>
-              <span style={{ color: "rgba(139,115,85,0.85)", display: "inline-flex" }}><Icon name="drop" size={11} /></span>
-              <span style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "rgba(139,115,85,0.85)", letterSpacing: "0.02em" }}>Apply on damp skin for best absorption</span>
-            </div>
-          )}
-          {expanded && reason && (
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: "10px 0 0", lineHeight: 1.65, paddingTop: 10, borderTop: "1px solid var(--border)", opacity: 0.85 }}>{reason}</p>
-          )}
-        </div>
-      </div>
+
+      {/* Product name + brand — subtle subtext */}
+      <p style={{
+        fontFamily: "var(--font-body)",
+        fontSize: 11,
+        color: checked ? "#c0c0c0" : "#a0a0a0",
+        margin: "5px 0 0",
+        letterSpacing: "0.02em",
+        lineHeight: 1.4,
+        transition: "color 0.4s ease",
+      }}>
+        {step.name}
+        {step.brand && <span style={{ opacity: 0.7 }}> · {step.brand}</span>}
+        {freqLabel && <span style={{ marginLeft: 8, fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase" }}> {freqLabel}</span>}
+      </p>
+
+      {/* Expandable reason — tap label to toggle */}
+      {reason && (
+        <button
+          onClick={() => setExpanded(e => !e)}
+          style={{ background: "none", border: "none", padding: "4px 0 0", cursor: "pointer", display: "block" }}
+        >
+          <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "#c0c0c0", transition: "color 0.2s" }}>
+            {expanded ? "less" : "why?"}
+          </span>
+        </button>
+      )}
+      {expanded && reason && (
+        <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#a0a0a0", margin: "8px 0 0", lineHeight: 1.65 }}>{reason}</p>
+      )}
+
+      {/* Divider */}
+      {!isLast && (
+        <div style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: 1,
+          background: "rgba(192,192,192,0.3)",
+        }} />
+      )}
     </div>
   );
 }
