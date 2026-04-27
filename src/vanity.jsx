@@ -1,10 +1,118 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Icon, Section, Pill } from "./components.jsx";
 import { detectActives, analyzeShelf, calcSpending } from "./engine.js";
 import { assessRoutineFit, DEFER_TAG_CONFIG } from "./modals.jsx";
 import { ProductModal } from "./productmodal.jsx";
-import { ProductCard } from "./ritual.jsx";
 
+
+const CARD_IMG_BG = {
+  Cleanser:    "linear-gradient(145deg, #ede8de 0%, #ddd5c8 100%)",
+  Moisturizer: "linear-gradient(145deg, #eee9e1 0%, #e2d9cd 100%)",
+  Serum:       "linear-gradient(145deg, #eae4da 0%, #d8d0c4 100%)",
+  SPF:         "linear-gradient(145deg, #f0ebe3 0%, #e4dcce 100%)",
+  Toner:       "linear-gradient(145deg, #ece7de 0%, #ddd6c9 100%)",
+  Exfoliant:   "linear-gradient(145deg, #e8e2d8 0%, #d8d0c3 100%)",
+  Mask:        "linear-gradient(145deg, #edeae2 0%, #ddd5c7 100%)",
+};
+const GLASS_CARD = {
+  backdropFilter: "blur(12px)",
+  WebkitBackdropFilter: "blur(12px)",
+  background: "rgba(253,252,249,0.45)",
+  border: "1px solid rgba(192,192,192,0.3)",
+  borderRadius: 16,
+  boxShadow: "0 4px 24px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.8)",
+  overflow: "hidden",
+  display: "flex",
+  flexDirection: "column",
+};
+
+function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, user = {} }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const menuRef = useRef(null);
+  useEffect(() => {
+    if (!menuOpen) return;
+    const close = (e) => { if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false); };
+    document.addEventListener("pointerdown", close);
+    return () => document.removeEventListener("pointerdown", close);
+  }, [menuOpen]);
+
+  const inRoutine = product.inRoutine !== false;
+  const imgBg = CARD_IMG_BG[product.category] || "linear-gradient(145deg, #ede8de 0%, #ddd5c8 100%)";
+
+  return (
+    <>
+      <div style={GLASS_CARD}>
+        {/* Image area — full width, rounded top corners */}
+        <div style={{ position: "relative", width: "100%", aspectRatio: "1 / 1", background: product.imageUrl ? "transparent" : imgBg, flexShrink: 0, overflow: "hidden" }}>
+          {product.imageUrl
+            ? <img src={product.imageUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+            : (
+              <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                <span style={{ fontFamily: "var(--font-signature, 'Hellasta Signature', cursive)", fontSize: 36, color: "rgba(160,160,160,0.45)", lineHeight: 1 }}>
+                  {product.brand?.[0]?.toUpperCase() || "·"}
+                </span>
+                <span style={{ fontFamily: "var(--font-display, 'Fungis', sans-serif)", fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(160,160,160,0.55)" }}>
+                  {product.category}
+                </span>
+              </div>
+            )
+          }
+
+          {/* In-ritual indicator dot */}
+          {inRoutine && (
+            <div style={{ position: "absolute", top: 10, left: 10, width: 7, height: 7, borderRadius: "50%", background: "#c0c0c0", boxShadow: "0 0 0 2px rgba(255,255,255,0.85)" }} />
+          )}
+
+          {/* ⋯ menu */}
+          <div ref={menuRef} style={{ position: "absolute", top: 6, right: 6 }}>
+            <button onClick={() => setMenuOpen(o => !o)} aria-label="Options"
+              style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(253,252,249,0.75)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", border: "1px solid rgba(192,192,192,0.35)", color: "#1c1c1a", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, lineHeight: 1, fontFamily: "sans-serif" }}>
+              ⋯
+            </button>
+            {menuOpen && (
+              <div style={{ position: "absolute", right: 0, top: "110%", zIndex: 50, minWidth: 170, background: "rgba(253,252,249,0.96)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", border: "1px solid rgba(192,192,192,0.3)", borderRadius: 12, padding: "6px 0", boxShadow: "0 8px 28px rgba(0,0,0,0.10)" }}>
+                <button onClick={() => { setMenuOpen(false); onEdit(product); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#1c1c1a", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "left" }}>
+                  <Icon name="edit" size={12} /><span>Edit product</span>
+                </button>
+                <button onClick={() => { setMenuOpen(false); onToggleRoutine(product.id); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#1c1c1a", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "left" }}>
+                  <Icon name="sparkle" size={12} /><span>{inRoutine ? "Remove from ritual" : "Add to ritual"}</span>
+                </button>
+                <div style={{ height: 1, background: "rgba(192,192,192,0.25)", margin: "4px 12px" }} />
+                <button onClick={() => { setMenuOpen(false); setConfirmDelete(true); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#8b7355", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "left" }}>
+                  <Icon name="trash" size={12} /><span>Remove</span>
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Text content — 0 top padding (image bleeds to edge), 12px sides + bottom */}
+        <div style={{ padding: "10px 12px 12px" }}>
+          <p style={{ fontFamily: "var(--font-display, 'Fungis', sans-serif)", fontSize: 13, fontWeight: 400, letterSpacing: "0.1em", color: "#1c1c1a", margin: "0 0 3px", lineHeight: 1.3 }}>{product.name}</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "#a0a0a0", margin: 0, letterSpacing: "0.03em" }}>{product.brand}</p>
+          {product.price > 0 && (
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#1c1c1a", margin: "5px 0 0", fontWeight: 300, letterSpacing: "0.01em" }}>${(product.price || 0).toFixed(0)}</p>
+          )}
+        </div>
+      </div>
+
+      {/* Delete confirmation */}
+      {confirmDelete && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(253,252,249,0.8)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", padding: "0 28px" }} onClick={() => setConfirmDelete(false)}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 320, background: "rgba(253,252,249,0.97)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", border: "1px solid rgba(192,192,192,0.3)", borderRadius: 18, padding: "26px 24px 22px", boxShadow: "0 16px 48px rgba(0,0,0,0.10)" }}>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#a0a0a0", margin: "0 0 12px" }}>Confirm</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "#1c1c1a", margin: "0 0 22px", lineHeight: 1.65 }}>Remove <strong>{product.name}</strong> from your vanity? This cannot be undone.</p>
+            <div style={{ display: "flex", gap: 10 }}>
+              <button onClick={() => setConfirmDelete(false)} style={{ flex: 1, padding: "12px 0", borderRadius: 0, border: "1px solid rgba(192,192,192,0.35)", background: "transparent", color: "#1c1c1a", fontFamily: "var(--font-body)", fontSize: 12, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => { setConfirmDelete(false); onDelete(product.id); }} style={{ flex: 1, padding: "12px 0", borderRadius: 0, border: "1px solid rgba(139,115,85,0.3)", background: "rgba(139,115,85,0.07)", color: "#8b7355", fontFamily: "var(--font-body)", fontSize: 12, cursor: "pointer" }}>Remove</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
 
 function buildInsights(products, activeMap) {
   const insights = [];
@@ -293,12 +401,11 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo
                   <button onClick={onClearDemo} style={{ fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 600, background: "transparent", border: "1px solid rgba(139,115,85,0.3)", borderRadius: 8, color: "var(--clay)", padding: "6px 10px", cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}>Clear demo</button>
                 </div>
               )}
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 10 }}>
-                {filtered.map(p => <ProductCard key={p.id} product={p} onEdit={onEdit} onDelete={onDelete} onToggleRoutine={onToggleRoutine} onSession={onSession} user={user} />)}
-                <button onClick={onAdd}
-                  style={{ border: "1px dashed rgba(122,144,112,0.3)", borderRadius: 14, padding: "26px 16px", background: "rgba(122,144,112,0.04)", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 9, minHeight: 120 }}>
-                  <span style={{ fontSize: 22, color: "var(--sage)", opacity: 0.7 }}>+</span>
-                  <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--sage)" }}>Add Product</span>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
+                {filtered.map(p => <GlassProductCard key={p.id} product={p} onEdit={onEdit} onDelete={onDelete} onToggleRoutine={onToggleRoutine} onSession={onSession} user={user} />)}
+                <button onClick={onAdd} style={{ ...GLASS_CARD, background: "rgba(253,252,249,0.25)", border: "1px dashed rgba(192,192,192,0.4)", cursor: "pointer", aspectRatio: "1 / 1", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                  <span style={{ fontSize: 20, color: "#c0c0c0", lineHeight: 1 }}>+</span>
+                  <span style={{ fontFamily: "var(--font-display, 'Fungis', sans-serif)", fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: "#c0c0c0" }}>Add Product</span>
                 </button>
               </div>
             </>
