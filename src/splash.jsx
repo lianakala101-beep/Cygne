@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { LOGO_SRC } from "./components.jsx";
 
 function SplashScreen({ onDone }) {
   const [fading, setFading] = useState(false);
@@ -34,15 +33,15 @@ function SplashScreen({ onDone }) {
         WebkitTapHighlightColor: "transparent",
       }}>
 
-      {/* Logo image — centered, ~60% screen width */}
       <img
-        src={LOGO_SRC}
+        src="/cygne-logo.png"
         alt="Cygne"
         style={{
-          width: "60vw",
-          maxWidth: 440,
-          height: "auto",
+          width: "70%",
+          maxWidth: 300,
           display: "block",
+          margin: "0 auto",
+          background: "transparent",
         }}
       />
 
