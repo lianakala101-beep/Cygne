@@ -585,18 +585,14 @@ export default function App() {
     }
   };
 
-  // -- Loading state ----------------------------------------------------------
+  // -- Loading state — ivory blank while session resolves ---------------------
   if (authLoading) {
-    return (
-      <div style={{ minHeight: "100vh", background: "var(--color-ivory)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ width: 24, height: 24, border: "2px solid rgba(232,227,214,0.3)", borderTopColor: "rgba(232,227,214,0.8)", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
-        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-      </div>
-    );
+    return <div style={{ position: "fixed", inset: 0, background: "#fdfcf9" }} />;
   }
 
-  // -- No session → Auth screen -----------------------------------------------
+  // -- Unauthenticated flow: welcome splash → auth ----------------------------
   if (!authSession) {
+    if (!splashDone) return <SplashScreen onDone={() => setSplashDone(true)} />;
     return <AuthScreen onAuth={handleAuth} />;
   }
 
@@ -606,7 +602,6 @@ export default function App() {
   }
 
   // -- First run welcome (just completed onboarding) --------------------------
-  if (!splashDone) return <SplashScreen onDone={() => setSplashDone(true)} />;
   if (firstRun) return <SwanWelcomeScreen user={user} onDone={() => { setFirstRun(false); setTab("dashboard"); }} />;
 
   // -- Main app ---------------------------------------------------------------
