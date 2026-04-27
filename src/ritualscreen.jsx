@@ -384,7 +384,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
 
       {/* -- Swan guiding line ---------------------------------------------- */}
       {guidingLine && (
-        <p style={{ fontFamily: "var(--font-signature)", fontSize: 19, fontWeight: 400, color: "var(--clay)", margin: "0 0 22px", lineHeight: 1.4, letterSpacing: "0.01em" }}>{guidingLine}</p>
+        <p style={{ fontFamily: "var(--font-signature)", fontSize: 15, fontWeight: 400, color: "#8a8a8a", margin: "0 0 22px", lineHeight: 1.6, letterSpacing: "0.01em" }}>{guidingLine}</p>
       )}
 
       {/* -- Ritual Mode Card ---------------------------------------------- */}
