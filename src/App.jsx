@@ -627,19 +627,6 @@ export default function App() {
         ::-webkit-scrollbar { display: none; }
         button:focus { outline: none; }
 
-        /* Paper texture — place IMG_5640 as public/assets/paper-texture.jpg */
-        .app-texture::before {
-          content: '';
-          position: fixed;
-          inset: 0;
-          background-image: url('/assets/paper-texture.jpg');
-          background-repeat: repeat;
-          background-size: 600px 600px;
-          opacity: 0.17;
-          pointer-events: none;
-          z-index: 0;
-          mix-blend-mode: multiply;
-        }
 
         /* Silver liquid chrome gradient utility */
         .silver-chrome {
