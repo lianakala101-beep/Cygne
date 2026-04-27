@@ -156,8 +156,9 @@ export default function App() {
       if (meta.notifDismissed !== undefined) {
         setNotifDismissed(meta.notifDismissed);
       }
-      // Restore completed steps from Supabase
-      if (meta.completedSteps) {
+      // Restore completed steps only if they're from today — stale data is discarded
+      const _today = new Date().toISOString().split("T")[0];
+      if (meta.completedSteps?.date === _today) {
         setCompletedSteps(meta.completedSteps);
       }
       // Restore journals from Supabase (cloud takes priority over localStorage)

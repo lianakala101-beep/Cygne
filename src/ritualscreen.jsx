@@ -318,23 +318,40 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
   const { flags, activeMap } = analyzeShelf(products);
   const [recTab, setRecTab] = useState("additions");
   const today = new Date().toISOString().split("T")[0];
-  // Use persisted completed steps scoped to today, fall back to local state
-  const todaySteps = completedStepsProp?.date === today ? completedStepsProp.steps : [];
+  const LS_KEY = "cygne_ritual_completed";
+
+  // Completion state lives in localStorage, gated strictly by today's date.
+  // If the stored date is not today, the array is discarded and steps start fresh.
+  // Steps ONLY enter this array when the user explicitly taps them.
+  const [completedSteps, setCompletedSteps] = useState(() => {
+    try {
+      const raw = localStorage.getItem(LS_KEY);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      return parsed.date === today ? (parsed.steps || []) : [];
+    } catch { return []; }
+  });
+
   const [ritualDismissed, setRitualDismissed] = useState(false);
   const [showRitualCheckIn, setShowRitualCheckIn] = useState(false);
   const todayCheckedIn = checkIns.some(c => c.date === today);
-  const completedSteps = todaySteps;
-  // Check-in state is isolated per session: each entry is stored as
-  // `${session}_${productId}` so AM and PM completion never overlap.
+
+  // Step keys are session-scoped: "am_<id>" / "pm_<id>" so AM and PM never overlap.
   const stepKey = (id) => `${session}_${id}`;
   const isStepChecked = (id) => completedSteps.includes(stepKey(id));
+
   const toggleStep = (id) => {
     const key = stepKey(id);
-    const updated = completedSteps.includes(key) ? completedSteps.filter(x => x !== key) : [...completedSteps, key];
+    const updated = completedSteps.includes(key)
+      ? completedSteps.filter(x => x !== key)
+      : [...completedSteps, key];
+    setCompletedSteps(updated);
+    try {
+      localStorage.setItem(LS_KEY, JSON.stringify({ date: today, steps: updated }));
+    } catch {}
+    // Keep Supabase in sync so progress survives a device switch on the same day.
     const newState = { date: today, steps: updated };
     if (setCompletedStepsProp) setCompletedStepsProp(newState);
-    // Sync to Supabase via user metadata
-    if (onUpdateUser && user) onUpdateUser({ ...user, completedSteps: newState });
   };
 
   const { mode: ritualMode, key: ritualKey, cyclePhase } = getRitualMode(products, [], user, cycleDay, isFlightMode);
