@@ -35,13 +35,14 @@ function SplashScreen({ onDone }) {
 
       <img
         src="/cygne-logo.png"
-        alt="Cygne"
+        alt=""
         style={{
-          width: "70%",
-          maxWidth: 300,
+          width: "72%",
+          maxWidth: 320,
           display: "block",
           margin: "0 auto",
           background: "transparent",
+          border: "none",
         }}
       />
 
