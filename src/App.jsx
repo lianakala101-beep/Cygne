@@ -24,19 +24,6 @@ export default function App() {
   const [authLoading, setAuthLoading] = useState(true);
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
 
-  // -- Theme: auto by time, manual override ----------------------------------
-  const getAutoTheme = () => {
-    const h = new Date().getHours();
-    return (h >= 7 && h < 19) ? "light" : "dark";
-  };
-  const [themeOverride, setThemeOverride] = useLocalStorage("cygne_theme", null);
-  const theme = themeOverride || getAutoTheme();
-  const toggleTheme = () => setThemeOverride(t => {
-    if (t === null) return getAutoTheme() === "dark" ? "light" : "dark";
-    if (t === "light") return "dark";
-    return "light";
-  });
-  const isAuto = themeOverride === null;
 
   // Ensure Space Grotesk loads (custom fonts are loaded via src/index.css)
   useEffect(() => {
@@ -606,52 +593,39 @@ export default function App() {
 
   // -- Main app ---------------------------------------------------------------
   return (
-    <div className={`theme-${theme} app-texture`} style={{ minHeight: "100vh", background: "var(--deep)", paddingBottom: 88, transition: "background 0.4s ease, color 0.4s ease" }}>
+    <div className="app-texture" style={{ minHeight: "100vh", background: "var(--color-ivory, #fdfcf9)", paddingBottom: 88 }}>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
       <style>{`
         :root {
-          --sage:      #6e8a72;
           --script:    var(--font-signature, 'Hellasta Signature', cursive);
           --cursive:   var(--font-signature, 'Hellasta Signature', cursive);
           --sans:      var(--font-body, 'Space Grotesk', sans-serif);
           --heading:   var(--font-display, 'Fungis', sans-serif);
-          --inky-moss: #1A1F16;
-          --ivory:     var(--color-ivory, #fdfcf9);
-        }
-        .theme-dark {
-          --deep:      #0e100d;
-          --ink:       #151813;
-          --surface:   #1c201a;
-          --border:    rgba(200,215,190,0.09);
-          --parchment: #e8e2d9;
-          --clay:      #8b7355;
-          --muted:     #6b5a43;
-          --taupe:     #8b7355;
-          --overlay:   rgba(8,12,8,0.72);
-          --cta:       #323d30;
-        }
-        .theme-light {
+
+          /* All semantic tokens map to the ivory palette */
           --deep:      var(--color-ivory, #fdfcf9);
-          --ink:       #EDE8DE;
-          --surface:   #F9F5EE;
-          --border:    rgba(26,31,22,0.10);
-          --parchment: #1A1F16;
-          --clay:      #4A5140;
-          --muted:     #7A8270;
-          --taupe:     #4A5140;
-          --overlay:   rgba(26,31,22,0.6);
-          --sage:      #4A5140;
-          --cta:       #1A1F16;
+          --ink:       var(--color-ivory-shadow, #f0ebe0);
+          --surface:   var(--color-ivory-shadow, #f0ebe0);
+          --border:    rgba(192,192,192,0.35);
+          --parchment: var(--color-text-primary, #1c1c1a);
+          --clay:      var(--color-text-muted, #a0a0a0);
+          --muted:     var(--color-text-muted, #a0a0a0);
+          --taupe:     var(--color-text-muted, #a0a0a0);
+          --overlay:   rgba(253,252,249,0.85);
+          --sage:      var(--color-silver, #c0c0c0);
+          --cta:       var(--color-text-primary, #1c1c1a);
+          --inky-moss: var(--color-text-primary, #1c1c1a);
+          --ivory:     var(--color-ivory, #fdfcf9);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         input, select, textarea { outline: none; }
         input:focus, select:focus, textarea:focus { border-color: var(--sage) !important; }
         input::placeholder, textarea::placeholder { color: var(--muted); opacity: 0.7; }
         ::-webkit-scrollbar { display: none; }
-        .theme-light ::-webkit-scrollbar { display: none; }
-        .theme-light button:focus { outline: none; }
+        ::-webkit-scrollbar { display: none; }
+        button:focus { outline: none; }
 
         /* Paper texture — place IMG_5640 as public/assets/paper-texture.jpg */
         .app-texture::before {
@@ -680,7 +654,7 @@ export default function App() {
           background: transparent;
           border: 1px solid rgba(160,160,160,0.55);
           border-radius: 0;
-          color: var(--parchment);
+          color: var(--color-text-primary, #1c1c1a);
           font-family: var(--heading);
           font-size: 10px;
           letter-spacing: 0.15em;
@@ -690,8 +664,8 @@ export default function App() {
           transition: border-color 0.2s, background 0.2s;
         }
         .btn-ghost:hover {
-          border-color: rgba(192,192,192,0.8);
-          background: rgba(192,192,192,0.05);
+          border-color: rgba(28,28,26,0.5);
+          background: rgba(28,28,26,0.03);
         }
 
         /* Solid moss button: inky moss background, sharp corners */
@@ -741,35 +715,17 @@ export default function App() {
           to   { opacity: 1; transform: translateY(0); }
         }
         .cygne-swansong-intro { animation: cygneSwanSongIntro 500ms 200ms ease-out both; }
-        .theme-dark option { background: #1a1c1a; color: #e8e2d9; }
-        .theme-light option { background: #F5F0E8; color: #1A1F16; }
-        .theme-light input,
-        .theme-light select,
-        .theme-light textarea {
-          background: #EDE8DE !important;
-          color: #1A1F16 !important;
-        }
-        .theme-light .modal-bg {
-          background: rgba(245,240,232,0.55) !important;
-        }
-        .theme-light option {
-          background: #F5F0E8;
-          color: #1A1F16;
-        }
-        .theme-light .modal-bg { background: rgba(245,240,232,0.5) !important; }
+        option { background: #fdfcf9; color: #1c1c1a; }
+        input, select, textarea { background: transparent; color: #1c1c1a; }
+        .modal-bg { background: rgba(253,252,249,0.85) !important; }
+        button:focus { outline: none; }
       `}</style>
 
       {/* Header */}
-      <div style={{ position: "sticky", top: 0, zIndex: 50, background: theme === "dark" ? "rgba(13,15,13,0.94)" : "rgba(245,240,232,0.92)", backdropFilter: "blur(20px)", borderBottom: "1px solid var(--border)", padding: "0 22px" }}>
+      <div style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(253,252,249,0.92)", backdropFilter: "blur(20px)", borderBottom: "1px solid var(--border)", padding: "0 22px" }}>
         <div style={{ maxWidth: 600, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: 54 }}>
-          <Wordmark size={42} theme={theme} />
+          <Wordmark size={42} />
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <button onClick={toggleTheme} title={isAuto ? "Auto theme" : theme === "dark" ? "Dark mode" : "Light mode"}
-              style={{ width: 32, height: 32, borderRadius: "50%", background: "var(--surface)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "border-color 0.2s", color: "var(--clay)", flexShrink: 0 }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(122,144,112,0.5)"}
-              onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}>
-              <Icon name={isAuto ? "auto" : theme === "dark" ? "moon" : "sun"} size={14} />
-            </button>
             <button onClick={() => setProfileOpen(true)}
               style={{ width: 34, height: 34, borderRadius: "50%", background: "none", border: "none", cursor: "pointer", padding: 0, WebkitTapHighlightColor: "transparent" }}>
               <div style={{
@@ -796,7 +752,7 @@ export default function App() {
 
       {/* Content */}
       <div style={{ maxWidth: 600, margin: "0 auto", padding: "32px 22px 0", animation: "fadeUp 0.3s ease" }} key={tab}>
-        {tab === "dashboard" && <Dashboard products={products} setTab={setTab} checkIns={checkIns} swanPopupDismissed={swanPopupDismissed} onDismissSwanPopup={dismissSwanPopup} treatments={treatments} locationData={locationData} user={user} theme={theme} notifPermission={notifPermission} onRequestNotif={requestNotifications} notifDismissed={notifDismissed} onDismissNotif={() => setNotifDismissed(true)} journals={journals} setCheckIns={setCheckIns} onLoadDemo={() => setProducts(DEMO_PRODUCTS)} />}
+        {tab === "dashboard" && <Dashboard products={products} setTab={setTab} checkIns={checkIns} swanPopupDismissed={swanPopupDismissed} onDismissSwanPopup={dismissSwanPopup} treatments={treatments} locationData={locationData} user={user} notifPermission={notifPermission} onRequestNotif={requestNotifications} notifDismissed={notifDismissed} onDismissNotif={() => setNotifDismissed(true)} journals={journals} setCheckIns={setCheckIns} onLoadDemo={() => setProducts(DEMO_PRODUCTS)} />}
         {tab === "routine"   && <MyRoutine
           products={products}
           user={user}
@@ -846,7 +802,7 @@ export default function App() {
       </div>
 
       {/* Bottom nav */}
-      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: theme === "dark" ? "rgba(13,15,13,0.97)" : "rgba(245,240,232,0.97)", backdropFilter: "blur(20px)", borderTop: "1px solid var(--border)", zIndex: 50 }}>
+      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "rgba(253,252,249,0.97)", backdropFilter: "blur(20px)", borderTop: "1px solid var(--border)", zIndex: 50 }}>
         <div style={{ maxWidth: 600, margin: "0 auto", display: "flex" }}>
           {tabs.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}

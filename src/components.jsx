@@ -125,7 +125,7 @@ const LOGO_SRC = (
   + "RQAUZxRRQA95ncgsQSM9h35/rSm5kZgSwJCheQOgAAH5AVHRQA5pWcAMxYAADPYU2iigAooooAKKKKACiiigAooooAKKKKACiiigD//2Q=="
 );
 
-function Wordmark({ size = 28, theme = "dark" }) {
+function Wordmark({ size = 28 }) {
   return (
     <span style={{
       fontFamily: "var(--font-signature, 'Hellasta Signature', cursive)",
