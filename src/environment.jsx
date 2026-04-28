@@ -100,7 +100,7 @@ function EnvironmentStrip({ products, activeMap, locationData, tempUnit = "C" })
   if (loading) {
     return (
       <div style={{ padding: "12px 16px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, marginBottom: 20, display: "flex", alignItems: "center", gap: 10 }}>
-        <div style={{ width: 14, height: 14, border: "1.5px solid #6e8a72", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+        <div style={{ width: 14, height: 14, border: "1.5px solid #2d3d2b", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
         <span style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)" }}>Reading local conditions...</span>
       </div>
     );
@@ -110,15 +110,15 @@ function EnvironmentStrip({ products, activeMap, locationData, tempUnit = "C" })
   const location = locationData;
 
   const nudges = buildEnvAdvice(env, products, activeMap);
-  const uvCol = env.uvIndex >= 8 ? "#8b7355" : env.uvIndex >= 6 ? "#8b7355" : env.uvIndex >= 3 ? "#8b7355" : "#6e8a72";
-  const humCol = env.humidity < 30 ? "#8b7355" : env.humidity < 45 ? "#8b7355" : env.humidity > 75 ? "#8b7355" : "#6e8a72";
+  const uvCol = env.uvIndex >= 8 ? "#8b7355" : env.uvIndex >= 6 ? "#8b7355" : env.uvIndex >= 3 ? "#8b7355" : "#2d3d2b";
+  const humCol = env.humidity < 30 ? "#8b7355" : env.humidity < 45 ? "#8b7355" : env.humidity > 75 ? "#8b7355" : "#2d3d2b";
 
   return (
     <div style={{ marginBottom: 20 }}>
       {/* Compact strip */}
       <button onClick={() => setExpanded(e => !e)}
         style={{ width: "100%", display: "flex", alignItems: "center", gap: 0, padding: "11px 16px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: expanded ? "12px 12px 0 0" : 12, cursor: "pointer", transition: "all 0.2s", textAlign: "left" }}
-        onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(122,144,112,0.35)"}
+        onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(45,61,43,0.35)"}
         onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}>
 
         <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 6 }}>

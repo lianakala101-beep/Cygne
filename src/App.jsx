@@ -718,8 +718,8 @@ export default function App() {
               style={{ width: 34, height: 34, borderRadius: "50%", background: "none", border: "none", cursor: "pointer", padding: 0, WebkitTapHighlightColor: "transparent" }}>
               <div style={{
                 width: 34, height: 34, borderRadius: "50%",
-                background: "rgba(122,144,112,0.22)",
-                border: "1.5px solid rgba(122,144,112,0.5)",
+                background: "rgba(45,61,43,0.22)",
+                border: "1.5px solid rgba(45,61,43,0.5)",
                 display: "flex", alignItems: "center", justifyContent: "center",
               }}>
                 <span style={{

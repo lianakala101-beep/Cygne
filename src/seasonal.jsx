@@ -59,9 +59,9 @@ const SEASON_CONFIG = {
   spring: {
     label: "Spring",
     iconName: "leaf",
-    accent: "#6e8a72",
-    bg: "rgba(122,144,112,0.07)",
-    border: "rgba(122,144,112,0.2)",
+    accent: "#2d3d2b",
+    bg: "rgba(45,61,43,0.07)",
+    border: "rgba(45,61,43,0.2)",
     headline: "Skin is recovering. UV is rising.",
     body: "Barrier resilience returns as humidity climbs. Spring is the right window to reintroduce or increase actives — but SPF becomes non-negotiable.",
     shelfNudge: (products, activeMap) => {

@@ -25,7 +25,7 @@ function ScanModal({ products, onAddToShelf, onClose }) {
   const searchTimeout = useRef(null);
 
   const verdictConfig = {
-    pass:    { color: "#6e8a72", bg: "rgba(122,144,112,0.10)", border: "rgba(122,144,112,0.35)", label: "Good fit" },
+    pass:    { color: "#2d3d2b", bg: "rgba(45,61,43,0.10)", border: "rgba(45,61,43,0.35)", label: "Good fit" },
     caution: { color: "#8b7355", bg: "rgba(139,115,85,0.08)",  border: "rgba(139,115,85,0.30)",  label: "Use with care" },
     skip:    { color: "#8b7355", bg: "rgba(139,115,85,0.08)",   border: "rgba(139,115,85,0.30)",   label: "Skip this one" },
   };
@@ -188,7 +188,7 @@ function ScanModal({ products, onAddToShelf, onClose }) {
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               <button onClick={() => setMode("search")}
                 style={{ display: "flex", alignItems: "center", gap: 16, padding: "18px 20px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, cursor: "pointer", textAlign: "left" }}>
-                <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(122,144,112,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(45,61,43,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                   <Icon name="search" size={16} color="var(--sage)" />
                 </div>
                 <div>
@@ -198,7 +198,7 @@ function ScanModal({ products, onAddToShelf, onClose }) {
               </button>
               <button onClick={() => { setMode("scan"); setTimeout(() => fileRef.current && fileRef.current.click(), 100); }}
                 style={{ display: "flex", alignItems: "center", gap: 16, padding: "18px 20px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, cursor: "pointer", textAlign: "left" }}>
-                <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(122,144,112,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(45,61,43,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                   <Icon name="camera" size={16} color="var(--sage)" />
                 </div>
                 <div>
@@ -255,7 +255,7 @@ function ScanModal({ products, onAddToShelf, onClose }) {
               <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#8b7355", margin: "0 0 10px", padding: "8px 12px", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.2)", borderRadius: 8 }}>{scanError}</p>
             )}
             <button onClick={() => fileRef.current.click()}
-              style={{ width: "100%", padding: "32px 0", background: "rgba(122,144,112,0.08)", border: "1px dashed rgba(122,144,112,0.35)", borderRadius: 14, cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+              style={{ width: "100%", padding: "32px 0", background: "rgba(45,61,43,0.08)", border: "1px dashed rgba(45,61,43,0.35)", borderRadius: 14, cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
               <Icon name="camera" size={28} color="var(--sage)" />
               <span style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", letterSpacing: "0.06em" }}>Tap to open camera</span>
               <span style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", opacity: 0.5 }}>Point at the ingredient list for best results</span>
@@ -267,7 +267,7 @@ function ScanModal({ products, onAddToShelf, onClose }) {
         {mode === "scanning" && (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "32px 0 24px", gap: 16 }}>
             {imgPreview && <img src={imgPreview} alt="" style={{ width: 100, height: 100, objectFit: "cover", borderRadius: 12, opacity: 0.7 }} />}
-            <div style={{ width: 28, height: 28, border: "2px solid #6e8a72", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+            <div style={{ width: 28, height: 28, border: "2px solid #2d3d2b", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
             <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: 0 }}>Reading the label…</p>
           </div>
         )}
@@ -315,7 +315,7 @@ function ScanModal({ products, onAddToShelf, onClose }) {
             {scanned.actives && scanned.actives.length > 0 && (
               <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 16 }}>
                 {scanned.actives.map((a, i) => (
-                  <span key={i} style={{ fontSize: 9, fontFamily: "var(--font-body)", color: "#6e8a72", background: "rgba(122,144,112,0.1)", padding: "3px 10px", borderRadius: 20, border: "1px solid rgba(122,144,112,0.25)", letterSpacing: "0.1em", textTransform: "uppercase" }}>{a}</span>
+                  <span key={i} style={{ fontSize: 9, fontFamily: "var(--font-body)", color: "#2d3d2b", background: "rgba(45,61,43,0.1)", padding: "3px 10px", borderRadius: 20, border: "1px solid rgba(45,61,43,0.25)", letterSpacing: "0.1em", textTransform: "uppercase" }}>{a}</span>
                 ))}
               </div>
             )}
@@ -328,7 +328,7 @@ function ScanModal({ products, onAddToShelf, onClose }) {
                   {verdict === "skip" ? "Add anyway" : "Save to Vanity"}
                 </button>
               ) : (
-                <div style={{ flex: 1, padding: "13px 0", background: "rgba(122,144,112,0.1)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 12, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontFamily: "var(--font-body)", fontSize: 12, color: "#6e8a72" }}>
+                <div style={{ flex: 1, padding: "13px 0", background: "rgba(45,61,43,0.1)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 12, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontFamily: "var(--font-body)", fontSize: 12, color: "#2d3d2b" }}>
                   <Icon name="check" size={12} /> Saved to Vanity
                 </div>
               )}
@@ -457,7 +457,7 @@ function assessRoutineFit(product, products, checkIns = [], user = {}) {
 }
 
 const DEFER_TAG_CONFIG = {
-  season:  { color: "#6e8a72", bg: "rgba(122,144,112,0.10)", label: "Seasonal hold" },
+  season:  { color: "#2d3d2b", bg: "rgba(45,61,43,0.10)", label: "Seasonal hold" },
   ramp:    { color: "#8b7355", bg: "rgba(139,115,85,0.10)",  label: "Ritual at capacity" },
   skin:    { color: "#8b7355", bg: "rgba(139,115,85,0.10)",   label: "Skin recovery" },
   overlap: { color: "#8b7355", bg: "rgba(139,115,85,0.10)", label: "Redundant active" },

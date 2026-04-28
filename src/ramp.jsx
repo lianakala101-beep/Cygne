@@ -87,9 +87,9 @@ const RAMP_SCHEDULES = {
   },
   BHA: {
     label: "BHA Exfoliant",
-    color: "#6e8a72",
-    colorBg: "rgba(122,144,112,0.08)",
-    colorBorder: "rgba(122,144,112,0.22)",
+    color: "#2d3d2b",
+    colorBg: "rgba(45,61,43,0.08)",
+    colorBorder: "rgba(45,61,43,0.22)",
     phases: [
       {
         name: "Patch",
@@ -309,7 +309,7 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, on
 
           {/* On track / Back off */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 16 }}>
-            <div style={{ padding: "10px 12px", background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.2)", borderRadius: 10 }}>
+            <div style={{ padding: "10px 12px", background: "rgba(45,61,43,0.08)", border: "1px solid rgba(45,61,43,0.2)", borderRadius: 10 }}>
               <p style={{ fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--sage)", margin: "0 0 4px" }}>On track</p>
               <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>{phase.onTrack}</p>
             </div>
@@ -327,18 +327,18 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, on
                 <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", margin: 0, opacity: 0.7 }}>When you're ready, mark as handled to advance.</p>
               </div>
               <button onClick={handleAdvanceClick}
-                style={{ width: "100%", padding: "10px 0", background: "rgba(122,144,112,0.12)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 10, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer", transition: "all 0.18s" }}
-                onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.2)"}
-                onMouseLeave={e => e.currentTarget.style.background = "rgba(122,144,112,0.12)"}>
+                style={{ width: "100%", padding: "10px 0", background: "rgba(45,61,43,0.12)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 10, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer", transition: "all 0.18s" }}
+                onMouseEnter={e => e.currentTarget.style.background = "rgba(45,61,43,0.2)"}
+                onMouseLeave={e => e.currentTarget.style.background = "rgba(45,61,43,0.12)"}>
                 Skin handled it — advance <Icon name="check" size={10} />
               </button>
             </div>
           ) : (
             <div style={{ display: "flex", gap: 8 }}>
               <button onClick={handleAdvanceClick}
-                style={{ flex: 1, padding: "10px 0", background: "rgba(122,144,112,0.12)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 10, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer", transition: "all 0.18s" }}
-                onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.2)"}
-                onMouseLeave={e => e.currentTarget.style.background = "rgba(122,144,112,0.12)"}>
+                style={{ flex: 1, padding: "10px 0", background: "rgba(45,61,43,0.12)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 10, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer", transition: "all 0.18s" }}
+                onMouseEnter={e => e.currentTarget.style.background = "rgba(45,61,43,0.2)"}
+                onMouseLeave={e => e.currentTarget.style.background = "rgba(45,61,43,0.12)"}>
                 Skin handled it <Icon name="check" size={10} />
               </button>
               <button onClick={() => { onHold(product.id); setJustActioned("hold"); }}
@@ -424,7 +424,7 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, on
             <button onClick={confirmGraduation}
               style={{
                 padding: "12px 24px",
-                background: "rgba(122,144,112,0.22)",
+                background: "rgba(45,61,43,0.22)",
                 color: "#e8e0c8",
                 border: "1px solid rgba(232,224,200,0.28)",
                 borderRadius: 10,
@@ -434,8 +434,8 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, on
                 cursor: "pointer",
                 transition: "background 0.18s",
               }}
-              onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.32)"}
-              onMouseLeave={e => e.currentTarget.style.background = "rgba(122,144,112,0.22)"}>
+              onMouseEnter={e => e.currentTarget.style.background = "rgba(45,61,43,0.32)"}
+              onMouseLeave={e => e.currentTarget.style.background = "rgba(45,61,43,0.22)"}>
               Resume Routine
             </button>
           </div>
@@ -560,14 +560,14 @@ function WeeklyRitualCalendar({ rampProducts, products }) {
                 display: "flex", flexDirection: "column", alignItems: "center",
                 padding: "10px 4px 10px",
                 background: selected
-                  ? "rgba(122,144,112,0.15)"
+                  ? "rgba(45,61,43,0.15)"
                   : active
-                  ? "rgba(122,144,112,0.07)"
+                  ? "rgba(45,61,43,0.07)"
                   : "var(--surface)",
                 border: selected
-                  ? "1px solid rgba(122,144,112,0.45)"
+                  ? "1px solid rgba(45,61,43,0.45)"
                   : active
-                  ? "1px solid rgba(122,144,112,0.25)"
+                  ? "1px solid rgba(45,61,43,0.25)"
                   : "1px solid var(--border)",
                 borderRadius: 12,
                 cursor: "pointer",

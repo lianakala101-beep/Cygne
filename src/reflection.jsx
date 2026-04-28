@@ -279,7 +279,7 @@ function CaptureFlow({ onClose, onComplete }) {
               {ANGLES.map((a, i) => (
                 <div key={a.key} style={{
                   width: 9, height: 9, borderRadius: "50%",
-                  background: i < step ? "var(--sage)" : i === step ? "rgba(122,144,112,0.45)" : "transparent",
+                  background: i < step ? "var(--sage)" : i === step ? "rgba(45,61,43,0.45)" : "transparent",
                   border: `1px solid ${i <= step ? "var(--sage)" : BORDER}`,
                   transition: "all 0.2s",
                 }} />

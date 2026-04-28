@@ -93,7 +93,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
         const active = single ? selected === opt : selected.includes(opt);
         return (
           <button key={opt} onClick={() => onToggle(opt)}
-            style={{ padding: "10px 18px", borderRadius: 24, border: `1px solid ${active ? "rgba(122,144,112,0.7)" : "var(--border)"}`, background: active ? "rgba(122,144,112,0.12)" : "var(--surface)", color: active ? "#5a7a60" : "#6b5a43", fontFamily: "var(--font-body)", fontSize: 12, fontWeight: active ? 600 : 400, cursor: "pointer", transition: "all 0.18s", letterSpacing: "0.02em" }}>
+            style={{ padding: "10px 18px", borderRadius: 24, border: `1px solid ${active ? "rgba(45,61,43,0.7)" : "var(--border)"}`, background: active ? "rgba(45,61,43,0.12)" : "var(--surface)", color: active ? "#5a7a60" : "#6b5a43", fontFamily: "var(--font-body)", fontSize: 12, fontWeight: active ? 600 : 400, cursor: "pointer", transition: "all 0.18s", letterSpacing: "0.02em" }}>
             {opt}
           </button>
         );
@@ -128,8 +128,8 @@ function OnboardingScreen({ onComplete, setLocationData }) {
         </div>
       </div>
       {skinAge && (
-        <div style={{ marginTop: 20, padding: "13px 16px", background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.25)", borderRadius: 12 }}>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: "#6e8a72", margin: "0 0 5px" }}>{skinAge.bracket}</p>
+        <div style={{ marginTop: 20, padding: "13px 16px", background: "rgba(45,61,43,0.08)", border: "1px solid rgba(45,61,43,0.25)", borderRadius: 12 }}>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: "#2d3d2b", margin: "0 0 5px" }}>{skinAge.bracket}</p>
           <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.65 }}>{skinAge.note}</p>
         </div>
       )}
@@ -180,19 +180,19 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       <p style={obSub}>Cygne uses local humidity, UV index, and temperature to adjust your daily ritual advice. Your location is never shared.</p>
       <div style={{ marginTop: 32 }}>
         {locationSet ? (
-          <div style={{ padding: "16px 18px", background: "rgba(122,144,112,0.1)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 14 }}>
+          <div style={{ padding: "16px 18px", background: "rgba(45,61,43,0.1)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 14 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#6e8a72" }} />
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "#6e8a72", margin: 0, fontWeight: 500 }}>Location enabled</p>
+              <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#2d3d2b" }} />
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "#2d3d2b", margin: 0, fontWeight: 500 }}>Location enabled</p>
             </div>
             <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: "6px 0 0" }}>Your environment data will appear on the home screen.</p>
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <button onClick={requestLocation}
-              style={{ display: "flex", alignItems: "center", gap: 8, padding: "13px 20px", background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 12, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 600, color: "#6e8a72", cursor: "pointer", letterSpacing: "0.08em", transition: "all 0.2s" }}
-              onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.18)"}
-              onMouseLeave={e => e.currentTarget.style.background = "rgba(122,144,112,0.08)"}>
+              style={{ display: "flex", alignItems: "center", gap: 8, padding: "13px 20px", background: "rgba(45,61,43,0.10)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 12, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 600, color: "#2d3d2b", cursor: "pointer", letterSpacing: "0.08em", transition: "all 0.2s" }}
+              onMouseEnter={e => e.currentTarget.style.background = "rgba(45,61,43,0.18)"}
+              onMouseLeave={e => e.currentTarget.style.background = "rgba(45,61,43,0.08)"}>
               <Icon name="target" size={14} />
               {locationLoading ? "Requesting..." : "Enable Location"}
             </button>
@@ -225,8 +225,8 @@ function OnboardingScreen({ onComplete, setLocationData }) {
             <button key={d} onClick={() => setResetDay(d)}
               style={{
                 padding: "14px 0", borderRadius: 12,
-                border: `1px solid ${active ? "rgba(122,144,112,0.7)" : "var(--border)"}`,
-                background: active ? "rgba(122,144,112,0.15)" : "var(--surface)",
+                border: `1px solid ${active ? "rgba(45,61,43,0.7)" : "var(--border)"}`,
+                background: active ? "rgba(45,61,43,0.15)" : "var(--surface)",
                 color: active ? "#5a7a60" : "#6b5a43",
                 fontFamily: "var(--font-body)", fontSize: 12,
                 fontWeight: active ? 600 : 400, letterSpacing: "0.08em",
@@ -263,7 +263,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
         <p style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 400, letterSpacing: "0.12em", color: "rgba(232,227,214,0.6)", margin: "0 0 24px" }}>Your ritual begins.</p>
         {skinAge && (
           <div style={{ padding: "12px 16px", background: "rgba(232,227,214,0.06)", border: "1px solid rgba(232,227,214,0.15)", borderRadius: 12, marginBottom: 28, width: "100%" }}>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(122,144,112,0.9)", margin: "0 0 5px" }}>{skinAge.bracket}</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(45,61,43,0.9)", margin: "0 0 5px" }}>{skinAge.bracket}</p>
             <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "rgba(232,227,214,0.55)", margin: 0, lineHeight: 1.7 }}>{skinAge.note}</p>
           </div>
         )}
@@ -299,7 +299,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       {step < TOTAL_STEPS - 1 && (
         <div style={{ position: "sticky", top: 0, zIndex: 10, paddingTop: 52, paddingBottom: 16, background: "#f5f2ee" }}>
           <div style={{ height: 1.5, background: "var(--border)", borderRadius: 2, overflow: "hidden" }}>
-            <div style={{ height: "100%", width: `${progress}%`, background: "#6e8a72", borderRadius: 2, transition: "width 0.4s ease" }} />
+            <div style={{ height: "100%", width: `${progress}%`, background: "#2d3d2b", borderRadius: 2, transition: "width 0.4s ease" }} />
           </div>
         </div>
       )}
@@ -321,7 +321,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       {step >= 0 && step < 5 && (
         <div style={{ position: "sticky", bottom: 0, background: "#f5f2ee", padding: "16px 24px 32px", marginTop: "auto" }}>
           <button onClick={() => canAdvance[step] && advance(1)}
-            style={{ width: "100%", padding: "14px 0", background: canAdvance[step] ? "#6e8a72" : "#e0dbd5", color: canAdvance[step] ? "#0d0f0d" : "var(--clay)", border: `1px solid ${canAdvance[step] ? "transparent" : "var(--border)"}`, borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: canAdvance[step] ? "pointer" : "default", transition: "all 0.2s", opacity: canAdvance[step] ? 1 : 0.5 }}>
+            style={{ width: "100%", padding: "14px 0", background: canAdvance[step] ? "#2d3d2b" : "#e0dbd5", color: canAdvance[step] ? "#fdfcf9" : "var(--clay)", border: `1px solid ${canAdvance[step] ? "transparent" : "var(--border)"}`, borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: canAdvance[step] ? "pointer" : "default", transition: "all 0.2s", opacity: canAdvance[step] ? 1 : 0.5 }}>
             Continue
           </button>
           {step === 3 || step === 4 ? (
@@ -332,7 +332,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       {step === 5 && (
         <div style={{ maxWidth: 420, width: "100%", margin: "24px auto 0" }}>
           <button onClick={() => advance(1)}
-            style={{ width: "100%", padding: "14px 0", background: "#6e8a72", color: "#0d0f0d", border: "none", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}>
+            style={{ width: "100%", padding: "14px 0", background: "#2d3d2b", color: "#fdfcf9", border: "none", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}>
             Continue
           </button>
         </div>
@@ -340,7 +340,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       {step === 6 && (
         <div style={{ position: "sticky", bottom: 0, background: "#f5f2ee", padding: "16px 24px 32px", marginTop: "auto" }}>
           <button onClick={() => advance(1)}
-            style={{ width: "100%", padding: "14px 0", background: "#6e8a72", color: "#0d0f0d", border: "none", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}>
+            style={{ width: "100%", padding: "14px 0", background: "#2d3d2b", color: "#fdfcf9", border: "none", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}>
             Continue
           </button>
         </div>

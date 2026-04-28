@@ -16,7 +16,7 @@ function SessionPicker({ productId, product, initial, onSession }) {
       <div onClick={e => e.stopPropagation()} style={{ marginTop: 10 }}>
         <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 6px", opacity: 0.6 }}>Session</p>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ padding: "5px 12px", borderRadius: 8, background: isAM ? "rgba(122,144,112,0.14)" : "rgba(232,226,217,0.10)", border: "1px solid " + (isAM ? "rgba(122,144,112,0.4)" : "rgba(232,226,217,0.3)"), fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 700, color: isAM ? "var(--sage)" : "#e8e2d9" }}>{isAM ? "AM only" : "PM only"}</span>
+          <span style={{ padding: "5px 12px", borderRadius: 8, background: isAM ? "rgba(45,61,43,0.14)" : "rgba(232,226,217,0.10)", border: "1px solid " + (isAM ? "rgba(45,61,43,0.4)" : "rgba(232,226,217,0.3)"), fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 700, color: isAM ? "var(--sage)" : "#e8e2d9" }}>{isAM ? "AM only" : "PM only"}</span>
           <span style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", opacity: 0.5 }}>locked by ingredients</span>
         </div>
         <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", margin: "8px 0 0", lineHeight: 1.5, opacity: 0.6 }}>{locked.reason}</p>
@@ -33,7 +33,7 @@ function SessionPicker({ productId, product, initial, onSession }) {
           const active = selected === s.id;
           return (
             <button key={s.id} onClick={e => { e.stopPropagation(); setSelected(s.id); if (onSession) onSession(productId, s.id); }}
-              style={{ flex: 1, padding: "7px 0", borderRadius: 8, border: "1px solid " + (active ? "rgba(122,144,112,0.55)" : "var(--border)"), background: active ? "rgba(122,144,112,0.18)" : "transparent", color: active ? "var(--parchment)" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 10, fontWeight: active ? 700 : 400, cursor: "pointer" }}>
+              style={{ flex: 1, padding: "7px 0", borderRadius: 8, border: "1px solid " + (active ? "rgba(45,61,43,0.55)" : "var(--border)"), background: active ? "rgba(45,61,43,0.18)" : "transparent", color: active ? "var(--parchment)" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 10, fontWeight: active ? 700 : 400, cursor: "pointer" }}>
               {s.label}
             </button>
           );
@@ -87,7 +87,7 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
 
   return (
     <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: "18px 18px 16px", display: "flex", flexDirection: "column", gap: 12, transition: "border-color 0.2s" }}
-      onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(122,144,112,0.4)"}
+      onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(45,61,43,0.4)"}
       onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}>
 
       {/* Header row */}
@@ -101,7 +101,7 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
           <button onClick={() => setMenuOpen(o => !o)} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: "6px 8px", opacity: 0.6, transition: "opacity 0.15s", fontSize: 16, lineHeight: 1, fontFamily: "sans-serif" }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0.6} aria-label="Product options">⋯</button>
           {menuOpen && (
             <div style={{ position: "absolute", right: 0, top: "100%", zIndex: 50, minWidth: 180, background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 12, padding: "6px 0", boxShadow: "0 8px 28px rgba(0,0,0,0.45)" }}>
-              <button onClick={() => { setMenuOpen(false); onEdit(product); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "var(--parchment)", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "left", transition: "background 0.12s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.1)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>
+              <button onClick={() => { setMenuOpen(false); onEdit(product); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "var(--parchment)", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "left", transition: "background 0.12s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(45,61,43,0.1)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>
                 <Icon name="edit" size={12} /><span>Edit product</span>
               </button>
               <div style={{ height: 1, background: "var(--border)", margin: "4px 12px" }} />
@@ -138,16 +138,16 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
             <span key={a} style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 9, fontFamily: "var(--font-body)", letterSpacing: "0.08em", color: "#8b7355", background: "rgba(139,115,85,0.08)", padding: "3px 8px", borderRadius: 20, border: "1px solid rgba(139,115,85,0.22)" }}><Icon name="warning" size={9} /> {a}</span>
           ))}
           {lovedHits.map(l => (
-            <span key={l} style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 9, fontFamily: "var(--font-body)", letterSpacing: "0.08em", color: "#6e8a72", background: "rgba(122,144,112,0.08)", padding: "3px 8px", borderRadius: 20, border: "1px solid rgba(122,144,112,0.2)" }}><Icon name="sparkle" size={9} /> {l}</span>
+            <span key={l} style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 9, fontFamily: "var(--font-body)", letterSpacing: "0.08em", color: "#2d3d2b", background: "rgba(45,61,43,0.08)", padding: "3px 8px", borderRadius: 20, border: "1px solid rgba(45,61,43,0.2)" }}><Icon name="sparkle" size={9} /> {l}</span>
           ))}
         </div>
       )}
 
       {/* In-ritual toggle */}
       <button onClick={() => onToggleRoutine(product.id)}
-        style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 14px", background: inRoutine ? "rgba(122,144,112,0.08)" : "var(--ink)", border: `1px solid ${inRoutine ? "rgba(122,144,112,0.3)" : "var(--border)"}`, borderRadius: 10, cursor: "pointer", transition: "all 0.18s" }}
-        onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(122,144,112,0.5)"}
-        onMouseLeave={e => e.currentTarget.style.borderColor = inRoutine ? "rgba(122,144,112,0.3)" : "var(--border)"}>
+        style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 14px", background: inRoutine ? "rgba(45,61,43,0.08)" : "var(--ink)", border: `1px solid ${inRoutine ? "rgba(45,61,43,0.3)" : "var(--border)"}`, borderRadius: 10, cursor: "pointer", transition: "all 0.18s" }}
+        onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(45,61,43,0.5)"}
+        onMouseLeave={e => e.currentTarget.style.borderColor = inRoutine ? "rgba(45,61,43,0.3)" : "var(--border)"}>
         <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: inRoutine ? "var(--sage)" : "var(--clay)", fontWeight: inRoutine ? 600 : 400 }}>
           {inRoutine ? "In ritual" : "Not in ritual"}
         </span>
@@ -217,7 +217,7 @@ const STEP_VERB = {
   Prescription:"Treat",
 };
 
-const DEEP_MOSS = "#4a5c47";
+const DEEP_MOSS = "#2d3d2b";
 const SILVER_GRADIENT = "linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 30%, #a8a8a8 50%, #d4d4d4 70%, #b0b0b0 100%)";
 
 function silverText(checked) {
@@ -306,7 +306,7 @@ function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }
       <p style={{
         fontFamily: "var(--font-body)",
         fontSize: 11,
-        color: checked ? "#c0c0c0" : "#a0a0a0",
+        color: checked ? "#c0c0c0" : "#5a5a5a",
         margin: "5px 0 0",
         letterSpacing: "0.02em",
         lineHeight: 1.4,
@@ -323,13 +323,13 @@ function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }
           onClick={() => setExpanded(e => !e)}
           style={{ background: "none", border: "none", padding: "4px 0 0", cursor: "pointer", display: "block" }}
         >
-          <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "#c0c0c0", transition: "color 0.2s" }}>
+          <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "#2d3d2b", opacity: 0.6, transition: "color 0.2s" }}>
             {expanded ? "less" : "why?"}
           </span>
         </button>
       )}
       {expanded && reason && (
-        <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#a0a0a0", margin: "8px 0 0", lineHeight: 1.65 }}>{reason}</p>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#5a5a5a", margin: "8px 0 0", lineHeight: 1.65 }}>{reason}</p>
       )}
 
       {/* Divider */}
@@ -565,7 +565,7 @@ function FlightModeModal({ products, activeMap, onClose }) {
         <div style={{ display: "flex", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10, padding: 3, marginBottom: 24 }}>
           {[{ id: "edit", label: "Your Edit" }, { id: "tips", label: "Flight Tips" }].map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
-              style={{ flex: 1, padding: "8px 0", borderRadius: 8, border: "none", background: tab === t.id ? "#6e8a72" : "transparent", color: tab === t.id ? "#0d0f0d" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 10, fontWeight: tab === t.id ? 700 : 400, cursor: "pointer", letterSpacing: "0.12em", textTransform: "uppercase", transition: "all 0.18s" }}>
+              style={{ flex: 1, padding: "8px 0", borderRadius: 8, border: "none", background: tab === t.id ? "#2d3d2b" : "transparent", color: tab === t.id ? "#fdfcf9" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 10, fontWeight: tab === t.id ? 700 : 400, cursor: "pointer", letterSpacing: "0.12em", textTransform: "uppercase", transition: "all 0.18s" }}>
               {t.label}
             </button>
           ))}
@@ -602,12 +602,12 @@ function FlightModeModal({ products, activeMap, onClose }) {
             {keep.length > 0 && (
               <div style={{ marginBottom: 20 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-                  <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#6e8a72" }} />
-                  <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#6e8a72" }}>Pack These</span>
+                  <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#2d3d2b" }} />
+                  <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#2d3d2b" }}>Pack These</span>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {keep.map((item, i) => (
-                    <div key={i} style={{ padding: "13px 16px", background: "rgba(122,144,112,0.06)", border: "1px solid rgba(122,144,112,0.2)", borderRadius: 12 }}>
+                    <div key={i} style={{ padding: "13px 16px", background: "rgba(45,61,43,0.06)", border: "1px solid rgba(45,61,43,0.2)", borderRadius: 12 }}>
                       <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "var(--parchment)", margin: "0 0 3px", fontWeight: 500 }}>{item.name}</p>
                       <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>{item.reason}</p>
                     </div>
@@ -651,8 +651,8 @@ function FlightModeModal({ products, activeMap, onClose }) {
             ))}
 
             {/* Recovery note */}
-            <div style={{ padding: "16px 18px", background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.25)", borderRadius: 12, marginTop: 4 }}>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "#6e8a72", margin: "0 0 6px" }}>Landing Day</p>
+            <div style={{ padding: "16px 18px", background: "rgba(45,61,43,0.08)", border: "1px solid rgba(45,61,43,0.25)", borderRadius: 12, marginTop: 4 }}>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "#2d3d2b", margin: "0 0 6px" }}>Landing Day</p>
               <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: 0, lineHeight: 1.65 }}>
                 Give your skin 24h to re-acclimate before reintroducing actives. Cleanse, moisturize, SPF. Nothing else the first night.
               </p>
