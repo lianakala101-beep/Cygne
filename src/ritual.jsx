@@ -306,7 +306,7 @@ function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }
       <p style={{
         fontFamily: "var(--font-body)",
         fontSize: 11,
-        color: checked ? "#c0c0c0" : "#5a5a5a",
+        color: checked ? "var(--color-pebble)" : "var(--color-stone)",
         margin: "5px 0 0",
         letterSpacing: "0.02em",
         lineHeight: 1.4,

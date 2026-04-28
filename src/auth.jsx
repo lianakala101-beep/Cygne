@@ -154,7 +154,7 @@ function AuthScreen({ onAuth }) {
           border: "none",
           fontFamily: "var(--font-body, 'Space Grotesk', sans-serif)",
           fontSize: 11,
-          color: "#a0a0a0",
+          color: "#7a7a7a",
           cursor: "pointer",
           padding: "8px 0",
           letterSpacing: "0.04em",

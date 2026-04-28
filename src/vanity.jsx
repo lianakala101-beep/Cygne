@@ -90,7 +90,7 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
         {/* Text content — 0 top padding (image bleeds to edge), 12px sides + bottom */}
         <div style={{ padding: "10px 12px 12px" }}>
           <p style={{ fontFamily: "var(--font-display, 'Fungis', sans-serif)", fontSize: 13, fontWeight: 400, letterSpacing: "0.1em", color: "#1c1c1a", margin: "0 0 3px", lineHeight: 1.3 }}>{product.name}</p>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "#a0a0a0", margin: 0, letterSpacing: "0.03em" }}>{product.brand}</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "#7a7a7a", margin: 0, letterSpacing: "0.03em" }}>{product.brand}</p>
           {product.price > 0 && (
             <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#1c1c1a", margin: "5px 0 0", fontWeight: 300, letterSpacing: "0.01em" }}>${(product.price || 0).toFixed(0)}</p>
           )}
@@ -101,7 +101,7 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
       {confirmDelete && (
         <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(253,252,249,0.8)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", padding: "0 28px" }} onClick={() => setConfirmDelete(false)}>
           <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 320, background: "rgba(253,252,249,0.97)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", border: "1px solid rgba(192,192,192,0.3)", borderRadius: 18, padding: "26px 24px 22px", boxShadow: "0 16px 48px rgba(0,0,0,0.10)" }}>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#a0a0a0", margin: "0 0 12px" }}>Confirm</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#7a7a7a", margin: "0 0 12px" }}>Confirm</p>
             <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "#1c1c1a", margin: "0 0 22px", lineHeight: 1.65 }}>Remove <strong>{product.name}</strong> from your vanity? This cannot be undone.</p>
             <div style={{ display: "flex", gap: 10 }}>
               <button onClick={() => setConfirmDelete(false)} style={{ flex: 1, padding: "12px 0", borderRadius: 0, border: "1px solid rgba(192,192,192,0.35)", background: "transparent", color: "#1c1c1a", fontFamily: "var(--font-body)", fontSize: 12, cursor: "pointer" }}>Cancel</button>
@@ -404,8 +404,8 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo
               <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
                 {filtered.map(p => <GlassProductCard key={p.id} product={p} onEdit={onEdit} onDelete={onDelete} onToggleRoutine={onToggleRoutine} onSession={onSession} user={user} />)}
                 <button onClick={onAdd} style={{ ...GLASS_CARD, background: "rgba(253,252,249,0.25)", border: "1px dashed rgba(192,192,192,0.4)", cursor: "pointer", aspectRatio: "1 / 1", alignItems: "center", justifyContent: "center", gap: 8 }}>
-                  <span style={{ fontSize: 20, color: "#c0c0c0", lineHeight: 1 }}>+</span>
-                  <span style={{ fontFamily: "var(--font-display, 'Fungis', sans-serif)", fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: "#c0c0c0" }}>Add Product</span>
+                  <span style={{ fontSize: 20, color: "#7a7a7a", lineHeight: 1 }}>+</span>
+                  <span style={{ fontFamily: "var(--font-display, 'Fungis', sans-serif)", fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: "#7a7a7a" }}>Add Product</span>
                 </button>
               </div>
             </>

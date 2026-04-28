@@ -27,22 +27,22 @@
   --font-signature: 'Hellasta Signature', cursive;
   --font-display: 'Fungis', sans-serif;
   --font-body: 'Space Grotesk', sans-serif;
-
-  /* Font weights */
   --font-weight-normal: 400;
   --font-weight-heavy: 700;
-
-  /* Letter spacing - 15% for Fungis */
   --tracking-fungis: 0.15em;
 
-  /* Colors */
+  /* Backgrounds */
   --color-ivory: #fdfcf9;
   --color-ivory-shadow: #f0ebe0;
-  --color-text-primary: #1c1c1a;
-  --color-inky-moss: #2d3d2b;
 
-  /* Satin silver gradient for Heavy headings */
-  --gradient-satin: linear-gradient(
+  /* Text */
+  --color-ink: #1c1c1a;
+  --color-inky-moss: #2d3d2b;
+  --color-stone: #5a5a5a;
+  --color-pebble: #7a7a7a;
+
+  /* Brand accent — vibes only, never for readable text */
+  --color-silver-gradient: linear-gradient(
     135deg,
     #c0c0c0 0%,
     #e8e8e8 30%,
@@ -56,7 +56,7 @@
 body {
   font-family: var(--font-body);
   background-color: #fdfcf9;
-  color: var(--color-text-primary);
+  color: var(--color-ink);
   min-height: 100vh;
 }
 
@@ -107,7 +107,7 @@ body {
 
 /* Satin silver text effect — use on Fungis Heavy only */
 .text-satin {
-  background: var(--gradient-satin);
+  background: var(--color-silver-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

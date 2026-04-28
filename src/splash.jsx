@@ -62,7 +62,7 @@ function SplashScreen({ onDone }) {
           fontWeight: 400,
           letterSpacing: "0.15em",
           textTransform: "uppercase",
-          color: "#a0a0a0",
+          color: "#7a7a7a",
           margin: 0,
         }}>Built Around You</p>
 

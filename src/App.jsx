@@ -605,20 +605,20 @@ export default function App() {
           --sans:      var(--font-body, 'Space Grotesk', sans-serif);
           --heading:   var(--font-display, 'Fungis', sans-serif);
 
-          /* All semantic tokens map to the ivory palette */
-          --deep:      var(--color-ivory, #fdfcf9);
-          --ink:       var(--color-ivory-shadow, #f0ebe0);
-          --surface:   var(--color-ivory-shadow, #f0ebe0);
+          /* Semantic aliases → new token system */
+          --deep:      var(--color-ivory);
+          --ink:       var(--color-ivory-shadow);
+          --surface:   var(--color-ivory-shadow);
           --border:    rgba(192,192,192,0.35);
-          --parchment: var(--color-text-primary, #1c1c1a);
-          --clay:      var(--color-text-muted, #a0a0a0);
-          --muted:     var(--color-text-muted, #a0a0a0);
-          --taupe:     var(--color-text-muted, #a0a0a0);
+          --parchment: var(--color-ink);
+          --clay:      var(--color-stone);
+          --muted:     var(--color-pebble);
+          --taupe:     var(--color-pebble);
           --overlay:   rgba(253,252,249,0.85);
-          --sage:      var(--color-silver, #c0c0c0);
-          --cta:       var(--color-text-primary, #1c1c1a);
-          --inky-moss: var(--color-text-primary, #1c1c1a);
-          --ivory:     var(--color-ivory, #fdfcf9);
+          --sage:      var(--color-stone);
+          --cta:       var(--color-ink);
+          --inky-moss: var(--color-inky-moss);
+          --ivory:     var(--color-ivory);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         input, select, textarea { outline: none; }
@@ -642,7 +642,7 @@ export default function App() {
           background: transparent;
           border: 1px solid rgba(160,160,160,0.55);
           border-radius: 0;
-          color: var(--color-text-primary, #1c1c1a);
+          color: var(--color-ink, #1c1c1a);
           font-family: var(--heading);
           font-size: 10px;
           letter-spacing: 0.15em;
