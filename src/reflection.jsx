@@ -647,7 +647,7 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
         <p style={{ fontFamily: "var(--heading)", fontSize: 9, letterSpacing: "0.30em", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: "0 0 12px" }}>
           Reflection
         </p>
-        <h1 style={{ fontFamily: "var(--heading)", fontSize: 34, fontWeight: 700, color: TEXT, margin: "0 0 10px", letterSpacing: "0.15em", textTransform: "uppercase", lineHeight: 1.2 }}>
+        <h1 style={{ fontFamily: "var(--font-display)", fontSize: 34, fontWeight: 700, color: "var(--color-inky-moss)", margin: "0 0 10px", letterSpacing: "0.15em", textTransform: "uppercase", lineHeight: 1.2 }}>
           A Living Gallery.
         </h1>
         {reflections.length === 0 && (

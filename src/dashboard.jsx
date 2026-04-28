@@ -49,16 +49,13 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
     <div>
       {/* Hero */}
       <div style={{ marginBottom: products.length === 0 ? 28 : 36, paddingTop: 44 }}>
-        <p style={{ fontFamily: "var(--heading)", fontSize: 9, letterSpacing: "0.28em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 12px", opacity: 0.8 }}>
-          {(() => {
-            const h = new Date().getHours();
-            if (h >= 5  && h < 12) return user?.name ? `Good morning, ${user.name.split(" ")[0]}.` : "Good morning.";
-            if (h >= 12 && h < 17) return user?.name ? `Good afternoon, ${user.name.split(" ")[0]}.` : "Good afternoon.";
-            return user?.name ? `Good evening, ${user.name.split(" ")[0]}.` : "Good evening.";
-          })()}
+        <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 9, letterSpacing: "0.28em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 10px", opacity: 0.7 }}>
+          {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
         </p>
-        <h1 style={{ fontFamily: "var(--heading)", fontSize: 46, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--parchment)", margin: "0 0 4px", lineHeight: 1.15 }}>
-          {products.length === 0 ? "Welcome." : "Your Ritual."}
+        <h1 style={{ fontFamily: "var(--font-signature)", fontSize: 52, color: "var(--color-inky-moss)", margin: "0 0 4px", lineHeight: 1.1 }}>
+          {user?.name
+            ? user.name.split(" ")[0]
+            : new Date().getHours() < 17 ? "good morning" : "good evening"}
         </h1>
       </div>
 
