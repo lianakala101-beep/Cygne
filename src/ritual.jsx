@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Icon, Section, Wordmark, SwanIcon } from "./components.jsx";
+import { Icon, Section, Wordmark } from "./components.jsx";
 import { detectActives, analyzeShelf, buildRoutine, isDampSkinProduct, hasSPFCoverage } from "./engine.js";
 import { FREQUENCIES } from "./constants.js";
 import { getLockedSession, getAutoSession } from "./productmodal.jsx";
@@ -353,24 +353,6 @@ function getDayIndex() {
 
 const NO_DATA_LINE = "Log a few check-ins and I'll have something for you soon.";
 
-// Split the SwanSense insight into lines (prefers explicit line breaks,
-// falls back to sentence boundaries) and stagger a fadeInLine animation
-// across each segment.
-function renderInsightLines(text) {
-  const raw = String(text || "");
-  const byBreak = raw.split(/\n+/).map(s => s.trim()).filter(Boolean);
-  const segments = byBreak.length > 1
-    ? byBreak
-    : raw.split(/(?<=[.!?])\s+/).map(s => s.trim()).filter(Boolean);
-  return segments.map((seg, i) => (
-    <span key={i} style={{
-      display: "block",
-      opacity: 0,
-      animation: "fadeInLine 0.8s ease-in forwards",
-      animationDelay: `${i * 0.5}s`,
-    }}>{seg}</span>
-  ));
-}
 
 function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = {}, predictions = [] }) {
   const now = new Date();
@@ -384,79 +366,70 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
     "Happy birthday. Your skin looks radiant.",
   ];
 
-  // Separate meaningful predictions from baseline fallbacks
   const meaningfulPredictions = predictions.filter(p => {
     const key = p.id || p.type;
     return key && !key.startsWith("baseline_");
   });
   const hasMeaningful = meaningfulPredictions.length > 0;
 
-  // Line: SwanSense prediction > birthday > "not enough data yet"
   const line = isBirthday
     ? BIRTHDAY_LINES[now.getFullYear() % BIRTHDAY_LINES.length]
     : hasMeaningful
       ? meaningfulPredictions[0].headline
       : NO_DATA_LINE;
 
-  const grain ="url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E\")";
+  const detail = hasMeaningful && meaningfulPredictions[0].detail
+    ? meaningfulPredictions[0].detail
+    : "Log a few check-ins and I'll have something for you soon.";
 
-  // -- POPUP version ---------------------------------------------------------
+  const NOISE_BG = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23noise)' opacity='0.045'/%3E%3C/svg%3E\")";
+
+  const cardStyle = {
+    backgroundColor: "var(--color-ivory-shadow)",
+    backgroundImage: NOISE_BG,
+    backgroundRepeat: "repeat",
+    border: "1px solid rgba(192,192,192,0.35)",
+    borderRadius: 4,
+    boxShadow: "0 4px 24px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04)",
+    padding: "28px 24px",
+  };
+
+  const cardContent = (
+    <>
+      <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-inky-moss)", margin: "0 0 8px" }}>
+        Swan Song
+      </p>
+      <p style={{ fontFamily: "var(--font-signature)", fontSize: 20, color: "var(--color-inky-moss)", margin: "0 0 16px", lineHeight: 1.45 }}>
+        {line}
+      </p>
+      <div style={{ height: 1, background: "rgba(192,192,192,0.3)", margin: "16px 0" }} />
+      <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 14, lineHeight: 1.7, color: "var(--color-stone)", letterSpacing: "0.05em", margin: 0 }}>
+        {detail}
+      </p>
+    </>
+  );
+
   if (asPopup) {
     return (
       <div style={{
         position: "fixed", inset: 0, zIndex: 200,
         display: "flex", alignItems: "center", justifyContent: "center",
-        background: "rgba(8,10,8,0.72)", backdropFilter: "blur(10px)",
+        background: "rgba(253,252,249,0.88)", backdropFilter: "blur(14px)",
         padding: "0 28px",
         animation: "fadeUp 0.38s ease",
       }}>
-        <div style={{
-          position: "relative", width: "100%", maxWidth: 340,
-          background: "linear-gradient(158deg, #3d3a28 0%, #2a2619 45%, #1e1a14 100%)",
-          borderRadius: 22,
-          padding: "28px 26px 24px",
-          overflow: "hidden",
-          isolation: "isolate",
-          boxShadow: "0 24px 60px rgba(0,0,0,0.7), 0 1px 0 rgba(232,220,180,0.06) inset",
-          border: "1px solid rgba(139,115,85,0.22)",
-        }}>
-          <span aria-hidden="true" style={{
-            position: "absolute", top: "50%", left: "50%",
-            transform: "translate(-50%, -50%)",
-            fontFamily: "var(--font-signature)",
-            fontSize: 160, lineHeight: 1,
-            color: "#f5f0e8", opacity: 0.07,
-            pointerEvents: "none", userSelect: "none",
-            whiteSpace: "nowrap",
-            zIndex: -1,
-          }}>Cygne</span>
-          <div style={{ position: "absolute", inset: 0, borderRadius: 22, pointerEvents: "none", backgroundImage: grain, backgroundSize: "180px 180px", opacity: 0.7 }} />
-          <div style={{ position: "absolute", inset: 0, borderRadius: 22, pointerEvents: "none", background: "radial-gradient(ellipse at 85% 15%, rgba(139,115,85,0.12) 0%, transparent 65%)" }} />
-          <div style={{ position: "absolute", bottom: 14, right: 18, opacity: 0.18, color: "rgba(232,220,180,0.9)", pointerEvents: "none" }}><SwanIcon size={56} /></div>
-
-          <div style={{ textAlign: "center", marginBottom: 18 }}>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(232,226,217,0.65)", margin: 0 }}>
-              Swan Song
-            </p>
-          </div>
-          <div style={{ height: 1, background: "rgba(232,226,217,0.12)", marginBottom: 18 }} />
-
-          <p style={{ fontFamily: "var(--cursive)", fontSize: 32, fontWeight: 400, lineHeight: 1.5, color: "#e8e3d6", letterSpacing: "0.02em", margin: "0 0 18px" }}>{renderInsightLines(line)}</p>
-
-          {/* Show first prediction detail in popup */}
-          {hasMeaningful && meaningfulPredictions[0].detail && (
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "rgba(232,226,217,0.5)", margin: "0 0 22px", lineHeight: 1.65 }}>{meaningfulPredictions[0].detail}</p>
-          )}
-
+        <div style={{ ...cardStyle, width: "100%", maxWidth: 340 }}>
+          {cardContent}
           <button onClick={onDismissPopup} style={{
-            width: "100%", padding: "11px 0",
-            background: "rgba(232,226,217,0.08)", border: "1px solid rgba(232,226,217,0.18)",
-            borderRadius: 10, cursor: "pointer",
-            fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.2em",
-            textTransform: "uppercase", color: "rgba(232,226,217,0.55)", transition: "all 0.2s",
+            marginTop: 24, width: "100%", padding: "12px 0",
+            background: "transparent", border: "1px solid rgba(192,192,192,0.4)",
+            borderRadius: 0, cursor: "pointer",
+            fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 9,
+            letterSpacing: "0.2em", textTransform: "uppercase",
+            color: "var(--color-stone)", transition: "all 0.2s",
           }}
-            onMouseEnter={e => { e.currentTarget.style.background = "rgba(232,226,217,0.14)"; e.currentTarget.style.color = "rgba(232,226,217,0.85)"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "rgba(232,226,217,0.08)"; e.currentTarget.style.color = "rgba(232,226,217,0.55)"; }}>
+            onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--color-ink)"; e.currentTarget.style.color = "var(--color-ink)"; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(192,192,192,0.4)"; e.currentTarget.style.color = "var(--color-stone)"; }}>
             Carry on
           </button>
         </div>
@@ -464,40 +437,7 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
     );
   }
 
-  // -- INLINE (settled) version — small card at bottom of home ---------------
-  return (
-    <div style={{ position: "relative", marginTop: 8 }}>
-      <div style={{
-        position: "relative",
-        background: "linear-gradient(158deg, #3d3a28 0%, #2a2619 45%, #1e1a14 100%)",
-        borderRadius: 14,
-        padding: "16px 18px 14px",
-        overflow: "hidden",
-        isolation: "isolate",
-        boxShadow: "0 4px 18px rgba(0,0,0,0.35)",
-        border: "1px solid rgba(139,115,85,0.15)",
-      }}>
-        <span aria-hidden="true" style={{
-          position: "absolute", top: "50%", left: "50%",
-          transform: "translate(-50%, -50%)",
-          fontFamily: "var(--font-signature)",
-          fontSize: 160, lineHeight: 1,
-          color: "#f5f0e8", opacity: 0.07,
-          pointerEvents: "none", userSelect: "none",
-          whiteSpace: "nowrap",
-          zIndex: -1,
-        }}>Cygne</span>
-        <div style={{ position: "absolute", inset: 0, borderRadius: 14, pointerEvents: "none", backgroundImage: grain, backgroundSize: "180px 180px", opacity: 0.6 }} />
-        <div style={{ position: "absolute", bottom: 8, right: 12, opacity: 0.18, color: "rgba(232,220,180,0.9)", pointerEvents: "none" }}><SwanIcon size={44} /></div>
-
-        <div style={{ marginBottom: 10 }}>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 8, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(232,226,217,0.55)", margin: 0 }}>Swan Song</p>
-        </div>
-
-        <p style={{ fontFamily: "var(--cursive)", fontSize: 22, fontWeight: 400, lineHeight: 1.5, color: "rgba(232,227,214,0.85)", letterSpacing: "0.02em", margin: 0 }}>{renderInsightLines(line)}</p>
-      </div>
-    </div>
-  );
+  return <div style={{ marginTop: 8, ...cardStyle }}>{cardContent}</div>;
 }
 
 
