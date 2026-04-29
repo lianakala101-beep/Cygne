@@ -1421,8 +1421,11 @@ function isScheduledOnDate(product, date) {
   const freq = product.frequency || "daily";
   if (freq === "daily") return true;
   if (freq === "as-needed") return false;
-  const start = product.routineStartDate ? new Date(product.routineStartDate) : new Date();
-  const dayDiff = Math.floor((date - new Date(start.getFullYear(), start.getMonth(), start.getDate())) / 86400000);
+  const rs = product.routineStartDate;
+  const start = rs
+    ? (() => { const [y, m, d] = rs.split("T")[0].split("-").map(Number); return new Date(y, m - 1, d); })()
+    : new Date();
+  const dayDiff = Math.floor((date - start) / 86400000);
   if (freq === "alternating") return dayDiff % 2 === 0;
   if (freq === "2-3x") return [0, 2, 4].includes(((dayDiff % 7) + 7) % 7);
   if (freq === "weekly") return ((dayDiff % 7) + 7) % 7 === 0;

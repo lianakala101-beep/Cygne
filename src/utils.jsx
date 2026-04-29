@@ -122,6 +122,13 @@ const DEMO_PRODUCTS = [
 // Use local midnight (not UTC) so cycle & treatment tracking advance at the
 // user's local midnight, not UTC midnight.
 function toLocalMidnight(d) {
+  // When given a "YYYY-MM-DD" (or "YYYY-MM-DDTHH:…") string, parse the date
+  // portion as local — new Date("YYYY-MM-DD") is UTC midnight which shifts
+  // one day back in negative-UTC-offset timezones.
+  if (typeof d === "string") {
+    const [year, month, day] = d.split("T")[0].split("-").map(Number);
+    return new Date(year, month - 1, day).getTime();
+  }
   const date = d instanceof Date ? d : new Date(d);
   return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
 }
@@ -136,9 +143,9 @@ function daysBetweenLocal(startIso, nowDate = new Date()) {
 function getCurrentCycleDay(user) {
   if (!user) return null;
   if (user.cycleStartDate) {
-    // Parse stored ISO as local date
-    const start = new Date(user.cycleStartDate);
-    const startLocal = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+    // Parse stored date string as local midnight to avoid UTC-offset shifts.
+    const [y, m, d] = user.cycleStartDate.split("T")[0].split("-").map(Number);
+    const startLocal = new Date(y, m - 1, d);
     const today = new Date();
     const todayLocal = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     const diffDays = Math.floor((todayLocal.getTime() - startLocal.getTime()) / (1000 * 60 * 60 * 24));

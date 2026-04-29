@@ -334,6 +334,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
   const [ritualDismissed, setRitualDismissed] = useState(false);
   const [showRitualCheckIn, setShowRitualCheckIn] = useState(false);
   const todayCheckedIn = checkIns.some(c => c.date === today);
+  const [hintVisible, setHintVisible] = useState(() => !localStorage.getItem("ritual_hint_dismissed"));
 
   const isStepChecked = (id) => completedSteps.includes(id);
 
@@ -384,6 +385,23 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
           stroke="rgba(192,192,192,0.5)" strokeWidth="1.5" fill="none" strokeLinecap="round"
         />
       </svg>
+
+      {/* -- First-visit hint banner --------------------------------------- */}
+      {hintVisible && (
+        <button
+          onClick={() => { localStorage.setItem("ritual_hint_dismissed", "1"); setHintVisible(false); }}
+          style={{
+            display: "block", width: "100%", margin: "0 0 18px",
+            padding: "10px 16px", textAlign: "center",
+            background: "rgba(240,235,224,0.8)", border: "1px solid rgba(192,192,192,0.25)",
+            borderRadius: 2, cursor: "pointer",
+            fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 10,
+            letterSpacing: "0.15em", textTransform: "uppercase",
+            color: "var(--color-inky-moss)",
+          }}>
+          Tap each step to mark it complete
+        </button>
+      )}
 
       {/* -- Swan guiding line ---------------------------------------------- */}
       {guidingLine && (
