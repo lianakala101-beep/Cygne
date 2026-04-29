@@ -674,6 +674,10 @@ export default function App() {
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
         @keyframes cygneCheckDraw { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
+        @keyframes ritualWave {
+          0%, 100% { transform: translateY(0px); opacity: 0.85; }
+          50%       { transform: translateY(-2px); opacity: 1; }
+        }
         @keyframes etherealGlide {
           0%   { transform: translateY(0px) rotate(0deg); }
           25%  { transform: translateY(-3px) rotate(-1deg); }

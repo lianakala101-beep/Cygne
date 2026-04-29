@@ -377,10 +377,19 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
       {/* -- Header ----------------------------------------------------------- */}
       <div style={{ marginBottom: 16, paddingTop: 44 }}>
         <BreathText
-          text="Ritual"
-          style={{ fontFamily: "var(--heading)", fontSize: 42, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#2d3d2b", margin: 0, lineHeight: 1.15 }}
+          text="Your Ritual"
+          style={{ fontFamily: "var(--font-display)", fontSize: 42, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-inky-moss)", margin: 0, lineHeight: 1.15 }}
         />
       </div>
+
+      {/* Decorative wave — between header and steps */}
+      <svg width="100%" height="12" viewBox="0 0 300 12" preserveAspectRatio="none"
+        style={{ display: "block", margin: "2px 0 18px", animation: "ritualWave 5s ease-in-out infinite" }}>
+        <path
+          d="M0 6 C 37.5 2, 75 10, 112.5 6 C 150 2, 187.5 10, 225 6 C 262.5 2, 300 10, 337.5 6"
+          stroke="rgba(192,192,192,0.5)" strokeWidth="1.5" fill="none" strokeLinecap="round"
+        />
+      </svg>
 
       {/* -- Swan guiding line ---------------------------------------------- */}
       {guidingLine && (

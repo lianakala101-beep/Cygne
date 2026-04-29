@@ -237,6 +237,13 @@ function getStepReason(step) {
   return STEP_REASONS[step.category] || null;
 }
 
+const DAMP_SKIN_CATEGORIES = new Set(["Toner", "Essence", "Mist", "Mask"]);
+function needsDampSkin(step) {
+  if (DAMP_SKIN_CATEGORIES.has(step.category)) return true;
+  const ings = (step.ingredients || []).map(i => i.toLowerCase());
+  return ings.some(i => i.includes("hyaluronic") || i.includes("hyaluronate"));
+}
+
 function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }) {
   const [expanded, setExpanded] = useState(false);
   const reason = getStepReason(step);
@@ -316,6 +323,12 @@ function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }
         {step.brand && <span style={{ opacity: 0.7 }}> · {step.brand}</span>}
         {freqLabel && <span style={{ marginLeft: 8, fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase" }}> {freqLabel}</span>}
       </p>
+
+      {needsDampSkin(step) && !checked && (
+        <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 10, letterSpacing: "0.1em", color: "var(--color-inky-moss)", opacity: 0.75, margin: "4px 0 0" }}>
+          ✦ best applied to damp skin
+        </p>
+      )}
 
       {/* Expandable reason — tap label to toggle */}
       {reason && (
