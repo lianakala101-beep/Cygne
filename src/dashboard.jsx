@@ -95,7 +95,9 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
               ))}
             </div>
             <button onClick={() => setTab("shelf")}
-              style={{ width: "100%", padding: "16px 0", background: "var(--cta)", border: "1px solid rgba(45,61,43,0.35)", borderRadius: 14, fontFamily: "var(--font-body)", fontSize: 13, fontWeight: 600, color: "var(--parchment)", cursor: "pointer", letterSpacing: "0.04em", marginBottom: 10 }}>
+              style={{ width: "100%", padding: "14px 0", background: "transparent", border: "1.5px solid var(--color-inky-moss)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 700, color: "var(--color-inky-moss)", cursor: "pointer", letterSpacing: "0.2em", textTransform: "uppercase", transition: "all 0.3s ease", marginBottom: 10 }}
+              onMouseEnter={e => { e.currentTarget.style.background = "var(--color-inky-moss)"; e.currentTarget.style.color = "var(--color-ivory)"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--color-inky-moss)"; }}>
               Add your first product
             </button>
             {onLoadDemo && (
@@ -321,28 +323,28 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         {/* 5. Travel Edit + Shop Scan — utility buttons at bottom */}
         <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
           <button onClick={() => setFlightOpen(true)}
-            style={{ flex: 1, display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", background: "var(--cta)", border: "1px solid rgba(45,61,43,0.25)", borderRadius: 14, cursor: "pointer", transition: "background 0.2s", textAlign: "left" }}
-            onMouseEnter={e => e.currentTarget.style.background = "#444d3d"}
-            onMouseLeave={e => e.currentTarget.style.background = "var(--color-ivory)"}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(232,227,214,0.7)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            style={{ flex: 1, display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", background: "transparent", border: "1px solid rgba(45,61,43,0.35)", borderRadius: 14, cursor: "pointer", transition: "all 0.2s", textAlign: "left" }}
+            onMouseEnter={e => { e.currentTarget.style.background = "var(--color-inky-moss)"; e.currentTarget.querySelectorAll("p").forEach(p => p.style.color = "var(--color-ivory)"); e.currentTarget.querySelector("svg").style.opacity = "0.9"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.querySelectorAll("p").forEach((p, i) => p.style.color = i === 0 ? "var(--color-inky-moss)" : "var(--color-pebble)"); e.currentTarget.querySelector("svg").style.opacity = "1"; }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-inky-moss)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/>
             </svg>
             <div>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "rgba(232,227,214,0.95)", fontWeight: 600, margin: "0 0 2px", letterSpacing: "0.06em", textTransform: "uppercase" }}>Travel Edit</p>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 9, color: "rgba(232,227,214,0.45)", margin: 0, letterSpacing: "0.02em" }}>Pack & skip</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--color-inky-moss)", fontWeight: 600, margin: "0 0 2px", letterSpacing: "0.06em", textTransform: "uppercase" }}>Travel Edit</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 9, color: "var(--color-pebble)", margin: 0, letterSpacing: "0.02em" }}>Pack & skip</p>
             </div>
           </button>
           <button onClick={() => setShopScanOpen(true)}
-            style={{ flex: 1, display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", background: "var(--cta)", border: "1px solid rgba(45,61,43,0.25)", borderRadius: 14, cursor: "pointer", transition: "background 0.2s", textAlign: "left" }}
-            onMouseEnter={e => e.currentTarget.style.background = "#444d3d"}
-            onMouseLeave={e => e.currentTarget.style.background = "var(--color-ivory)"}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(232,227,214,0.7)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            style={{ flex: 1, display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", background: "transparent", border: "1px solid rgba(45,61,43,0.35)", borderRadius: 14, cursor: "pointer", transition: "all 0.2s", textAlign: "left" }}
+            onMouseEnter={e => { e.currentTarget.style.background = "var(--color-inky-moss)"; e.currentTarget.querySelectorAll("p").forEach(p => p.style.color = "var(--color-ivory)"); e.currentTarget.querySelector("svg").style.opacity = "0.9"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.querySelectorAll("p").forEach((p, i) => p.style.color = i === 0 ? "var(--color-inky-moss)" : "var(--color-pebble)"); e.currentTarget.querySelector("svg").style.opacity = "1"; }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-inky-moss)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
             </svg>
             <div>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "rgba(232,227,214,0.95)", fontWeight: 600, margin: "0 0 2px", letterSpacing: "0.06em", textTransform: "uppercase" }}>Shop Scan</p>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 9, color: "rgba(232,227,214,0.45)", margin: 0, letterSpacing: "0.02em" }}>Would my skin like this?</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--color-inky-moss)", fontWeight: 600, margin: "0 0 2px", letterSpacing: "0.06em", textTransform: "uppercase" }}>Shop Scan</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 9, color: "var(--color-pebble)", margin: 0, letterSpacing: "0.02em" }}>Would my skin like this?</p>
             </div>
           </button>
         </div>

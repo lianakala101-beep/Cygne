@@ -289,13 +289,16 @@ function CaptureFlow({ onClose, onComplete }) {
             <button onClick={pick} disabled={busy}
               style={{
                 display: "inline-flex", alignItems: "center", gap: 10,
-                padding: "14px 28px", borderRadius: 11,
-                background: CTA_BG, color: TEXT, border: `1px solid ${CTA_BORDER}`,
+                padding: "14px 40px", borderRadius: 0,
+                background: "transparent", color: "var(--color-inky-moss)", border: "1.5px solid var(--color-inky-moss)",
                 cursor: busy ? "default" : "pointer",
-                fontFamily: SANS, fontSize: 11, fontWeight: 600,
-                letterSpacing: "0.18em", textTransform: "uppercase",
+                fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 700,
+                letterSpacing: "0.2em", textTransform: "uppercase",
+                transition: "all 0.3s ease",
                 opacity: busy ? 0.5 : 1,
-              }}>
+              }}
+              onMouseEnter={e => { if (!busy) { e.currentTarget.style.background = "var(--color-inky-moss)"; e.currentTarget.style.color = "var(--color-ivory)"; } }}
+              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--color-inky-moss)"; }}>
               <Icon name="camera" size={14} />
               {busy ? "Loading..." : step === 0 ? "Begin Capture" : "Next Shot"}
             </button>
@@ -326,13 +329,16 @@ function CaptureFlow({ onClose, onComplete }) {
             <button onClick={finish} disabled={busy}
               style={{
                 display: "inline-flex", alignItems: "center", gap: 10,
-                padding: "14px 28px", borderRadius: 11,
-                background: CTA_BG, color: TEXT, border: `1px solid ${CTA_BORDER}`,
+                padding: "14px 40px", borderRadius: 0,
+                background: "transparent", color: "var(--color-inky-moss)", border: "1.5px solid var(--color-inky-moss)",
                 cursor: busy ? "default" : "pointer",
-                fontFamily: SANS, fontSize: 11, fontWeight: 600,
-                letterSpacing: "0.18em", textTransform: "uppercase",
+                fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 700,
+                letterSpacing: "0.2em", textTransform: "uppercase",
+                transition: "all 0.3s ease",
                 opacity: busy ? 0.5 : 1,
-              }}>
+              }}
+              onMouseEnter={e => { if (!busy) { e.currentTarget.style.background = "var(--color-inky-moss)"; e.currentTarget.style.color = "var(--color-ivory)"; } }}
+              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--color-inky-moss)"; }}>
               {busy ? "Saving..." : "Save reflection"}
             </button>
 
@@ -672,15 +678,17 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
           <button onClick={() => setCapturing(true)} disabled={saving}
             style={{
               display: "inline-flex", alignItems: "center", gap: 10,
-              padding: "14px 26px", borderRadius: 11,
-              background: CTA_BG, color: TEXT,
-              border: `1px solid ${CTA_BORDER}`,
+              padding: "14px 40px", borderRadius: 0,
+              background: "transparent", color: "var(--color-inky-moss)",
+              border: "1.5px solid var(--color-inky-moss)",
               cursor: saving ? "default" : "pointer",
-              fontFamily: SANS, fontSize: 11, fontWeight: 600,
-              letterSpacing: "0.18em", textTransform: "uppercase",
-              transition: "border-color 0.2s, opacity 0.2s",
+              fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 700,
+              letterSpacing: "0.2em", textTransform: "uppercase",
+              transition: "all 0.3s ease",
               opacity: saving ? 0.6 : 1,
-            }}>
+            }}
+            onMouseEnter={e => { if (!saving) { e.currentTarget.style.background = "var(--color-inky-moss)"; e.currentTarget.style.color = "var(--color-ivory)"; } }}
+            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--color-inky-moss)"; }}>
             <Icon name="camera" size={14} />
             {saving ? "Saving..." : reflections.length === 0 ? "Capture your first reflection" : "Capture this week"}
           </button>

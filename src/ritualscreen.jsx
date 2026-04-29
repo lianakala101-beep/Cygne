@@ -483,8 +483,10 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
             </div>
           </div>
           <button onClick={() => setShowRitualCheckIn(true)}
-            style={{ width: "100%", padding: "12px 0", background: "var(--cta)", border: "1px solid rgba(45,61,43,0.35)", borderRadius: 11, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 600, color: "var(--parchment)", cursor: "pointer", letterSpacing: "0.04em" }}>
-            Log a check-in <Icon name="arrow-right" size={12} />
+            style={{ width: "100%", padding: "14px 40px", background: "transparent", border: "1.5px solid var(--color-inky-moss)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 700, color: "var(--color-inky-moss)", cursor: "pointer", letterSpacing: "0.2em", textTransform: "uppercase", transition: "all 0.3s ease" }}
+            onMouseEnter={e => { e.currentTarget.style.background = "var(--color-inky-moss)"; e.currentTarget.style.color = "var(--color-ivory)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--color-inky-moss)"; }}>
+            RITUAL COMPLETE
           </button>
         </div>
       )}
