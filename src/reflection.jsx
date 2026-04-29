@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "./components.jsx";
 import { supabase } from "./supabase.js";
 import { getSwanSensePredictions } from "./swansense.jsx";
+import { compressImageBlob } from "./utils.jsx";
 
 // ---------------------------------------------------------------------------
 // Reflection — a weekly triptych gallery of the user's skin journey.
@@ -35,6 +36,34 @@ export function isoWeekNumber(date = new Date()) {
   d.setUTCDate(d.getUTCDate() + 4 - day);
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
   return Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
+}
+
+// ISO week year — the year that "owns" this ISO week (may differ from calendar year
+// in the first/last days of January/December).
+function isoWeekYear(d) {
+  const dt = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const day = dt.getUTCDay() || 7;
+  dt.setUTCDate(dt.getUTCDate() + 4 - day);
+  return dt.getUTCFullYear();
+}
+
+// Monday of the given ISO week/year (UTC).
+function isoWeekToMonday(weekNum, isoYear) {
+  const jan4 = new Date(Date.UTC(isoYear, 0, 4));
+  const day = jan4.getUTCDay() || 7;
+  const week1Mon = new Date(jan4);
+  week1Mon.setUTCDate(jan4.getUTCDate() - (day - 1));
+  const result = new Date(week1Mon);
+  result.setUTCDate(week1Mon.getUTCDate() + (weekNum - 1) * 7);
+  return result;
+}
+
+// Sunday (last day) of the given ISO week/year (UTC).
+function isoWeekToSunday(weekNum, isoYear) {
+  const monday = isoWeekToMonday(weekNum, isoYear);
+  const sunday = new Date(monday);
+  sunday.setUTCDate(monday.getUTCDate() + 6);
+  return sunday;
 }
 
 // Seasonal / lunar label for a given ISO week. The wheel is loosely calibrated
@@ -225,7 +254,10 @@ function CaptureFlow({ onClose, onComplete }) {
     if (!file) return;
     try {
       setBusy(true);
-      const url = await fileToDataUrl(file);
+      console.log("[Cygne reflection] raw file size:", file.size, "bytes");
+      const compressed = await compressImageBlob(file);
+      console.log("[Cygne reflection] compressed blob size:", compressed.size, "bytes");
+      const url = await fileToDataUrl(compressed);
       setShots(prev => [...prev, url]);
     } finally {
       setBusy(false);
@@ -554,6 +586,63 @@ function GalleryEntry({ entry, onExpand, caption }) {
 }
 
 // ---------------------------------------------------------------------------
+// PLACEHOLDER ENTRY — shown for weeks without a captured reflection
+// ---------------------------------------------------------------------------
+
+function PlaceholderEntry({ weekNum, date, onCapture }) {
+  const ref = useRef(null);
+  const [revealed, setRevealed] = useState(false);
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+    if (typeof IntersectionObserver === "undefined") { setRevealed(true); return; }
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) { setRevealed(true); io.disconnect(); break; }
+      }
+    }, { threshold: 0.15, rootMargin: "0px 0px -8% 0px" });
+    io.observe(node);
+    return () => io.disconnect();
+  }, []);
+
+  const dateLabel = date.toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" });
+
+  return (
+    <button onClick={onCapture} ref={ref}
+      style={{
+        display: "block", width: "100%", margin: "0 auto 48px",
+        background: "none", border: "none", padding: 0, cursor: "pointer",
+        textAlign: "center", color: TEXT,
+        opacity: revealed ? 1 : 0,
+        transform: revealed ? "translateY(0)" : "translateY(16px)",
+        transition: "opacity 500ms ease-out, transform 500ms ease-out",
+        willChange: "opacity, transform",
+      }}>
+      <p style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: "0 0 4px" }}>
+        Week {weekNum}
+      </p>
+      <p style={{ fontFamily: SANS, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: TEXT_SOFT, margin: "0 0 18px", opacity: 0.7 }}>
+        {dateLabel}
+      </p>
+      <div style={{
+        width: "100%", maxWidth: 520, margin: "0 auto",
+        aspectRatio: "1560 / 680",
+        background: "var(--color-ivory-shadow)",
+        borderTop: `1px solid ${BORDER}`,
+        borderBottom: `1px solid ${BORDER}`,
+        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+        gap: 10,
+      }}>
+        <span style={{ fontSize: 28, lineHeight: 1, color: "var(--color-pebble)", opacity: 0.5 }}>+</span>
+        <p style={{ fontFamily: "var(--font-signature)", fontSize: 13, color: "var(--color-pebble)", margin: 0, letterSpacing: "0.02em" }}>
+          {dateLabel}
+        </p>
+      </div>
+    </button>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // MAIN REFLECTION SCREEN
 // ---------------------------------------------------------------------------
 
@@ -570,6 +659,47 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
   const now = new Date();
   const currentWeek = isoWeekNumber(now);
   const currentYear = now.getFullYear();
+
+  // Build gallery items: real entries + placeholders for missed weeks.
+  // Only computed when there is at least one reflection.
+  const galleryItems = useMemo(() => {
+    if (sorted.length === 0) return [];
+
+    const byWeek = {};
+    for (const e of sorted) {
+      const d = new Date(e.date);
+      const wy = isoWeekYear(d);
+      const key = `${wy}-W${e.weekNumber}`;
+      if (!byWeek[key]) byWeek[key] = e;
+    }
+
+    const earliest = sorted[sorted.length - 1];
+    const earliestD = new Date(earliest.date);
+    const earliestWN = earliest.weekNumber;
+    const earliestWY = isoWeekYear(earliestD);
+
+    const startMon = isoWeekToMonday(earliestWN, earliestWY);
+    const curWN = isoWeekNumber(now);
+    const curWY = isoWeekYear(now);
+    const curMon = isoWeekToMonday(curWN, curWY);
+
+    const items = [];
+    const cursor = new Date(startMon);
+    while (cursor <= curMon) {
+      const wn = isoWeekNumber(cursor);
+      const wy = isoWeekYear(cursor);
+      const key = `${wy}-W${wn}`;
+      if (byWeek[key]) {
+        items.push({ type: "entry", data: byWeek[key] });
+      } else {
+        items.push({ type: "placeholder", weekNum: wn, year: wy, date: isoWeekToSunday(wn, wy) });
+      }
+      cursor.setUTCDate(cursor.getUTCDate() + 7);
+    }
+
+    return items.reverse();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sorted.length]);
   const capturedThisWeek = reflections.some(r => {
     if (r.weekNumber !== currentWeek) return false;
     const d = new Date(r.date);
@@ -711,16 +841,25 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
       )}
 
       {/* Gallery */}
-      {sorted.length > 0 && (
+      {galleryItems.length > 0 && (
         <div style={{ maxWidth: 560, margin: "0 auto" }}>
-          {sorted.map((entry, idx) => (
-            <GalleryEntry
-              key={entry.id}
-              entry={decorate(entry)}
-              onExpand={() => setExpandedId(entry.id)}
-              caption={idx === 0 ? "The week is behind you." : null}
-            />
-          ))}
+          {galleryItems.map((item, idx) =>
+            item.type === "entry" ? (
+              <GalleryEntry
+                key={item.data.id}
+                entry={decorate(item.data)}
+                onExpand={() => setExpandedId(item.data.id)}
+                caption={idx === 0 ? "The week is behind you." : null}
+              />
+            ) : (
+              <PlaceholderEntry
+                key={`placeholder-${item.year}-W${item.weekNum}`}
+                weekNum={item.weekNum}
+                date={item.date}
+                onCapture={() => setCapturing(true)}
+              />
+            )
+          )}
         </div>
       )}
 

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Icon, LOGO_SRC, SwanIcon } from "./components.jsx";
 
-/** Compress an image file to JPEG, max 800px on longest side, keeps output well under 1MB */
-export async function compressImage(file, maxDim = 800, quality = 0.7) {
+/** Compress an image file to JPEG, max 1080px on longest side, keeps output well under 1MB */
+export async function compressImage(file, maxDim = 1080, quality = 0.82) {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => {
@@ -23,6 +23,32 @@ export async function compressImage(file, maxDim = 800, quality = 0.7) {
       console.log("[Cygne compress] resized:", width, "x", height, "base64 length:", b64.length, "(~" + Math.round(b64.length * 0.75 / 1024) + "KB)");
       URL.revokeObjectURL(img.src);
       resolve(b64);
+    };
+    img.onerror = (e) => { URL.revokeObjectURL(img.src); reject(e); };
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+/** Compress an image file to JPEG Blob, max 1080px wide, returns Blob for direct upload */
+export async function compressImageBlob(file, maxWidth = 1080, quality = 0.82) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > maxWidth) {
+        height = Math.round(height * (maxWidth / width));
+        width = maxWidth;
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, width, height);
+      canvas.toBlob((blob) => {
+        URL.revokeObjectURL(img.src);
+        if (blob) resolve(blob);
+        else reject(new Error("canvas.toBlob returned null"));
+      }, "image/jpeg", quality);
     };
     img.onerror = (e) => { URL.revokeObjectURL(img.src); reject(e); };
     img.src = URL.createObjectURL(file);
