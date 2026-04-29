@@ -237,12 +237,12 @@ function getStepReason(step) {
   return STEP_REASONS[step.category] || null;
 }
 
-const DAMP_SKIN_CATEGORIES = new Set(["Toner", "Essence", "Mist", "Mask"]);
-const DAMP_SKIN_KEYWORDS = ["hyaluronic", "hyaluronate", "toner", "essence", "lotion", "mist", "sheet mask", "serum"];
+const DAMP_SKIN_BLOCKLIST = ["cleanser", "wash", "foam", "scrub", "sunscreen", "spf", "retinol", "moisturizer", "cream", "oil"];
+const DAMP_SKIN_ALLOWLIST = ["hyaluronic", "hyaluronate", "essence", "sheet mask", "niacinamide serum", "hydrating serum"];
 function needsDampSkin(step) {
-  if (DAMP_SKIN_CATEGORIES.has(step.category)) return true;
   const haystack = `${step.name || ""} ${step.category || ""}`.toLowerCase();
-  if (DAMP_SKIN_KEYWORDS.some(kw => haystack.includes(kw))) return true;
+  if (DAMP_SKIN_BLOCKLIST.some(kw => haystack.includes(kw))) return false;
+  if (DAMP_SKIN_ALLOWLIST.some(kw => haystack.includes(kw))) return true;
   const ings = (step.ingredients || []).map(i => i.toLowerCase());
   return ings.some(i => i.includes("hyaluronic") || i.includes("hyaluronate"));
 }
