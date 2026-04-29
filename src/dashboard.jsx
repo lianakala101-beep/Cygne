@@ -52,7 +52,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 9, letterSpacing: "0.28em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 10px", opacity: 0.7 }}>
           {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
         </p>
-        <h1 style={{ fontFamily: "var(--font-signature)", fontSize: 52, color: "var(--color-inky-moss)", margin: "0 0 4px", lineHeight: 1.1 }}>
+        <h1 style={{ fontFamily: "var(--font-signature)", fontSize: 60, letterSpacing: "0.03em", color: "var(--color-inky-moss)", margin: "0 0 4px", lineHeight: 1.1 }}>
           {user?.name
             ? user.name.split(" ")[0]
             : new Date().getHours() < 17 ? "good morning" : "good evening"}

@@ -252,7 +252,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
           alt="Cygne"
           style={{ height: 170, width: "auto", display: "block", filter: "brightness(1.25) contrast(1.05)", mixBlendMode: "lighten" }}
         />
-        <p style={{ fontFamily: "var(--font-signature)", fontSize: 22, fontWeight: 400, color: "rgba(232,227,214,0.95)", margin: "6px 0 0 130px", letterSpacing: "0.05em", lineHeight: 1 }}>built around you</p>
+        <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 11, letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(232,227,214,0.95)", margin: "6px 0 0 130px", lineHeight: 1 }}>built around you</p>
       </div>
 
       {/* Bottom — welcome message + skin age + Enter button */}
