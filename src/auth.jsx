@@ -54,7 +54,7 @@ function AuthScreen({ onAuth }) {
   return (
     <div style={{
       minHeight: "100vh",
-      background: "#fdfcf9",
+      background: "var(--color-ivory)",
       display: "flex",
       flexDirection: "column",
       alignItems: "center",

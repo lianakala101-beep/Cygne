@@ -17,7 +17,7 @@ const CARD_IMG_BG = {
 const GLASS_CARD = {
   backdropFilter: "blur(12px)",
   WebkitBackdropFilter: "blur(12px)",
-  background: "rgba(253,252,249,0.45)",
+  background: "rgba(250,249,244,0.45)",
   border: "1px solid rgba(192,192,192,0.3)",
   borderRadius: 16,
   boxShadow: "0 4px 24px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.8)",
@@ -67,11 +67,11 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
           {/* ⋯ menu */}
           <div ref={menuRef} style={{ position: "absolute", top: 6, right: 6 }}>
             <button onClick={() => setMenuOpen(o => !o)} aria-label="Options"
-              style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(253,252,249,0.75)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", border: "1px solid rgba(192,192,192,0.35)", color: "#1c1c1a", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, lineHeight: 1, fontFamily: "sans-serif" }}>
+              style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(250,249,244,0.75)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", border: "1px solid rgba(192,192,192,0.35)", color: "#1c1c1a", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, lineHeight: 1, fontFamily: "sans-serif" }}>
               ⋯
             </button>
             {menuOpen && (
-              <div style={{ position: "absolute", right: 0, top: "110%", zIndex: 50, minWidth: 170, background: "rgba(253,252,249,0.96)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", border: "1px solid rgba(192,192,192,0.3)", borderRadius: 12, padding: "6px 0", boxShadow: "0 8px 28px rgba(0,0,0,0.10)" }}>
+              <div style={{ position: "absolute", right: 0, top: "110%", zIndex: 50, minWidth: 170, background: "rgba(250,249,244,0.96)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", border: "1px solid rgba(192,192,192,0.3)", borderRadius: 12, padding: "6px 0", boxShadow: "0 8px 28px rgba(0,0,0,0.10)" }}>
                 <button onClick={() => { setMenuOpen(false); onEdit(product); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#1c1c1a", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "left" }}>
                   <Icon name="edit" size={12} /><span>Edit product</span>
                 </button>
@@ -99,8 +99,8 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
 
       {/* Delete confirmation */}
       {confirmDelete && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(253,252,249,0.8)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", padding: "0 28px" }} onClick={() => setConfirmDelete(false)}>
-          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 320, background: "rgba(253,252,249,0.97)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", border: "1px solid rgba(192,192,192,0.3)", borderRadius: 18, padding: "26px 24px 22px", boxShadow: "0 16px 48px rgba(0,0,0,0.10)" }}>
+        <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(250,249,244,0.8)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", padding: "0 28px" }} onClick={() => setConfirmDelete(false)}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 320, background: "rgba(250,249,244,0.97)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", border: "1px solid rgba(192,192,192,0.3)", borderRadius: 18, padding: "26px 24px 22px", boxShadow: "0 16px 48px rgba(0,0,0,0.10)" }}>
             <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#7a7a7a", margin: "0 0 12px" }}>Confirm</p>
             <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "#1c1c1a", margin: "0 0 22px", lineHeight: 1.65 }}>Remove <strong>{product.name}</strong> from your vanity? This cannot be undone.</p>
             <div style={{ display: "flex", gap: 10 }}>
@@ -403,7 +403,7 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo
               )}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
                 {filtered.map(p => <GlassProductCard key={p.id} product={p} onEdit={onEdit} onDelete={onDelete} onToggleRoutine={onToggleRoutine} onSession={onSession} user={user} />)}
-                <button onClick={onAdd} style={{ ...GLASS_CARD, background: "rgba(253,252,249,0.25)", border: "1px dashed rgba(192,192,192,0.4)", cursor: "pointer", aspectRatio: "1 / 1", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                <button onClick={onAdd} style={{ ...GLASS_CARD, background: "rgba(250,249,244,0.25)", border: "1px dashed rgba(192,192,192,0.4)", cursor: "pointer", aspectRatio: "1 / 1", alignItems: "center", justifyContent: "center", gap: 8 }}>
                   <span style={{ fontSize: 20, color: "#7a7a7a", lineHeight: 1 }}>+</span>
                   <span style={{ fontFamily: "var(--font-display, 'Fungis', sans-serif)", fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: "#7a7a7a" }}>Add Product</span>
                 </button>

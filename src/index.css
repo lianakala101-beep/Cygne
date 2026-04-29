@@ -32,7 +32,7 @@
   --tracking-fungis: 0.15em;
 
   /* Backgrounds */
-  --color-ivory: #fdfcf9;
+  --color-ivory: #faf9f4;
   --color-ivory-shadow: #f0ebe0;
 
   /* Text */
@@ -55,33 +55,44 @@
 /* Base */
 body {
   font-family: var(--font-body);
-  background-color: #fdfcf9;
+  background-color: var(--color-ivory);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='250' height='250' filter='url(%23grain)' opacity='0.045'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-attachment: fixed;
+  background-size: 250px 250px;
   color: var(--color-ink);
   min-height: 100vh;
 }
 
-#root {
-  position: relative;
-  min-height: 100vh;
+/* Remove any solid white or stark backgrounds that block the texture */
+.card,
+.container,
+[class*="card"],
+[class*="container"],
+[class*="wrapper"] {
+  background-color: transparent !important;
 }
 
-#root::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='linen'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='6' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.95 0 0 0 0 0.92 0 0 0 0 0.88 0 0 0 0.12 0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23linen)'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='weave'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='150' height='150' filter='url(%23weave)' opacity='0.04'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 300px 300px, 150px 150px;
+/* Cards that need a surface should use ivory-shadow at partial opacity so texture shows through */
+.surface-card {
+  background-color: rgba(240, 235, 224, 0.6) !important;
 }
 
-/* All content sits above the texture */
-#root > * {
-  position: relative;
-  z-index: 1;
+/* Navigation bar — texture must show through */
+nav,
+[class*="nav"],
+[class*="bottom-bar"],
+[class*="tab-bar"] {
+  background-color: rgba(250, 249, 244, 0.85) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-top: 1px solid rgba(192, 192, 192, 0.2);
+}
+
+/* Header — texture must show through */
+header,
+[class*="header"] {
+  background-color: transparent !important;
 }
 
 /* Typography roles */
@@ -111,9 +122,4 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-}
-
-/* Card/container depth using shadow ivory */
-.card {
-  background-color: var(--color-ivory-shadow);
 }

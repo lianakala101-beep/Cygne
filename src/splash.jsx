@@ -21,7 +21,7 @@ function SplashScreen({ onDone }) {
         position: "fixed",
         inset: 0,
         zIndex: 9999,
-        background: "#fdfcf9",
+        background: "var(--color-ivory)",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",

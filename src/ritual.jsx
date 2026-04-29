@@ -427,7 +427,7 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
       <div style={{
         position: "fixed", inset: 0, zIndex: 200,
         display: "flex", alignItems: "center", justifyContent: "center",
-        background: "rgba(253,252,249,0.88)", backdropFilter: "blur(14px)",
+        background: "rgba(250,249,244,0.88)", backdropFilter: "blur(14px)",
         padding: "0 28px",
         animation: "fadeUp 0.38s ease",
       }}>

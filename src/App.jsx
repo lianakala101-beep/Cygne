@@ -575,7 +575,7 @@ export default function App() {
 
   // -- Loading state — ivory blank while session resolves ---------------------
   if (authLoading) {
-    return <div style={{ position: "fixed", inset: 0, background: "#fdfcf9" }} />;
+    return <div style={{ position: "fixed", inset: 0, background: "var(--color-ivory)" }} />;
   }
 
   // -- Unauthenticated flow: welcome splash → auth ----------------------------
@@ -594,7 +594,7 @@ export default function App() {
 
   // -- Main app ---------------------------------------------------------------
   return (
-    <div className="app-texture" style={{ minHeight: "100vh", background: "var(--color-ivory, #fdfcf9)", paddingBottom: 88 }}>
+    <div className="app-texture" style={{ minHeight: "100vh", background: "transparent", paddingBottom: 88 }}>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -614,7 +614,7 @@ export default function App() {
           --clay:      var(--color-stone);
           --muted:     var(--color-pebble);
           --taupe:     var(--color-pebble);
-          --overlay:   rgba(253,252,249,0.85);
+          --overlay:   rgba(250,249,244,0.85);
           --sage:      var(--color-stone);
           --cta:       var(--color-ink);
           --inky-moss: var(--color-inky-moss);
@@ -707,14 +707,14 @@ export default function App() {
           to   { opacity: 1; transform: translateY(0); }
         }
         .cygne-swansong-intro { animation: cygneSwanSongIntro 500ms 200ms ease-out both; }
-        option { background: #fdfcf9; color: #1c1c1a; }
+        option { background: #faf9f4; color: #1c1c1a; }
         input, select, textarea { background: transparent; color: #1c1c1a; }
-        .modal-bg { background: rgba(253,252,249,0.85) !important; }
+        .modal-bg { background: rgba(250,249,244,0.85) !important; }
         button:focus { outline: none; }
       `}</style>
 
       {/* Header */}
-      <div style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(253,252,249,0.92)", backdropFilter: "blur(20px)", borderBottom: "1px solid var(--border)", padding: "0 22px" }}>
+      <div style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(250,249,244,0.92)", backdropFilter: "blur(20px)", borderBottom: "1px solid var(--border)", padding: "0 22px" }}>
         <div style={{ maxWidth: 600, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: 54 }}>
           <Wordmark size={42} />
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -794,7 +794,7 @@ export default function App() {
       </div>
 
       {/* Bottom nav */}
-      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "rgba(253,252,249,0.97)", backdropFilter: "blur(20px)", borderTop: "1px solid var(--border)", zIndex: 50 }}>
+      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "rgba(250,249,244,0.97)", backdropFilter: "blur(20px)", borderTop: "1px solid var(--border)", zIndex: 50 }}>
         <div style={{ maxWidth: 600, margin: "0 auto", display: "flex" }}>
           {tabs.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
