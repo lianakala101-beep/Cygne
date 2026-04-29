@@ -33,7 +33,18 @@ function OnboardingScreen({ onComplete, setLocationData }) {
   const [locationSet, setLocationSet] = useState(false);
   const [resetDay, setResetDay] = useState(0); // 0 = Sunday
 
-  const TOTAL_STEPS = 8;
+  // New profile screens
+  const [skinGoals, setSkinGoals] = useState([]);
+  const [specialOccasion, setSpecialOccasion] = useState("");
+  const [consistency, setConsistency] = useState("");
+  const [routinePhilosophy, setRoutinePhilosophy] = useState("");
+  const [climate, setClimate] = useState("");
+  const [environment, setEnvironment] = useState("");
+  const [travel, setTravel] = useState("");
+  const [fragrance, setFragrance] = useState("");
+  const [ingredientsToAvoid, setIngredientsToAvoid] = useState("");
+
+  const TOTAL_STEPS = 17;
 
   const advance = (n = 1) => {
     if (animating) return;
@@ -74,6 +85,17 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       knownActives: actives,
       skinAgeBracket: skinAge?.bracket || null,
       resetDay,
+      skinProfile: {
+        skinGoals,
+        specialOccasion: specialOccasion || null,
+        consistency: consistency || null,
+        routinePhilosophy: routinePhilosophy || null,
+        climate: climate || null,
+        environment: environment || null,
+        travel: travel || null,
+        fragrance: fragrance || null,
+        ingredientsToAvoid: ingredientsToAvoid.trim() || null,
+      },
     });
   };
 
@@ -242,7 +264,141 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       </p>
     </div>,
 
-    // 7 — All set
+    // 7 — Skin goal
+    <div key="skingoal" style={slideStyle}>
+      <p style={obEyebrow}>Your goals</p>
+      <h2 style={obHeading}>What would you love your skin to look like in 3 months?</h2>
+      <p style={obSub}>Select everything you're working toward.</p>
+      <div style={{ marginTop: 32 }}>
+        <PillSelect
+          options={["Glassy & Luminous", "Clear & Smooth", "Even-Toned", "Firm & Refined", "Hydrated & Plump"]}
+          selected={skinGoals}
+          onToggle={v => setSkinGoals(prev => prev.includes(v) ? prev.filter(x => x !== v) : [...prev, v])}
+        />
+      </div>
+    </div>,
+
+    // 8 — Special occasion
+    <div key="occasion" style={slideStyle}>
+      <p style={obEyebrow}>Your moment</p>
+      <h2 style={obHeading}>Are you preparing for anything special?</h2>
+      <p style={obSub}>Cygne can pace your routine toward a specific date.</p>
+      <div style={{ marginTop: 32 }}>
+        <PillSelect
+          options={["Wedding", "Vacation", "Event or Shoot", "Just For Me", "Not Right Now"]}
+          selected={specialOccasion}
+          onToggle={v => setSpecialOccasion(prev => prev === v ? "" : v)}
+          single={true}
+        />
+      </div>
+    </div>,
+
+    // 9 — Consistency
+    <div key="consistency" style={slideStyle}>
+      <p style={obEyebrow}>Your habits</p>
+      <h2 style={obHeading}>How consistent are you with skincare?</h2>
+      <p style={obSub}>No judgment — this helps Cygne set realistic expectations.</p>
+      <div style={{ marginTop: 32 }}>
+        <PillSelect
+          options={["Daily, Without Fail", "A Few Times a Week", "When I Remember"]}
+          selected={consistency}
+          onToggle={v => setConsistency(prev => prev === v ? "" : v)}
+          single={true}
+        />
+      </div>
+    </div>,
+
+    // 10 — Routine philosophy
+    <div key="philosophy" style={slideStyle}>
+      <p style={obEyebrow}>Your ritual</p>
+      <h2 style={obHeading}>What kind of ritual speaks to you?</h2>
+      <p style={obSub}>Your answer shapes how Cygne sequences and scales your routine.</p>
+      <div style={{ marginTop: 32 }}>
+        <PillSelect
+          options={["Minimalist — 3 to 5 steps", "Multi-Step — full ritual, I enjoy the process", "Somewhere In Between"]}
+          selected={routinePhilosophy}
+          onToggle={v => setRoutinePhilosophy(prev => prev === v ? "" : v)}
+          single={true}
+        />
+      </div>
+    </div>,
+
+    // 11 — Climate
+    <div key="climate" style={slideStyle}>
+      <p style={obEyebrow}>Your environment</p>
+      <h2 style={obHeading}>What climate do you live in?</h2>
+      <p style={obSub}>Climate shapes how your skin behaves and what it needs season to season.</p>
+      <div style={{ marginTop: 32 }}>
+        <PillSelect
+          options={["Humid", "Dry", "Cold", "Tropical", "Mixed Seasons"]}
+          selected={climate}
+          onToggle={v => setClimate(prev => prev === v ? "" : v)}
+          single={true}
+        />
+      </div>
+    </div>,
+
+    // 12 — Environment
+    <div key="environment" style={slideStyle}>
+      <p style={obEyebrow}>Your environment</p>
+      <h2 style={obHeading}>Where do you spend most of your day?</h2>
+      <p style={obSub}>Sun exposure and indoor air quality both affect your skin differently.</p>
+      <div style={{ marginTop: 32 }}>
+        <PillSelect
+          options={["Indoors", "Outdoors", "Hybrid"]}
+          selected={environment}
+          onToggle={v => setEnvironment(prev => prev === v ? "" : v)}
+          single={true}
+        />
+      </div>
+    </div>,
+
+    // 13 — Travel
+    <div key="travel" style={slideStyle}>
+      <p style={obEyebrow}>Your lifestyle</p>
+      <h2 style={obHeading}>Do you travel often?</h2>
+      <p style={obSub}>Frequent travel means changing water, climate, and cabin pressure — all hard on skin.</p>
+      <div style={{ marginTop: 32 }}>
+        <PillSelect
+          options={["Frequently", "Occasionally", "Rarely"]}
+          selected={travel}
+          onToggle={v => setTravel(prev => prev === v ? "" : v)}
+          single={true}
+        />
+      </div>
+    </div>,
+
+    // 14 — Fragrance
+    <div key="fragrance" style={slideStyle}>
+      <p style={obEyebrow}>Your preferences</p>
+      <h2 style={obHeading}>Are you sensitive to fragrance?</h2>
+      <p style={obSub}>Cygne will flag fragranced products if you prefer to avoid them.</p>
+      <div style={{ marginTop: 32 }}>
+        <PillSelect
+          options={["Yes — I avoid it", "Sometimes", "No"]}
+          selected={fragrance}
+          onToggle={v => setFragrance(prev => prev === v ? "" : v)}
+          single={true}
+        />
+      </div>
+    </div>,
+
+    // 15 — Ingredients to avoid
+    <div key="avoidings" style={slideStyle}>
+      <p style={obEyebrow}>Your preferences</p>
+      <h2 style={obHeading}>Do you avoid any ingredients?</h2>
+      <p style={obSub}>Cygne will surface a warning when these appear on a product label.</p>
+      <div style={{ marginTop: 32 }}>
+        <input
+          style={{ ...inputSt, fontSize: 14 }}
+          value={ingredientsToAvoid}
+          onChange={e => setIngredientsToAvoid(e.target.value)}
+          placeholder="e.g. retinol, essential oils, alcohol..."
+        />
+      </div>
+    </div>,
+
+    // 16 — All set
     <div key="done" style={{ ...slideStyle, position: "fixed", inset: 0, background: "var(--color-ivory)", display: "flex", flexDirection: "column", justifyContent: "space-between", overflow: "hidden" }}>
 
       {/* Top — logo + welcome, matching splash layout */}
@@ -285,7 +441,16 @@ function OnboardingScreen({ onComplete, setLocationData }) {
     true,                          // 4 — actives — optional
     true,                          // 5 — location — optional
     true,                          // 6 — reset day (has a default)
-    true,                          // 7 — all set
+    true,                          // 7 — skin goals — optional
+    true,                          // 8 — special occasion — optional
+    true,                          // 9 — consistency — optional
+    true,                          // 10 — routine philosophy — optional
+    true,                          // 11 — climate — optional
+    true,                          // 12 — environment — optional
+    true,                          // 13 — travel — optional
+    true,                          // 14 — fragrance — optional
+    true,                          // 15 — ingredients to avoid — optional
+    true,                          // 16 — all set
   ];
 
   return (
@@ -317,7 +482,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
         {steps[step]}
       </div>
 
-      {/* Next button — not shown on location (step 5) or all-set (step 7) */}
+      {/* Steps 0–4: Continue with canAdvance check + optional Skip */}
       {step >= 0 && step < 5 && (
         <div style={{ position: "sticky", bottom: 0, background: "#f5f2ee", padding: "16px 24px 32px", marginTop: "auto" }}>
           <button onClick={() => canAdvance[step] && advance(1)}
@@ -329,6 +494,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
           ) : null}
         </div>
       )}
+      {/* Step 5 (location): inline continue rendered inside step; show extra Continue below */}
       {step === 5 && (
         <div style={{ maxWidth: 420, width: "100%", margin: "24px auto 0" }}>
           <button onClick={() => advance(1)}
@@ -337,7 +503,8 @@ function OnboardingScreen({ onComplete, setLocationData }) {
           </button>
         </div>
       )}
-      {step === 6 && (
+      {/* Steps 6–15: sticky Continue (reset day + all new profile screens) */}
+      {step >= 6 && step < TOTAL_STEPS - 1 && (
         <div style={{ position: "sticky", bottom: 0, background: "#f5f2ee", padding: "16px 24px 32px", marginTop: "auto" }}>
           <button onClick={() => advance(1)}
             style={{ width: "100%", padding: "14px 0", background: "#2d3d2b", color: "#fdfcf9", border: "none", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}>
