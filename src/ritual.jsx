@@ -238,8 +238,11 @@ function getStepReason(step) {
 }
 
 const DAMP_SKIN_CATEGORIES = new Set(["Toner", "Essence", "Mist", "Mask"]);
+const DAMP_SKIN_KEYWORDS = ["hyaluronic", "hyaluronate", "toner", "essence", "lotion", "mist", "sheet mask", "serum"];
 function needsDampSkin(step) {
   if (DAMP_SKIN_CATEGORIES.has(step.category)) return true;
+  const haystack = `${step.name || ""} ${step.category || ""}`.toLowerCase();
+  if (DAMP_SKIN_KEYWORDS.some(kw => haystack.includes(kw))) return true;
   const ings = (step.ingredients || []).map(i => i.toLowerCase());
   return ings.some(i => i.includes("hyaluronic") || i.includes("hyaluronate"));
 }

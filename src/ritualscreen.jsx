@@ -317,18 +317,17 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
   const conflicts = detectConflicts(products);
   const { flags, activeMap } = analyzeShelf(products);
   const [recTab, setRecTab] = useState("additions");
-  const today = new Date().toISOString().split("T")[0];
-  const LS_KEY = "cygne_ritual_completed";
+  const now = new Date();
+  const today = now.toISOString().split("T")[0];
+  const period = now.getHours() < 12 ? "AM" : "PM";
+  const sessionKey = `ritual_complete_${today}_${period}`;
 
-  // Completion state lives in localStorage, gated strictly by today's date.
-  // If the stored date is not today, the array is discarded and steps start fresh.
-  // Steps ONLY enter this array when the user explicitly taps them.
+  // AM and PM completions live under separate localStorage keys.
+  // AM key resets at midnight (date changes); PM key resets at noon (period changes).
   const [completedSteps, setCompletedSteps] = useState(() => {
     try {
-      const raw = localStorage.getItem(LS_KEY);
-      if (!raw) return [];
-      const parsed = JSON.parse(raw);
-      return parsed.date === today ? (parsed.steps || []) : [];
+      const raw = localStorage.getItem(sessionKey);
+      return raw ? JSON.parse(raw) : [];
     } catch { return []; }
   });
 
@@ -336,22 +335,17 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
   const [showRitualCheckIn, setShowRitualCheckIn] = useState(false);
   const todayCheckedIn = checkIns.some(c => c.date === today);
 
-  // Step keys are session-scoped: "am_<id>" / "pm_<id>" so AM and PM never overlap.
-  const stepKey = (id) => `${session}_${id}`;
-  const isStepChecked = (id) => completedSteps.includes(stepKey(id));
+  const isStepChecked = (id) => completedSteps.includes(id);
 
   const toggleStep = (id) => {
-    const key = stepKey(id);
-    const updated = completedSteps.includes(key)
-      ? completedSteps.filter(x => x !== key)
-      : [...completedSteps, key];
+    const updated = completedSteps.includes(id)
+      ? completedSteps.filter(x => x !== id)
+      : [...completedSteps, id];
     setCompletedSteps(updated);
     try {
-      localStorage.setItem(LS_KEY, JSON.stringify({ date: today, steps: updated }));
+      localStorage.setItem(sessionKey, JSON.stringify(updated));
     } catch {}
-    // Keep Supabase in sync so progress survives a device switch on the same day.
-    const newState = { date: today, steps: updated };
-    if (setCompletedStepsProp) setCompletedStepsProp(newState);
+    if (setCompletedStepsProp) setCompletedStepsProp({ date: today, period, steps: updated });
   };
 
   const { mode: ritualMode, key: ritualKey, cyclePhase } = getRitualMode(products, [], user, cycleDay, isFlightMode);
