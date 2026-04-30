@@ -9,6 +9,7 @@ import { CheckInModal } from "./progress.jsx";
 import { getCyclePhase, getActivePauseState } from "./progress.jsx";
 import { getNextUseLabel } from "./constants.js";
 import { getSeason } from "./seasonal.jsx";
+import { getRitualPeriod, getRitualTimeLabel } from "./utils/ritualPeriod.js";
 
 const RITUAL_MODES = {
   travel: {
@@ -319,7 +320,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
   const [recTab, setRecTab] = useState("additions");
   const now = new Date();
   const today = now.toISOString().split("T")[0];
-  const period = now.getHours() < 12 ? "AM" : "PM";
+  const period = getRitualPeriod();
   const sessionKey = `ritual_complete_${today}_${period}`;
 
   // AM and PM completions live under separate localStorage keys.
@@ -417,7 +418,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
           </button>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
             <span style={{ color: "var(--clay)", opacity: 0.6 }}><Icon name={sessionIcon} size={13} /></span>
-            <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)" }}>tonight</span>
+            <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)" }}>{getRitualTimeLabel().toLowerCase()}</span>
             {cyclePhase && (
               <span style={{ marginLeft: "auto", fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: ritualMode.color, opacity: 0.8 }}>{cyclePhase} phase</span>
             )}
@@ -427,7 +428,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
           <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: 0, lineHeight: 1.65 }}>{ritualMode.guidance}</p>
           {filteredOut.length > 0 && (
             <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${ritualMode.border}` }}>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: ritualMode.color, margin: "0 0 6px", letterSpacing: "0.06em", opacity: 0.85 }}>Paused tonight</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: ritualMode.color, margin: "0 0 6px", letterSpacing: "0.06em", opacity: 0.85 }}>{"Paused " + getRitualTimeLabel().toLowerCase()}</p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                 {filteredOut.map(p => (
                   <span key={p.id} style={{ padding: "3px 10px", borderRadius: 20, background: "var(--ink)", border: "1px solid var(--border)", fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)" }}>{p.name}</span>

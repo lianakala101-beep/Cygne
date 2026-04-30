@@ -1,9 +1,11 @@
 import { ACTIVE_RULES, ACTIVE_SESSION, CONFLICT_RULES, LAYER_ORDER, layerIndex, isScheduledToday, getNextUseLabel } from "./constants.js";
+import { getRitualPeriod } from "./utils/ritualPeriod.js";
 
 // --- TIME-OF-DAY --------------------------------------------------------------
+// Single source of truth: delegates to getRitualPeriod() so the session
+// boundary (AM = 5:00–11:59, PM = 12:00+) is consistent everywhere.
 function getCurrentSession() {
-  const hour = new Date().getHours(); // local time
-  return hour >= 5 && hour < 18 ? "am" : "pm";
+  return getRitualPeriod() === "AM" ? "am" : "pm";
 }
 
 // --- ENGINE -------------------------------------------------------------------
