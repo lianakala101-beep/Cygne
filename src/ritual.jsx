@@ -415,7 +415,7 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
       <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-inky-moss)", margin: "0 0 8px" }}>
         Swan Song
       </p>
-      <p style={{ fontFamily: "var(--font-signature)", fontSize: 23, letterSpacing: "0.03em", color: "var(--color-inky-moss)", margin: "0 0 16px", lineHeight: 1.45 }}>
+      <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontStyle: "italic", fontSize: 14, letterSpacing: "0.03em", color: "var(--color-inky-moss)", opacity: 0.85, margin: "0 0 16px", lineHeight: 1.6 }}>
         {line}
       </p>
       <div style={{ height: 1, background: "rgba(192,192,192,0.3)", margin: "16px 0" }} />

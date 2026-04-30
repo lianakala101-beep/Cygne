@@ -252,7 +252,7 @@ export function AskCygneOverlay({ user, onClose }) {
               alt="Cygne"
               style={{ width: 100, display: "block", margin: "0 auto 24px", animation: "askCygnePulse 1.5s ease-in-out infinite" }}
             />
-            <p style={{ fontFamily: "var(--font-signature)", fontSize: 16, color: "var(--color-pebble)", margin: 0, letterSpacing: "0.03em" }}>
+            <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontStyle: "italic", fontSize: 16, color: "var(--color-pebble)", margin: 0, letterSpacing: "0.03em" }}>
               reading your ritual...
             </p>
           </div>
@@ -272,7 +272,7 @@ export function AskCygneOverlay({ user, onClose }) {
         {/* LIMIT */}
         {phase === "limit" && (
           <div style={{ textAlign: "center" }}>
-            <p style={{ fontFamily: "var(--font-signature)", fontSize: 20, color: "var(--color-inky-moss)", margin: "0 0 32px", letterSpacing: "0.02em" }}>
+            <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontStyle: "italic", fontSize: 20, color: "var(--color-inky-moss)", margin: "0 0 32px", letterSpacing: "0.02em" }}>
               return tomorrow for fresh insight
             </p>
             {ctaButton("Close", onClose, true)}

@@ -727,7 +727,9 @@ export default function App() {
                 display: "flex", alignItems: "center", justifyContent: "center",
               }}>
                 <span style={{
-                  fontFamily: "var(--font-signature)",
+                  fontFamily: "var(--font-display)",
+                  fontWeight: 400,
+                  fontStyle: "italic",
                   fontSize: 22,
                   color: "var(--sage)",
                   lineHeight: 1,

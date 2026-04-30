@@ -49,7 +49,7 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
             ? <img src={product.imageUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
             : (
               <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6 }}>
-                <span style={{ fontFamily: "var(--font-signature, 'Hellasta Signature', cursive)", fontSize: 36, color: "rgba(160,160,160,0.45)", lineHeight: 1 }}>
+                <span style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontStyle: "italic", fontSize: 36, color: "rgba(160,160,160,0.45)", lineHeight: 1 }}>
                   {product.brand?.[0]?.toUpperCase() || "·"}
                 </span>
                 <span style={{ fontFamily: "var(--font-display, 'Fungis', sans-serif)", fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(160,160,160,0.55)" }}>

@@ -554,7 +554,7 @@ function ProfileSheet({ user, products, locationData, setLocationData, locationD
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: editingAccount ? 16 : 0 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 <div style={{ width: 44, height: 44, borderRadius: "50%", flexShrink: 0, background: "rgba(45,61,43,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <span style={{ fontFamily: "var(--font-signature)", fontSize: 28, color: "var(--sage)", lineHeight: 1 }}>
+                  <span style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontStyle: "italic", fontSize: 28, color: "var(--sage)", lineHeight: 1 }}>
                     {(accountDraft.name || user?.name || "?").trim()[0].toUpperCase()}
                   </span>
                 </div>
