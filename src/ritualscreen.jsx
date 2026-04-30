@@ -291,10 +291,11 @@ function RitualProgressTracker({ completed, total }) {
       }}>
         <span style={{
           display: "inline-block",
-          color: "var(--color-ivory)",
+          color: "var(--color-inky-moss)",
+          opacity: 0.35,
           animation: "etherealGlide 3s ease-in-out infinite",
         }}>
-          <SwanIcon size={20} />
+          <SwanIcon size={20} outlineOnly />
         </span>
       </div>
     </div>

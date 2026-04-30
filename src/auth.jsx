@@ -5,6 +5,7 @@ function AuthScreen({ onAuth }) {
   const [mode, setMode] = useState("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -35,7 +36,10 @@ function AuthScreen({ onAuth }) {
           onAuth(data.session, data.user, true);
         }
       } else {
-        const { data, error: err } = await supabase.auth.signInWithPassword({ email, password });
+        const { data, error: err } = await supabase.auth.signInWithPassword({
+          email, password,
+          options: { persistSession: rememberMe },
+        });
         if (err) {
           setError(err.message || JSON.stringify(err));
           setLoading(false);
@@ -108,6 +112,31 @@ function AuthScreen({ onAuth }) {
           style={inputStyle}
         />
       </div>
+
+      {/* Remember Me — login mode only */}
+      {mode === "login" && (
+        <div
+          onClick={() => setRememberMe(r => !r)}
+          style={{ display: "flex", alignItems: "center", gap: 9, width: "100%", maxWidth: 320, marginBottom: 16, cursor: "pointer", userSelect: "none" }}>
+          <div style={{
+            width: 14, height: 14, flexShrink: 0,
+            border: "1px solid rgba(45,61,43,0.4)",
+            borderRadius: 2,
+            background: rememberMe ? "var(--color-inky-moss)" : "transparent",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            transition: "background 0.15s",
+          }}>
+            {rememberMe && (
+              <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
+                <path d="M1 3.5L3.5 6L8 1" stroke="white" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            )}
+          </div>
+          <span style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 10, letterSpacing: "0.15em", color: "var(--color-stone)" }}>
+            REMEMBER ME
+          </span>
+        </div>
+      )}
 
       {error && (
         <p style={{
