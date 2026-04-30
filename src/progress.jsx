@@ -680,24 +680,66 @@ function getActivePauseState(treatments = [], products = []) {
   return { pausedActives, reintroActives, treatment, phase };
 }
 
+// Expanded pause rules applied during Acute recovery phases.
+// Returns a short reason tag, or null if the product is safe.
+const ACUTE_PAUSE_RULES = [
+  { keywords: ["retinol", "retinoid", "tretinoin"],                                     reason: "active"     },
+  { keywords: ["glycolic acid", "salicylic acid", "lactic acid", "mandelic acid",
+               "ascorbic acid", "alpha hydroxy", "beta hydroxy", " aha ", " bha "],     reason: "acid"       },
+  { keywords: ["benzoyl peroxide"],                                                      reason: "active"     },
+  { keywords: ["exfoliant", "exfoliating", "exfoliate", "scrub"],                       reason: "exfoliant"  },
+  { keywords: ["toning pad", "toner pad", "peel pad"],                                  reason: "exfoliant"  },
+];
+function getAcutePauseReason(product) {
+  if (!product) return null;
+  const haystack = [
+    product.name     || "",
+    product.category || "",
+    ...(Array.isArray(product.ingredients)
+          ? product.ingredients
+          : typeof product.ingredients === "string"
+            ? product.ingredients.split(",")
+            : []),
+  ].join(" ").toLowerCase();
+
+  for (const { keywords, reason } of ACUTE_PAUSE_RULES) {
+    if (keywords.some(kw => haystack.includes(kw))) return reason;
+  }
+  // "peel" in name or category (but not "peel off" instructional text)
+  if (/\bpeel\b/.test(haystack) && !haystack.includes("peel off")) return "exfoliant";
+  return null;
+}
+
 function buildTreatmentRoutineAdvice(phase, products, activeMap) {
-  const hasRetinol = !!activeMap["retinol"]?.length;
-  const hasAHA = !!activeMap["AHA"]?.length;
-  const hasBHA = !!activeMap["BHA"]?.length;
-  const hasVitC = !!activeMap["vitamin C"]?.length;
   const hasSPF = hasSPFCoverage(products, activeMap);
+  const isAcutePhase = /acute/i.test(phase.label);
 
+  // paused: { name, reason } — actual product names shown in the UI
   const paused = [];
-  const cleared = [];
+  const cleared = []; // strings
 
-  const isCleared = (name) => phase.resume.some(r => r.toLowerCase().includes(name.toLowerCase()) || r === "Full Ritual");
+  const isCleared = (name) => (phase.resume || []).some(r =>
+    r.toLowerCase().includes(name.toLowerCase()) || r === "Full Ritual"
+  );
 
-  if (hasRetinol) { isCleared("Retinol") ? cleared.push("Retinol") : paused.push("Retinol"); }
-  if (hasAHA)     { isCleared("AHA") ? cleared.push("AHA") : paused.push("AHA Exfoliant"); }
-  if (hasBHA)     { isCleared("BHA") ? cleared.push("BHA") : paused.push("BHA Exfoliant"); }
-  if (hasVitC)    { isCleared("Vitamin C") ? cleared.push("Vitamin C") : paused.push("Vitamin C"); }
-  if (hasSPF)     { cleared.push("SPF — mandatory"); }
+  if (isAcutePhase) {
+    // Scan actual vanity products for all ingredients / categories to pause
+    products.forEach(p => {
+      const reason = getAcutePauseReason(p);
+      if (reason) paused.push({ name: p.name, reason });
+    });
+  } else {
+    const hasRetinol = !!activeMap["retinol"]?.length;
+    const hasAHA    = !!activeMap["AHA"]?.length;
+    const hasBHA    = !!activeMap["BHA"]?.length;
+    const hasVitC   = !!activeMap["vitamin C"]?.length;
+    if (hasRetinol) { isCleared("Retinol")    ? cleared.push("Retinol")       : paused.push({ name: "Retinol",       reason: "active" }); }
+    if (hasAHA)     { isCleared("AHA")        ? cleared.push("AHA Exfoliant") : paused.push({ name: "AHA Exfoliant", reason: "acid"   }); }
+    if (hasBHA)     { isCleared("BHA")        ? cleared.push("BHA Exfoliant") : paused.push({ name: "BHA Exfoliant", reason: "acid"   }); }
+    if (hasVitC)    { isCleared("Vitamin C")  ? cleared.push("Vitamin C")     : paused.push({ name: "Vitamin C",     reason: "active" }); }
+  }
 
+  if (hasSPF) cleared.push("SPF — mandatory");
   return { paused, cleared };
 }
 
@@ -814,7 +856,10 @@ function TreatmentRecoveryCard({ treatment, products, activeMap, onDismiss, onRe
             <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "#8b7355", margin: "0 0 6px" }}>Paused from your vanity</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
               {paused.map((p, i) => (
-                <span key={i} style={{ fontSize: 9, fontFamily: "var(--font-body)", color: "#8b7355", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.22)", padding: "3px 10px", borderRadius: 20, letterSpacing: "0.06em" }}>{p}</span>
+                <span key={i} style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 9, fontFamily: "var(--font-body)", color: "#8b7355", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.22)", padding: "3px 10px", borderRadius: 20, letterSpacing: "0.06em" }}>
+                  {p.name}
+                  <span style={{ fontSize: 9, letterSpacing: "0.1em", color: "var(--color-pebble)", opacity: 0.65 }}>{p.reason}</span>
+                </span>
               ))}
             </div>
           </div>
@@ -1808,42 +1853,50 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
         <WeekAtAGlance checkIns={checkIns} journals={journals} products={products} pausedActives={pausedActives} />
       </div>
 
-      {/* -- Introduce Slowly (always visible; empty state when no ramp) -------- */}
+      {/* -- Introduce Slowly (hidden during Acute recovery; empty state otherwise) */}
       <div style={{ marginBottom: 28 }}>
-        {sectionLabel("leaf", "Introduce Slowly")}
-        {reintroActives.length > 0 && pauseTreatment && pausePhase && (
-          <div style={{ background: "rgba(45,61,43,0.08)", border: "1px solid rgba(45,61,43,0.25)", borderRadius: 12, padding: "12px 14px", marginBottom: 12 }}>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--sage)", margin: "0 0 4px" }}>Reintroducing after recovery</p>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>
-              You're in the {pausePhase.label.toLowerCase()} phase. {reintroActives.join(", ")} can return — but build slowly from week 1 to avoid overwhelming skin that's still settling.
-            </p>
-          </div>
-        )}
-        {rampProducts.length > 0 ? (
-          rampProducts.map(p => {
-            const activeKey = p.category === "Toning Pad"
-              ? "toning pad"
-              : RAMP_ACTIVES.find(a => detectActives(p.ingredients || [])[a]);
-            const schedule = RAMP_SCHEDULES[activeKey];
-            if (!schedule) return null;
-            return (
-              <IntroduceSlowlyCard
-                key={p.id}
-                product={p}
-                schedule={schedule}
-                weekNumber={getRampWeek(p)}
-                onAdvance={onAdvanceRamp}
-                onHold={onHoldRamp}
-                onResetStart={onResetRampStart}
-              />
-            );
-          })
+        {/acute/i.test(pausePhase?.label) ? (
+          <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontStyle: "italic", fontSize: 11, letterSpacing: "0.15em", color: "var(--color-pebble)", textAlign: "center", margin: "16px 0" }}>
+            Introduce Slowly is paused while you recover.
+          </p>
         ) : (
-          <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: "18px 18px 16px" }}>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: 0, lineHeight: 1.6, opacity: 0.75 }}>
-              No actives in ramp-up right now.
-            </p>
-          </div>
+          <>
+            {sectionLabel("leaf", "Introduce Slowly")}
+            {reintroActives.length > 0 && pauseTreatment && pausePhase && (
+              <div style={{ background: "rgba(45,61,43,0.08)", border: "1px solid rgba(45,61,43,0.25)", borderRadius: 12, padding: "12px 14px", marginBottom: 12 }}>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--sage)", margin: "0 0 4px" }}>Reintroducing after recovery</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>
+                  You're in the {pausePhase.label.toLowerCase()} phase. {reintroActives.join(", ")} can return — but build slowly from week 1 to avoid overwhelming skin that's still settling.
+                </p>
+              </div>
+            )}
+            {rampProducts.length > 0 ? (
+              rampProducts.map(p => {
+                const activeKey = p.category === "Toning Pad"
+                  ? "toning pad"
+                  : RAMP_ACTIVES.find(a => detectActives(p.ingredients || [])[a]);
+                const schedule = RAMP_SCHEDULES[activeKey];
+                if (!schedule) return null;
+                return (
+                  <IntroduceSlowlyCard
+                    key={p.id}
+                    product={p}
+                    schedule={schedule}
+                    weekNumber={getRampWeek(p)}
+                    onAdvance={onAdvanceRamp}
+                    onHold={onHoldRamp}
+                    onResetStart={onResetRampStart}
+                  />
+                );
+              })
+            ) : (
+              <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: "18px 18px 16px" }}>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: 0, lineHeight: 1.6, opacity: 0.75 }}>
+                  No actives in ramp-up right now.
+                </p>
+              </div>
+            )}
+          </>
         )}
       </div>
 
