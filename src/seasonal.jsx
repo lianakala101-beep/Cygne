@@ -136,20 +136,17 @@ function SeasonalNudgeCard({ products, activeMap }) {
       marginBottom: 20,
     }}>
       <div style={{
-        background: cfg.bg,
-        border: `1px solid ${cfg.border}`,
-        borderRadius: 16,
-        padding: "18px 20px 16px",
+        background: "radial-gradient(circle at 85% 15%, rgba(45,61,43,0.06) 0%, rgba(45,61,43,0.02) 35%, transparent 65%), var(--color-ivory-shadow)",
+        border: "1px solid rgba(192,192,192,0.25)",
+        borderRadius: 12,
+        boxShadow: "0 4px 24px rgba(0,0,0,0.05)",
+        padding: 20,
         position: "relative",
         overflow: "hidden",
       }}>
-        {/* Subtle season glyph watermark */}
-        <div style={{ position: "absolute", top: 8, right: 14, opacity: 0.08, color: cfg.accent, userSelect: "none", pointerEvents: "none", display: "inline-flex" }}><Icon name={cfg.iconName} size={72} /></div>
-
         {/* Header */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-          <span style={{ color: cfg.accent, opacity: 0.8, display: "inline-flex" }}><Icon name={cfg.iconName} size={11} /></span>
-          <span style={{ fontFamily: "var(--sans)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: cfg.accent }}>{cfg.label}</span>
+        <div style={{ display: "flex", alignItems: "center", marginBottom: 10 }}>
+          <span style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 11, letterSpacing: "4px", textTransform: "uppercase", color: "var(--color-inky-moss)" }}>{cfg.label}</span>
           <div style={{ flex: 1 }} />
           <button onClick={handleDismiss} style={{ background: "none", border: "none", color: "var(--clay)", opacity: 0.35, cursor: "pointer", padding: "2px 4px", transition: "opacity 0.2s", display: "inline-flex" }}
             onMouseEnter={e => e.currentTarget.style.opacity = "0.7"}
@@ -163,7 +160,7 @@ function SeasonalNudgeCard({ products, activeMap }) {
         <p style={{ fontFamily: "var(--sans)", fontSize: 11, color: "var(--clay)", margin: "0 0 12px", lineHeight: 1.65 }}>{cfg.body}</p>
 
         {/* Shelf-specific nudge */}
-        <div style={{ padding: "11px 14px", background: "rgba(0,0,0,0.12)", borderRadius: 10, borderLeft: "2px solid " + cfg.accent }}>
+        <div style={{ padding: "11px 14px", background: "rgba(0,0,0,0.12)", borderRadius: 4, borderLeft: "2px solid " + cfg.accent }}>
           <p style={{ fontFamily: "var(--sans)", fontSize: 11, color: "var(--parchment)", margin: 0, lineHeight: 1.65 }}>{nudge}</p>
         </div>
       </div>
