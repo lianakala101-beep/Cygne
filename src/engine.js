@@ -107,9 +107,45 @@ function buildRoutine(products, { pausedActives = [] } = {}) {
   return { am: sort(am, "am"), pm: sort(pm, "pm"), periodic };
 }
 
+// Derive session from category, name, and active ingredients when the stored
+// session value is absent or ambiguous. Uses ACTIVE_SESSION from constants
+// (retinol→pm, AHA→pm, BHA→pm, vitamin C→am, SPF→am) plus category rules.
+function inferSessionFromProduct(p) {
+  const cat  = (p.category || "").toLowerCase().trim();
+  const name = (p.name     || "").toLowerCase();
+
+  // Category beats everything — these are unambiguous
+  if (cat === "spf" || cat === "spf moisturizer") return "am";
+  if (cat === "sleeping mask" || cat === "night cream") return "pm";
+  // Facial oils sit at the end of a PM routine; if used AM they should be
+  // explicitly set to "am" or "both" by the user.
+  if (cat === "facial oil" || cat === "oil") return "pm";
+  // Prescription treatments (tretinoin etc.) are PM by default
+  if (cat === "prescription") return "pm";
+
+  // Name signals — "night / nightly / overnight / sleeping" → PM
+  if (/night(?:ly)?|overnight|sleeping/.test(name)) return "pm";
+  if (/\bmorning\b/.test(name)) return "am";
+
+  // Active ingredient session mapping (ACTIVE_SESSION already imported)
+  const actives = detectActives(p.ingredients || []);
+  const sessions = Object.entries(ACTIVE_SESSION)
+    .filter(([active]) => actives[active])
+    .map(([, sess]) => sess);
+  const toAm = sessions.includes("am");
+  const toPm = sessions.includes("pm");
+  if (toAm && !toPm) return "am";
+  if (toPm && !toAm) return "pm";
+  // Mixed actives (e.g. niacinamide + retinol in one product) — keep "both"
+  // so no step is accidentally hidden; user should set explicit session.
+  return "both";
+}
+
 // Normalize whatever the product record uses for its routine schedule into
 // one of "am" | "pm" | "both". Handles every storage shape we've seen so a
 // PM-only product never leaks into the AM list because of casing or shape.
+// When the stored value is "both" / null / unset, inferSessionFromProduct()
+// is consulted so category and ingredient rules fill the gap.
 function resolveSession(p) {
   if (!p) return "both";
 
@@ -123,7 +159,7 @@ function resolveSession(p) {
     const m = pmFlag === true;
     if (a && !m) return "am";
     if (m && !a) return "pm";
-    return "both";
+    // Both true (or both false) → fall through to heuristics
   }
 
   // 2. Array form on either field.
@@ -136,19 +172,24 @@ function resolveSession(p) {
     const hasPm = tokens.some(s => s.includes("pm"));
     if (hasPm && !hasAm) return "pm";
     if (hasAm && !hasPm) return "am";
-    return "both";
+    // Both present → fall through to heuristics
   }
 
-  // 3. String form, case-insensitive, trimmed.
+  // 3. Scalar string — only act on explicit single-direction values.
   const raw = p.session ?? p.schedule;
-  if (raw == null) return "both";
-  const s = String(raw).toLowerCase().trim().replace(/\./g, "");
-  if (!s || s === "auto") return "both";
-  const hasAm = /\bam\b/.test(s) || s.startsWith("am");
-  const hasPm = /\bpm\b/.test(s) || s.startsWith("pm");
-  if (hasPm && !hasAm) return "pm";
-  if (hasAm && !hasPm) return "am";
-  return "both";
+  if (raw != null) {
+    const s = String(raw).toLowerCase().trim().replace(/\./g, "");
+    // "both", "am + pm", "auto", empty string → fall through to heuristics
+    if (s && s !== "both" && s !== "auto") {
+      const hasAm = /\bam\b/.test(s) || s.startsWith("am");
+      const hasPm = /\bpm\b/.test(s) || s.startsWith("pm");
+      if (hasPm && !hasAm) return "pm";
+      if (hasAm && !hasPm) return "am";
+    }
+  }
+
+  // 4. Heuristic fallback — infer from category, name, and active ingredients.
+  return inferSessionFromProduct(p);
 }
 
 function detectConflicts(products) {
