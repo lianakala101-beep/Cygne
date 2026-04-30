@@ -159,7 +159,7 @@ YOUR RULES:
 - Tone: editorial, never clinical or chatbot-like
 - Never use bullet points — write in flowing prose only`;
 
-    // ── F. CALL CLAUDE ────────────────────────────────────────────────────────
+    // ── F. CALL CLAUDE (streaming to avoid idle-timeout on the TCP connection) ──
     console.log("[ask-cygne] calling Claude for user", userId, "session", sessionId);
     const claudeRes = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -171,6 +171,7 @@ YOUR RULES:
       body: JSON.stringify({
         model: "claude-sonnet-4-6",
         max_tokens: 300,
+        stream: true,
         system: systemPrompt,
         messages: [{ role: "user", content: q }],
       }),
@@ -182,8 +183,27 @@ YOUR RULES:
       return json({ error: "AI request failed" }, 502);
     }
 
-    const claudeData = await claudeRes.json();
-    const responseText: string = claudeData.content?.[0]?.text ?? "";
+    // Read the SSE stream and collect all text_delta chunks into a single string.
+    let responseText = "";
+    const reader = claudeRes.body!.getReader();
+    const decoder = new TextDecoder();
+    outer: while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value, { stream: true });
+      for (const line of chunk.split("\n")) {
+        if (!line.startsWith("data: ")) continue;
+        const payload = line.slice(6).trim();
+        if (payload === "[DONE]") break outer;
+        try {
+          const evt = JSON.parse(payload);
+          if (evt.type === "content_block_delta" && evt.delta?.type === "text_delta") {
+            responseText += evt.delta.text;
+          }
+        } catch { /* ignore malformed lines */ }
+      }
+    }
+
     if (!responseText) return json({ error: "Empty response from AI" }, 502);
 
     // ── G. SAVE CACHE + USAGE ─────────────────────────────────────────────────
