@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import { LOGO_SRC } from "./components.jsx";
 import { supabase } from "./supabase.js";
 
 const MAX_DAILY = 3;
@@ -176,9 +175,9 @@ export function AskCygneOverlay({ user, onClose }) {
       {/* ── Header ── */}
       <div style={{ textAlign: "center", marginBottom: 48 }}>
         <img
-          src={LOGO_SRC}
+          src="/cygne-logo.png"
           alt="Cygne"
-          style={{ width: 120, display: "block", margin: "0 auto 24px" }}
+          style={{ width: "140px", display: "block", margin: "0 auto 24px", background: "transparent", border: "none" }}
         />
         <p style={{
           fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 10,
@@ -248,9 +247,9 @@ export function AskCygneOverlay({ user, onClose }) {
         {phase === "loading" && (
           <div style={{ textAlign: "center" }}>
             <img
-              src={LOGO_SRC}
+              src="/cygne-logo.png"
               alt="Cygne"
-              style={{ width: 100, display: "block", margin: "0 auto 24px", animation: "askCygnePulse 1.5s ease-in-out infinite" }}
+              style={{ width: "140px", display: "block", margin: "0 auto 24px", background: "transparent", border: "none", animation: "askCygnePulse 1.5s ease-in-out infinite" }}
             />
             <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontStyle: "italic", fontSize: 16, color: "var(--color-pebble)", margin: 0, letterSpacing: "0.03em" }}>
               reading your ritual...
