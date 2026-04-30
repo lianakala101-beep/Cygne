@@ -589,56 +589,16 @@ function GalleryEntry({ entry, onExpand, caption }) {
 // PLACEHOLDER ENTRY — shown for weeks without a captured reflection
 // ---------------------------------------------------------------------------
 
-function PlaceholderEntry({ weekNum, date, onCapture }) {
-  const ref = useRef(null);
-  const [revealed, setRevealed] = useState(false);
-  useEffect(() => {
-    const node = ref.current;
-    if (!node) return;
-    if (typeof IntersectionObserver === "undefined") { setRevealed(true); return; }
-    const io = new IntersectionObserver((entries) => {
-      for (const e of entries) {
-        if (e.isIntersecting) { setRevealed(true); io.disconnect(); break; }
-      }
-    }, { threshold: 0.15, rootMargin: "0px 0px -8% 0px" });
-    io.observe(node);
-    return () => io.disconnect();
-  }, []);
-
-  const dateLabel = date.toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" });
-
+function MissedWeekLabel({ weekNum }) {
   return (
-    <button onClick={onCapture} ref={ref}
-      style={{
-        display: "block", width: "100%", margin: "0 auto 48px",
-        background: "none", border: "none", padding: 0, cursor: "pointer",
-        textAlign: "center", color: TEXT,
-        opacity: revealed ? 1 : 0,
-        transform: revealed ? "translateY(0)" : "translateY(16px)",
-        transition: "opacity 500ms ease-out, transform 500ms ease-out",
-        willChange: "opacity, transform",
-      }}>
-      <p style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: "0 0 4px" }}>
-        Week {weekNum}
-      </p>
-      <p style={{ fontFamily: SANS, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: TEXT_SOFT, margin: "0 0 18px", opacity: 0.7 }}>
-        {dateLabel}
-      </p>
-      <div style={{
-        width: "100%", maxWidth: 520, margin: "0 auto",
-        aspectRatio: "1560 / 680",
-        background: "var(--color-ivory-shadow)",
-        borderTop: `1px solid ${BORDER}`,
-        borderBottom: `1px solid ${BORDER}`,
-        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-        gap: 10,
-      }}>
-        <span style={{ fontSize: 28, lineHeight: 1, color: "var(--color-pebble)", opacity: 0.5 }}>+</span>
-        <p style={{ fontFamily: "var(--font-signature)", fontSize: 13, color: "var(--color-pebble)", margin: 0, letterSpacing: "0.02em" }}>
-          {dateLabel}
-        </p>
-      </div>
-    </button>
+    <div style={{
+      textAlign: "center", margin: "8px 0",
+      fontFamily: "var(--font-display)", fontWeight: 400,
+      fontSize: 9, letterSpacing: "0.2em",
+      color: "var(--color-pebble)", opacity: 0.5,
+    }}>
+      · week {weekNum} ·
+    </div>
   );
 }
 
@@ -843,23 +803,28 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
       {/* Gallery */}
       {galleryItems.length > 0 && (
         <div style={{ maxWidth: 560, margin: "0 auto" }}>
-          {galleryItems.map((item, idx) =>
-            item.type === "entry" ? (
-              <GalleryEntry
-                key={item.data.id}
-                entry={decorate(item.data)}
-                onExpand={() => setExpandedId(item.data.id)}
-                caption={idx === 0 ? "The week is behind you." : null}
-              />
-            ) : (
-              <PlaceholderEntry
-                key={`placeholder-${item.year}-W${item.weekNum}`}
+          {galleryItems.map((item, idx) => {
+            if (item.type === "entry") {
+              return (
+                <GalleryEntry
+                  key={item.data.id}
+                  entry={decorate(item.data)}
+                  onExpand={() => setExpandedId(item.data.id)}
+                  caption={idx === 0 ? "The week is behind you." : null}
+                />
+              );
+            }
+            // Current week with no photo — the "Capture this week" button above is the prompt
+            const isCurrentWeek = item.weekNum === currentWeek && item.year === isoWeekYear(now);
+            if (isCurrentWeek) return null;
+            // Past week with no photo — minimal muted label only
+            return (
+              <MissedWeekLabel
+                key={`missed-${item.year}-W${item.weekNum}`}
                 weekNum={item.weekNum}
-                date={item.date}
-                onCapture={() => setCapturing(true)}
               />
-            )
-          )}
+            );
+          })}
         </div>
       )}
 
