@@ -195,7 +195,7 @@ function getSwanGuidingLine(products, checkIns = [], user = {}, cycleDay = null,
   if (ritualKey === "travel")        return "Essentials only tonight. Your skin travels better light.";
   if (ritualKey === "recovery")      return "Step back tonight. Calm, cleanse, seal — let the barrier recover.";
   if (ritualKey === "barrier_repair") return "Rebuild before you push. Your barrier comes first.";
-  if (ritualKey === "menstrual")     return "Gentler than usual tonight. Your skin is more reactive right now.";
+  if (ritualKey === "menstrual")     return "Your skin is asking for softness tonight.";
   if (ritualKey === "luteal")        return "Sebum is peaking this week. Stay consistent with your BHA.";
   if (ritualKey === "follicular")    return session === "pm"
     ? (hasRetinol || onTretinoin ? "Good window for actives. Your skin is at its most resilient right now." : "Follicular phase — your skin is ready if you want to push.")
@@ -406,7 +406,11 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
 
       {/* -- Swan guiding line ---------------------------------------------- */}
       {guidingLine && (
-        <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 11, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-stone)", margin: "0 0 22px", lineHeight: 1.6 }}>{guidingLine}</p>
+        ritualKey === "menstrual" ? (
+          <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 13, letterSpacing: "0.04em", color: "var(--color-inky-moss)", opacity: 0.8, fontStyle: "italic", textTransform: "none", lineHeight: 1.6, textAlign: "left", margin: "0 0 16px" }}>{guidingLine}</p>
+        ) : (
+          <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 11, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-stone)", margin: "0 0 22px", lineHeight: 1.6 }}>{guidingLine}</p>
+        )
       )}
 
       {/* -- Ritual Mode Card ---------------------------------------------- */}
