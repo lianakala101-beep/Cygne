@@ -3,3 +3,6 @@ id = "mxcefgbaaylddnyxrnao"
 
 [functions.rapid-action]
 verify_jwt = false
+
+[functions.ask-cygne]
+verify_jwt = false

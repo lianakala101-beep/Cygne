@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Icon, Section, FlagCard, SwanIcon } from "./components.jsx";
+import { AskCygneButton, AskCygneOverlay } from "./AskCygne.jsx";
 import { analyzeShelf, detectConflicts, buildRoutine, calcSpending, getCurrentSession } from "./engine.js";
 import { getSwanSensePredictions } from "./swansense.jsx";
 import { SwanSongCard, FlightModeModal } from "./ritual.jsx";
@@ -19,6 +20,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
   const [flightOpen, setFlightOpen] = useState(false);
   const [shopScanOpen, setShopScanOpen] = useState(false);
   const [cycleExpanded, setCycleExpanded] = useState(false);
+  const [askCygneOpen, setAskCygneOpen] = useState(false);
   const currentCycleDay = getCurrentCycleDay(user);
   const { activeMap } = analyzeShelf(products);
   const swanSensePredictions = getSwanSensePredictions(products, checkIns, user, locationData, journals);
@@ -320,6 +322,11 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           </div>
         )}
 
+        {/* Ask Cygne */}
+        <div style={{ textAlign: "center", marginBottom: 20 }}>
+          <AskCygneButton onClick={() => setAskCygneOpen(true)} />
+        </div>
+
         {/* 5. Travel Edit + Shop Scan — utility buttons at bottom */}
         <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
           <button onClick={() => setFlightOpen(true)}
@@ -357,6 +364,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
       {flightOpen && (
         <FlightModeModal products={products} activeMap={activeMap} onClose={() => setFlightOpen(false)} />
       )}
+      {askCygneOpen && <AskCygneOverlay user={user} onClose={() => setAskCygneOpen(false)} />}
     </div>
   );
 }
