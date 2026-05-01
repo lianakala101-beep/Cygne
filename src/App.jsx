@@ -42,7 +42,7 @@ export default function App() {
   useEffect(() => {
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Pinyon+Script&display=swap";
+    link.href = "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap";
     document.head.appendChild(link);
   }, []);
 
@@ -614,12 +614,30 @@ export default function App() {
     <div className={`theme-${theme}`} style={{ minHeight: "100vh", background: "var(--deep)", paddingBottom: 88, transition: "background 0.4s ease, color 0.4s ease" }}>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-      <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Pinyon+Script&display=swap" rel="stylesheet" />
+      <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
       <style>{`
+        @font-face {
+          font-family: 'Fungis Heavy';
+          src: url('/fonts/FUNGIS Heavy.otf') format('opentype');
+          font-weight: 700;
+          font-style: normal;
+        }
+        @font-face {
+          font-family: 'Fungis Normal';
+          src: url('/fonts/FUNGIS Regular.otf') format('opentype');
+          font-weight: 400;
+          font-style: normal;
+        }
+        @font-face {
+          font-family: 'Hellasta Signature';
+          src: url('/fonts/hellastasignature.ttf') format('truetype');
+          font-weight: 400;
+          font-style: normal;
+        }
         :root {
           --sage:      #6e8a72;
-          --script:    'Pinyon Script', cursive;
-          --cursive:   'Pinyon Script', cursive;
+          --script:    'Hellasta Signature', cursive;
+          --cursive:   'Hellasta Signature', cursive;
           --sans:      'Space Grotesk', sans-serif;
           /* Cygne design system tokens */
           --color-ivory:        #faf9f4;
@@ -733,7 +751,7 @@ export default function App() {
                 display: "flex", alignItems: "center", justifyContent: "center",
               }}>
                 <span style={{
-                  fontFamily: "Pinyon Script, cursive",
+                  fontFamily: "var(--script)",
                   fontSize: 22,
                   color: "var(--sage)",
                   lineHeight: 1,
