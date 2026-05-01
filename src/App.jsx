@@ -621,6 +621,15 @@ export default function App() {
           --script:    'Pinyon Script', cursive;
           --cursive:   'Pinyon Script', cursive;
           --sans:      'Space Grotesk', sans-serif;
+          /* Cygne design system tokens */
+          --color-ivory:        #faf9f4;
+          --color-ivory-shadow: #f0ebe0;
+          --color-ink:          #1c1c1a;
+          --color-inky-moss:    #2d3d2b;
+          --color-stone:        #5a5a5a;
+          --color-pebble:       #7a7a7a;
+          --font-display: 'Fungis Heavy', 'Space Grotesk', sans-serif;
+          --font-body:    'Fungis Normal', 'Space Grotesk', sans-serif;
         }
         .theme-dark {
           --deep:      #0e100d;

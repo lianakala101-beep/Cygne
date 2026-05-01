@@ -4,6 +4,7 @@ import { detectActives, analyzeShelf, detectConflicts, buildRoutine, hasSPFCover
 import { getAutoSession } from "./productmodal.jsx";
 import { RAMP_SCHEDULES, RAMP_ACTIVES, IntroduceSlowlyCard, getRampWeek } from "./ramp.jsx";
 import { getCurrentCycleDay, getTreatmentElapsed, daysBetweenLocal } from "./utils.jsx";
+import { FaceZoneSelector } from "./components/FaceZoneSelector.jsx";
 
 
 function computeStabilityScore(products, checkIns, activeMap) {
@@ -253,6 +254,8 @@ function SkinJournalModal({ onSubmit, onClose, existing = null }) {
   const [sleep,     setSleep]     = useState(existing?.sleep     ?? null); // "good"|"poor"|null
   const [stress,    setStress]    = useState(existing?.stress    ?? null); // "low"|"high"|null
   const [notes,     setNotes]     = useState(existing?.notes     || "");
+  const [affectedZones, setAffectedZones] = useState(existing?.affectedZones || []);
+  const [zoneSkipped, setZoneSkipped] = useState(false);
   // Which option is currently playing the soft pulse. Cleared on
   // animation end so a re-tap can replay the pulse.
   const [pulsing, setPulsing] = useState(null);
@@ -348,8 +351,54 @@ function SkinJournalModal({ onSubmit, onClose, existing = null }) {
           />
         </div>
 
+        {/* Face zone */}
+        <div style={{ marginBottom: 28 }}>
+          <p style={{
+            fontFamily: "var(--font-display, 'Fungis Heavy', 'Space Grotesk', sans-serif)",
+            fontWeight: 400,
+            fontSize: 10,
+            letterSpacing: "0.15em",
+            textTransform: "uppercase",
+            color: "var(--color-pebble, #7a7a7a)",
+            margin: "0 0 12px",
+          }}>
+            Where on your face?
+          </p>
+          <FaceZoneSelector
+            selected={zoneSkipped ? [] : affectedZones}
+            onChange={(zones) => { setAffectedZones(zones); setZoneSkipped(false); }}
+          />
+          <button
+            type="button"
+            onClick={() => { setAffectedZones([]); setZoneSkipped(true); }}
+            style={{
+              display: "block",
+              margin: "10px auto 0",
+              background: "none",
+              border: "none",
+              padding: "4px 8px",
+              fontFamily: "Space Grotesk, sans-serif",
+              fontSize: 9,
+              letterSpacing: "0.15em",
+              textTransform: "uppercase",
+              color: "var(--color-pebble, #7a7a7a)",
+              cursor: "pointer",
+              opacity: zoneSkipped ? 1 : 0.75,
+              textDecoration: zoneSkipped ? "underline" : "none",
+            }}>
+            Skip — no specific area
+          </button>
+        </div>
+
         <button
-          onClick={() => canSubmit && onSubmit({ date: today, condition, sleep, stress, notes: notes.trim() })}
+          onClick={() => canSubmit && onSubmit({
+            date: today,
+            condition,
+            sleep,
+            stress,
+            notes: notes.trim(),
+            affectedZones: zoneSkipped ? [] : affectedZones,
+          })}
           style={{ width: "100%", padding: "15px 0", background: canSubmit ? "#6e8a72" : "var(--surface)", color: canSubmit ? "#0d0f0d" : "var(--clay)", border: `1px solid ${canSubmit ? "transparent" : "var(--border)"}`, borderRadius: 13, fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 600, letterSpacing: "0.08em", cursor: canSubmit ? "pointer" : "default", transition: "all 0.2s" }}>
           Save Entry
         </button>
