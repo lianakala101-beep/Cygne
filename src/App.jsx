@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Icon, Wordmark, LOGO_SRC } from "./components.jsx";
+import { Icon } from "./components.jsx";
 import { analyzeShelf, detectConflicts, buildRoutine, detectActives } from "./engine.js";
 import { RAMP_SCHEDULES, RAMP_ACTIVES } from "./ramp.jsx";
 import { SplashScreen } from "./splash.jsx";
@@ -711,36 +711,52 @@ export default function App() {
         input, select, textarea { background: transparent; color: #1c1c1a; }
         .modal-bg { background: rgba(250,249,244,0.85) !important; }
         button:focus { outline: none; }
+        @media (max-width: 350px) { .app-header-logo { width: 90px !important; } }
       `}</style>
 
       {/* Header */}
-      <div style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(250,249,244,0.92)", backdropFilter: "blur(20px)", borderBottom: "1px solid var(--border)", padding: "0 22px" }}>
-        <div style={{ maxWidth: 600, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: 54 }}>
-          <Wordmark size={42} />
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <button onClick={() => setProfileOpen(true)}
-              style={{ width: 34, height: 34, borderRadius: "50%", background: "none", border: "none", cursor: "pointer", padding: 0, WebkitTapHighlightColor: "transparent" }}>
-              <div style={{
-                width: 34, height: 34, borderRadius: "50%",
-                background: "rgba(45,61,43,0.22)",
-                border: "1.5px solid rgba(45,61,43,0.5)",
-                display: "flex", alignItems: "center", justifyContent: "center",
+      <div style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(250,249,244,0.92)", backdropFilter: "blur(20px)", borderBottom: "1px solid var(--border)" }}>
+        <div style={{ maxWidth: 600, margin: "0 auto", position: "relative", display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "max(env(safe-area-inset-top), 16px)", paddingLeft: 20, paddingRight: 20, paddingBottom: 12 }}>
+
+          {/* Left spacer — mirrors profile button so absolute logo stays centred */}
+          <div style={{ width: 34, flexShrink: 0 }} />
+
+          {/* Logo — absolutely centred */}
+          <img
+            src="/cygne-logo.png"
+            alt="Cygne"
+            className="app-header-logo"
+            style={{
+              position: "absolute", left: "50%", transform: "translateX(-50%)",
+              width: 120, height: "auto", display: "block",
+              filter: "brightness(0.7) contrast(1.1) drop-shadow(0 0 0.4px rgba(60,60,60,0.3))",
+            }}
+          />
+
+          {/* Profile button — right */}
+          <button onClick={() => setProfileOpen(true)}
+            style={{ width: 34, height: 34, borderRadius: "50%", background: "none", border: "none", cursor: "pointer", padding: 0, WebkitTapHighlightColor: "transparent", flexShrink: 0 }}>
+            <div style={{
+              width: 34, height: 34, borderRadius: "50%",
+              background: "rgba(45,61,43,0.22)",
+              border: "1.5px solid rgba(45,61,43,0.5)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              <span style={{
+                fontFamily: "var(--font-display)",
+                fontWeight: 400,
+                fontStyle: "italic",
+                fontSize: 22,
+                color: "var(--sage)",
+                lineHeight: 1,
+                userSelect: "none",
+                marginTop: 2,
               }}>
-                <span style={{
-                  fontFamily: "var(--font-display)",
-                  fontWeight: 400,
-                  fontStyle: "italic",
-                  fontSize: 22,
-                  color: "var(--sage)",
-                  lineHeight: 1,
-                  userSelect: "none",
-                  marginTop: 2,
-                }}>
-                  {user?.name ? user.name.trim()[0].toUpperCase() : "?"}
-                </span>
-              </div>
-            </button>
-          </div>
+                {user?.name ? user.name.trim()[0].toUpperCase() : "?"}
+              </span>
+            </div>
+          </button>
+
         </div>
       </div>
 
