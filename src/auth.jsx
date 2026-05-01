@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { LOGO_SRC } from "./components.jsx";
 import { supabase } from "./supabase.js";
 
 function AuthScreen({ onAuth }) {
-  const [mode, setMode] = useState("login"); // login | signup
+  const [mode, setMode] = useState("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -19,18 +19,13 @@ function AuthScreen({ onAuth }) {
       if (mode === "signup") {
         const { data, error: err } = await supabase.auth.signUp({ email, password });
         if (err) {
-          console.error("[Cygne Auth] signUp error:", err);
           setError(err.message || JSON.stringify(err));
           setLoading(false);
           return;
         }
-
-        // If email confirmation is enabled, session will be null.
-        // Try to sign in immediately — works when confirmation is disabled.
         if (!data.session) {
           const { data: loginData, error: loginErr } = await supabase.auth.signInWithPassword({ email, password });
           if (loginErr) {
-            console.error("[Cygne Auth] post-signup signIn error:", loginErr);
             setError("Account created! Check your email to confirm, then sign in.");
             setLoading(false);
             setMode("login");
@@ -41,9 +36,11 @@ function AuthScreen({ onAuth }) {
           onAuth(data.session, data.user, true);
         }
       } else {
-        const { data, error: err } = await supabase.auth.signInWithPassword({ email, password });
+        const { data, error: err } = await supabase.auth.signInWithPassword({
+          email, password,
+          options: { persistSession: rememberMe },
+        });
         if (err) {
-          console.error("[Cygne Auth] signIn error:", err);
           setError(err.message || JSON.stringify(err));
           setLoading(false);
           return;
@@ -51,7 +48,6 @@ function AuthScreen({ onAuth }) {
         onAuth(data.session, data.user, false);
       }
     } catch (e) {
-      console.error("[Cygne Auth] exception:", e);
       setError(e?.message || "Connection failed. Check your network and try again.");
     }
     setLoading(false);
@@ -60,59 +56,155 @@ function AuthScreen({ onAuth }) {
   const handleKeyDown = (e) => { if (e.key === "Enter") handleSubmit(); };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#323d30", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between", padding: "0 36px" }}>
+    <div style={{
+      minHeight: "100vh",
+      background: "var(--color-ivory)",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "0 36px",
+    }}>
 
-      {/* Top — logo */}
-      <div style={{ paddingTop: 72, width: "100%", maxWidth: 380 }}>
-        <img src={LOGO_SRC} alt="Cygne" style={{ height: 140, width: "auto", display: "block", filter: "brightness(1.25) contrast(1.05)", mixBlendMode: "lighten" }} />
-        <p style={{ fontFamily: "var(--script)", fontSize: 22, fontWeight: 400, color: "rgba(232,227,214,0.95)", margin: "6px 0 0 110px", letterSpacing: "0.05em", lineHeight: 1 }}>built around you</p>
+      {/* Logo */}
+      <img
+        src="/cygne-logo.png"
+        alt=""
+        style={{
+          width: "48%",
+          maxWidth: 200,
+          display: "block",
+          margin: "0 auto 52px",
+        }}
+      />
+
+      {/* Heading */}
+      <p style={{
+        fontFamily: "var(--font-display, 'Fungis', sans-serif)",
+        fontWeight: 700,
+        fontSize: 13,
+        letterSpacing: "0.15em",
+        textTransform: "uppercase",
+        color: "#1c1c1a",
+        margin: "0 0 28px",
+        textAlign: "center",
+      }}>
+        {mode === "login" ? "Welcome Back" : "Create Account"}
+      </p>
+
+      {/* Inputs */}
+      <div style={{ width: "100%", maxWidth: 320, display: "flex", flexDirection: "column", gap: 12, marginBottom: 16 }}>
+        <input
+          type="email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Email"
+          autoFocus
+          style={inputStyle}
+        />
+        <input
+          type="password"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Password"
+          style={inputStyle}
+        />
       </div>
 
-      {/* Form */}
-      <div style={{ width: "100%", maxWidth: 380, paddingBottom: 64 }}>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(232,227,214,0.45)", margin: "0 0 20px" }}>
-          {mode === "login" ? "Welcome back" : "Create your account"}
-        </p>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 16 }}>
-          <input
-            type="email" value={email} onChange={e => setEmail(e.target.value)} onKeyDown={handleKeyDown}
-            placeholder="Email" autoFocus
-            style={inputStyle} />
-          <input
-            type="password" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={handleKeyDown}
-            placeholder="Password"
-            style={inputStyle} />
+      {/* Remember Me — login mode only */}
+      {mode === "login" && (
+        <div
+          onClick={() => setRememberMe(r => !r)}
+          style={{ display: "flex", alignItems: "center", gap: 9, width: "100%", maxWidth: 320, marginBottom: 16, cursor: "pointer", userSelect: "none" }}>
+          <div style={{
+            width: 14, height: 14, flexShrink: 0,
+            border: "1px solid rgba(45,61,43,0.4)",
+            borderRadius: 2,
+            background: rememberMe ? "var(--color-inky-moss)" : "transparent",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            transition: "background 0.15s",
+          }}>
+            {rememberMe && (
+              <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
+                <path d="M1 3.5L3.5 6L8 1" stroke="white" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            )}
+          </div>
+          <span style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 10, letterSpacing: "0.15em", color: "var(--color-stone)" }}>
+            REMEMBER ME
+          </span>
         </div>
+      )}
 
-        {error && (
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#8b7355", margin: "0 0 14px", lineHeight: 1.5 }}>{error}</p>
-        )}
+      {error && (
+        <p style={{
+          width: "100%",
+          maxWidth: 320,
+          fontFamily: "var(--font-body, 'Space Grotesk', sans-serif)",
+          fontSize: 11,
+          color: "#8b7355",
+          margin: "0 0 14px",
+          lineHeight: 1.5,
+        }}>{error}</p>
+      )}
 
-        <button onClick={handleSubmit} disabled={loading}
-          style={{ width: "100%", padding: "15px 0", background: "rgba(232,227,214,0.12)", color: "rgba(232,227,214,0.95)", border: "1px solid rgba(232,227,214,0.28)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase", cursor: loading ? "default" : "pointer", opacity: loading ? 0.5 : 1, transition: "background 0.2s, border-color 0.2s" }}
-          onMouseEnter={e => { if (!loading) { e.currentTarget.style.background = "rgba(232,227,214,0.2)"; e.currentTarget.style.borderColor = "rgba(232,227,214,0.5)"; }}}
-          onMouseLeave={e => { e.currentTarget.style.background = "rgba(232,227,214,0.12)"; e.currentTarget.style.borderColor = "rgba(232,227,214,0.28)"; }}>
-          {loading ? "..." : mode === "login" ? "Sign In" : "Create Account"}
-        </button>
+      {/* Primary button — matches BEGIN YOUR RITUAL style */}
+      <button
+        onClick={handleSubmit}
+        disabled={loading}
+        style={{
+          width: "100%",
+          maxWidth: 320,
+          padding: "14px 40px",
+          fontFamily: "var(--font-display, 'Fungis', sans-serif)",
+          fontSize: 12,
+          fontWeight: 400,
+          letterSpacing: "0.2em",
+          textTransform: "uppercase",
+          color: "#1c1c1a",
+          background: "transparent",
+          border: "1px solid #1c1c1a",
+          borderRadius: 0,
+          cursor: loading ? "default" : "pointer",
+          opacity: loading ? 0.5 : 1,
+          transition: "opacity 0.2s",
+        }}>
+        {loading ? "..." : mode === "login" ? "Sign In" : "Create Account"}
+      </button>
 
-        <button onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(null); }}
-          style={{ width: "100%", marginTop: 14, background: "none", border: "none", fontFamily: "var(--font-body)", fontSize: 11, color: "rgba(232,227,214,0.45)", cursor: "pointer", padding: "8px 0", letterSpacing: "0.06em", transition: "color 0.2s" }}
-          onMouseEnter={e => e.currentTarget.style.color = "rgba(232,227,214,0.7)"}
-          onMouseLeave={e => e.currentTarget.style.color = "rgba(232,227,214,0.45)"}>
-          {mode === "login" ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
-        </button>
-      </div>
+      {/* Toggle link */}
+      <button
+        onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(null); }}
+        style={{
+          marginTop: 20,
+          background: "none",
+          border: "none",
+          fontFamily: "var(--font-body, 'Space Grotesk', sans-serif)",
+          fontSize: 11,
+          color: "#7a7a7a",
+          cursor: "pointer",
+          padding: "8px 0",
+          letterSpacing: "0.04em",
+        }}>
+        {mode === "login" ? "Create an account" : "Already have an account? Sign in"}
+      </button>
     </div>
   );
 }
 
 const inputStyle = {
-  width: "100%", padding: "14px 16px",
-  background: "rgba(232,227,214,0.06)", border: "1px solid rgba(232,227,214,0.15)",
-  borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 14,
-  color: "rgba(232,227,214,0.95)", outline: "none",
-  transition: "border-color 0.2s",
+  width: "100%",
+  padding: "14px 16px",
+  background: "transparent",
+  border: "1px solid rgba(28,28,26,0.25)",
+  borderRadius: 0,
+  fontFamily: "var(--font-body, 'Space Grotesk', sans-serif)",
+  fontSize: 14,
+  color: "#1c1c1a",
+  outline: "none",
+  boxSizing: "border-box",
 };
 
 export { AuthScreen };

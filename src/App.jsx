@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Icon, Wordmark, LOGO_SRC } from "./components.jsx";
+import { Icon } from "./components.jsx";
 import { analyzeShelf, detectConflicts, buildRoutine, detectActives } from "./engine.js";
 import { RAMP_SCHEDULES, RAMP_ACTIVES } from "./ramp.jsx";
 import { SplashScreen } from "./splash.jsx";
@@ -24,21 +24,8 @@ export default function App() {
   const [authLoading, setAuthLoading] = useState(true);
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
 
-  // -- Theme: auto by time, manual override ----------------------------------
-  const getAutoTheme = () => {
-    const h = new Date().getHours();
-    return (h >= 7 && h < 19) ? "light" : "dark";
-  };
-  const [themeOverride, setThemeOverride] = useLocalStorage("cygne_theme", null);
-  const theme = themeOverride || getAutoTheme();
-  const toggleTheme = () => setThemeOverride(t => {
-    if (t === null) return getAutoTheme() === "dark" ? "light" : "dark";
-    if (t === "light") return "dark";
-    return "light";
-  });
-  const isAuto = themeOverride === null;
 
-  // Ensure fonts load
+  // Ensure Space Grotesk loads (custom fonts are loaded via src/index.css)
   useEffect(() => {
     const link = document.createElement("link");
     link.rel = "stylesheet";
@@ -169,8 +156,9 @@ export default function App() {
       if (meta.notifDismissed !== undefined) {
         setNotifDismissed(meta.notifDismissed);
       }
-      // Restore completed steps from Supabase
-      if (meta.completedSteps) {
+      // Restore completed steps only if they're from today — stale data is discarded
+      const _today = new Date().toISOString().split("T")[0];
+      if (meta.completedSteps?.date === _today) {
         setCompletedSteps(meta.completedSteps);
       }
       // Restore journals from Supabase (cloud takes priority over localStorage)
@@ -585,18 +573,14 @@ export default function App() {
     }
   };
 
-  // -- Loading state ----------------------------------------------------------
+  // -- Loading state — ivory blank while session resolves ---------------------
   if (authLoading) {
-    return (
-      <div style={{ minHeight: "100vh", background: "#323d30", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ width: 24, height: 24, border: "2px solid rgba(232,227,214,0.3)", borderTopColor: "rgba(232,227,214,0.8)", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
-        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-      </div>
-    );
+    return <div style={{ position: "fixed", inset: 0, background: "var(--color-ivory)" }} />;
   }
 
-  // -- No session → Auth screen -----------------------------------------------
+  // -- Unauthenticated flow: welcome splash → auth ----------------------------
   if (!authSession) {
+    if (!splashDone) return <SplashScreen onDone={() => setSplashDone(true)} />;
     return <AuthScreen onAuth={handleAuth} />;
   }
 
@@ -606,84 +590,94 @@ export default function App() {
   }
 
   // -- First run welcome (just completed onboarding) --------------------------
-  if (!splashDone) return <SplashScreen onDone={() => setSplashDone(true)} />;
   if (firstRun) return <SwanWelcomeScreen user={user} onDone={() => { setFirstRun(false); setTab("dashboard"); }} />;
 
   // -- Main app ---------------------------------------------------------------
   return (
-    <div className={`theme-${theme}`} style={{ minHeight: "100vh", background: "var(--deep)", paddingBottom: 88, transition: "background 0.4s ease, color 0.4s ease" }}>
+    <div className="app-texture" style={{ minHeight: "100vh", background: "transparent", paddingBottom: 88 }}>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
       <style>{`
-        @font-face {
-          font-family: 'Fungis Heavy';
-          src: url('/fonts/FUNGIS Heavy.otf') format('opentype');
-          font-weight: 700;
-          font-style: normal;
-        }
-        @font-face {
-          font-family: 'Fungis Normal';
-          src: url('/fonts/FUNGIS Regular.otf') format('opentype');
-          font-weight: 400;
-          font-style: normal;
-        }
-        @font-face {
-          font-family: 'Hellasta Signature';
-          src: url('/fonts/hellastasignature.ttf') format('truetype');
-          font-weight: 400;
-          font-style: normal;
-        }
         :root {
-          --sage:      #6e8a72;
-          --script:    'Hellasta Signature', cursive;
-          --cursive:   'Hellasta Signature', cursive;
-          --sans:      'Space Grotesk', sans-serif;
-          /* Cygne design system tokens */
-          --color-ivory:        #faf9f4;
-          --color-ivory-shadow: #f0ebe0;
-          --color-ink:          #1c1c1a;
-          --color-inky-moss:    #2d3d2b;
-          --color-stone:        #5a5a5a;
-          --color-pebble:       #7a7a7a;
-          --font-display: 'Fungis Heavy', 'Space Grotesk', sans-serif;
-          --font-body:    'Fungis Normal', 'Space Grotesk', sans-serif;
-        }
-        .theme-dark {
-          --deep:      #0e100d;
-          --ink:       #151813;
-          --surface:   #1c201a;
-          --border:    rgba(200,215,190,0.09);
-          --parchment: #e8e2d9;
-          --clay:      #8b7355;
-          --muted:     #6b5a43;
-          --taupe:     #8b7355;
-          --overlay:   rgba(8,12,8,0.72);
-          --cta:       #323d30;
-        }
-        .theme-light {
-          --deep:      #f0ece6;
-          --ink:       #f7f4f0;
-          --surface:   #ffffff;
-          --border:    rgba(0,0,0,0.10);
-          --parchment: #1a1612;
-          --clay:      #6b5338;
-          --muted:     #a8906c;
-          --taupe:     #6b5338;
-          --overlay:   rgba(30,25,20,0.5);
-          --sage:      #526859;
-          --cta:       #3d5240;
+          --script:    var(--font-signature, 'Hellasta Signature', cursive);
+          --cursive:   var(--font-signature, 'Hellasta Signature', cursive);
+          --sans:      var(--font-body, 'Space Grotesk', sans-serif);
+          --heading:   var(--font-display, 'Fungis', sans-serif);
+
+          /* Semantic aliases → new token system */
+          --deep:      var(--color-ivory);
+          --ink:       var(--color-ivory-shadow);
+          --surface:   var(--color-ivory-shadow);
+          --border:    rgba(192,192,192,0.35);
+          --parchment: var(--color-ink);
+          --clay:      var(--color-stone);
+          --muted:     var(--color-pebble);
+          --taupe:     var(--color-pebble);
+          --overlay:   rgba(250,249,244,0.85);
+          --sage:      var(--color-stone);
+          --cta:       var(--color-ink);
+          --inky-moss: var(--color-inky-moss);
+          --ivory:     var(--color-ivory);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         input, select, textarea { outline: none; }
         input:focus, select:focus, textarea:focus { border-color: var(--sage) !important; }
         input::placeholder, textarea::placeholder { color: var(--muted); opacity: 0.7; }
         ::-webkit-scrollbar { display: none; }
-        .theme-light ::-webkit-scrollbar { display: none; }
-        .theme-light button:focus { outline: none; }
+        ::-webkit-scrollbar { display: none; }
+        button:focus { outline: none; }
+
+
+        /* Silver liquid chrome gradient utility */
+        .silver-chrome {
+          background: linear-gradient(135deg, #505050 0%, #B8B8B8 22%, #EBEBEB 38%, #C4C4C4 55%, #909090 70%, #D8D8D8 85%, #585858 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        /* Ghost button: thin silver outline, sharp corners, no border-radius */
+        .btn-ghost {
+          background: transparent;
+          border: 1px solid rgba(160,160,160,0.55);
+          border-radius: 0;
+          color: var(--color-ink, #1c1c1a);
+          font-family: var(--heading);
+          font-size: 10px;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          cursor: pointer;
+          padding: 10px 20px;
+          transition: border-color 0.2s, background 0.2s;
+        }
+        .btn-ghost:hover {
+          border-color: rgba(28,28,26,0.5);
+          background: rgba(28,28,26,0.03);
+        }
+
+        /* Solid moss button: inky moss background, sharp corners */
+        .btn-solid-moss {
+          background: var(--inky-moss, #1A1F16);
+          border: 1px solid var(--inky-moss, #1A1F16);
+          border-radius: 0;
+          color: #F5F0E8;
+          font-family: var(--heading);
+          font-size: 10px;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          cursor: pointer;
+          padding: 10px 20px;
+          transition: opacity 0.2s;
+        }
+
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
         @keyframes cygneCheckDraw { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
+        @keyframes ritualWave {
+          0%, 100% { transform: translateY(0px); opacity: 0.85; }
+          50%       { transform: translateY(-2px); opacity: 1; }
+        }
         @keyframes etherealGlide {
           0%   { transform: translateY(0px) rotate(0deg); }
           25%  { transform: translateY(-3px) rotate(-1deg); }
@@ -713,62 +707,62 @@ export default function App() {
           to   { opacity: 1; transform: translateY(0); }
         }
         .cygne-swansong-intro { animation: cygneSwanSongIntro 500ms 200ms ease-out both; }
-        .theme-dark option { background: #1a1c1a; color: #e8e2d9; }
-        .theme-light option { background: #f7f4f0; color: #1a1612; }
-        .theme-light input,
-        .theme-light select,
-        .theme-light textarea {
-          background: #f7f4f0 !important;
-          color: #1a1612 !important;
-        }
-        .theme-light .modal-bg {
-          background: rgba(232,226,217,0.55) !important;
-        }
-        .theme-light option {
-          background: #f7f4f0;
-          color: #1a1612;
-        }
-        .theme-light .modal-bg { background: rgba(232,226,217,0.5) !important; }
+        option { background: #faf9f4; color: #1c1c1a; }
+        input, select, textarea { background: transparent; color: #1c1c1a; }
+        .modal-bg { background: rgba(250,249,244,0.85) !important; }
+        button:focus { outline: none; }
+        @media (max-width: 350px) { .app-header-logo { width: 90px !important; } }
       `}</style>
 
       {/* Header */}
-      <div style={{ position: "sticky", top: 0, zIndex: 50, background: theme === "dark" ? "rgba(13,15,13,0.94)" : "rgba(240,236,230,0.94)", backdropFilter: "blur(16px)", borderBottom: "1px solid var(--border)", padding: "0 22px" }}>
-        <div style={{ maxWidth: 600, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: 54 }}>
-          <Wordmark size={42} theme={theme} />
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <button onClick={toggleTheme} title={isAuto ? "Auto theme" : theme === "dark" ? "Dark mode" : "Light mode"}
-              style={{ width: 32, height: 32, borderRadius: "50%", background: "var(--surface)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "border-color 0.2s", color: "var(--clay)", flexShrink: 0 }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(122,144,112,0.5)"}
-              onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}>
-              <Icon name={isAuto ? "auto" : theme === "dark" ? "moon" : "sun"} size={14} />
-            </button>
-            <button onClick={() => setProfileOpen(true)}
-              style={{ width: 34, height: 34, borderRadius: "50%", background: "none", border: "none", cursor: "pointer", padding: 0, WebkitTapHighlightColor: "transparent" }}>
-              <div style={{
-                width: 34, height: 34, borderRadius: "50%",
-                background: "rgba(122,144,112,0.22)",
-                border: "1.5px solid rgba(122,144,112,0.5)",
-                display: "flex", alignItems: "center", justifyContent: "center",
+      <div style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(250,249,244,0.92)", backdropFilter: "blur(20px)", borderBottom: "1px solid var(--border)" }}>
+        <div style={{ maxWidth: 600, margin: "0 auto", position: "relative", display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "max(env(safe-area-inset-top), 16px)", paddingLeft: 20, paddingRight: 20, paddingBottom: 12 }}>
+
+          {/* Left spacer — mirrors profile button so absolute logo stays centred */}
+          <div style={{ width: 34, flexShrink: 0 }} />
+
+          {/* Logo — absolutely centred */}
+          <img
+            src="/cygne-logo.png"
+            alt="Cygne"
+            className="app-header-logo"
+            style={{
+              position: "absolute", left: "50%", transform: "translateX(-50%)",
+              width: 120, height: "auto", display: "block",
+              filter: "brightness(0.7) contrast(1.1) drop-shadow(0 0 0.4px rgba(60,60,60,0.3))",
+            }}
+          />
+
+          {/* Profile button — right */}
+          <button onClick={() => setProfileOpen(true)}
+            style={{ width: 34, height: 34, borderRadius: "50%", background: "none", border: "none", cursor: "pointer", padding: 0, WebkitTapHighlightColor: "transparent", flexShrink: 0 }}>
+            <div style={{
+              width: 34, height: 34, borderRadius: "50%",
+              background: "rgba(45,61,43,0.22)",
+              border: "1.5px solid rgba(45,61,43,0.5)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              <span style={{
+                fontFamily: "var(--font-display)",
+                fontWeight: 400,
+                fontStyle: "italic",
+                fontSize: 22,
+                color: "var(--sage)",
+                lineHeight: 1,
+                userSelect: "none",
+                marginTop: 2,
               }}>
-                <span style={{
-                  fontFamily: "var(--script)",
-                  fontSize: 22,
-                  color: "var(--sage)",
-                  lineHeight: 1,
-                  userSelect: "none",
-                  marginTop: 2,
-                }}>
-                  {user?.name ? user.name.trim()[0].toUpperCase() : "?"}
-                </span>
-              </div>
-            </button>
-          </div>
+                {user?.name ? user.name.trim()[0].toUpperCase() : "?"}
+              </span>
+            </div>
+          </button>
+
         </div>
       </div>
 
       {/* Content */}
       <div style={{ maxWidth: 600, margin: "0 auto", padding: "32px 22px 0", animation: "fadeUp 0.3s ease" }} key={tab}>
-        {tab === "dashboard" && <Dashboard products={products} setTab={setTab} checkIns={checkIns} swanPopupDismissed={swanPopupDismissed} onDismissSwanPopup={dismissSwanPopup} treatments={treatments} locationData={locationData} user={user} theme={theme} notifPermission={notifPermission} onRequestNotif={requestNotifications} notifDismissed={notifDismissed} onDismissNotif={() => setNotifDismissed(true)} journals={journals} setCheckIns={setCheckIns} onLoadDemo={() => setProducts(DEMO_PRODUCTS)} />}
+        {tab === "dashboard" && <Dashboard products={products} setTab={setTab} checkIns={checkIns} swanPopupDismissed={swanPopupDismissed} onDismissSwanPopup={dismissSwanPopup} treatments={treatments} locationData={locationData} user={user} notifPermission={notifPermission} onRequestNotif={requestNotifications} notifDismissed={notifDismissed} onDismissNotif={() => setNotifDismissed(true)} journals={journals} setCheckIns={setCheckIns} onLoadDemo={() => setProducts(DEMO_PRODUCTS)} />}
         {tab === "routine"   && <MyRoutine
           products={products}
           user={user}
@@ -818,14 +812,14 @@ export default function App() {
       </div>
 
       {/* Bottom nav */}
-      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: theme === "dark" ? "rgba(13,15,13,0.97)" : "rgba(240,236,230,0.97)", backdropFilter: "blur(16px)", borderTop: "1px solid var(--border)", zIndex: 50 }}>
+      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "rgba(250,249,244,0.97)", backdropFilter: "blur(20px)", borderTop: "1px solid var(--border)", zIndex: 50 }}>
         <div style={{ maxWidth: 600, margin: "0 auto", display: "flex" }}>
           {tabs.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
-              style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", padding: "12px 0 18px", background: "none", border: "none", cursor: "pointer", color: tab === t.id ? "var(--sage)" : "var(--clay)", transition: "color 0.2s", gap: 5, position: "relative", opacity: tab === t.id ? 1 : 0.65 }}>
+              style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", padding: "12px 0 18px", background: "none", border: "none", cursor: "pointer", color: tab === t.id ? "var(--parchment)" : "var(--clay)", transition: "color 0.2s", gap: 5, position: "relative", opacity: tab === t.id ? 1 : 0.5 }}>
               <Icon name={t.icon} size={tab === t.id ? 20 : 18} />
-              <span style={{ fontFamily: "var(--sans)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", fontWeight: tab === t.id ? 600 : 400 }}>{t.label}</span>
-              {tab === t.id && <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 18, height: 1, background: "var(--sage)" }} />}
+              <span style={{ fontFamily: "var(--heading)", fontSize: 8, letterSpacing: "0.15em", textTransform: "uppercase", fontWeight: 700 }}>{t.label}</span>
+              {tab === t.id && <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 24, height: 1.5, background: "linear-gradient(90deg, transparent, #C0C0C0, #EEEEEE, #C0C0C0, transparent)" }} />}
             </button>
           ))}
         </div>

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Icon, Section, Wordmark, SwanIcon } from "./components.jsx";
+import { Icon, Section, Wordmark } from "./components.jsx";
 import { detectActives, analyzeShelf, buildRoutine, isDampSkinProduct, hasSPFCoverage } from "./engine.js";
 import { FREQUENCIES } from "./constants.js";
 import { getLockedSession, getAutoSession } from "./productmodal.jsx";
@@ -16,7 +16,7 @@ function SessionPicker({ productId, product, initial, onSession }) {
       <div onClick={e => e.stopPropagation()} style={{ marginTop: 10 }}>
         <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 6px", opacity: 0.6 }}>Session</p>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ padding: "5px 12px", borderRadius: 8, background: isAM ? "rgba(122,144,112,0.14)" : "rgba(232,226,217,0.10)", border: "1px solid " + (isAM ? "rgba(122,144,112,0.4)" : "rgba(232,226,217,0.3)"), fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 700, color: isAM ? "var(--sage)" : "#e8e2d9" }}>{isAM ? "AM only" : "PM only"}</span>
+          <span style={{ padding: "5px 12px", borderRadius: 8, background: isAM ? "rgba(45,61,43,0.14)" : "rgba(232,226,217,0.10)", border: "1px solid " + (isAM ? "rgba(45,61,43,0.4)" : "rgba(232,226,217,0.3)"), fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 700, color: isAM ? "var(--sage)" : "#e8e2d9" }}>{isAM ? "AM only" : "PM only"}</span>
           <span style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", opacity: 0.5 }}>locked by ingredients</span>
         </div>
         <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", margin: "8px 0 0", lineHeight: 1.5, opacity: 0.6 }}>{locked.reason}</p>
@@ -33,7 +33,7 @@ function SessionPicker({ productId, product, initial, onSession }) {
           const active = selected === s.id;
           return (
             <button key={s.id} onClick={e => { e.stopPropagation(); setSelected(s.id); if (onSession) onSession(productId, s.id); }}
-              style={{ flex: 1, padding: "7px 0", borderRadius: 8, border: "1px solid " + (active ? "rgba(122,144,112,0.55)" : "var(--border)"), background: active ? "rgba(122,144,112,0.18)" : "transparent", color: active ? "var(--parchment)" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 10, fontWeight: active ? 700 : 400, cursor: "pointer" }}>
+              style={{ flex: 1, padding: "7px 0", borderRadius: 8, border: "1px solid " + (active ? "rgba(45,61,43,0.55)" : "var(--border)"), background: active ? "rgba(45,61,43,0.18)" : "transparent", color: active ? "var(--parchment)" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 10, fontWeight: active ? 700 : 400, cursor: "pointer" }}>
               {s.label}
             </button>
           );
@@ -87,21 +87,21 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
 
   return (
     <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: "18px 18px 16px", display: "flex", flexDirection: "column", gap: 12, transition: "border-color 0.2s" }}
-      onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(122,144,112,0.4)"}
+      onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(45,61,43,0.4)"}
       onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}>
 
       {/* Header row */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
         <div style={{ minWidth: 0 }}>
           <div style={{ fontSize: 9, fontFamily: "var(--font-body)", letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--sage)", marginBottom: 6 }}>{product.category}</div>
-          <h3 style={{ fontFamily: "var(--script)", fontSize: 22, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: "0 0 2px", lineHeight: 1.15 }}>{product.name}</h3>
+          <h3 style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 400, letterSpacing: "0.08em", color: "var(--parchment)", margin: "0 0 2px", lineHeight: 1.2 }}>{product.name}</h3>
           <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, letterSpacing: "0.04em" }}>{product.brand}</p>
         </div>
         <div ref={menuRef} style={{ position: "relative", flexShrink: 0, marginLeft: 8 }}>
           <button onClick={() => setMenuOpen(o => !o)} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: "6px 8px", opacity: 0.6, transition: "opacity 0.15s", fontSize: 16, lineHeight: 1, fontFamily: "sans-serif" }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0.6} aria-label="Product options">⋯</button>
           {menuOpen && (
             <div style={{ position: "absolute", right: 0, top: "100%", zIndex: 50, minWidth: 180, background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 12, padding: "6px 0", boxShadow: "0 8px 28px rgba(0,0,0,0.45)" }}>
-              <button onClick={() => { setMenuOpen(false); onEdit(product); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "var(--parchment)", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "left", transition: "background 0.12s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.1)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>
+              <button onClick={() => { setMenuOpen(false); onEdit(product); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "var(--parchment)", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "left", transition: "background 0.12s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(45,61,43,0.1)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>
                 <Icon name="edit" size={12} /><span>Edit product</span>
               </button>
               <div style={{ height: 1, background: "var(--border)", margin: "4px 12px" }} />
@@ -138,16 +138,16 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
             <span key={a} style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 9, fontFamily: "var(--font-body)", letterSpacing: "0.08em", color: "#8b7355", background: "rgba(139,115,85,0.08)", padding: "3px 8px", borderRadius: 20, border: "1px solid rgba(139,115,85,0.22)" }}><Icon name="warning" size={9} /> {a}</span>
           ))}
           {lovedHits.map(l => (
-            <span key={l} style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 9, fontFamily: "var(--font-body)", letterSpacing: "0.08em", color: "#6e8a72", background: "rgba(122,144,112,0.08)", padding: "3px 8px", borderRadius: 20, border: "1px solid rgba(122,144,112,0.2)" }}><Icon name="sparkle" size={9} /> {l}</span>
+            <span key={l} style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 9, fontFamily: "var(--font-body)", letterSpacing: "0.08em", color: "#2d3d2b", background: "rgba(45,61,43,0.08)", padding: "3px 8px", borderRadius: 20, border: "1px solid rgba(45,61,43,0.2)" }}><Icon name="sparkle" size={9} /> {l}</span>
           ))}
         </div>
       )}
 
       {/* In-ritual toggle */}
       <button onClick={() => onToggleRoutine(product.id)}
-        style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 14px", background: inRoutine ? "rgba(122,144,112,0.08)" : "var(--ink)", border: `1px solid ${inRoutine ? "rgba(122,144,112,0.3)" : "var(--border)"}`, borderRadius: 10, cursor: "pointer", transition: "all 0.18s" }}
-        onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(122,144,112,0.5)"}
-        onMouseLeave={e => e.currentTarget.style.borderColor = inRoutine ? "rgba(122,144,112,0.3)" : "var(--border)"}>
+        style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 14px", background: inRoutine ? "rgba(45,61,43,0.08)" : "var(--ink)", border: `1px solid ${inRoutine ? "rgba(45,61,43,0.3)" : "var(--border)"}`, borderRadius: 10, cursor: "pointer", transition: "all 0.18s" }}
+        onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(45,61,43,0.5)"}
+        onMouseLeave={e => e.currentTarget.style.borderColor = inRoutine ? "rgba(45,61,43,0.3)" : "var(--border)"}>
         <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: inRoutine ? "var(--sage)" : "var(--clay)", fontWeight: inRoutine ? 600 : 400 }}>
           {inRoutine ? "In ritual" : "Not in ritual"}
         </span>
@@ -199,6 +199,33 @@ const STEP_REASONS = {
   Prescription:  "Applied after cleansing, before moisturiser. PM only — prescription actives like tretinoin are photosensitive and work best overnight.",
 };
 
+const STEP_VERB = {
+  Cleanser:    "Cleanse",
+  Toner:       "Tone",
+  Serum:       "Treat",
+  Essence:     "Essence",
+  Moisturizer: "Moisturize",
+  SPF:         "Protect",
+  "Eye Cream": "Eye Cream",
+  Oil:         "Oil",
+  Mask:        "Mask",
+  Exfoliant:   "Exfoliate",
+  "Toning Pad":"Exfoliate",
+  Mist:        "Mist",
+  Balm:        "Seal",
+  Treatment:   "Treat",
+  Prescription:"Treat",
+};
+
+const DEEP_MOSS = "#2d3d2b";
+const SILVER_GRADIENT = "linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 30%, #a8a8a8 50%, #d4d4d4 70%, #b0b0b0 100%)";
+
+function silverText(checked) {
+  return checked
+    ? { background: SILVER_GRADIENT, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }
+    : { color: DEEP_MOSS, WebkitTextFillColor: DEEP_MOSS };
+}
+
 function getStepReason(step) {
   const actives = Object.keys(detectActives(step.ingredients || []));
   if (actives.includes("retinol"))     return "Applied last in the PM active layers. Photosensitive — breaks down in sunlight, so PM only.";
@@ -210,109 +237,128 @@ function getStepReason(step) {
   return STEP_REASONS[step.category] || null;
 }
 
-function DrawnCheck({ size = 14, color = "#0d0f0d" }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ display: "block" }}>
-      <path
-        d="M5 12.5 L10.2 17.5 L19 7.2"
-        stroke={color}
-        strokeWidth="2.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        style={{
-          strokeDasharray: 24,
-          strokeDashoffset: 24,
-          animation: "cygneCheckDraw 300ms ease-out forwards",
-        }}
-      />
-    </svg>
-  );
+const DAMP_SKIN_BLOCKLIST = ["cleanser", "wash", "foam", "scrub", "sunscreen", "spf", "retinol", "moisturizer", "cream", "oil"];
+const DAMP_SKIN_ALLOWLIST = ["hyaluronic", "hyaluronate", "essence", "sheet mask", "niacinamide serum", "hydrating serum"];
+function needsDampSkin(step) {
+  const haystack = `${step.name || ""} ${step.category || ""}`.toLowerCase();
+  if (DAMP_SKIN_BLOCKLIST.some(kw => haystack.includes(kw))) return false;
+  if (DAMP_SKIN_ALLOWLIST.some(kw => haystack.includes(kw))) return true;
+  const ings = (step.ingredients || []).map(i => i.toLowerCase());
+  return ings.some(i => i.includes("hyaluronic") || i.includes("hyaluronate"));
 }
 
 function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }) {
-  const activeKeys = Object.keys(detectActives(step.ingredients || []));
   const [expanded, setExpanded] = useState(false);
   const reason = getStepReason(step);
-  const damp = isDampSkinProduct(step);
   const freqLabel = step.frequency && step.frequency !== "daily"
     ? (FREQUENCIES.find(f => f.id === step.frequency)?.label || step.frequency)
     : null;
-  const nameColor = scheduled ? "var(--parchment)" : "var(--taupe)";
-  const ringColor = scheduled ? "#6e8a72" : "var(--taupe)";
+  const stepLabel = `Step ${String(index + 1).padStart(2, "0")}`;
+  const stepVerb = STEP_VERB[step.category] || step.category;
+
   return (
-    <div style={{
-      display: "flex", gap: 16, alignItems: "flex-start",
-      opacity: checked ? 0.7 : scheduled ? 1 : 0.55,
-      transform: checked ? "translateX(-4px)" : "translateX(0)",
-      transition: "opacity 280ms ease-out, transform 320ms ease-out",
-    }}>
-      <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <div
-          onClick={onCheck}
-          style={{
-            width: 28, height: 28, borderRadius: "50%",
-            border: `1px solid ${ringColor}`,
-            background: checked ? ringColor : "transparent",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            cursor: "pointer",
-            transition: "background-color 280ms ease-out, border-color 280ms ease-out",
-            flexShrink: 0,
-          }}>
-          {checked && <DrawnCheck size={14} />}
-        </div>
-        {!isLast && <div style={{ width: 1, flex: 1, background: "var(--border)", marginTop: 6, minHeight: 16 }} />}
+    <div
+      style={{
+        paddingTop: 20,
+        paddingBottom: 20,
+        position: "relative",
+        opacity: scheduled ? 1 : 0.4,
+        WebkitTapHighlightColor: "transparent",
+      }}
+    >
+      {/* STEP 01 */}
+      <p style={{
+        fontFamily: "var(--heading, 'Fungis', sans-serif)",
+        fontSize: 10,
+        fontWeight: 700,
+        letterSpacing: "0.2em",
+        textTransform: "uppercase",
+        margin: "0 0 5px",
+        transition: "all 0.4s ease",
+        ...silverText(checked),
+      }}>
+        {stepLabel}
+      </p>
+
+      {/* CLEANSE — tap row to complete, silver strikethrough when done */}
+      <div
+        onClick={onCheck}
+        style={{ position: "relative", cursor: "pointer", display: "inline-block", width: "100%" }}
+      >
+        <p style={{
+          fontFamily: "var(--heading, 'Fungis', sans-serif)",
+          fontSize: 18,
+          fontWeight: 700,
+          letterSpacing: "0.15em",
+          textTransform: "uppercase",
+          margin: 0,
+          lineHeight: 1.2,
+          transition: "all 0.4s ease",
+          ...silverText(checked),
+        }}>
+          {stepVerb}
+        </p>
+        {checked && (
+          <div style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            top: "50%",
+            height: 1,
+            background: SILVER_GRADIENT,
+            transform: "translateY(-50%)",
+            pointerEvents: "none",
+          }} />
+        )}
       </div>
-      <div style={{ flex: 1, marginBottom: isLast ? 0 : 12 }}>
-        <div
-          style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 13, padding: "13px 15px", cursor: reason ? "pointer" : "default", transition: "border-color 0.15s" }}
-          onClick={() => reason && setExpanded(e => !e)}
-          onMouseEnter={e => { if (reason) e.currentTarget.style.borderColor = "rgba(122,144,112,0.35)"; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; }}>
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 9, fontFamily: "var(--font-body)", letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", marginBottom: 4 }}>
-                {step.category}
-                {!scheduled && <span style={{ marginLeft: 8, color: "var(--taupe)", opacity: 0.75 }}>· Skipped today</span>}
-              </div>
-              <p style={{
-                fontFamily: "var(--script)", fontSize: 22, fontWeight: 400,
-                letterSpacing: "0.02em", color: nameColor, margin: "0 0 2px",
-                opacity: checked ? 0.6 : 1,
-                textDecoration: checked ? "line-through" : "none",
-                textDecorationColor: "rgba(232,226,217,0.45)",
-                textDecorationThickness: "1px",
-                transition: "opacity 280ms ease-out",
-              }}>{step.name}</p>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0 }}>
-                {step.brand}
-                {freqLabel && (
-                  <span style={{ marginLeft: 8, fontSize: 9, fontFamily: "var(--font-body)", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--taupe)", opacity: 0.85 }}>{freqLabel}</span>
-                )}
-                {step.session && step.session !== "auto" && (
-                  <span style={{ marginLeft: 8, fontSize: 9, fontFamily: "var(--font-body)", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.6 }}>{step.session === "both" ? "AM + PM" : step.session === "am" ? "AM" : step.session === "pm" ? "PM" : step.session}</span>
-                )}
-              </p>
-              {activeKeys.length > 0 && (
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 9 }}>
-                  {activeKeys.map(a => <span key={a} style={{ fontSize: 9, fontFamily: "var(--font-body)", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)", background: "var(--ink)", padding: "3px 8px", borderRadius: 20, border: "1px solid var(--border)" }}>{a}</span>)}
-                </div>
-              )}
-            </div>
-            {reason && (
-              <span style={{ color: "var(--clay)", opacity: 0.35, flexShrink: 0, marginTop: 2, display: "inline-flex", transition: "transform 0.18s", transform: expanded ? "rotate(-90deg)" : "rotate(90deg)" }}><Icon name="chevron" size={11} /></span>
-            )}
-          </div>
-          {damp && (
-            <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 10, padding: "6px 9px", borderRadius: 8, background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.2)" }}>
-              <span style={{ color: "rgba(139,115,85,0.85)", display: "inline-flex" }}><Icon name="drop" size={11} /></span>
-              <span style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "rgba(139,115,85,0.85)", letterSpacing: "0.02em" }}>Apply on damp skin for best absorption</span>
-            </div>
-          )}
-          {expanded && reason && (
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: "10px 0 0", lineHeight: 1.65, paddingTop: 10, borderTop: "1px solid var(--border)", opacity: 0.85 }}>{reason}</p>
-          )}
-        </div>
-      </div>
+
+      {/* Product name + brand — subtle subtext */}
+      <p style={{
+        fontFamily: "var(--font-body)",
+        fontSize: 11,
+        color: checked ? "var(--color-pebble)" : "var(--color-stone)",
+        margin: "5px 0 0",
+        letterSpacing: "0.02em",
+        lineHeight: 1.4,
+        transition: "color 0.4s ease",
+      }}>
+        {step.name}
+        {step.brand && <span style={{ opacity: 0.7 }}> · {step.brand}</span>}
+        {freqLabel && <span style={{ marginLeft: 8, fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase" }}> {freqLabel}</span>}
+      </p>
+
+      {needsDampSkin(step) && !checked && (
+        <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 10, letterSpacing: "0.1em", color: "var(--color-inky-moss)", opacity: 0.75, margin: "4px 0 0" }}>
+          ✦ best applied to damp skin
+        </p>
+      )}
+
+      {/* Expandable reason — tap label to toggle */}
+      {reason && (
+        <button
+          onClick={() => setExpanded(e => !e)}
+          style={{ background: "none", border: "none", padding: "4px 0 0", cursor: "pointer", display: "block" }}
+        >
+          <span style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "#2d3d2b", opacity: 0.6, transition: "color 0.2s" }}>
+            {expanded ? "less" : "why?"}
+          </span>
+        </button>
+      )}
+      {expanded && reason && (
+        <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#5a5a5a", margin: "8px 0 0", lineHeight: 1.65 }}>{reason}</p>
+      )}
+
+      {/* Divider */}
+      {!isLast && (
+        <div style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: 1,
+          background: "rgba(192,192,192,0.3)",
+        }} />
+      )}
     </div>
   );
 }
@@ -323,24 +369,6 @@ function getDayIndex() {
 
 const NO_DATA_LINE = "Log a few check-ins and I'll have something for you soon.";
 
-// Split the SwanSense insight into lines (prefers explicit line breaks,
-// falls back to sentence boundaries) and stagger a fadeInLine animation
-// across each segment.
-function renderInsightLines(text) {
-  const raw = String(text || "");
-  const byBreak = raw.split(/\n+/).map(s => s.trim()).filter(Boolean);
-  const segments = byBreak.length > 1
-    ? byBreak
-    : raw.split(/(?<=[.!?])\s+/).map(s => s.trim()).filter(Boolean);
-  return segments.map((seg, i) => (
-    <span key={i} style={{
-      display: "block",
-      opacity: 0,
-      animation: "fadeInLine 0.8s ease-in forwards",
-      animationDelay: `${i * 0.5}s`,
-    }}>{seg}</span>
-  ));
-}
 
 function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = {}, predictions = [] }) {
   const now = new Date();
@@ -354,79 +382,70 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
     "Happy birthday. Your skin looks radiant.",
   ];
 
-  // Separate meaningful predictions from baseline fallbacks
   const meaningfulPredictions = predictions.filter(p => {
     const key = p.id || p.type;
     return key && !key.startsWith("baseline_");
   });
   const hasMeaningful = meaningfulPredictions.length > 0;
 
-  // Line: SwanSense prediction > birthday > "not enough data yet"
   const line = isBirthday
     ? BIRTHDAY_LINES[now.getFullYear() % BIRTHDAY_LINES.length]
     : hasMeaningful
       ? meaningfulPredictions[0].headline
       : NO_DATA_LINE;
 
-  const grain ="url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E\")";
+  const detail = hasMeaningful && meaningfulPredictions[0].detail
+    ? meaningfulPredictions[0].detail
+    : "Log a few check-ins and I'll have something for you soon.";
 
-  // -- POPUP version ---------------------------------------------------------
+  const NOISE_BG = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23noise)' opacity='0.045'/%3E%3C/svg%3E\")";
+
+  const cardStyle = {
+    backgroundColor: "var(--color-ivory-shadow)",
+    backgroundImage: NOISE_BG,
+    backgroundRepeat: "repeat",
+    border: "1px solid rgba(192,192,192,0.35)",
+    borderRadius: 4,
+    boxShadow: "0 4px 24px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04)",
+    padding: "28px 24px",
+  };
+
+  const cardContent = (
+    <>
+      <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-inky-moss)", margin: "0 0 8px" }}>
+        Swan Song
+      </p>
+      <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontStyle: "italic", fontSize: 14, letterSpacing: "0.03em", color: "var(--color-inky-moss)", opacity: 0.85, margin: "0 0 16px", lineHeight: 1.6 }}>
+        {line}
+      </p>
+      <div style={{ height: 1, background: "rgba(192,192,192,0.3)", margin: "16px 0" }} />
+      <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 14, lineHeight: 1.7, color: "var(--color-stone)", letterSpacing: "0.05em", margin: 0 }}>
+        {detail}
+      </p>
+    </>
+  );
+
   if (asPopup) {
     return (
       <div style={{
         position: "fixed", inset: 0, zIndex: 200,
         display: "flex", alignItems: "center", justifyContent: "center",
-        background: "rgba(8,10,8,0.72)", backdropFilter: "blur(10px)",
+        background: "rgba(250,249,244,0.88)", backdropFilter: "blur(14px)",
         padding: "0 28px",
         animation: "fadeUp 0.38s ease",
       }}>
-        <div style={{
-          position: "relative", width: "100%", maxWidth: 340,
-          background: "linear-gradient(158deg, #3d3a28 0%, #2a2619 45%, #1e1a14 100%)",
-          borderRadius: 22,
-          padding: "28px 26px 24px",
-          overflow: "hidden",
-          isolation: "isolate",
-          boxShadow: "0 24px 60px rgba(0,0,0,0.7), 0 1px 0 rgba(232,220,180,0.06) inset",
-          border: "1px solid rgba(139,115,85,0.22)",
-        }}>
-          <span aria-hidden="true" style={{
-            position: "absolute", top: "50%", left: "50%",
-            transform: "translate(-50%, -50%)",
-            fontFamily: "var(--script)",
-            fontSize: 160, lineHeight: 1,
-            color: "#f5f0e8", opacity: 0.07,
-            pointerEvents: "none", userSelect: "none",
-            whiteSpace: "nowrap",
-            zIndex: -1,
-          }}>Cygne</span>
-          <div style={{ position: "absolute", inset: 0, borderRadius: 22, pointerEvents: "none", backgroundImage: grain, backgroundSize: "180px 180px", opacity: 0.7 }} />
-          <div style={{ position: "absolute", inset: 0, borderRadius: 22, pointerEvents: "none", background: "radial-gradient(ellipse at 85% 15%, rgba(139,115,85,0.12) 0%, transparent 65%)" }} />
-          <div style={{ position: "absolute", bottom: 14, right: 18, opacity: 0.18, color: "rgba(232,220,180,0.9)", pointerEvents: "none" }}><SwanIcon size={56} /></div>
-
-          <div style={{ textAlign: "center", marginBottom: 18 }}>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(232,226,217,0.65)", margin: 0 }}>
-              Swan Song
-            </p>
-          </div>
-          <div style={{ height: 1, background: "rgba(232,226,217,0.12)", marginBottom: 18 }} />
-
-          <p style={{ fontFamily: "var(--cursive)", fontSize: 32, fontWeight: 400, lineHeight: 1.5, color: "#e8e3d6", letterSpacing: "0.02em", margin: "0 0 18px" }}>{renderInsightLines(line)}</p>
-
-          {/* Show first prediction detail in popup */}
-          {hasMeaningful && meaningfulPredictions[0].detail && (
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "rgba(232,226,217,0.5)", margin: "0 0 22px", lineHeight: 1.65 }}>{meaningfulPredictions[0].detail}</p>
-          )}
-
+        <div style={{ ...cardStyle, width: "100%", maxWidth: 340 }}>
+          {cardContent}
           <button onClick={onDismissPopup} style={{
-            width: "100%", padding: "11px 0",
-            background: "rgba(232,226,217,0.08)", border: "1px solid rgba(232,226,217,0.18)",
-            borderRadius: 10, cursor: "pointer",
-            fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.2em",
-            textTransform: "uppercase", color: "rgba(232,226,217,0.55)", transition: "all 0.2s",
+            marginTop: 24, width: "100%", padding: "12px 0",
+            background: "transparent", border: "1px solid rgba(192,192,192,0.4)",
+            borderRadius: 0, cursor: "pointer",
+            fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 9,
+            letterSpacing: "0.2em", textTransform: "uppercase",
+            color: "var(--color-stone)", transition: "all 0.2s",
           }}
-            onMouseEnter={e => { e.currentTarget.style.background = "rgba(232,226,217,0.14)"; e.currentTarget.style.color = "rgba(232,226,217,0.85)"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "rgba(232,226,217,0.08)"; e.currentTarget.style.color = "rgba(232,226,217,0.55)"; }}>
+            onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--color-ink)"; e.currentTarget.style.color = "var(--color-ink)"; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(192,192,192,0.4)"; e.currentTarget.style.color = "var(--color-stone)"; }}>
             Carry on
           </button>
         </div>
@@ -434,40 +453,7 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
     );
   }
 
-  // -- INLINE (settled) version — small card at bottom of home ---------------
-  return (
-    <div style={{ position: "relative", marginTop: 8 }}>
-      <div style={{
-        position: "relative",
-        background: "linear-gradient(158deg, #3d3a28 0%, #2a2619 45%, #1e1a14 100%)",
-        borderRadius: 14,
-        padding: "16px 18px 14px",
-        overflow: "hidden",
-        isolation: "isolate",
-        boxShadow: "0 4px 18px rgba(0,0,0,0.35)",
-        border: "1px solid rgba(139,115,85,0.15)",
-      }}>
-        <span aria-hidden="true" style={{
-          position: "absolute", top: "50%", left: "50%",
-          transform: "translate(-50%, -50%)",
-          fontFamily: "var(--script)",
-          fontSize: 160, lineHeight: 1,
-          color: "#f5f0e8", opacity: 0.07,
-          pointerEvents: "none", userSelect: "none",
-          whiteSpace: "nowrap",
-          zIndex: -1,
-        }}>Cygne</span>
-        <div style={{ position: "absolute", inset: 0, borderRadius: 14, pointerEvents: "none", backgroundImage: grain, backgroundSize: "180px 180px", opacity: 0.6 }} />
-        <div style={{ position: "absolute", bottom: 8, right: 12, opacity: 0.18, color: "rgba(232,220,180,0.9)", pointerEvents: "none" }}><SwanIcon size={44} /></div>
-
-        <div style={{ marginBottom: 10 }}>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 8, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(232,226,217,0.55)", margin: 0 }}>Swan Song</p>
-        </div>
-
-        <p style={{ fontFamily: "var(--cursive)", fontSize: 22, fontWeight: 400, lineHeight: 1.5, color: "rgba(232,227,214,0.85)", letterSpacing: "0.02em", margin: 0 }}>{renderInsightLines(line)}</p>
-      </div>
-    </div>
-  );
+  return <div style={{ marginTop: 8, ...cardStyle }}>{cardContent}</div>;
 }
 
 
@@ -522,7 +508,7 @@ function FlightModeModal({ products, activeMap, onClose }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
           <div>
             <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 5px" }}>Flight Day</p>
-            <h2 style={{ fontFamily: "var(--script)", fontSize: 22, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: 0, lineHeight: 1.1 }}>Your Ritual, Anywhere</h2>
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--parchment)", margin: 0, lineHeight: 1.1 }}>Your Ritual, Anywhere</h2>
           </div>
           <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: 4 }}><Icon name="x" size={17} /></button>
         </div>
@@ -535,7 +521,7 @@ function FlightModeModal({ products, activeMap, onClose }) {
         <div style={{ display: "flex", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10, padding: 3, marginBottom: 24 }}>
           {[{ id: "edit", label: "Your Edit" }, { id: "tips", label: "Flight Tips" }].map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
-              style={{ flex: 1, padding: "8px 0", borderRadius: 8, border: "none", background: tab === t.id ? "#6e8a72" : "transparent", color: tab === t.id ? "#0d0f0d" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 10, fontWeight: tab === t.id ? 700 : 400, cursor: "pointer", letterSpacing: "0.12em", textTransform: "uppercase", transition: "all 0.18s" }}>
+              style={{ flex: 1, padding: "8px 0", borderRadius: 8, border: "none", background: tab === t.id ? "#2d3d2b" : "transparent", color: tab === t.id ? "#fdfcf9" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 10, fontWeight: tab === t.id ? 700 : 400, cursor: "pointer", letterSpacing: "0.12em", textTransform: "uppercase", transition: "all 0.18s" }}>
               {t.label}
             </button>
           ))}
@@ -572,12 +558,12 @@ function FlightModeModal({ products, activeMap, onClose }) {
             {keep.length > 0 && (
               <div style={{ marginBottom: 20 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-                  <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#6e8a72" }} />
-                  <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#6e8a72" }}>Pack These</span>
+                  <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#2d3d2b" }} />
+                  <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#2d3d2b" }}>Pack These</span>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {keep.map((item, i) => (
-                    <div key={i} style={{ padding: "13px 16px", background: "rgba(122,144,112,0.06)", border: "1px solid rgba(122,144,112,0.2)", borderRadius: 12 }}>
+                    <div key={i} style={{ padding: "13px 16px", background: "rgba(45,61,43,0.06)", border: "1px solid rgba(45,61,43,0.2)", borderRadius: 12 }}>
                       <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "var(--parchment)", margin: "0 0 3px", fontWeight: 500 }}>{item.name}</p>
                       <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>{item.reason}</p>
                     </div>
@@ -621,8 +607,8 @@ function FlightModeModal({ products, activeMap, onClose }) {
             ))}
 
             {/* Recovery note */}
-            <div style={{ padding: "16px 18px", background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.25)", borderRadius: 12, marginTop: 4 }}>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "#6e8a72", margin: "0 0 6px" }}>Landing Day</p>
+            <div style={{ padding: "16px 18px", background: "rgba(45,61,43,0.08)", border: "1px solid rgba(45,61,43,0.25)", borderRadius: 12, marginTop: 4 }}>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "#2d3d2b", margin: "0 0 6px" }}>Landing Day</p>
               <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: 0, lineHeight: 1.65 }}>
                 Give your skin 24h to re-acclimate before reintroducing actives. Cleanse, moisturize, SPF. Nothing else the first night.
               </p>

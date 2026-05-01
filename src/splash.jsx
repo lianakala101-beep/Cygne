@@ -1,91 +1,94 @@
 import { useState } from "react";
-import { LOGO_SRC } from "./components.jsx";
 
 function SplashScreen({ onDone }) {
   const [fading, setFading] = useState(false);
 
-  const handleContinue = () => {
+  const handleTap = () => {
     if (fading) return;
     setFading(true);
     setTimeout(onDone, 600);
   };
 
+  const handleButton = (e) => {
+    e.stopPropagation();
+    handleTap();
+  };
+
   return (
     <div
+      onClick={handleTap}
       style={{
-        position: "fixed", inset: 0, zIndex: 9999,
-        background: "#323d30",
-        display: "flex", flexDirection: "column",
-        justifyContent: "flex-start",
+        position: "fixed",
+        inset: 0,
+        zIndex: 9999,
+        background: "var(--color-ivory)",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
         opacity: fading ? 0 : 1,
         transition: "opacity 0.6s ease",
-        overflow: "hidden",
+        cursor: "default",
+        userSelect: "none",
+        WebkitTapHighlightColor: "transparent",
       }}>
 
-      {/* Top — logo + tagline, left-aligned */}
-      <div style={{ padding: "72px 36px 0" }}>
-        <img
-          src={LOGO_SRC}
-          alt="Cygne"
-          style={{
-            height: 170, width: "auto",
-            display: "block",
-            filter: "brightness(1.25) contrast(1.05)",
-            mixBlendMode: "lighten",
-          }}
-        />
-        <p style={{
-          fontFamily: "var(--script)",
-          fontSize: 22, fontWeight: 400,
-          color: "rgba(232,227,214,0.95)",
-          margin: "6px 0 0 130px",
-          letterSpacing: "0.05em",
-          lineHeight: 1,
-        }}>built around you</p>
-      </div>
+      <img
+        src="/cygne-logo.png"
+        alt=""
+        style={{
+          width: "72%",
+          maxWidth: 320,
+          display: "block",
+          margin: "0 auto",
+          background: "transparent",
+          border: "none",
+        }}
+      />
 
-      {/* Below logo — description and button sitting just under the logo block */}
+      {/* Tagline + CTA — pinned to bottom, above safe area */}
       <div style={{
-        display: "flex", flexDirection: "column", alignItems: "center",
-        padding: "32px 36px 72px",
+        position: "absolute",
+        bottom: "calc(60px + env(safe-area-inset-bottom, 0px))",
+        left: 0,
+        right: 0,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
       }}>
         <p style={{
-          fontFamily: "var(--font-body)",
+          fontFamily: "var(--font-display, 'Fungis', sans-serif)",
           fontSize: 13,
-          color: "rgba(232,227,214,0.60)",
-          margin: "0 0 28px",
-          lineHeight: 1.75,
-          textAlign: "center",
-          maxWidth: 300,
-        }}>A ritual tracker that reads your vanity, your skin, and your life — and keeps up with all three.</p>
+          fontWeight: 400,
+          letterSpacing: "0.15em",
+          textTransform: "uppercase",
+          color: "#7a7a7a",
+          margin: 0,
+        }}>Built Around You</p>
 
         <button
-          onClick={handleContinue}
+          onClick={handleButton}
           style={{
-            padding: "15px 0",
-            background: "rgba(232,227,214,0.12)",
-            color: "rgba(232,227,214,0.95)",
-            border: "1px solid rgba(232,227,214,0.28)",
-            borderRadius: 10,
-            fontFamily: "var(--font-body)",
-            fontSize: 10,
-            fontWeight: 600,
+            marginTop: 32,
+            padding: "14px 40px",
+            fontFamily: "var(--font-display, 'Fungis', sans-serif)",
+            fontSize: 12,
+            fontWeight: 400,
             letterSpacing: "0.2em",
             textTransform: "uppercase",
+            color: "#1c1c1a",
+            background: "transparent",
+            border: "1px solid #1c1c1a",
+            borderRadius: 0,
+            width: "auto",
             cursor: "pointer",
-            transition: "background 0.2s, border-color 0.2s",
-            width: "100%",
-          }}
-          onMouseEnter={e => { e.currentTarget.style.background = "rgba(232,227,214,0.2)"; e.currentTarget.style.borderColor = "rgba(232,227,214,0.5)"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = "rgba(232,227,214,0.12)"; e.currentTarget.style.borderColor = "rgba(232,227,214,0.28)"; }}>
-          Get Started
+            WebkitTapHighlightColor: "transparent",
+          }}>
+          Begin Your Ritual
         </button>
       </div>
     </div>
   );
 }
-
-
-// --- ONBOARDING ---------------------------------------------------------------
 
 export { SplashScreen };

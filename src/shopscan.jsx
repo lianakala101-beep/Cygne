@@ -87,7 +87,7 @@ function ShopScanModal({ products, user = {}, onClose }) {
   };
 
   const verdictConfig = {
-    love:  { color: "#6e8a72",  bg: "rgba(122,144,112,0.08)", border: "rgba(122,144,112,0.25)", label: "Your skin would love this" },
+    love:  { color: "#2d3d2b",  bg: "rgba(45,61,43,0.08)", border: "rgba(45,61,43,0.25)", label: "Your skin would love this" },
     maybe: { color: "#8b7355",      bg: "rgba(139,115,85,0.08)",  border: "rgba(139,115,85,0.25)",  label: "Think twice" },
     skip:  { color: "#8b7355",      bg: "rgba(139,115,85,0.08)",   border: "rgba(139,115,85,0.25)",   label: "Not for you" },
   };
@@ -102,7 +102,7 @@ function ShopScanModal({ products, user = {}, onClose }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "24px 24px 0" }}>
           <div>
             <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 4px" }}>Shopping</p>
-            <h2 style={{ fontFamily: "var(--script)", fontSize: 32, fontWeight: 400, color: "var(--parchment)", margin: 0, letterSpacing: "0.01em" }}>Would my skin like this?</h2>
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--parchment)", margin: 0 }}>Would my skin like this?</h2>
           </div>
           <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: 4, marginTop: 2 }}><Icon name="x" size={17} /></button>
         </div>
@@ -120,7 +120,7 @@ function ShopScanModal({ products, user = {}, onClose }) {
               <input ref={fileRef} type="file" accept="image/*" capture="environment" style={{ display: "none" }} onChange={handleFile} />
               <button onClick={() => fileRef.current?.click()}
                 style={{ width: "100%", padding: "36px 20px", border: "1.5px dashed var(--border)", borderRadius: 16, background: "var(--surface)", cursor: "pointer", transition: "border-color 0.2s, background 0.2s" }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(122,144,112,0.5)"; e.currentTarget.style.background = "rgba(122,144,112,0.06)"; }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(45,61,43,0.5)"; e.currentTarget.style.background = "rgba(45,61,43,0.06)"; }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.background = "var(--surface)"; }}>
                 <div style={{ color: "var(--clay)", marginBottom: 10, display: "flex", justifyContent: "center" }}><Icon name="camera" size={28} /></div>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--parchment)", margin: "0 0 4px", fontWeight: 500 }}>Scan product</p>
@@ -131,7 +131,7 @@ function ShopScanModal({ products, user = {}, onClose }) {
                 <div style={{ marginTop: 16, padding: "12px 14px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10 }}>
                   <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 6px" }}>Checking against your skin</p>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-                    {user.skinType && <span style={{ fontSize: 10, fontFamily: "var(--font-body)", color: "#6e8a72", background: "rgba(122,144,112,0.1)", border: "1px solid rgba(122,144,112,0.25)", padding: "2px 9px", borderRadius: 20 }}>{user.skinType}</span>}
+                    {user.skinType && <span style={{ fontSize: 10, fontFamily: "var(--font-body)", color: "#2d3d2b", background: "rgba(45,61,43,0.1)", border: "1px solid rgba(45,61,43,0.25)", padding: "2px 9px", borderRadius: 20 }}>{user.skinType}</span>}
                     {(user.concerns || []).map((c, i) => <span key={i} style={{ fontSize: 10, fontFamily: "var(--font-body)", color: "var(--clay)", background: "var(--surface)", border: "1px solid var(--border)", padding: "2px 9px", borderRadius: 20 }}>{c}</span>)}
                   </div>
                 </div>
@@ -144,7 +144,7 @@ function ShopScanModal({ products, user = {}, onClose }) {
             <div style={{ textAlign: "center", padding: "40px 0" }}>
               {imgPreview && <img src={imgPreview} alt="" style={{ width: 120, height: 120, objectFit: "cover", borderRadius: 12, marginBottom: 20, opacity: 0.6 }} />}
               <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 10 }}>
-                <div style={{ width: 14, height: 14, border: "1.5px solid #6e8a72", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+                <div style={{ width: 14, height: 14, border: "1.5px solid #2d3d2b", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
                 <span style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)" }}>Reading the ingredients...</span>
               </div>
               <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", opacity: 0.5, margin: 0 }}>Checking against your skin and vanity</p>
@@ -159,7 +159,7 @@ function ShopScanModal({ products, user = {}, onClose }) {
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 8 }}>
                   <div>
                     <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: vc.color, margin: "0 0 5px" }}>{vc.label}</p>
-                    <p style={{ fontFamily: "var(--script)", fontSize: 32, fontWeight: 400, color: "var(--parchment)", margin: 0, lineHeight: 1.2, letterSpacing: "0.01em" }}>{result.headline}</p>
+                    <p style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 400, letterSpacing: "0.08em", color: "var(--parchment)", margin: 0, lineHeight: 1.3 }}>{result.headline}</p>
                   </div>
                   {imgPreview && <img src={imgPreview} alt="" style={{ width: 52, height: 52, objectFit: "cover", borderRadius: 8, flexShrink: 0, marginLeft: 12 }} />}
                 </div>
@@ -198,8 +198,8 @@ function ShopScanModal({ products, user = {}, onClose }) {
 
               {/* Fills a gap */}
               {result.fillsGap && result.gap && (
-                <div style={{ padding: "11px 14px", background: "rgba(122,144,112,0.06)", border: "1px solid rgba(122,144,112,0.2)", borderRadius: 10, marginBottom: 10 }}>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "#6e8a72", margin: "0 0 4px" }}>Fills a gap</p>
+                <div style={{ padding: "11px 14px", background: "rgba(45,61,43,0.06)", border: "1px solid rgba(45,61,43,0.2)", borderRadius: 10, marginBottom: 10 }}>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "#2d3d2b", margin: "0 0 4px" }}>Fills a gap</p>
                   <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{result.gap}</p>
                 </div>
               )}
@@ -219,7 +219,7 @@ function ShopScanModal({ products, user = {}, onClose }) {
                   Scan Another
                 </button>
                 <button onClick={onClose}
-                  style={{ flex: 1, padding: "12px 0", background: "#6e8a72", border: "none", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 10, color: "#0d0f0d", fontWeight: 700, cursor: "pointer", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                  style={{ flex: 1, padding: "12px 0", background: "#2d3d2b", border: "none", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 10, color: "#fdfcf9", fontWeight: 700, cursor: "pointer", letterSpacing: "0.1em", textTransform: "uppercase" }}>
                   Done
                 </button>
               </div>

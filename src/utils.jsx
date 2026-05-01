@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Icon, LOGO_SRC, SwanIcon } from "./components.jsx";
 
-/** Compress an image file to JPEG, max 800px on longest side, keeps output well under 1MB */
-export async function compressImage(file, maxDim = 800, quality = 0.7) {
+/** Compress an image file to JPEG, max 1080px on longest side, keeps output well under 1MB */
+export async function compressImage(file, maxDim = 1080, quality = 0.82) {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => {
@@ -29,17 +29,43 @@ export async function compressImage(file, maxDim = 800, quality = 0.7) {
   });
 }
 
+/** Compress an image file to JPEG Blob, max 1080px wide, returns Blob for direct upload */
+export async function compressImageBlob(file, maxWidth = 1080, quality = 0.82) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > maxWidth) {
+        height = Math.round(height * (maxWidth / width));
+        width = maxWidth;
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, width, height);
+      canvas.toBlob((blob) => {
+        URL.revokeObjectURL(img.src);
+        if (blob) resolve(blob);
+        else reject(new Error("canvas.toBlob returned null"));
+      }, "image/jpeg", quality);
+    };
+    img.onerror = (e) => { URL.revokeObjectURL(img.src); reject(e); };
+    img.src = URL.createObjectURL(file);
+  });
+}
+
 
 function SwanWelcomeScreen({ user, onDone }) {
   const name = user?.name && user.name !== "Friend" ? user.name.split(" ")[0] : null;
   return (
-    <div style={{ position: "fixed", inset: 0, background: "#323d30", display: "flex", flexDirection: "column", alignItems: "flex-start", justifyContent: "space-between", padding: "72px 36px 64px", zIndex: 500 }}>
+    <div style={{ position: "fixed", inset: 0, background: "var(--color-ivory)", display: "flex", flexDirection: "column", alignItems: "flex-start", justifyContent: "space-between", padding: "72px 36px 64px", zIndex: 500 }}>
       <div>
         <div style={{ marginBottom: 32, color: "rgba(232,226,217,0.95)" }}><SwanIcon size={56} /></div>
         <p style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(232,226,217,0.5)", margin: "0 0 14px" }}>
           {name ? "Welcome, " + name + "." : "Welcome."}
         </p>
-        <h1 style={{ fontFamily: "var(--script)", fontSize: 44, fontWeight: 400, color: "rgba(232,226,217,0.95)", margin: "0 0 20px", lineHeight: 1.15 }}>
+        <h1 style={{ fontFamily: "var(--font-display)", fontSize: 38, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(232,226,217,0.95)", margin: "0 0 20px", lineHeight: 1.2 }}>
           Your ritual starts here.
         </h1>
         <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "rgba(232,226,217,0.55)", lineHeight: 1.7, maxWidth: 320 }}>
@@ -96,6 +122,13 @@ const DEMO_PRODUCTS = [
 // Use local midnight (not UTC) so cycle & treatment tracking advance at the
 // user's local midnight, not UTC midnight.
 function toLocalMidnight(d) {
+  // When given a "YYYY-MM-DD" (or "YYYY-MM-DDTHH:…") string, parse the date
+  // portion as local — new Date("YYYY-MM-DD") is UTC midnight which shifts
+  // one day back in negative-UTC-offset timezones.
+  if (typeof d === "string") {
+    const [year, month, day] = d.split("T")[0].split("-").map(Number);
+    return new Date(year, month - 1, day).getTime();
+  }
   const date = d instanceof Date ? d : new Date(d);
   return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
 }
@@ -110,9 +143,9 @@ function daysBetweenLocal(startIso, nowDate = new Date()) {
 function getCurrentCycleDay(user) {
   if (!user) return null;
   if (user.cycleStartDate) {
-    // Parse stored ISO as local date
-    const start = new Date(user.cycleStartDate);
-    const startLocal = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+    // Parse stored date string as local midnight to avoid UTC-offset shifts.
+    const [y, m, d] = user.cycleStartDate.split("T")[0].split("-").map(Number);
+    const startLocal = new Date(y, m - 1, d);
     const today = new Date();
     const todayLocal = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     const diffDays = Math.floor((todayLocal.getTime() - startLocal.getTime()) / (1000 * 60 * 60 * 24));
