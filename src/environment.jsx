@@ -122,7 +122,7 @@ function EnvironmentStrip({ products, activeMap, locationData, tempUnit = "C" })
         onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}>
 
         <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", letterSpacing: "0.04em" }}>
+          <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 10, letterSpacing: "0.12em", color: "var(--color-inky-moss)" }}>
             {location?.city}{location?.country ? ` · ${location.country}` : ""}
           </span>
         </div>
@@ -131,18 +131,18 @@ function EnvironmentStrip({ products, activeMap, locationData, tempUnit = "C" })
           {env.humidity !== null && (
             <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
               <span style={{ color: "var(--clay)", opacity: 0.5, display: "inline-flex" }}><Icon name="drop" size={10} /></span>
-              <span style={{ fontFamily: "var(--font-body)", fontSize: 11, color: humCol, fontWeight: 500 }}>{env.humidity}%</span>
+              <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 10, letterSpacing: "0.12em", color: "var(--color-inky-moss)" }}>{env.humidity}%</span>
             </div>
           )}
           {env.uvIndex !== null && (
             <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
               <span style={{ color: "var(--clay)", opacity: 0.5, display: "inline-flex" }}><Icon name="sun" size={10} /></span>
-              <span style={{ fontFamily: "var(--font-body)", fontSize: 11, color: uvCol, fontWeight: 500 }}>UV {env.uvIndex}</span>
+              <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 10, letterSpacing: "0.12em", color: "var(--color-inky-moss)" }}>UV {env.uvIndex}</span>
             </div>
           )}
           {env.temp !== null && (
             <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              <span style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)" }}>{Math.round(tempUnit === "F" ? (env.temp * 9/5 + 32) : env.temp)}°{tempUnit}</span>
+              <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 10, letterSpacing: "0.12em", color: "var(--color-inky-moss)" }}>{Math.round(tempUnit === "F" ? (env.temp * 9/5 + 32) : env.temp)}°{tempUnit}</span>
             </div>
           )}
           {nudges.length > 0 && (
