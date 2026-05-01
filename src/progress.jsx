@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Icon, Section } from "./components.jsx";
 import { detectActives, analyzeShelf, detectConflicts } from "./engine.js";
 import { RAMP_SCHEDULES, RAMP_ACTIVES, IntroduceSlowlyCard, WeeklyRitualCalendar } from "./ramp.jsx";
+import { FaceHeatMap } from "./components/FaceHeatMap.jsx";
+import { AskCygneModal } from "./components/AskCygneModal.jsx";
 
 
 function computeStabilityScore(products, checkIns, activeMap) {
@@ -1075,6 +1077,7 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
 function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatments, user = {}, onAdvanceRamp, onHoldRamp, journals = [], setJournals = () => {}, onUpdateUser = () => {} }) {
   const [showCheckIn, setShowCheckIn] = useState(false);
   const [showJournal, setShowJournal] = useState(false);
+  const [askCygneQuestion, setAskCygneQuestion] = useState(null);
   const { activeMap } = analyzeShelf(products);
   const conflicts = detectConflicts(products);
 
@@ -1111,6 +1114,12 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
       {/* -- Header ----------------------------------------------------------- */}
       <div style={{ marginBottom: 20 }}>
         <h1 style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 42, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: 0, lineHeight: 1 }}>Your Progress</h1>
+      </div>
+
+      {/* -- Inflammation Heat Map ------------------------------------------ */}
+      {sectionLabel("map-pin", "Inflammation Map")}
+      <div style={{ marginBottom: 28 }}>
+        <FaceHeatMap journals={journals} onAskCygne={(q, ctx) => setAskCygneQuestion({ q, ctx })} />
       </div>
 
       {/* -- Skin Journal ------------------------------------------------------ */}
@@ -1369,6 +1378,13 @@ function LocationManager({ locationData, setLocationData }) {
         {loading ? "Requesting..." : "Enable Location"}
       </button>
       {error && <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "#c06060", margin: "10px 0 0" }}>{error}</p>}
+      {askCygneQuestion && (
+        <AskCygneModal
+          initialQuestion={askCygneQuestion.q}
+          context={askCygneQuestion.ctx}
+          onClose={() => setAskCygneQuestion(null)}
+        />
+      )}
     </div>
   );
 }
