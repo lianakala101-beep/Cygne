@@ -4,6 +4,8 @@ import { detectActives, analyzeShelf, detectConflicts, buildRoutine, hasSPFCover
 import { getAutoSession } from "./productmodal.jsx";
 import { RAMP_SCHEDULES, RAMP_ACTIVES, IntroduceSlowlyCard, getRampWeek } from "./ramp.jsx";
 import { getCurrentCycleDay, getTreatmentElapsed, daysBetweenLocal } from "./utils.jsx";
+import { FaceHeatMap } from "./components/FaceHeatMap.jsx";
+import { AskCygneModal } from "./components/AskCygneModal.jsx";
 
 
 function computeStabilityScore(products, checkIns, activeMap) {
