@@ -91,8 +91,8 @@ function analyzeShelf(products) {
   }
   const exfCount = products.filter(p => { const a = detectActives(p.ingredients); return a.AHA || a.BHA || p.category === "Exfoliant"; }).length;
   if (exfCount > 1) flags.push({ severity: "warning", label: `${exfCount} exfoliants detected`, detail: "Multiple exfoliants risk barrier damage. Alternate days — never layer." });
-  if (!products.some(p => p.category === "SPF" || detectActives(p.ingredients).SPF)) flags.push({ severity: "missing", label: "No SPF in your vanity", detail: "Daily SPF is non-negotiable — even indoors, even in winter." });
-  if (!products.some(p => p.category === "Moisturizer")) flags.push({ severity: "missing", label: "No moisturizer detected", detail: "A moisturizer is a foundational step in every ritual." });
+  if (!products.some(p => p.category === "SPF" || p.category === "SPF Moisturizer" || detectActives(p.ingredients || []).SPF)) flags.push({ severity: "missing", label: "No SPF in your vanity", detail: "Daily SPF is non-negotiable — even indoors, even in winter." });
+  if (!products.some(p => p.category === "Moisturizer" || p.category === "SPF Moisturizer" || p.category === "Oil")) flags.push({ severity: "missing", label: "No moisturizer detected", detail: "A moisturizer is a foundational step in every ritual." });
   return { activeMap, flags };
 }
 
@@ -107,5 +107,5 @@ function calcSpending(products) {
 export { isScheduledToday, getNextUseLabel, getCurrentSession, detectActives, buildRoutine, detectConflicts, analyzeShelf, calcSpending };
 
 export function hasSPFCoverage(products, activeMap) {
-  return products.some(p => p.category === "SPF" || (p.ingredients && detectActives(p.ingredients).SPF));
+  return products.some(p => p.category === "SPF" || p.category === "SPF Moisturizer" || (p.ingredients && detectActives(p.ingredients).SPF));
 }
