@@ -80,7 +80,7 @@ function AuthScreen({ onAuth }) {
       {/* Top — logo */}
       <div style={{ paddingTop: 72, width: "100%", maxWidth: 380 }}>
         <img src="/cygne-logo.png" alt="Cygne" style={{ height: 140, width: "auto", display: "block" }} />
-        <p style={{ fontFamily: "'Reenie Beanie', cursive", fontSize: 22, fontWeight: 400, color: "var(--color-ink)", margin: "6px 0 0 110px", letterSpacing: "0.05em", lineHeight: 1 }}>built around you</p>
+        <p style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 400, color: "var(--color-ink)", margin: "6px 0 0 110px", letterSpacing: "0.05em", lineHeight: 1 }}>built around you</p>
       </div>
 
       {/* Form */}
@@ -197,7 +197,7 @@ function ResetPasswordScreen({ onDone }) {
     <div style={{ minHeight: "100vh", background: "var(--color-ivory)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between", padding: "0 36px" }}>
       <div style={{ paddingTop: 72, width: "100%", maxWidth: 380 }}>
         <img src="/cygne-logo.png" alt="Cygne" style={{ height: 140, width: "auto", display: "block" }} />
-        <p style={{ fontFamily: "'Reenie Beanie', cursive", fontSize: 22, fontWeight: 400, color: "var(--color-ink)", margin: "6px 0 0 110px", letterSpacing: "0.05em", lineHeight: 1 }}>built around you</p>
+        <p style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 400, color: "var(--color-ink)", margin: "6px 0 0 110px", letterSpacing: "0.05em", lineHeight: 1 }}>built around you</p>
       </div>
 
       <div style={{ width: "100%", maxWidth: 380, paddingBottom: 64 }}>

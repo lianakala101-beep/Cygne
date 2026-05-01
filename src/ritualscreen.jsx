@@ -294,14 +294,14 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
 
       {/* -- Header ----------------------------------------------------------- */}
       <div style={{ marginBottom: 16 }}>
-        <h1 style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 42, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: 0, lineHeight: 1 }}>{user?.name ? `${user.name.split(" ")[0]}'s Ritual` : "Your Ritual"}</h1>
+        <h1 style={{ fontFamily: "var(--font-display)", fontSize: 42, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: 0, lineHeight: 1 }}>{user?.name ? `${user.name.split(" ")[0]}'s Ritual` : "Your Ritual"}</h1>
       </div>
 
       {/* -- Swan guiding line ---------------------------------------------- */}
       {guidingLine && (
         <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 22 }}>
           <span style={{ fontSize: 13, lineHeight: 1, flexShrink: 0 }}>🦢</span>
-          <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 19, fontWeight: 400, color: "var(--clay)", margin: 0, lineHeight: 1.4, letterSpacing: "0.01em" }}>{guidingLine}</p>
+          <p style={{ fontFamily: "var(--font-display)", fontSize: 19, fontWeight: 400, color: "var(--clay)", margin: 0, lineHeight: 1.4, letterSpacing: "0.01em" }}>{guidingLine}</p>
         </div>
       )}
 
@@ -319,7 +319,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
               <span style={{ marginLeft: "auto", fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: ritualMode.color, opacity: 0.8 }}>{cyclePhase} phase</span>
             )}
           </div>
-          <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 26, fontWeight: 400, color: "var(--parchment)", margin: "0 0 2px", letterSpacing: "0.02em" }}>{ritualMode.name}</p>
+          <p style={{ fontFamily: "var(--font-display)", fontSize: 26, fontWeight: 400, color: "var(--parchment)", margin: "0 0 2px", letterSpacing: "0.02em" }}>{ritualMode.name}</p>
           <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: "0 0 10px", opacity: 0.7 }}>{ritualMode.tagline}</p>
           <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", margin: 0, lineHeight: 1.65 }}>{ritualMode.guidance}</p>
           {filteredOut.length > 0 && (
@@ -350,13 +350,13 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
             </p>
             <div>{steps.map((p, i) => <RoutineStep key={p.id} step={p} index={i} isLast={i === steps.length - 1} checked={completedSteps.includes(p.id)} onCheck={() => toggleStep(p.id)} />)}</div>
           </Section>
-        : <div style={{ padding: "32px 0 16px" }}><div style={{ display: "flex", alignItems: "flex-start", gap: 9, marginBottom: 8 }}><span style={{ fontSize: 15, lineHeight: 1.4, flexShrink: 0 }}>🦢</span><p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 19, color: "var(--clay)", margin: 0, lineHeight: 1.4 }}>Your ritual is waiting. Add products to your vanity and they'll appear here.</p></div></div>}
+        : <div style={{ padding: "32px 0 16px" }}><div style={{ display: "flex", alignItems: "flex-start", gap: 9, marginBottom: 8 }}><span style={{ fontSize: 15, lineHeight: 1.4, flexShrink: 0 }}>🦢</span><p style={{ fontFamily: "var(--font-display)", fontSize: 19, color: "var(--clay)", margin: 0, lineHeight: 1.4 }}>Your ritual is waiting. Add products to your vanity and they'll appear here.</p></div></div>}
       {allDone && steps.length > 0 && (
         <div style={{ margin: "16px 0", padding: "18px 18px", background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 14 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: todayCheckedIn ? 0 : 14 }}>
             <span style={{ fontSize: 16 }}>🦢</span>
             <div>
-              <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 22, color: "var(--parchment)", margin: "0 0 2px" }}>Ritual complete.</p>
+              <p style={{ fontFamily: "var(--font-display)", fontSize: 22, color: "var(--parchment)", margin: "0 0 2px" }}>Ritual complete.</p>
               <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>
                 {todayCheckedIn ? "Check-in logged. Rest well." : `Your ${sessionLabel.toLowerCase()} ritual is done — how did your skin feel today?`}
               </p>
@@ -391,7 +391,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
               return (
                 <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: "var(--surface)", border: `1px solid ${scheduledTonight ? "rgba(122,144,112,0.35)" : "var(--border)"}`, borderRadius: 12, marginBottom: 8, opacity: scheduledTonight ? 1 : 0.6 }}>
                   <div>
-                    <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 22, color: "var(--parchment)", margin: "0 0 1px" }}>{p.name}</p>
+                    <p style={{ fontFamily: "var(--font-display)", fontSize: 22, color: "var(--parchment)", margin: "0 0 1px" }}>{p.name}</p>
                     <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>{p.brand}</p>
                   </div>
                   <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: labelColor, background: scheduledTonight ? "rgba(122,144,112,0.12)" : "transparent", padding: "3px 8px", borderRadius: 20, border: scheduledTonight ? "1px solid rgba(122,144,112,0.25)" : "none" }}>{label}</span>
@@ -411,7 +411,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
             return (
               <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, marginBottom: 8 }}>
                 <div>
-                  <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 22, color: "var(--parchment)", margin: "0 0 1px" }}>{p.name}</p>
+                  <p style={{ fontFamily: "var(--font-display)", fontSize: 22, color: "var(--parchment)", margin: "0 0 1px" }}>{p.name}</p>
                   <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>{p.brand} · {freqLabel}</p>
                 </div>
                 <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)" }}>{nextLabel}</span>

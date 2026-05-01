@@ -78,7 +78,7 @@ function CheckInModal({ onSubmit, onClose }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
           <div>
             <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 6px" }}>Weekly Check-In</p>
-            <h2 style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 22, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: 0 }}>How is your skin?</h2>
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: 0 }}>How is your skin?</h2>
           </div>
           <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: 4, marginTop: 2 }}><Icon name="x" size={17} /></button>
         </div>
@@ -189,7 +189,7 @@ function SkinJournalModal({ onSubmit, onClose, existing = null }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
           <div>
             <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 4px" }}>SKIN JOURNAL</p>
-            <h2 style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 26, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: 0 }}>How is your skin today?</h2>
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: 26, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: 0 }}>How is your skin today?</h2>
           </div>
           <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: 4 }}>
             <Icon name="x" size={16} />
@@ -596,7 +596,7 @@ function AddTreatmentModal({ onSave, onClose }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
           <div>
             <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 5px" }}>Log Treatment</p>
-            <h2 style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 22, fontWeight: 400, color: "var(--parchment)", margin: 0, lineHeight: 1.1 }}>What did you get?</h2>
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 400, color: "var(--parchment)", margin: 0, lineHeight: 1.1 }}>What did you get?</h2>
           </div>
           <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: 4 }}><Icon name="x" size={17} /></button>
         </div>
@@ -650,7 +650,7 @@ function TreatmentRecoveryCard({ treatment, products, activeMap, onDismiss }) {
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 12 }}>
           <div>
             <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 3px" }}>Recovery — Day {elapsed}</p>
-            <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 22, fontWeight: 400, color: "var(--parchment)", margin: "0 0 2px", lineHeight: 1.2 }}>{type.label}</p>
+            <p style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 400, color: "var(--parchment)", margin: "0 0 2px", lineHeight: 1.2 }}>{type.label}</p>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <div style={{ width: 5, height: 5, borderRadius: "50%", background: isLastPhase ? "#7a9070" : "#c49040" }} />
               <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: isLastPhase ? "#7a9070" : "#c49040", fontWeight: 600, letterSpacing: "0.06em" }}>{phase.label}</span>
@@ -1042,7 +1042,7 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
               <div>
                 <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 4px" }}>Log</p>
-                <h2 style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 22, fontWeight: 400, color: "var(--parchment)", margin: 0 }}>What happened today?</h2>
+                <h2 style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 400, color: "var(--parchment)", margin: 0 }}>What happened today?</h2>
               </div>
               <button onClick={() => setShowTriggerModal(false)} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: 4 }}><Icon name="x" size={17} /></button>
             </div>
@@ -1113,7 +1113,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
 
       {/* -- Header ----------------------------------------------------------- */}
       <div style={{ marginBottom: 20 }}>
-        <h1 style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 42, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: 0, lineHeight: 1 }}>Your Progress</h1>
+        <h1 style={{ fontFamily: "var(--font-display)", fontSize: 42, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: 0, lineHeight: 1 }}>Your Progress</h1>
       </div>
 
       {/* -- Inflammation Heat Map ------------------------------------------ */}
@@ -1136,7 +1136,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
                 style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "15px 18px", background: "rgba(122,144,112,0.07)", border: "1px solid rgba(122,144,112,0.18)", borderRadius: 14, cursor: "pointer" }}>
                 <div style={{ textAlign: "left" }}>
                   <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 4px" }}>Skin Journal</p>
-                  <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 20, color: "var(--parchment)", margin: 0 }}>How is your skin today?</p>
+                  <p style={{ fontFamily: "var(--font-display)", fontSize: 20, color: "var(--parchment)", margin: 0 }}>How is your skin today?</p>
                 </div>
                 <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600, color: "#7a9070", letterSpacing: "0.06em" }}>+ Log</span>
               </button>
@@ -1145,7 +1145,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
                 style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "13px 18px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, cursor: "pointer" }}>
                 <div>
                   <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 3px" }}>Today</p>
-                  <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 20, color: cond ? cond.color : "var(--parchment)", margin: 0 }}>{cond ? cond.label : todayEntry.condition}</p>
+                  <p style={{ fontFamily: "var(--font-display)", fontSize: 20, color: cond ? cond.color : "var(--parchment)", margin: 0 }}>{cond ? cond.label : todayEntry.condition}</p>
                 </div>
                 <div style={{ display: "flex", gap: 6 }}>
                   {todayEntry.sleep && <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)", background: "var(--ink)", padding: "3px 8px", borderRadius: 20 }}>Sleep {todayEntry.sleep}</span>}
@@ -1177,7 +1177,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
           style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 20px", background: "rgba(122,144,112,0.09)", border: "1px solid rgba(122,144,112,0.28)", borderRadius: 14, marginBottom: 24, cursor: "pointer", textAlign: "left" }}>
           <div>
             <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 4px" }}>Ritual Check-in</p>
-            <p style={{ fontFamily: "Reenie Beanie, cursive", fontSize: 22, color: "var(--parchment)", margin: "0 0 4px", lineHeight: 1 }}>How did your skin respond?</p>
+            <p style={{ fontFamily: "var(--font-display)", fontSize: 22, color: "var(--parchment)", margin: "0 0 4px", lineHeight: 1 }}>How did your skin respond?</p>
             <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>
               {daysSince === null ? "Log your first check-in to start tracking." : "Last check-in " + daysSince + " day" + (daysSince !== 1 ? "s" : "") + " ago."}
             </p>
