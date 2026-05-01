@@ -13,8 +13,8 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
   const hasBHA = !!activeMap["BHA"];
   const hasHA = !!activeMap["hyaluronic acid"];
   const hasCeramides = !!activeMap["ceramides"];
-  const hasSPF = cats.has("SPF") || !!activeMap["SPF"];
-  const hasMoisturizer = cats.has("Moisturizer");
+  const hasSPF = cats.has("SPF") || cats.has("SPF Moisturizer") || !!activeMap["SPF"];
+  const hasMoisturizer = cats.has("Moisturizer") || cats.has("SPF Moisturizer") || cats.has("Oil");
   const hasCleanser = cats.has("Cleanser");
   const hasEyeCream = cats.has("Eye Cream");
   const hasPeptides = !!activeMap["peptides"];
@@ -436,8 +436,8 @@ function buildRefinements(products, activeMap, conflicts) {
   }
 
   // -- 4. ADD (progress essentials) -----------------------------------------
-  const hasSPF = !!cats["SPF"] || !!activeMap["SPF"];
-  const hasMoisturizer = !!cats["Moisturizer"];
+  const hasSPF = !!cats["SPF"] || !!cats["SPF Moisturizer"] || !!activeMap["SPF"];
+  const hasMoisturizer = !!cats["Moisturizer"] || !!cats["SPF Moisturizer"] || !!cats["Oil"];
   const hasCleanser = !!cats["Cleanser"];
 
   if (!hasSPF) refinements.push({
