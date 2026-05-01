@@ -23,6 +23,24 @@ const Icon = ({ name, size = 20 }) => {
     leaf:    "M17 8C8 10 5.9 16.17 3.82 19c-1 1.5-.5 3 1.5 3 1 0 2-.5 3-1.5 1.5-1.5 3-4 5-4.5.5 2.5 0 5-2 7 3 0 7-3 9-7.5s0-8-3-9.5z",
     sparkle: "M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z",
     chevron: "M9 18l6-6-6-6",
+    bell:    "M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9 M13.73 21a2 2 0 01-3.46 0",
+    box:     "M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z M3.27 6.96L12 12.01l8.73-5.05 M12 22.08V12",
+    book:    "M4 19.5A2.5 2.5 0 016.5 17H20 M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z",
+    fog:     "M3 15h18 M3 19h12 M5 11h14 M5 7h14",
+    mountain:"M8 3l4 8 5-5 5 15H2L8 3z",
+    thermo:  "M14 14.76V3.5a2.5 2.5 0 00-5 0v11.26a4 4 0 105 0z",
+    snow:    "M12 2v20M2 12h20M5 5l14 14M19 5L5 19",
+    plane:   "M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3s-3 .5-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5 0 1 .4 1.3L9 12l-1 3-2 1-1 2 3-1 2 1 1-2-1-2 3-1 3.5 5.3c.3.4.8.6 1.3.4l.5-.2c.4-.3.6-.7.5-1.2z",
+    swan:    "M5 20h14 M6 20c0-5 3-9 8-9 M14 11c-3 0-5-2-5-4 M9 7a2 2 0 012-2l1 2",
+    target:  "M12 22a10 10 0 100-20 10 10 0 000 20z M12 18a6 6 0 100-12 6 6 0 000 12z M12 14a2 2 0 100-4 2 2 0 000 4z",
+    cycle:   "M12 2a10 10 0 010 20V2z M12 2a10 10 0 000 20",
+    circle:  "M12 22a10 10 0 100-20 10 10 0 000 20z",
+    auto:    "M12 22a10 10 0 100-20 10 10 0 000 20z M12 16v-4 M12 8h.01",
+    "arrow-right": "M5 12h14M13 5l7 7-7 7",
+    "arrow-left":  "M19 12H5M11 19l-7-7 7-7",
+    "arrow-up":    "M12 19V5M5 12l7-7 7 7",
+    "arrow-down":  "M12 5v14M19 12l-7 7-7-7",
+    reflection:   "M12 3a7 7 0 100 14 7 7 0 000-14z M12 17v4 M9 21h6 M12 7v6 M10 10h4",
   };
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
@@ -32,12 +50,12 @@ const Icon = ({ name, size = 20 }) => {
 };
 
 // --- SHARED -------------------------------------------------------------------
-const labelSt = { display: "block", fontFamily: "var(--sans)", fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", marginBottom: 8 };
-const inputSt = { width: "100%", padding: "12px 14px", background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 10, color: "var(--parchment)", fontFamily: "var(--sans)", fontSize: 14, outline: "none", boxSizing: "border-box" };
+const labelSt = { display: "block", fontFamily: "var(--heading)", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--clay)", marginBottom: 8 };
+const inputSt = { width: "100%", padding: "12px 14px", background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 0, color: "var(--parchment)", fontFamily: "var(--sans)", fontSize: 14, outline: "none", boxSizing: "border-box" };
 
 function Pill({ children, active, onClick }) {
   return (
-    <button onClick={onClick} style={{ flexShrink: 0, padding: "6px 15px", borderRadius: 20, border: `1px solid ${active ? "var(--sage)" : "var(--border)"}`, background: active ? "var(--sage)" : "transparent", color: active ? "var(--deep)" : "var(--clay)", fontFamily: "var(--sans)", fontSize: 11, cursor: "pointer", letterSpacing: "0.06em", whiteSpace: "nowrap", transition: "all 0.18s" }}>
+    <button onClick={onClick} style={{ flexShrink: 0, padding: "6px 16px", borderRadius: 0, border: `1px solid ${active ? "rgba(160,160,160,0.7)" : "var(--border)"}`, background: active ? "var(--cta)" : "transparent", color: active ? "#F5F0E8" : "var(--clay)", fontFamily: "var(--heading)", fontSize: 10, cursor: "pointer", letterSpacing: "0.12em", textTransform: "uppercase", whiteSpace: "nowrap", transition: "all 0.18s" }}>
       {children}
     </button>
   );
@@ -48,7 +66,7 @@ function Section({ title, icon, children }) {
     <div style={{ marginBottom: 32 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
         {icon && <span style={{ color: "var(--clay)", opacity: 0.7 }}><Icon name={icon} size={13} /></span>}
-        <span style={{ fontFamily: "var(--sans)", fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)" }}>{title}</span>
+        <span style={{ fontFamily: "var(--heading)", fontSize: 10, letterSpacing: "0.20em", textTransform: "uppercase", color: "var(--clay)" }}>{title}</span>
         <div style={{ flex: 1, height: 1, background: "var(--border)", marginLeft: 8 }} />
       </div>
       {children}
@@ -59,8 +77,8 @@ function Section({ title, icon, children }) {
 function FlagCard({ f }) {
   const variants = {
     warning: { border: "var(--border)", bg: "var(--surface)", dot: "var(--parchment)", text: "var(--parchment)" },
-    caution: { border: "var(--border)",         bg: "var(--surface)",         dot: "var(--sage)",    text: "var(--parchment)" },
-    missing: { border: "var(--border)",           bg: "var(--surface)",        dot: "var(--clay)",    text: "var(--parchment)" },
+    caution: { border: "var(--border)", bg: "var(--surface)", dot: "var(--sage)",      text: "var(--parchment)" },
+    missing: { border: "var(--border)", bg: "var(--surface)", dot: "var(--sage)",      text: "var(--parchment)" },
   };
   const v = variants[f.severity] || variants.caution;
   return (
@@ -107,15 +125,43 @@ const LOGO_SRC = (
   + "RQAUZxRRQA95ncgsQSM9h35/rSm5kZgSwJCheQOgAAH5AVHRQA5pWcAMxYAADPYU2iigAooooAKKKKACiiigAooooAKKKKACiiigD//2Q=="
 );
 
-function Wordmark({ size = 28, theme = "dark" }) {
-  const h = Math.round(size * 1.1);
-  if (theme === "light") {
-    return (
-      <span style={{ fontFamily: "var(--font-display)", fontSize: size * 0.9, fontWeight: 400, color: "#1a1814", letterSpacing: "0.04em", lineHeight: 1, display: "block" }}>Cygne</span>
-    );
-  }
+function Wordmark({ size = 28 }) {
   return (
-    <img src={LOGO_SRC} alt="Cygne" style={{ height: h, width: "auto", display: "block", objectFit: "contain", mixBlendMode: "lighten", filter: "brightness(1.15) contrast(1.1)" }} />
+    <span style={{
+      fontFamily: "var(--font-signature, 'Hellasta Signature', cursive)",
+      fontSize: size * 0.95,
+      fontWeight: 400,
+      letterSpacing: "0.04em",
+      lineHeight: 1,
+      display: "block",
+      background: "linear-gradient(135deg, #505050 0%, #B8B8B8 22%, #EBEBEB 38%, #C4C4C4 55%, #909090 70%, #D8D8D8 85%, #585858 100%)",
+      WebkitBackgroundClip: "text",
+      WebkitTextFillColor: "transparent",
+      backgroundClip: "text",
+    }}>Cygne</span>
+  );
+}
+
+// --- SWAN ICON ----------------------------------------------------------------
+// Minimal elegant swan: small oval head, long arching neck, streamlined
+// teardrop body low on the waterline. No legs, no emoji.
+function SwanIcon({ size = 18, color = "currentColor", outlineOnly = false }) {
+  const bodyFill   = outlineOnly ? "none" : color;
+  const strokeW    = outlineOnly ? 1.5    : 1.3;
+  const outStroke  = outlineOnly ? color  : "none";
+  return (
+    <svg width={size} height={size * 0.7} viewBox="0 0 40 28" fill="none" aria-hidden="true"
+      style={{ display: "block", overflow: "visible" }}>
+      <path
+        d="M4 20 Q 9 15.8, 20 16 Q 28.5 16.4, 30 19 Q 27.5 21.4, 18 21.4 Q 8 21.4, 4 20 Z"
+        fill={bodyFill} stroke={outStroke} strokeWidth={strokeW} />
+      <path
+        d="M26 16.4 C 25 11, 27 6.8, 31.2 4.8"
+        stroke={color} strokeWidth={strokeW} fill="none"
+        strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="31.8" cy="4.4" r="1.35" fill={bodyFill} stroke={outStroke} strokeWidth={strokeW} />
+      <path d="M33 4.6 L 34.9 4.2 L 33.1 5.6 Z" fill={bodyFill} stroke={outStroke} strokeWidth={strokeW} />
+    </svg>
   );
 }
 
@@ -124,7 +170,4 @@ function Wordmark({ size = 28, theme = "dark" }) {
 // --- SPLASH SCREEN -----------------------------------------------------------
 
 
-export { Icon, Pill, Section, FlagCard, Wordmark, LOGO_SRC };
-export function SwanIcon({ size = 16, color = "currentColor" }) {
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5"><path d="M12 3C8 3 4 6 4 10c0 3 2 5 4 7l4 4 4-4c2-2 4-4 4-7 0-4-4-7-8-7z" /></svg>;
-}
+export { Icon, Pill, Section, FlagCard, Wordmark, LOGO_SRC, SwanIcon };

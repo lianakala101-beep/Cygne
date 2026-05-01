@@ -1,21 +1,23 @@
-import { useState } from "react";
-import { Icon, Section, FlagCard } from "./components.jsx";
-import { detectActives, analyzeShelf, buildRoutine, detectConflicts, getCurrentSession, isScheduledToday } from "./engine.js";
+import { useEffect, useState } from "react";
+import { Icon, Section, FlagCard, SwanIcon } from "./components.jsx";
+import { detectActives, analyzeShelf, buildRoutine, detectConflicts, isScheduledToday } from "./engine.js";
 import { FREQUENCIES } from "./constants.js";
-import { buildRecommendations, buildRefinements, RecommendationCard, RefinementItem } from "./intelligence.jsx";
+import { buildRecommendations, buildRefinements } from "./intelligence.jsx";
 import { RoutineStep } from "./ritual.jsx";
+import { RecommendationCard } from "./intelligence.jsx";
 import { CheckInModal } from "./progress.jsx";
-import { getCyclePhase } from "./progress.jsx";
+import { getCyclePhase, getActivePauseState } from "./progress.jsx";
 import { getNextUseLabel } from "./constants.js";
 import { getSeason } from "./seasonal.jsx";
+import { getRitualPeriod, getRitualTimeLabel } from "./utils/ritualPeriod.js";
 
 const RITUAL_MODES = {
   travel: {
     name: "travel ritual",
     tagline: "Simplified for the road.",
-    color: "#9a9688",
-    bg: "rgba(154,150,136,0.08)",
-    border: "rgba(154,150,136,0.22)",
+    color: "#8b7355",
+    bg: "rgba(139,115,85,0.08)",
+    border: "rgba(139,115,85,0.22)",
     filterSteps: (steps) => steps.filter(p =>
       ["Cleanser","Moisturizer","SPF","Eye Cream"].includes(p.category)
     ),
@@ -24,9 +26,9 @@ const RITUAL_MODES = {
   recovery: {
     name: "recovery ritual",
     tagline: "Let your barrier breathe.",
-    color: "#c06060",
-    bg: "rgba(192,96,96,0.08)",
-    border: "rgba(192,96,96,0.22)",
+    color: "#8b7355",
+    bg: "rgba(139,115,85,0.08)",
+    border: "rgba(139,115,85,0.22)",
     filterSteps: (steps) => steps.filter(p =>
       !["Exfoliant","Toning Pad"].includes(p.category) &&
       !["retinol","AHA","BHA","benzoyl peroxide"].some(a =>
@@ -38,9 +40,9 @@ const RITUAL_MODES = {
   barrier_repair: {
     name: "barrier repair ritual",
     tagline: "Rebuild, don't strip.",
-    color: "#c4a060",
-    bg: "rgba(196,160,96,0.08)",
-    border: "rgba(196,160,96,0.22)",
+    color: "#8b7355",
+    bg: "rgba(139,115,85,0.08)",
+    border: "rgba(139,115,85,0.22)",
     filterSteps: (steps) => steps.filter(p =>
       ["Cleanser","Essence","Moisturizer","Oil","Eye Cream"].includes(p.category) ||
       (p.ingredients||[]).some(i => /ceramide|hyaluronic|squalane|panthenol/i.test(i))
@@ -50,9 +52,9 @@ const RITUAL_MODES = {
   menstrual: {
     name: "gentle ritual",
     tagline: "Your skin is more sensitive right now.",
-    color: "#b06060",
-    bg: "rgba(176,96,96,0.07)",
-    border: "rgba(176,96,96,0.2)",
+    color: "#8b7355",
+    bg: "rgba(139,115,85,0.07)",
+    border: "rgba(139,115,85,0.2)",
     filterSteps: (steps) => steps.filter(p =>
       !["Exfoliant","Toning Pad"].includes(p.category) &&
       !(p.ingredients||[]).some(i => /retinol|retinyl|tretinoin|glycolic|lactic|salicylic/i.test(i))
@@ -62,45 +64,45 @@ const RITUAL_MODES = {
   luteal: {
     name: "oil control ritual",
     tagline: "Sebum is peaking. Get ahead of it.",
-    color: "#c49040",
-    bg: "rgba(196,144,64,0.08)",
-    border: "rgba(196,144,64,0.22)",
+    color: "#8b7355",
+    bg: "rgba(139,115,85,0.08)",
+    border: "rgba(139,115,85,0.22)",
     filterSteps: (steps) => steps,
     guidance: "Progesterone is driving up sebum production this week. Prioritise your BHA if you have one, keep moisturiser lighter, and watch for congestion.",
   },
   follicular: {
     name: "actives ritual",
     tagline: "Your skin is resilient right now.",
-    color: "#7a9070",
-    bg: "rgba(122,144,112,0.08)",
-    border: "rgba(122,144,112,0.22)",
+    color: "#2d3d2b",
+    bg: "rgba(45,61,43,0.08)",
+    border: "rgba(45,61,43,0.22)",
     filterSteps: (steps) => steps,
     guidance: "Rising estrogen means higher resilience and better absorption. This is your best window for retinol and AHA — your skin can handle it.",
   },
   winter: {
     name: "winter ritual",
     tagline: "Moisture in, barrier up.",
-    color: "#7a9aaa",
-    bg: "rgba(122,154,170,0.08)",
-    border: "rgba(122,154,170,0.22)",
+    color: "#8b7355",
+    bg: "rgba(139,115,85,0.08)",
+    border: "rgba(139,115,85,0.22)",
     filterSteps: (steps) => steps,
     guidance: "Cold strips moisture and weakens the barrier. Swap any foaming cleansers for cream formulas tonight if you can, and lock everything in with an occlusive.",
   },
   summer: {
     name: "minimal ritual",
     tagline: "Light layers, consistent SPF.",
-    color: "#c4a060",
-    bg: "rgba(196,160,96,0.07)",
-    border: "rgba(196,160,96,0.2)",
+    color: "#8b7355",
+    bg: "rgba(139,115,85,0.07)",
+    border: "rgba(139,115,85,0.2)",
     filterSteps: (steps) => steps.filter(p => p.category !== "Oil"),
     guidance: "Heat and humidity mean your skin retains more moisture naturally. Oils and heavy occlusives can congest — keep it light and make SPF the hero.",
   },
   reset: {
     name: "reset ritual",
     tagline: "Back to basics.",
-    color: "#9a9688",
-    bg: "rgba(154,150,136,0.08)",
-    border: "rgba(154,150,136,0.22)",
+    color: "#8b7355",
+    bg: "rgba(139,115,85,0.08)",
+    border: "rgba(139,115,85,0.22)",
     filterSteps: (steps) => steps.filter(p =>
       ["Cleanser","Moisturizer","SPF"].includes(p.category)
     ),
@@ -109,9 +111,9 @@ const RITUAL_MODES = {
   standard: {
     name: null, // no named mode — just show normal steps
     tagline: null,
-    color: "#7a9070",
-    bg: "rgba(122,144,112,0.07)",
-    border: "rgba(122,144,112,0.18)",
+    color: "#2d3d2b",
+    bg: "rgba(45,61,43,0.07)",
+    border: "rgba(45,61,43,0.18)",
     filterSteps: (steps) => steps,
     guidance: null,
   },
@@ -193,7 +195,7 @@ function getSwanGuidingLine(products, checkIns = [], user = {}, cycleDay = null,
   if (ritualKey === "travel")        return "Essentials only tonight. Your skin travels better light.";
   if (ritualKey === "recovery")      return "Step back tonight. Calm, cleanse, seal — let the barrier recover.";
   if (ritualKey === "barrier_repair") return "Rebuild before you push. Your barrier comes first.";
-  if (ritualKey === "menstrual")     return "Gentler than usual tonight. Your skin is more reactive right now.";
+  if (ritualKey === "menstrual")     return "Your skin is asking for softness tonight.";
   if (ritualKey === "luteal")        return "Sebum is peaking this week. Stay consistent with your BHA.";
   if (ritualKey === "follicular")    return session === "pm"
     ? (hasRetinol || onTretinoin ? "Good window for actives. Your skin is at its most resilient right now." : "Follicular phase — your skin is ready if you want to push.")
@@ -234,58 +236,178 @@ function getSwanGuidingLine(products, checkIns = [], user = {}, cycleDay = null,
   return "Your ritual is ready. Take your time with it.";
 }
 
-function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false, journals = [], checkIns = [], setCheckIns = () => {}, completedSteps: completedStepsProp, setCompletedSteps: setCompletedStepsProp, onUpdateUser, setTab = () => {}, setModal = () => {}, dismissedSuggestions = [], onDismissSuggestion = () => {} }) {
-  const session = getCurrentSession();
-  const { am, pm, periodic } = buildRoutine(products);
+// --- BREATH TEXT ------------------------------------------------------------
+// Splits a heading into words and fades each one in, staggered, on mount.
+// Plays once — subsequent re-renders keep words settled.
+function BreathText({ text, style }) {
+  const [revealed, setRevealed] = useState(false);
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setRevealed(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+  const words = text.split(" ");
+  return (
+    <h1 style={style}>
+      {words.map((w, i) => (
+        <span key={i} style={{
+          display: "inline-block",
+          opacity: revealed ? 1 : 0,
+          transition: `opacity 600ms ease-out ${i * 120}ms`,
+          marginRight: i < words.length - 1 ? "0.24em" : 0,
+        }}>{w}</span>
+      ))}
+    </h1>
+  );
+}
+
+// --- RITUAL PROGRESS TRACKER -------------------------------------------------
+// Horizontal shoreline with a swan that glides from left to moon as the ritual
+// is checked off. Swan bobs continuously via etherealGlide and transitions
+// smoothly (400ms ease) to its completion-percentage position.
+function RitualProgressTracker({ completed, total }) {
+  if (total <= 0) return null;
+  const pct = Math.max(0, Math.min(1, completed / total));
+  const allDone = completed === total;
+  return (
+    <div style={{
+      position: "relative", height: 34, marginBottom: 22,
+      padding: "0 10px",
+    }}>
+      {/* Shoreline ripple — warm taupe, visible on cream */}
+      <svg viewBox="0 0 300 12" preserveAspectRatio="none"
+        style={{ position: "absolute", left: 10, right: 10, top: "50%", transform: "translateY(-50%)", width: "calc(100% - 20px)", height: 12, pointerEvents: "none" }}>
+        <path
+          d="M0 6 C 25 2, 50 10, 75 6 C 100 2, 125 10, 150 6 C 175 2, 200 10, 225 6 C 250 2, 275 10, 300 6"
+          stroke="rgba(139,115,85,0.55)" strokeWidth="1.1" fill="none" strokeLinecap="round" />
+      </svg>
+
+      {/* Swan — dark sage, bobs continuously, glides along the shoreline */}
+      <div style={{
+        position: "absolute", top: "50%",
+        left: `calc(10px + (100% - 30px) * ${pct})`,
+        transform: "translate(-50%, -50%)",
+        transition: "left 400ms ease",
+        pointerEvents: "none",
+      }}>
+        <span style={{
+          display: "inline-block",
+          color: "var(--color-inky-moss)",
+          opacity: 0.35,
+          animation: "etherealGlide 3s ease-in-out infinite",
+        }}>
+          <SwanIcon size={20} outlineOnly />
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false, journals = [], checkIns = [], setCheckIns = () => {}, completedSteps: completedStepsProp, setCompletedSteps: setCompletedStepsProp, onUpdateUser, onAddProduct, onEditProduct, treatments = [] }) {
+  // Pause actives that are still under recovery from a logged treatment.
+  // These products disappear from today's ritual and surface in Introduce
+  // Slowly instead so users aren't told to apply retinol while they're
+  // still healing from microneedling (etc).
+  const { pausedActives, treatment: pauseTreatment, phase: pausePhase } = getActivePauseState(treatments, products);
+  const pausedProducts = pausedActives.length > 0
+    ? products.filter(p => {
+        const actives = detectActives(p.ingredients || []);
+        return p.inRoutine !== false && pausedActives.some(a => actives[a]);
+      })
+    : [];
+  const { am, pm, periodic } = buildRoutine(products, { pausedActives });
   const conflicts = detectConflicts(products);
   const { flags, activeMap } = analyzeShelf(products);
   const [recTab, setRecTab] = useState("additions");
-  const today = new Date().toISOString().split("T")[0];
-  // Use persisted completed steps scoped to today, fall back to local state
-  const todaySteps = completedStepsProp?.date === today ? completedStepsProp.steps : [];
+  const now = new Date();
+  const today = now.toISOString().split("T")[0];
+
+  // Check if AM ritual was fully completed today (drives auto-switch to PM).
+  const amKey = `ritual_complete_${today}_AM`;
+  const amStepIds = am.map(p => p.id);
+  const amCompleted = amStepIds.length > 0 && (() => {
+    try { const done = JSON.parse(localStorage.getItem(amKey) || '[]'); return amStepIds.every(id => done.includes(id)); }
+    catch { return false; }
+  })();
+
+  // Manual period override — persisted with today's date; cleared at midnight.
+  const [manualOverride, setManualOverride] = useState(() => {
+    try {
+      const stored = localStorage.getItem('ritual_manual_override');
+      if (!stored) return null;
+      const data = JSON.parse(stored);
+      return data.date === today ? data.value : null;
+    } catch { return null; }
+  });
+
+  // Clear stale override at midnight (check every minute).
+  useEffect(() => {
+    const id = setInterval(() => {
+      try {
+        const stored = localStorage.getItem('ritual_manual_override');
+        if (!stored) return;
+        const data = JSON.parse(stored);
+        const currentDate = new Date().toISOString().split('T')[0];
+        if (data.date !== currentDate) {
+          localStorage.removeItem('ritual_manual_override');
+          setManualOverride(null);
+        }
+      } catch { localStorage.removeItem('ritual_manual_override'); setManualOverride(null); }
+    }, 60000);
+    return () => clearInterval(id);
+  }, []);
+
+  // Manual override wins; otherwise use behavior-based period.
+  const period = manualOverride || getRitualPeriod(amCompleted);
+  const session = period.toLowerCase(); // "am" | "pm"
+
+  const setManualPeriod = (value) => {
+    const data = { value, date: today };
+    try { localStorage.setItem('ritual_manual_override', JSON.stringify(data)); } catch {}
+    setManualOverride(value);
+  };
+
+  const sessionKey = `ritual_complete_${today}_${period}`;
+
+  // AM and PM completions live under separate localStorage keys.
+  const [completedSteps, setCompletedSteps] = useState(() => {
+    try {
+      const raw = localStorage.getItem(sessionKey);
+      return raw ? JSON.parse(raw) : [];
+    } catch { return []; }
+  });
+
   const [ritualDismissed, setRitualDismissed] = useState(false);
   const [showRitualCheckIn, setShowRitualCheckIn] = useState(false);
   const todayCheckedIn = checkIns.some(c => c.date === today);
-  const completedSteps = todaySteps;
+  const [hintVisible, setHintVisible] = useState(() => !localStorage.getItem("ritual_hint_dismissed"));
+
+  const isStepChecked = (id) => completedSteps.includes(id);
+
   const toggleStep = (id) => {
-    const updated = completedSteps.includes(id) ? completedSteps.filter(x => x !== id) : [...completedSteps, id];
-    const newState = { date: today, steps: updated };
-    if (setCompletedStepsProp) setCompletedStepsProp(newState);
-    // Sync to Supabase via user metadata
-    if (onUpdateUser && user) onUpdateUser({ ...user, completedSteps: newState });
+    const updated = completedSteps.includes(id)
+      ? completedSteps.filter(x => x !== id)
+      : [...completedSteps, id];
+    setCompletedSteps(updated);
+    try {
+      localStorage.setItem(sessionKey, JSON.stringify(updated));
+    } catch {}
+    if (setCompletedStepsProp) setCompletedStepsProp({ date: today, period, steps: updated });
   };
 
   const { mode: ritualMode, key: ritualKey, cyclePhase } = getRitualMode(products, [], user, cycleDay, isFlightMode);
   const baseSteps = session === "am" ? am : pm;
   const steps = ritualMode.filterSteps(baseSteps);
   const filteredOut = baseSteps.filter(s => !steps.find(x => x.id === s.id));
-  const allDone = steps.length > 0 && steps.every(s => completedSteps.includes(s.id));
+  const allDone = steps.length > 0 && steps.every(s => isStepChecked(s.id));
   const sessionLabel = session === "am" ? "Morning" : "Evening";
   const sessionIcon  = session === "am" ? "sun" : "moon";
 
   const recs = buildRecommendations(products, activeMap, conflicts, user);
   const refinements = buildRefinements(products, activeMap, conflicts);
-  const dismissed = new Set(dismissedSuggestions);
-  const additions = recs.filter(r => r.type === "addition" && !dismissed.has(r.trigger));
-  const swaps     = recs.filter(r => r.type === "swap"     && !dismissed.has(r.trigger));
-  const simplifications = recs.filter(r => r.type === "simplify" && !dismissed.has(r.trigger));
-  const visibleRefinements = refinements.filter(r => !dismissed.has(r.trigger));
-  const totalRecs = additions.length + swaps.length + simplifications.length + visibleRefinements.length;
-
-  const onAdd = (category) => {
-    setTab("shelf");
-    setModal({ brand: "", name: "", category, price: "", ingredients: "" });
-  };
-  const onEdit = (product) => {
-    setModal(product);
-  };
-
-  const refineVerbStyle = {
-    "Remove":           { color: "#c06060", bg: "rgba(192,96,96,0.08)",  border: "rgba(192,96,96,0.28)" },
-    "Reduce Frequency": { color: "#c49040", bg: "rgba(196,144,64,0.08)", border: "rgba(196,144,64,0.28)" },
-    "Replace":          { color: "#7a9070", bg: "rgba(122,144,112,0.08)",border: "rgba(122,144,112,0.28)" },
-    "Add":              { color: "#7a9070", bg: "rgba(122,144,112,0.08)", border: "rgba(122,144,112,0.28)" },
-  };
+  const additions = recs.filter(r => r.type === "addition");
+  const swaps     = recs.filter(r => r.type === "swap");
+  const simplifications = recs.filter(r => r.type === "simplify");
+  const totalRecs = recs.length + refinements.length;
 
   const guidingLine = getSwanGuidingLine(products, [], user, cycleDay, ritualKey, session, journals);
 
@@ -293,16 +415,66 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
     <div>
 
       {/* -- Header ----------------------------------------------------------- */}
-      <div style={{ marginBottom: 16 }}>
-        <h1 style={{ fontFamily: "var(--font-display)", fontSize: 42, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: 0, lineHeight: 1 }}>{user?.name ? `${user.name.split(" ")[0]}'s Ritual` : "Your Ritual"}</h1>
+      <div style={{ marginBottom: 16, paddingTop: 44 }}>
+        <BreathText
+          text="Your Ritual"
+          style={{ fontFamily: "var(--font-display)", fontSize: 42, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-inky-moss)", margin: 0, lineHeight: 1.15 }}
+        />
+        {/* AM / PM manual toggle */}
+        <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 8, marginTop: 10 }}>
+          <span style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 9, letterSpacing: "0.15em", color: period === "AM" ? "var(--color-inky-moss)" : "var(--color-pebble)", transition: "color 0.2s" }}>
+            MORNING
+          </span>
+          <div
+            onClick={() => setManualPeriod(period === "AM" ? "PM" : "AM")}
+            style={{ width: 28, height: 14, borderRadius: 7, background: "var(--color-inky-moss)", cursor: "pointer", position: "relative", opacity: 0.7, flexShrink: 0 }}>
+            <div style={{
+              position: "absolute", top: 2,
+              left: period === "AM" ? 2 : 16,
+              width: 10, height: 10, borderRadius: "50%",
+              background: "var(--color-ivory)",
+              transition: "left 0.2s ease",
+            }} />
+          </div>
+          <span style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 9, letterSpacing: "0.15em", color: period === "PM" ? "var(--color-inky-moss)" : "var(--color-pebble)", transition: "color 0.2s" }}>
+            EVENING
+          </span>
+        </div>
       </div>
+
+      {/* Decorative wave — between header and steps */}
+      <svg width="100%" height="12" viewBox="0 0 300 12" preserveAspectRatio="none"
+        style={{ display: "block", margin: "2px 0 18px", animation: "ritualWave 5s ease-in-out infinite" }}>
+        <path
+          d="M0 6 C 37.5 2, 75 10, 112.5 6 C 150 2, 187.5 10, 225 6 C 262.5 2, 300 10, 337.5 6"
+          stroke="rgba(192,192,192,0.5)" strokeWidth="1.5" fill="none" strokeLinecap="round"
+        />
+      </svg>
+
+      {/* -- First-visit hint banner --------------------------------------- */}
+      {hintVisible && (
+        <button
+          onClick={() => { localStorage.setItem("ritual_hint_dismissed", "1"); setHintVisible(false); }}
+          style={{
+            display: "block", width: "100%", margin: "0 0 18px",
+            padding: "10px 16px", textAlign: "center",
+            background: "rgba(240,235,224,0.8)", border: "1px solid rgba(192,192,192,0.25)",
+            borderRadius: 2, cursor: "pointer",
+            fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 10,
+            letterSpacing: "0.15em", textTransform: "uppercase",
+            color: "var(--color-inky-moss)",
+          }}>
+          Tap each step to mark it complete
+        </button>
+      )}
 
       {/* -- Swan guiding line ---------------------------------------------- */}
       {guidingLine && (
-        <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 22 }}>
-          <span style={{ fontSize: 13, lineHeight: 1, flexShrink: 0 }}>🦢</span>
-          <p style={{ fontFamily: "var(--font-display)", fontSize: 19, fontWeight: 400, color: "var(--clay)", margin: 0, lineHeight: 1.4, letterSpacing: "0.01em" }}>{guidingLine}</p>
-        </div>
+        ritualKey === "menstrual" ? (
+          <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 13, letterSpacing: "0.04em", color: "var(--color-inky-moss)", opacity: 0.8, fontStyle: "italic", textTransform: "none", lineHeight: 1.6, textAlign: "left", margin: "0 0 16px" }}>{guidingLine}</p>
+        ) : (
+          <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 11, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-stone)", margin: "0 0 22px", lineHeight: 1.6 }}>{guidingLine}</p>
+        )
       )}
 
       {/* -- Ritual Mode Card ---------------------------------------------- */}
@@ -314,20 +486,20 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
           </button>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
             <span style={{ color: "var(--clay)", opacity: 0.6 }}><Icon name={sessionIcon} size={13} /></span>
-            <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)" }}>tonight</span>
+            <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)" }}>{getRitualTimeLabel().toLowerCase()}</span>
             {cyclePhase && (
-              <span style={{ marginLeft: "auto", fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: ritualMode.color, opacity: 0.8 }}>{cyclePhase} phase</span>
+              <span style={{ marginLeft: "auto", fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: ritualMode.color, opacity: 0.8 }}>{cyclePhase} phase</span>
             )}
           </div>
-          <p style={{ fontFamily: "var(--font-display)", fontSize: 26, fontWeight: 400, color: "var(--parchment)", margin: "0 0 2px", letterSpacing: "0.02em" }}>{ritualMode.name}</p>
-          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: "0 0 10px", opacity: 0.7 }}>{ritualMode.tagline}</p>
-          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", margin: 0, lineHeight: 1.65 }}>{ritualMode.guidance}</p>
+          <p style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 400, letterSpacing: "0.08em", color: "var(--parchment)", margin: "0 0 2px" }}>{ritualMode.name}</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: "0 0 10px", opacity: 0.7 }}>{ritualMode.tagline}</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: 0, lineHeight: 1.65 }}>{ritualMode.guidance}</p>
           {filteredOut.length > 0 && (
             <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${ritualMode.border}` }}>
-              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: ritualMode.color, margin: "0 0 6px", letterSpacing: "0.06em", opacity: 0.85 }}>Paused tonight</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: ritualMode.color, margin: "0 0 6px", letterSpacing: "0.06em", opacity: 0.85 }}>{"Paused " + getRitualTimeLabel().toLowerCase()}</p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                 {filteredOut.map(p => (
-                  <span key={p.id} style={{ padding: "3px 10px", borderRadius: 20, background: "var(--ink)", border: "1px solid var(--border)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)" }}>{p.name}</span>
+                  <span key={p.id} style={{ padding: "3px 10px", borderRadius: 20, background: "var(--ink)", border: "1px solid var(--border)", fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)" }}>{p.name}</span>
                 ))}
               </div>
             </div>
@@ -335,39 +507,68 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
         </div>
       )}
 
+      {/* Treatment recovery pause banner */}
+      {pausedProducts.length > 0 && pauseTreatment && pausePhase && (
+        <div style={{ marginBottom: 18, padding: "13px 15px", background: "rgba(139,115,85,0.07)", border: "1px solid rgba(139,115,85,0.22)", borderRadius: 12 }}>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "#8b7355", margin: "0 0 5px" }}>Paused during recovery</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--parchment)", margin: "0 0 8px", lineHeight: 1.55 }}>
+            {pausedProducts.map(p => p.name).join(", ")} {pausedProducts.length === 1 ? "is" : "are"} held for your {pausePhase.label.toLowerCase()} phase. They'll return via Introduce Slowly once your skin is ready.
+          </p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+            {pausedProducts.map(p => (
+              <span key={p.id} style={{ padding: "3px 10px", borderRadius: 20, background: "var(--ink)", border: "1px solid var(--border)", fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)" }}>{p.name}</span>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Session header */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
         <span style={{ color: "var(--clay)", opacity: 0.55 }}><Icon name={sessionIcon} size={15} /></span>
-        <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)" }}>{sessionLabel} Ritual</span>
-        <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#7a9070", background: "rgba(122,144,112,0.14)", padding: "2px 8px", borderRadius: 20 }}>Now</span>
+        <span style={{ fontFamily: "var(--font-body)", fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)" }}>{sessionLabel} Ritual</span>
+        <span style={{ fontSize: 9, fontFamily: "var(--font-body)", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#2d3d2b", background: "rgba(45,61,43,0.14)", padding: "2px 8px", borderRadius: 20 }}>Now</span>
       </div>
 
       {/* Steps */}
       {steps.length > 0
-        ? <Section title={`${steps.length} steps — apply in this order`} icon="layers">
-            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", opacity: 0.5, margin: "-4px 0 16px", lineHeight: 1.6, letterSpacing: "0.02em" }}>
-              Tap the circle next to each step to check it off as you go.
-            </p>
-            <div>{steps.map((p, i) => <RoutineStep key={p.id} step={p} index={i} isLast={i === steps.length - 1} checked={completedSteps.includes(p.id)} onCheck={() => toggleStep(p.id)} />)}</div>
-          </Section>
-        : <div style={{ padding: "32px 0 16px" }}><div style={{ display: "flex", alignItems: "flex-start", gap: 9, marginBottom: 8 }}><span style={{ fontSize: 15, lineHeight: 1.4, flexShrink: 0 }}>🦢</span><p style={{ fontFamily: "var(--font-display)", fontSize: 19, color: "var(--clay)", margin: 0, lineHeight: 1.4 }}>Your ritual is waiting. Add products to your vanity and they'll appear here.</p></div></div>}
-      {allDone && steps.length > 0 && (
-        <div style={{ margin: "16px 0", padding: "18px 18px", background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 14 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: todayCheckedIn ? 0 : 14 }}>
-            <span style={{ fontSize: 16 }}>🦢</span>
+        ? <div style={{ marginBottom: 8 }}>
+            <RitualProgressTracker completed={steps.filter(s => isStepChecked(s.id)).length} total={steps.length} />
             <div>
-              <p style={{ fontFamily: "var(--font-display)", fontSize: 22, color: "var(--parchment)", margin: "0 0 2px" }}>Ritual complete.</p>
-              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>
-                {todayCheckedIn ? "Check-in logged. Rest well." : `Your ${sessionLabel.toLowerCase()} ritual is done — how did your skin feel today?`}
+              {steps.map((p, i) => <RoutineStep
+                key={p.id}
+                step={p}
+                index={i}
+                isLast={i === steps.length - 1}
+                checked={isStepChecked(p.id)}
+                onCheck={() => toggleStep(p.id)}
+                scheduled={isScheduledToday(p)}
+              />)}
+            </div>
+          </div>
+        : <div style={{ padding: "32px 0 16px" }}><div style={{ display: "flex", alignItems: "flex-start", gap: 9, marginBottom: 8 }}><span style={{ color: "var(--clay)", flexShrink: 0, marginTop: 4, display: "inline-flex" }}><SwanIcon size={16} /></span><p style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 400, letterSpacing: "0.05em", color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>Your ritual is waiting. Add products to your vanity and they'll appear here.</p></div></div>}
+      {allDone && steps.length > 0 && !todayCheckedIn && (
+        <div style={{ margin: "16px 0", padding: "18px 18px", background: "rgba(45,61,43,0.10)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 14 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+            <span style={{
+              color: "#2d3d2b",
+              display: "inline-flex",
+              animation: "etherealGlide 3s ease-in-out infinite",
+            }}>
+              <SwanIcon size={22} />
+            </span>
+            <div>
+              <p style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--parchment)", margin: "0 0 2px" }}>Ritual complete.</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0 }}>
+                {`Your ${sessionLabel.toLowerCase()} ritual is done — how did your skin feel today?`}
               </p>
             </div>
           </div>
-          {!todayCheckedIn && (
-            <button onClick={() => setShowRitualCheckIn(true)}
-              style={{ width: "100%", padding: "12px 0", background: "var(--cta)", border: "1px solid rgba(122,144,112,0.35)", borderRadius: 11, fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 600, color: "var(--parchment)", cursor: "pointer", letterSpacing: "0.04em" }}>
-              Log a check-in →
-            </button>
-          )}
+          <button onClick={() => setShowRitualCheckIn(true)}
+            style={{ width: "100%", padding: "14px 40px", background: "transparent", border: "1.5px solid var(--color-inky-moss)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 700, color: "var(--color-inky-moss)", cursor: "pointer", letterSpacing: "0.2em", textTransform: "uppercase", transition: "all 0.3s ease" }}
+            onMouseEnter={e => { e.currentTarget.style.background = "var(--color-inky-moss)"; e.currentTarget.style.color = "var(--color-ivory)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--color-inky-moss)"; }}>
+            RITUAL COMPLETE
+          </button>
         </div>
       )}
 
@@ -387,14 +588,14 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
             {alternating.map(p => {
               const scheduledTonight = isScheduledToday(p);
               const label = scheduledTonight ? "Tonight" : "Tomorrow night";
-              const labelColor = scheduledTonight ? "#7a9070" : "var(--clay)";
+              const labelColor = scheduledTonight ? "#2d3d2b" : "var(--clay)";
               return (
-                <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: "var(--surface)", border: `1px solid ${scheduledTonight ? "rgba(122,144,112,0.35)" : "var(--border)"}`, borderRadius: 12, marginBottom: 8, opacity: scheduledTonight ? 1 : 0.6 }}>
+                <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: "var(--surface)", border: `1px solid ${scheduledTonight ? "rgba(45,61,43,0.35)" : "var(--border)"}`, borderRadius: 12, marginBottom: 8, opacity: scheduledTonight ? 1 : 0.6 }}>
                   <div>
-                    <p style={{ fontFamily: "var(--font-display)", fontSize: 22, color: "var(--parchment)", margin: "0 0 1px" }}>{p.name}</p>
-                    <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>{p.brand}</p>
+                    <p style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 400, letterSpacing: "0.08em", color: "var(--parchment)", margin: "0 0 1px" }}>{p.name}</p>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0 }}>{p.brand}</p>
                   </div>
-                  <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: labelColor, background: scheduledTonight ? "rgba(122,144,112,0.12)" : "transparent", padding: "3px 8px", borderRadius: 20, border: scheduledTonight ? "1px solid rgba(122,144,112,0.25)" : "none" }}>{label}</span>
+                  <span style={{ fontSize: 9, fontFamily: "var(--font-body)", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: labelColor, background: scheduledTonight ? "rgba(45,61,43,0.12)" : "transparent", padding: "3px 8px", borderRadius: 20, border: scheduledTonight ? "1px solid rgba(45,61,43,0.25)" : "none" }}>{label}</span>
                 </div>
               );
             })}
@@ -411,10 +612,10 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
             return (
               <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, marginBottom: 8 }}>
                 <div>
-                  <p style={{ fontFamily: "var(--font-display)", fontSize: 22, color: "var(--parchment)", margin: "0 0 1px" }}>{p.name}</p>
-                  <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>{p.brand} · {freqLabel}</p>
+                  <p style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 400, letterSpacing: "0.08em", color: "var(--parchment)", margin: "0 0 1px" }}>{p.name}</p>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0 }}>{p.brand} · {freqLabel}</p>
                 </div>
-                <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)" }}>{nextLabel}</span>
+                <span style={{ fontSize: 9, fontFamily: "var(--font-body)", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)" }}>{nextLabel}</span>
               </div>
             );
           })}
@@ -429,13 +630,13 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
             <div key={i} style={{ padding: "15px 17px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 13, marginBottom: 10 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 7 }}>
                 <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--parchment)", flexShrink: 0, boxShadow: "0 0 6px rgba(232,227,214,0.4)" }} />
-                <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 700, color: "var(--parchment)", letterSpacing: "0.13em", textTransform: "uppercase" }}>{c.pair.join(" + ")}</span>
-                <span style={{ marginLeft: "auto", fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.11em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.65 }}>{c.severity}</span>
+                <span style={{ fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 700, color: "var(--parchment)", letterSpacing: "0.13em", textTransform: "uppercase" }}>{c.pair.join(" + ")}</span>
+                <span style={{ marginLeft: "auto", fontSize: 9, fontFamily: "var(--font-body)", letterSpacing: "0.11em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.65 }}>{c.severity}</span>
               </div>
-              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", margin: "0 0 9px", lineHeight: 1.6 }}>{c.reason}</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: "0 0 9px", lineHeight: 1.6 }}>{c.reason}</p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                 {[...c.productsA, ...c.productsB].filter((p, i, arr) => arr.findIndex(x => x.id === p.id) === i).map(p => (
-                  <span key={p.id} style={{ fontSize: 10, fontFamily: "Space Grotesk, sans-serif", color: "var(--clay)", background: "var(--surface)", padding: "3px 8px", borderRadius: 20, border: "1px solid var(--border)" }}>{p.name}</span>
+                  <span key={p.id} style={{ fontSize: 10, fontFamily: "var(--font-body)", color: "var(--clay)", background: "var(--surface)", padding: "3px 8px", borderRadius: 20, border: "1px solid var(--border)" }}>{p.name}</span>
                 ))}
               </div>
             </div>
@@ -455,9 +656,9 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
         <div style={{ marginBottom: 32 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
             <span style={{ color: "var(--clay)", opacity: 0.7 }}><Icon name="sparkle" size={13} /></span>
-            <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)" }}>Cygne Intelligence</span>
+            <span style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)" }}>Cygne Intelligence</span>
             <div style={{ flex: 1, height: 1, background: "var(--border)", marginLeft: 8 }} />
-            <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.65 }}>{totalRecs} suggestion{totalRecs !== 1 ? "s" : ""}</span>
+            <span style={{ fontSize: 9, fontFamily: "var(--font-body)", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.65 }}>{totalRecs} suggestion{totalRecs !== 1 ? "s" : ""}</span>
           </div>
 
           <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
@@ -465,24 +666,58 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
               { id: "additions", label: "Add",      count: additions.length,      icon: "plus" },
               { id: "swaps",     label: "Swap",     count: swaps.length,          icon: "layers" },
               { id: "simplify",  label: "Simplify", count: simplifications.length, icon: "drop" },
-              { id: "refine",    label: "Refine",   count: visibleRefinements.length, icon: "sparkle" },
+              { id: "refine",    label: "Refine",   count: refinements.length,    icon: "sparkle" },
             ].filter(t => t.count > 0).map(t => (
               <button key={t.id} onClick={() => setRecTab(t.id)}
-                style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 12px", borderRadius: 20, border: `1px solid ${recTab === t.id ? "#7a9070" : "var(--border)"}`, background: recTab === t.id ? "rgba(122,144,112,0.11)" : "transparent", color: recTab === t.id ? "#7a9070" : "var(--clay)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: recTab === t.id ? 700 : 400, cursor: "pointer", letterSpacing: "0.1em", textTransform: "uppercase", transition: "all 0.16s" }}>
+                style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 12px", borderRadius: 20, border: `1px solid ${recTab === t.id ? "#2d3d2b" : "var(--border)"}`, background: recTab === t.id ? "rgba(45,61,43,0.11)" : "transparent", color: recTab === t.id ? "#2d3d2b" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 10, fontWeight: recTab === t.id ? 700 : 400, cursor: "pointer", letterSpacing: "0.1em", textTransform: "uppercase", transition: "all 0.16s" }}>
                 <Icon name={t.icon} size={11} />
                 {t.label}
-                <span style={{ fontSize: 9, background: recTab === t.id ? "rgba(122,144,112,0.2)" : "rgba(255,255,255,0.05)", borderRadius: 10, padding: "1px 5px" }}>{t.count}</span>
+                <span style={{ fontSize: 9, background: recTab === t.id ? "rgba(45,61,43,0.2)" : "rgba(255,255,255,0.05)", borderRadius: 10, padding: "1px 5px" }}>{t.count}</span>
               </button>
             ))}
           </div>
 
           <div>
-            {recTab === "additions"  && additions.map((r, i) => <RecommendationCard key={r.trigger || i} rec={r} onAdd={onAdd} onDismiss={r.trigger ? () => onDismissSuggestion(r.trigger) : undefined} />)}
-            {recTab === "swaps"      && swaps.map((r, i) => <RecommendationCard key={r.trigger || i} rec={r} onDismiss={r.trigger ? () => onDismissSuggestion(r.trigger) : undefined} />)}
-            {recTab === "simplify"   && simplifications.map((r, i) => <RecommendationCard key={r.trigger || i} rec={r} onDismiss={r.trigger ? () => onDismissSuggestion(r.trigger) : undefined} />)}
-            {recTab === "refine"     && visibleRefinements.map((r, i) => {
-              const vs = refineVerbStyle[r.verb] || { color: "#7a9070", bg: "rgba(122,144,112,0.08)", border: "rgba(122,144,112,0.28)" };
-              return <RefinementItem key={r.trigger || i} r={r} vs={vs} onEdit={onEdit} onDismiss={r.trigger ? () => onDismissSuggestion(r.trigger) : undefined} />;
+            {recTab === "additions"  && additions.map((r, i) => <RecommendationCard key={i} rec={r} onAdd={onAddProduct} onEdit={onEditProduct} />)}
+            {recTab === "swaps"      && swaps.map((r, i) => <RecommendationCard key={i} rec={r} onAdd={onAddProduct} onEdit={onEditProduct} />)}
+            {recTab === "simplify"   && simplifications.map((r, i) => <RecommendationCard key={i} rec={r} onAdd={onAddProduct} onEdit={onEditProduct} />)}
+            {recTab === "refine"     && refinements.map((r, i) => {
+              const targets = (r.productIds || [])
+                .map(id => products.find(p => p.id === id))
+                .filter(Boolean);
+              return (
+                <div key={i} style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "13px 15px", marginBottom: 8 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                    <span style={{ fontSize: 9, fontFamily: "var(--font-body)", fontWeight: 700, letterSpacing: "0.13em", textTransform: "uppercase", color: "var(--parchment)", opacity: 0.7 }}>{r.verb}</span>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--parchment)", margin: 0, flex: 1, fontWeight: 500, lineHeight: 1.3 }}>{r.title}</p>
+                  </div>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.65 }}>{r.body}</p>
+                  {r.action && (
+                    <div style={{ display: "flex", gap: 8, padding: "9px 11px", background: "rgba(45,61,43,0.06)", borderRadius: 8, border: "1px solid rgba(45,61,43,0.15)", marginTop: 10 }}>
+                      <span style={{ color: "#2d3d2b", flexShrink: 0, marginTop: 1 }}><Icon name="check" size={11} /></span>
+                      <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--parchment)", margin: 0, lineHeight: 1.55 }}>{r.action}</p>
+                    </div>
+                  )}
+                  {targets.length > 0 && onEditProduct && (
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 10 }}>
+                      {targets.map(p => (
+                        <button key={p.id} onClick={() => onEditProduct(p)}
+                          style={{ padding: "6px 11px", borderRadius: 20, background: "rgba(45,61,43,0.12)", border: "1px solid rgba(45,61,43,0.3)", fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 600, color: "#2d3d2b", cursor: "pointer", letterSpacing: "0.05em", display: "inline-flex", alignItems: "center", gap: 5 }}>
+                          {p.name} <Icon name="chevron" size={10} />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {targets.length === 0 && r.addCategory && onAddProduct && (
+                    <div style={{ marginTop: 10 }}>
+                      <button onClick={() => onAddProduct(r.addCategory)}
+                        style={{ padding: "8px 14px", borderRadius: 10, background: "rgba(45,61,43,0.15)", border: "1px solid rgba(45,61,43,0.35)", fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 600, color: "#2d3d2b", cursor: "pointer", letterSpacing: "0.05em" }}>
+                        + Add {r.addCategory}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
             })}
           </div>
 
@@ -490,9 +725,9 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
       )}
 
       {conflicts.length === 0 && flags.length === 0 && totalRecs === 0 && products.length > 0 && (
-        <div style={{ display: "flex", gap: 11, padding: "13px 16px", background: "rgba(107,120,95,0.07)", borderRadius: 12, border: "1px solid rgba(107,120,95,0.18)" }}>
-          <span style={{ color: "#7a9070" }}><Icon name="check" size={14} /></span>
-          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, color: "var(--parchment)", margin: 0 }}>No conflicts. Your ritual is well-balanced.</p>
+        <div style={{ display: "flex", gap: 11, padding: "13px 16px", background: "rgba(45,61,43,0.07)", borderRadius: 12, border: "1px solid rgba(45,61,43,0.18)" }}>
+          <span style={{ color: "#2d3d2b" }}><Icon name="check" size={14} /></span>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "var(--parchment)", margin: 0 }}>No conflicts. Your ritual is well-balanced.</p>
         </div>
       )}
     </div>
