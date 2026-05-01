@@ -413,9 +413,8 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, on
           }}>
             <p style={{
               fontFamily: "var(--font-display)",
-              fontSize: 18, fontWeight: 400, letterSpacing: "0.05em", lineHeight: 1.5,
+              fontSize: 18, fontWeight: 400, letterSpacing: "0.02em", lineHeight: 1.5,
               color: "#e8e0c8",
-              letterSpacing: "0.02em",
               margin: "0 0 22px",
               whiteSpace: "pre-line",
             }}>

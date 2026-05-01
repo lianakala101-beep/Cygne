@@ -105,3 +105,7 @@ function calcSpending(products) {
 
 
 export { isScheduledToday, getNextUseLabel, getCurrentSession, detectActives, buildRoutine, detectConflicts, analyzeShelf, calcSpending };
+
+export function hasSPFCoverage(products, activeMap) {
+  return products.some(p => p.category === "SPF" || (p.ingredients && detectActives(p.ingredients).SPF));
+}
