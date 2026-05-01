@@ -125,3 +125,4 @@ export function FaceZoneSelector({ selected = [], onChange }) {
 
 export const FACE_ZONE_IDS = ZONES.map(z => z.id);
 export const FACE_ZONE_LABELS = ZONE_LABEL;
+export const FACE_ZONES = ZONES;

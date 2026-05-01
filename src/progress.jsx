@@ -5,6 +5,7 @@ import { getAutoSession } from "./productmodal.jsx";
 import { RAMP_SCHEDULES, RAMP_ACTIVES, IntroduceSlowlyCard, getRampWeek } from "./ramp.jsx";
 import { getCurrentCycleDay, getTreatmentElapsed, daysBetweenLocal } from "./utils.jsx";
 import { FaceZoneSelector } from "./components/FaceZoneSelector.jsx";
+import { FaceHeatMap } from "./components/FaceHeatMap.jsx";
 
 
 function computeStabilityScore(products, checkIns, activeMap) {
@@ -1797,6 +1798,11 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
           </div>
         );
       })()}
+
+      {/* -- Inflammation Map -------------------------------------------------- */}
+      <div style={{ marginBottom: 28 }}>
+        <FaceHeatMap journals={journals} products={products} user={user} />
+      </div>
 
       {/* -- Ritual Check-in ---------------------------------------------------- */}
       {sectionLabel("activity", "Ritual Check-in")}
