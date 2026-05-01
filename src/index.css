@@ -1,0 +1,20 @@
+@font-face {
+  font-family: 'Fungis Heavy';
+  src: url('/fonts/FUNGIS Heavy.otf') format('opentype');
+  font-weight: 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Fungis Normal';
+  src: url('/fonts/FUNGIS Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Hellasta Signature';
+  src: url('/fonts/hellastasignature.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}

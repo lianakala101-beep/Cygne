@@ -35,7 +35,7 @@ function SplashScreen({ onDone }) {
           }}
         />
         <p style={{
-          fontFamily: "'Pinyon Script', cursive",
+          fontFamily: "var(--script)",
           fontSize: 22, fontWeight: 400,
           color: "rgba(232,227,214,0.95)",
           margin: "6px 0 0 130px",
@@ -50,7 +50,7 @@ function SplashScreen({ onDone }) {
         padding: "32px 36px 72px",
       }}>
         <p style={{
-          fontFamily: "'Space Grotesk', sans-serif",
+          fontFamily: "var(--font-body)",
           fontSize: 13,
           color: "rgba(232,227,214,0.60)",
           margin: "0 0 28px",
@@ -67,7 +67,7 @@ function SplashScreen({ onDone }) {
             color: "rgba(232,227,214,0.95)",
             border: "1px solid rgba(232,227,214,0.28)",
             borderRadius: 10,
-            fontFamily: "'Space Grotesk', sans-serif",
+            fontFamily: "var(--font-body)",
             fontSize: 10,
             fontWeight: 600,
             letterSpacing: "0.2em",
