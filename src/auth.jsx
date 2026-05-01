@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { LOGO_SRC } from "./components.jsx";
+
 import { supabase } from "./supabase.js";
 
 function AuthScreen({ onAuth }) {
@@ -75,12 +75,12 @@ function AuthScreen({ onAuth }) {
   const handleKeyDown = (e) => { if (e.key === "Enter") mode === "forgot" ? handleForgot() : handleSubmit(); };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#3a4134", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between", padding: "0 36px" }}>
+    <div style={{ minHeight: "100vh", background: "var(--color-ivory)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between", padding: "0 36px" }}>
 
       {/* Top — logo */}
       <div style={{ paddingTop: 72, width: "100%", maxWidth: 380 }}>
-        <img src={LOGO_SRC} alt="Cygne" style={{ height: 140, width: "auto", display: "block", filter: "brightness(1.25) contrast(1.05)", mixBlendMode: "lighten" }} />
-        <p style={{ fontFamily: "'Reenie Beanie', cursive", fontSize: 22, fontWeight: 400, color: "rgba(232,227,214,0.95)", margin: "6px 0 0 110px", letterSpacing: "0.05em", lineHeight: 1 }}>built around you</p>
+        <img src="/cygne-logo.png" alt="Cygne" style={{ height: 140, width: "auto", display: "block" }} />
+        <p style={{ fontFamily: "'Reenie Beanie', cursive", fontSize: 22, fontWeight: 400, color: "var(--color-ink)", margin: "6px 0 0 110px", letterSpacing: "0.05em", lineHeight: 1 }}>built around you</p>
       </div>
 
       {/* Form */}
@@ -93,7 +93,7 @@ function AuthScreen({ onAuth }) {
             </p>
           ) : (
             <>
-              <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(232,227,214,0.45)", margin: "0 0 20px" }}>
+              <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-pebble)", margin: "0 0 20px" }}>
                 Reset password
               </p>
               <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 16 }}>
@@ -106,7 +106,7 @@ function AuthScreen({ onAuth }) {
                 <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 11, color: "#c06060", margin: "0 0 14px", lineHeight: 1.5 }}>{error}</p>
               )}
               <button onClick={handleForgot} disabled={loading}
-                style={{ width: "100%", padding: "15px 0", background: "rgba(232,227,214,0.12)", color: "rgba(232,227,214,0.95)", border: "1px solid rgba(232,227,214,0.28)", borderRadius: 10, fontFamily: "'Space Grotesk', sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase", cursor: loading ? "default" : "pointer", opacity: loading ? 0.5 : 1, transition: "background 0.2s, border-color 0.2s" }}
+                style={{ width: "100%", padding: "15px 0", background: "rgba(232,227,214,0.12)", color: "var(--color-ink)", border: "1px solid rgba(232,227,214,0.28)", borderRadius: 10, fontFamily: "'Space Grotesk', sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase", cursor: loading ? "default" : "pointer", opacity: loading ? 0.5 : 1, transition: "background 0.2s, border-color 0.2s" }}
                 onMouseEnter={e => { if (!loading) { e.currentTarget.style.background = "rgba(232,227,214,0.2)"; e.currentTarget.style.borderColor = "rgba(232,227,214,0.5)"; }}}
                 onMouseLeave={e => { e.currentTarget.style.background = "rgba(232,227,214,0.12)"; e.currentTarget.style.borderColor = "rgba(232,227,214,0.28)"; }}>
                 {loading ? "..." : "Send reset link"}
@@ -115,7 +115,7 @@ function AuthScreen({ onAuth }) {
           )
         ) : (
           <>
-            <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(232,227,214,0.45)", margin: "0 0 20px" }}>
+            <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-pebble)", margin: "0 0 20px" }}>
               {mode === "login" ? "Welcome back" : "Create your account"}
             </p>
 
@@ -136,7 +136,7 @@ function AuthScreen({ onAuth }) {
 
             {mode === "login" && failedAttempts > 0 && (
               <button onClick={() => { setMode("forgot"); setError(null); setResetSent(false); }}
-                style={{ display: "block", background: "none", border: "none", fontFamily: "'Space Grotesk', sans-serif", fontSize: 11, color: "rgba(232,227,214,0.45)", cursor: "pointer", padding: "0 0 14px", letterSpacing: "0.04em", transition: "color 0.2s" }}
+                style={{ display: "block", background: "none", border: "none", fontFamily: "'Space Grotesk', sans-serif", fontSize: 11, color: "var(--color-pebble)", cursor: "pointer", padding: "0 0 14px", letterSpacing: "0.04em", transition: "color 0.2s" }}
                 onMouseEnter={e => e.currentTarget.style.color = "rgba(232,227,214,0.65)"}
                 onMouseLeave={e => e.currentTarget.style.color = "rgba(232,227,214,0.45)"}>
                 Forgot password?
@@ -144,14 +144,14 @@ function AuthScreen({ onAuth }) {
             )}
 
             <button onClick={handleSubmit} disabled={loading}
-              style={{ width: "100%", padding: "15px 0", background: "rgba(232,227,214,0.12)", color: "rgba(232,227,214,0.95)", border: "1px solid rgba(232,227,214,0.28)", borderRadius: 10, fontFamily: "'Space Grotesk', sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase", cursor: loading ? "default" : "pointer", opacity: loading ? 0.5 : 1, transition: "background 0.2s, border-color 0.2s" }}
+              style={{ width: "100%", padding: "15px 0", background: "rgba(232,227,214,0.12)", color: "var(--color-ink)", border: "1px solid rgba(232,227,214,0.28)", borderRadius: 10, fontFamily: "'Space Grotesk', sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase", cursor: loading ? "default" : "pointer", opacity: loading ? 0.5 : 1, transition: "background 0.2s, border-color 0.2s" }}
               onMouseEnter={e => { if (!loading) { e.currentTarget.style.background = "rgba(232,227,214,0.2)"; e.currentTarget.style.borderColor = "rgba(232,227,214,0.5)"; }}}
               onMouseLeave={e => { e.currentTarget.style.background = "rgba(232,227,214,0.12)"; e.currentTarget.style.borderColor = "rgba(232,227,214,0.28)"; }}>
               {loading ? "..." : mode === "login" ? "Sign In" : "Create Account"}
             </button>
 
             <button onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(null); }}
-              style={{ width: "100%", marginTop: 14, background: "none", border: "none", fontFamily: "'Space Grotesk', sans-serif", fontSize: 11, color: "rgba(232,227,214,0.45)", cursor: "pointer", padding: "8px 0", letterSpacing: "0.06em", transition: "color 0.2s" }}
+              style={{ width: "100%", marginTop: 14, background: "none", border: "none", fontFamily: "'Space Grotesk', sans-serif", fontSize: 11, color: "var(--color-pebble)", cursor: "pointer", padding: "8px 0", letterSpacing: "0.06em", transition: "color 0.2s" }}
               onMouseEnter={e => e.currentTarget.style.color = "rgba(232,227,214,0.7)"}
               onMouseLeave={e => e.currentTarget.style.color = "rgba(232,227,214,0.45)"}>
               {mode === "login" ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
@@ -161,7 +161,7 @@ function AuthScreen({ onAuth }) {
 
         {(mode === "forgot") && (
           <button onClick={() => { setMode("login"); setError(null); setResetSent(false); }}
-            style={{ width: "100%", marginTop: 14, background: "none", border: "none", fontFamily: "'Space Grotesk', sans-serif", fontSize: 11, color: "rgba(232,227,214,0.45)", cursor: "pointer", padding: "8px 0", letterSpacing: "0.06em", transition: "color 0.2s" }}
+            style={{ width: "100%", marginTop: 14, background: "none", border: "none", fontFamily: "'Space Grotesk', sans-serif", fontSize: 11, color: "var(--color-pebble)", cursor: "pointer", padding: "8px 0", letterSpacing: "0.06em", transition: "color 0.2s" }}
             onMouseEnter={e => e.currentTarget.style.color = "rgba(232,227,214,0.7)"}
             onMouseLeave={e => e.currentTarget.style.color = "rgba(232,227,214,0.45)"}>
             Back to sign in
@@ -194,10 +194,10 @@ function ResetPasswordScreen({ onDone }) {
   const handleKeyDown = (e) => { if (e.key === "Enter") handleReset(); };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#3a4134", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between", padding: "0 36px" }}>
+    <div style={{ minHeight: "100vh", background: "var(--color-ivory)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between", padding: "0 36px" }}>
       <div style={{ paddingTop: 72, width: "100%", maxWidth: 380 }}>
-        <img src={LOGO_SRC} alt="Cygne" style={{ height: 140, width: "auto", display: "block", filter: "brightness(1.25) contrast(1.05)", mixBlendMode: "lighten" }} />
-        <p style={{ fontFamily: "'Reenie Beanie', cursive", fontSize: 22, fontWeight: 400, color: "rgba(232,227,214,0.95)", margin: "6px 0 0 110px", letterSpacing: "0.05em", lineHeight: 1 }}>built around you</p>
+        <img src="/cygne-logo.png" alt="Cygne" style={{ height: 140, width: "auto", display: "block" }} />
+        <p style={{ fontFamily: "'Reenie Beanie', cursive", fontSize: 22, fontWeight: 400, color: "var(--color-ink)", margin: "6px 0 0 110px", letterSpacing: "0.05em", lineHeight: 1 }}>built around you</p>
       </div>
 
       <div style={{ width: "100%", maxWidth: 380, paddingBottom: 64 }}>
@@ -207,7 +207,7 @@ function ResetPasswordScreen({ onDone }) {
           </p>
         ) : (
           <>
-            <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(232,227,214,0.45)", margin: "0 0 20px" }}>
+            <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-pebble)", margin: "0 0 20px" }}>
               Set new password
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 16 }}>
@@ -222,7 +222,7 @@ function ResetPasswordScreen({ onDone }) {
               <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 11, color: "#c06060", margin: "0 0 14px", lineHeight: 1.5 }}>{error}</p>
             )}
             <button onClick={handleReset} disabled={loading}
-              style={{ width: "100%", padding: "15px 0", background: "rgba(232,227,214,0.12)", color: "rgba(232,227,214,0.95)", border: "1px solid rgba(232,227,214,0.28)", borderRadius: 10, fontFamily: "'Space Grotesk', sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase", cursor: loading ? "default" : "pointer", opacity: loading ? 0.5 : 1, transition: "background 0.2s, border-color 0.2s" }}
+              style={{ width: "100%", padding: "15px 0", background: "rgba(232,227,214,0.12)", color: "var(--color-ink)", border: "1px solid rgba(232,227,214,0.28)", borderRadius: 10, fontFamily: "'Space Grotesk', sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase", cursor: loading ? "default" : "pointer", opacity: loading ? 0.5 : 1, transition: "background 0.2s, border-color 0.2s" }}
               onMouseEnter={e => { if (!loading) { e.currentTarget.style.background = "rgba(232,227,214,0.2)"; e.currentTarget.style.borderColor = "rgba(232,227,214,0.5)"; }}}
               onMouseLeave={e => { e.currentTarget.style.background = "rgba(232,227,214,0.12)"; e.currentTarget.style.borderColor = "rgba(232,227,214,0.28)"; }}>
               {loading ? "..." : "Update password"}
@@ -238,7 +238,7 @@ const inputStyle = {
   width: "100%", padding: "14px 16px",
   background: "rgba(232,227,214,0.06)", border: "1px solid rgba(232,227,214,0.15)",
   borderRadius: 10, fontFamily: "'Space Grotesk', sans-serif", fontSize: 14,
-  color: "rgba(232,227,214,0.95)", outline: "none",
+  color: "var(--color-ink)", outline: "none",
   transition: "border-color 0.2s",
 };
 
