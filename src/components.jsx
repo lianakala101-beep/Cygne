@@ -125,3 +125,6 @@ function Wordmark({ size = 28, theme = "dark" }) {
 
 
 export { Icon, Pill, Section, FlagCard, Wordmark, LOGO_SRC };
+export function SwanIcon({ size = 16, color = "currentColor" }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5"><path d="M12 3C8 3 4 6 4 10c0 3 2 5 4 7l4 4 4-4c2-2 4-4 4-7 0-4-4-7-8-7z" /></svg>;
+}
