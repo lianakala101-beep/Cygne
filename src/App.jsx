@@ -42,7 +42,7 @@ export default function App() {
   useEffect(() => {
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Pinyon+Script&display=swap";
+    link.href = "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap";
     document.head.appendChild(link);
   }, []);
 
@@ -614,7 +614,7 @@ export default function App() {
     <div className={`theme-${theme}`} style={{ minHeight: "100vh", background: "var(--deep)", paddingBottom: 88, transition: "background 0.4s ease, color 0.4s ease" }}>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-      <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Pinyon+Script&display=swap" rel="stylesheet" />
+      <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
       <style>{`
         @font-face {
           font-family: 'Fungis Heavy';
@@ -639,8 +639,8 @@ export default function App() {
         }
         :root {
           --sage:      #6e8a72;
-          --script:    'Pinyon Script', cursive;
-          --cursive:   'Pinyon Script', cursive;
+          --script:    'Hellasta Signature', cursive;
+          --cursive:   'Hellasta Signature', cursive;
           --sans:      'Space Grotesk', sans-serif;
           /* Cygne design system tokens */
           --color-ivory:        #faf9f4;
@@ -651,7 +651,7 @@ export default function App() {
           --color-pebble:       #7a7a7a;
           --font-display:  'Fungis Heavy', 'Space Grotesk', sans-serif;
           --font-body:     'Fungis Normal', 'Space Grotesk', sans-serif;
-          --font-signature:'Hellasta Signature', 'Pinyon Script', cursive;
+          --font-signature:'Hellasta Signature', cursive;
         }
         .theme-dark {
           --deep:      #0e100d;
@@ -737,15 +737,28 @@ export default function App() {
 
       {/* Header */}
       <div style={{ position: "sticky", top: 0, zIndex: 50, background: theme === "dark" ? "rgba(13,15,13,0.94)" : "rgba(240,236,230,0.94)", backdropFilter: "blur(16px)", borderBottom: "1px solid var(--border)", padding: "0 22px" }}>
-        <div style={{ maxWidth: 600, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: 54 }}>
-          <Wordmark size={42} theme={theme} />
+        <div style={{ position: "relative", maxWidth: 600, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: 54 }}>
+          <button onClick={toggleTheme} title={isAuto ? "Auto theme" : theme === "dark" ? "Dark mode" : "Light mode"}
+            style={{ width: 32, height: 32, borderRadius: "50%", background: "var(--surface)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "border-color 0.2s", color: "var(--clay)", flexShrink: 0 }}
+            onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(122,144,112,0.5)"}
+            onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}>
+            <Icon name={isAuto ? "auto" : theme === "dark" ? "moon" : "sun"} size={14} />
+          </button>
+          <img
+            src="/cygne-logo.png"
+            alt="Cygne"
+            style={{
+              position: "absolute",
+              left: "50%",
+              top: "50%",
+              transform: "translate(-50%, -50%)",
+              height: 36,
+              width: "auto",
+              pointerEvents: "none",
+              userSelect: "none",
+            }}
+          />
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <button onClick={toggleTheme} title={isAuto ? "Auto theme" : theme === "dark" ? "Dark mode" : "Light mode"}
-              style={{ width: 32, height: 32, borderRadius: "50%", background: "var(--surface)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "border-color 0.2s", color: "var(--clay)", flexShrink: 0 }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(122,144,112,0.5)"}
-              onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}>
-              <Icon name={isAuto ? "auto" : theme === "dark" ? "moon" : "sun"} size={14} />
-            </button>
             <button onClick={() => setProfileOpen(true)}
               style={{ width: 34, height: 34, borderRadius: "50%", background: "none", border: "none", cursor: "pointer", padding: 0, WebkitTapHighlightColor: "transparent" }}>
               <div style={{
@@ -755,7 +768,7 @@ export default function App() {
                 display: "flex", alignItems: "center", justifyContent: "center",
               }}>
                 <span style={{
-                  fontFamily: "Pinyon Script, cursive",
+                  fontFamily: "var(--script)",
                   fontSize: 22,
                   color: "var(--sage)",
                   lineHeight: 1,

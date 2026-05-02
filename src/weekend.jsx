@@ -100,7 +100,7 @@ function WeekendNudgeCard({ products, activeMap }) {
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
         <div>
           <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: cfg.accent }}>{cfg.label}</span>
-          <p style={{ fontFamily: "var(--font-body)", fontStyle: "italic", fontSize: 24, fontWeight: 400, color: "var(--parchment)", margin: "2px 0 0", lineHeight: 1.25, letterSpacing: "0.005em" }}>{cfg.headline}</p>
+          <p style={{ fontFamily: "var(--font-body)", fontStyle: "italic", fontSize: 18, fontWeight: 400, color: "var(--parchment)", margin: "2px 0 0", lineHeight: 1.3, letterSpacing: "0.005em" }}>{cfg.headline}</p>
         </div>
         <button onClick={() => setDismissed(true)} style={{ background: "none", border: "none", color: "var(--clay)", opacity: 0.35, cursor: "pointer", padding: "2px 4px", display: "inline-flex" }}><Icon name="x" size={12} /></button>
       </div>

@@ -104,14 +104,23 @@ function calcSpending(products) {
 }
 
 
+// Humectant-forward products absorb best on damp skin (Essence/HA Serum/etc).
+const DAMP_KEYWORDS = ["hyaluronic", "sodium hyaluronate", "glycerin", "panthenol", "sodium pca", "urea", "propylene glycol", "butylene glycol"];
+const DAMP_CATEGORIES = ["Essence", "Toner", "Mist"];
+export function isDampSkinProduct(product) {
+  if (!product) return false;
+  if (DAMP_CATEGORIES.includes(product.category)) return true;
+  const ingArr = Array.isArray(product.ingredients)
+    ? product.ingredients
+    : typeof product.ingredients === "string"
+      ? product.ingredients.split(",").map(s => s.trim()).filter(Boolean)
+      : [];
+  const lower = ingArr.map(i => i.toLowerCase());
+  return DAMP_KEYWORDS.some(k => lower.some(ing => ing.includes(k)));
+}
+
 export { isScheduledToday, getNextUseLabel, getCurrentSession, detectActives, buildRoutine, detectConflicts, analyzeShelf, calcSpending };
 
 export function hasSPFCoverage(products, activeMap) {
   return products.some(p => p.category === "SPF" || p.category === "SPF Moisturizer" || (p.ingredients && detectActives(p.ingredients).SPF));
-}
-
-export function isDampSkinProduct(product) {
-  const name = (product.name || "").toLowerCase();
-  const cat = (product.category || "").toLowerCase();
-  return cat === "essence" || cat === "toner" || name.includes("essence") || name.includes("lotion") || name.includes("toner");
 }
