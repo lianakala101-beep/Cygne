@@ -411,7 +411,7 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
           </div>
           <div style={{ height: 1, background: "rgba(232,226,217,0.12)", marginBottom: 18 }} />
 
-          <p style={{ fontFamily: "var(--cursive)", fontSize: 32, fontWeight: 400, lineHeight: 1.5, color: "#e8e3d6", letterSpacing: "0.02em", margin: "0 0 18px" }}>{renderInsightLines(line)}</p>
+          <p style={{ fontFamily: "var(--font-signature)", fontSize: 34, fontWeight: 400, lineHeight: 1.4, color: "#e8e3d6", letterSpacing: "0.01em", margin: "0 0 18px" }}>{renderInsightLines(line)}</p>
 
           {/* Show first prediction detail in popup */}
           {hasMeaningful && meaningfulPredictions[0].detail && (
@@ -464,7 +464,7 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
           <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 8, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(232,226,217,0.55)", margin: 0 }}>Swan Song</p>
         </div>
 
-        <p style={{ fontFamily: "var(--cursive)", fontSize: 22, fontWeight: 400, lineHeight: 1.5, color: "rgba(232,227,214,0.85)", letterSpacing: "0.02em", margin: 0 }}>{renderInsightLines(line)}</p>
+        <p style={{ fontFamily: "var(--font-signature)", fontSize: 34, fontWeight: 400, lineHeight: 1.35, color: "rgba(232,227,214,0.9)", letterSpacing: "0.01em", margin: 0 }}>{renderInsightLines(line)}</p>
       </div>
     </div>
   );

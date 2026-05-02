@@ -616,6 +616,27 @@ export default function App() {
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Pinyon+Script&display=swap" rel="stylesheet" />
       <style>{`
+        @font-face {
+          font-family: 'Fungis Heavy';
+          src: url('/fonts/FUNGIS%20Heavy.otf') format('opentype');
+          font-weight: 700;
+          font-style: normal;
+          font-display: swap;
+        }
+        @font-face {
+          font-family: 'Fungis Normal';
+          src: url('/fonts/FUNGIS%20Regular.otf') format('opentype');
+          font-weight: 400;
+          font-style: normal;
+          font-display: swap;
+        }
+        @font-face {
+          font-family: 'Hellasta Signature';
+          src: url('/fonts/hellastasignature.ttf') format('truetype');
+          font-weight: 400;
+          font-style: normal;
+          font-display: swap;
+        }
         :root {
           --sage:      #6e8a72;
           --script:    'Pinyon Script', cursive;
@@ -628,8 +649,9 @@ export default function App() {
           --color-inky-moss:    #2d3d2b;
           --color-stone:        #5a5a5a;
           --color-pebble:       #7a7a7a;
-          --font-display: 'Fungis Heavy', 'Space Grotesk', sans-serif;
-          --font-body:    'Fungis Normal', 'Space Grotesk', sans-serif;
+          --font-display:  'Fungis Heavy', 'Space Grotesk', sans-serif;
+          --font-body:     'Fungis Normal', 'Space Grotesk', sans-serif;
+          --font-signature:'Hellasta Signature', 'Pinyon Script', cursive;
         }
         .theme-dark {
           --deep:      #0e100d;
