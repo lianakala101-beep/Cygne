@@ -229,90 +229,149 @@ function DrawnCheck({ size = 14, color = "#0d0f0d" }) {
   );
 }
 
+// Verb names for ritual steps. Falls back to upper-cased category for any
+// new categories added later.
+const STEP_VERBS = {
+  "Cleanser":        "CLEANSE",
+  "Toner":           "TONE",
+  "Toning Pad":      "TONE",
+  "Essence":         "ESSENCE",
+  "Mist":            "MIST",
+  "Serum":           "TREAT",
+  "Eye Cream":       "EYE",
+  "Moisturizer":     "MOISTURIZE",
+  "Oil":             "SEAL",
+  "SPF":             "SPF",
+  "SPF Moisturizer": "SPF MOISTURIZER",
+  "Exfoliant":       "EXFOLIATE",
+  "Mask":            "MASK",
+  "Prescription":    "PRESCRIBED",
+  "Lip":             "LIP",
+};
+
 function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }) {
-  const activeKeys = Object.keys(detectActives(step.ingredients || []));
   const [expanded, setExpanded] = useState(false);
   const reason = getStepReason(step);
   const damp = isDampSkinProduct(step);
+  const stepNum = String(index + 1).padStart(2, "0");
+  const verb = STEP_VERBS[step.category] || (step.category || "").toUpperCase();
+  const sessionTag = step.session === "am" ? "AM"
+    : step.session === "pm" ? "PM"
+    : step.session === "both" ? "AM + PM"
+    : null;
   const freqLabel = step.frequency && step.frequency !== "daily"
     ? (FREQUENCIES.find(f => f.id === step.frequency)?.label || step.frequency)
     : null;
-  const nameColor = scheduled ? "var(--parchment)" : "var(--taupe)";
-  const ringColor = scheduled ? "#6e8a72" : "var(--taupe)";
+
+  const dimmed = checked || !scheduled;
+
   return (
-    <div style={{
-      display: "flex", gap: 16, alignItems: "flex-start",
-      opacity: checked ? 0.7 : scheduled ? 1 : 0.55,
-      transform: checked ? "translateX(-4px)" : "translateX(0)",
-      transition: "opacity 280ms ease-out, transform 320ms ease-out",
-    }}>
-      <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <div
-          onClick={onCheck}
+    <div
+      onClick={onCheck}
+      style={{
+        padding: "20px 0",
+        borderBottom: isLast ? "none" : "1px solid var(--border)",
+        cursor: "pointer",
+        opacity: checked ? 0.42 : scheduled ? 1 : 0.55,
+        transition: "opacity 320ms ease-out",
+        WebkitTapHighlightColor: "transparent",
+      }}
+    >
+      <p style={{
+        fontFamily: "var(--font-body)",
+        fontSize: 10, fontWeight: 400,
+        letterSpacing: "0.28em", textTransform: "uppercase",
+        color: "var(--clay)",
+        margin: "0 0 6px",
+      }}>
+        Step {stepNum}
+        {!scheduled && <span style={{ marginLeft: 10, opacity: 0.75 }}>· Skipped today</span>}
+      </p>
+
+      <h3 style={{
+        fontFamily: "var(--font-display)",
+        fontSize: 26, fontWeight: 700,
+        letterSpacing: "0.04em", textTransform: "uppercase",
+        color: "var(--parchment)",
+        lineHeight: 1.05,
+        margin: "0 0 8px",
+        textDecoration: checked ? "line-through" : "none",
+        textDecorationThickness: "2px",
+        textDecorationColor: "rgba(232,226,217,0.55)",
+        transition: "text-decoration-color 280ms ease",
+      }}>
+        {verb}
+      </h3>
+
+      <p style={{
+        fontFamily: "var(--font-body)",
+        fontSize: 14, fontWeight: 400,
+        color: "var(--parchment)",
+        margin: "0 0 2px",
+        lineHeight: 1.35,
+      }}>
+        {step.name}
+      </p>
+      <p style={{
+        fontFamily: "var(--font-body)",
+        fontSize: 12, fontWeight: 400,
+        color: "var(--clay)",
+        margin: 0,
+        lineHeight: 1.4,
+      }}>
+        {step.brand}
+        {sessionTag && (
+          <span style={{ marginLeft: 10, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", opacity: 0.75 }}>
+            {sessionTag}
+          </span>
+        )}
+        {freqLabel && (
+          <span style={{ marginLeft: 10, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", opacity: 0.75 }}>
+            {freqLabel}
+          </span>
+        )}
+      </p>
+
+      {damp && (
+        <p style={{
+          fontFamily: "var(--font-body)",
+          fontStyle: "italic", fontSize: 11,
+          color: "rgba(139,115,85,0.85)",
+          margin: "8px 0 0",
+        }}>
+          Apply on damp skin for best absorption
+        </p>
+      )}
+
+      {reason && (
+        <button
+          onClick={(e) => { e.stopPropagation(); setExpanded(x => !x); }}
           style={{
-            width: 28, height: 28, borderRadius: "50%",
-            border: `1px solid ${ringColor}`,
-            background: checked ? ringColor : "transparent",
-            display: "flex", alignItems: "center", justifyContent: "center",
+            marginTop: 12,
+            background: "none", border: "none", padding: 0,
             cursor: "pointer",
-            transition: "background-color 280ms ease-out, border-color 280ms ease-out",
-            flexShrink: 0,
-          }}>
-          {checked && <DrawnCheck size={14} />}
-        </div>
-        {!isLast && <div style={{ width: 1, flex: 1, background: "var(--border)", marginTop: 6, minHeight: 16 }} />}
-      </div>
-      <div style={{ flex: 1, marginBottom: isLast ? 0 : 12 }}>
-        <div
-          style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 13, padding: "13px 15px", cursor: reason ? "pointer" : "default", transition: "border-color 0.15s" }}
-          onClick={() => reason && setExpanded(e => !e)}
-          onMouseEnter={e => { if (reason) e.currentTarget.style.borderColor = "rgba(122,144,112,0.35)"; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; }}>
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", marginBottom: 4 }}>
-                {step.category}
-                {!scheduled && <span style={{ marginLeft: 8, color: "var(--taupe)", opacity: 0.75 }}>· Skipped today</span>}
-              </div>
-              <p style={{
-                fontFamily: "var(--script)", fontSize: 22, fontWeight: 400,
-                letterSpacing: "0.02em", color: nameColor, margin: "0 0 2px",
-                opacity: checked ? 0.6 : 1,
-                textDecoration: checked ? "line-through" : "none",
-                textDecorationColor: "rgba(232,226,217,0.45)",
-                textDecorationThickness: "1px",
-                transition: "opacity 280ms ease-out",
-              }}>{step.name}</p>
-              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>
-                {step.brand}
-                {freqLabel && (
-                  <span style={{ marginLeft: 8, fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--taupe)", opacity: 0.85 }}>{freqLabel}</span>
-                )}
-                {step.session && step.session !== "auto" && (
-                  <span style={{ marginLeft: 8, fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.6 }}>{step.session === "both" ? "AM + PM" : step.session === "am" ? "AM" : step.session === "pm" ? "PM" : step.session}</span>
-                )}
-              </p>
-              {activeKeys.length > 0 && (
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 9 }}>
-                  {activeKeys.map(a => <span key={a} style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)", background: "var(--ink)", padding: "3px 8px", borderRadius: 20, border: "1px solid var(--border)" }}>{a}</span>)}
-                </div>
-              )}
-            </div>
-            {reason && (
-              <span style={{ color: "var(--clay)", opacity: 0.35, flexShrink: 0, marginTop: 2, display: "inline-flex", transition: "transform 0.18s", transform: expanded ? "rotate(-90deg)" : "rotate(90deg)" }}><Icon name="chevron" size={11} /></span>
-            )}
-          </div>
-          {damp && (
-            <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 10, padding: "6px 9px", borderRadius: 8, background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.2)" }}>
-              <span style={{ color: "rgba(139,115,85,0.85)", display: "inline-flex" }}><Icon name="drop" size={11} /></span>
-              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "rgba(139,115,85,0.85)", letterSpacing: "0.02em" }}>Apply on damp skin for best absorption</span>
-            </div>
-          )}
-          {expanded && reason && (
-            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: "10px 0 0", lineHeight: 1.65, paddingTop: 10, borderTop: "1px solid var(--border)", opacity: 0.85 }}>{reason}</p>
-          )}
-        </div>
-      </div>
+            fontFamily: "var(--font-display)",
+            fontSize: 10, fontWeight: 700,
+            letterSpacing: "0.22em", textTransform: "uppercase",
+            color: "var(--color-inky-moss, #2d3d2b)",
+            display: "inline-flex", alignItems: "center", gap: 4,
+          }}
+        >
+          {expanded ? "HIDE" : "WHY?"}
+        </button>
+      )}
+
+      {expanded && reason && (
+        <p style={{
+          fontFamily: "var(--font-body)",
+          fontSize: 12, fontWeight: 400,
+          color: "var(--clay)",
+          margin: "10px 0 0",
+          lineHeight: 1.7,
+        }}>
+          {reason}
+        </p>
+      )}
     </div>
   );
 }
