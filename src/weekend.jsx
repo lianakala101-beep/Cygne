@@ -80,9 +80,9 @@ const WEEKEND_PHASE_CONFIG = {
     label: "Recovery Day",
     sublabel: "Sunday",
     headline: "Your skin needs a quiet day.",
-    accent: "#2d3d2b",
-    bg: "rgba(45,61,43,0.07)",
-    border: "rgba(45,61,43,0.2)",
+    accent: "#6e8a72",
+    bg: "rgba(122,144,112,0.07)",
+    border: "rgba(122,144,112,0.2)",
   },
 };
 
@@ -99,8 +99,8 @@ function WeekendNudgeCard({ products, activeMap }) {
     <div style={{ marginBottom: 20, background: cfg.bg, border: `1px solid ${cfg.border}`, borderRadius: 16, padding: "18px 20px 16px", position: "relative" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
         <div>
-          <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: cfg.accent }}>{cfg.label}</span>
-          <p style={{ fontFamily: "var(--script)", fontSize: 28, fontWeight: 400, color: "var(--parchment)", margin: "2px 0 0", lineHeight: 1.2 }}>{cfg.headline}</p>
+          <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: cfg.accent }}>{cfg.label}</span>
+          <p style={{ fontFamily: "var(--font-body)", fontStyle: "italic", fontSize: 24, fontWeight: 400, color: "var(--parchment)", margin: "2px 0 0", lineHeight: 1.25, letterSpacing: "0.005em" }}>{cfg.headline}</p>
         </div>
         <button onClick={() => setDismissed(true)} style={{ background: "none", border: "none", color: "var(--clay)", opacity: 0.35, cursor: "pointer", padding: "2px 4px", display: "inline-flex" }}><Icon name="x" size={12} /></button>
       </div>
@@ -109,7 +109,7 @@ function WeekendNudgeCard({ products, activeMap }) {
           {advice.skip.map((s, i) => (
             <div key={i} style={{ display: "flex", gap: 8, marginBottom: 6 }}>
               <span style={{ color: "#8b7355", fontSize: 10, flexShrink: 0, marginTop: 1 }}>—</span>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{s}</p>
+              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{s}</p>
             </div>
           ))}
         </div>
@@ -117,7 +117,7 @@ function WeekendNudgeCard({ products, activeMap }) {
       {advice.do.map((s, i) => (
         <div key={i} style={{ display: "flex", gap: 8, marginBottom: 6 }}>
           <span style={{ color: cfg.accent, fontSize: 10, flexShrink: 0, marginTop: 1 }}>+</span>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{s}</p>
+          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{s}</p>
         </div>
       ))}
     </div>
