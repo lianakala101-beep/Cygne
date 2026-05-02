@@ -737,13 +737,7 @@ export default function App() {
 
       {/* Header */}
       <div style={{ position: "sticky", top: 0, zIndex: 50, background: theme === "dark" ? "rgba(13,15,13,0.94)" : "rgba(240,236,230,0.94)", backdropFilter: "blur(16px)", borderBottom: "1px solid var(--border)", padding: "0 22px" }}>
-        <div style={{ position: "relative", maxWidth: 600, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: 54 }}>
-          <button onClick={toggleTheme} title={isAuto ? "Auto theme" : theme === "dark" ? "Dark mode" : "Light mode"}
-            style={{ width: 32, height: 32, borderRadius: "50%", background: "var(--surface)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "border-color 0.2s", color: "var(--clay)", flexShrink: 0 }}
-            onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(122,144,112,0.5)"}
-            onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}>
-            <Icon name={isAuto ? "auto" : theme === "dark" ? "moon" : "sun"} size={14} />
-          </button>
+        <div style={{ position: "relative", maxWidth: 600, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "flex-end", height: 76 }}>
           <img
             src="/cygne-logo.png"
             alt="Cygne"
@@ -752,10 +746,13 @@ export default function App() {
               left: "50%",
               top: "50%",
               transform: "translate(-50%, -50%)",
-              height: 36,
+              height: 56,
               width: "auto",
               pointerEvents: "none",
               userSelect: "none",
+              filter: theme === "light"
+                ? "brightness(0.45) contrast(1.35) saturate(0.6)"
+                : "brightness(1.05) contrast(1.15)",
             }}
           />
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
