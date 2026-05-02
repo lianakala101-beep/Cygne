@@ -3,9 +3,11 @@ import { supabase } from "./supabase.js";
 
 function AuthScreen({ onAuth }) {
   const [mode, setMode] = useState("login");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(() => localStorage.getItem("cygne_remember_email") || "");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [resetSent, setResetSent] = useState(false);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -41,9 +43,15 @@ function AuthScreen({ onAuth }) {
           options: { persistSession: rememberMe },
         });
         if (err) {
+          setFailedAttempts(f => f + 1);
           setError(err.message || JSON.stringify(err));
           setLoading(false);
           return;
+        }
+        if (rememberMe) {
+          localStorage.setItem("cygne_remember_email", email);
+        } else {
+          localStorage.removeItem("cygne_remember_email");
         }
         onAuth(data.session, data.user, false);
       }
@@ -190,6 +198,40 @@ function AuthScreen({ onAuth }) {
         }}>
         {mode === "login" ? "Create an account" : "Already have an account? Sign in"}
       </button>
+
+      {/* Forgot password — show after first failed attempt */}
+      {mode === "login" && failedAttempts >= 1 && !resetSent && (
+        <button
+          onClick={async () => {
+            if (!email) { setError("Enter your email above first."); return; }
+            const { error: err } = await supabase.auth.resetPasswordForEmail(email, {
+              redirectTo: window.location.origin,
+            });
+            if (err) { setError(err.message); return; }
+            setResetSent(true);
+            setError(null);
+          }}
+          style={{
+            marginTop: 12,
+            background: "none",
+            border: "none",
+            fontFamily: "var(--font-body, 'Space Grotesk', sans-serif)",
+            fontSize: 11,
+            color: "var(--color-pebble, #7a7a7a)",
+            cursor: "pointer",
+            padding: "4px 0",
+            letterSpacing: "0.04em",
+            textDecoration: "underline",
+          }}>
+          Forgot your password?
+        </button>
+      )}
+
+      {resetSent && (
+        <p style={{ fontSize: 11, color: "var(--color-stone, #5a5a5a)", marginTop: 12, textAlign: "center", letterSpacing: "0.02em" }}>
+          Reset link sent — check your email.
+        </p>
+      )}
     </div>
   );
 }
