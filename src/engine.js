@@ -109,3 +109,9 @@ export { isScheduledToday, getNextUseLabel, getCurrentSession, detectActives, bu
 export function hasSPFCoverage(products, activeMap) {
   return products.some(p => p.category === "SPF" || p.category === "SPF Moisturizer" || (p.ingredients && detectActives(p.ingredients).SPF));
 }
+
+export function isDampSkinProduct(product) {
+  const name = (product.name || "").toLowerCase();
+  const cat = (product.category || "").toLowerCase();
+  return cat === "essence" || cat === "toner" || name.includes("essence") || name.includes("lotion") || name.includes("toner");
+}
