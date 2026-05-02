@@ -49,12 +49,12 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
     <div>
       {/* Hero */}
       <div style={{ marginBottom: products.length === 0 ? 28 : 36 }}>
-        <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 8px" }}>
+        <p style={{ fontFamily: "var(--font-signature)", fontSize: 44, fontWeight: 400, letterSpacing: "0.01em", color: "var(--parchment)", margin: "0 0 12px", lineHeight: 1.05 }}>
           {(() => {
             const h = new Date().getHours();
-            if (h >= 5  && h < 12) return user?.name ? `Good morning, ${user.name.split(" ")[0]}.` : "Good morning.";
-            if (h >= 12 && h < 17) return user?.name ? `Good afternoon, ${user.name.split(" ")[0]}.` : "Good afternoon.";
-            return user?.name ? `Good evening, ${user.name.split(" ")[0]}.` : "Good evening.";
+            if (h >= 5  && h < 12) return user?.name ? `good morning, ${user.name.split(" ")[0]}` : "good morning";
+            if (h >= 12 && h < 17) return user?.name ? `good afternoon, ${user.name.split(" ")[0]}` : "good afternoon";
+            return user?.name ? `good evening, ${user.name.split(" ")[0]}` : "good evening";
           })()}
         </p>
         <h1 style={{ fontFamily: "Pinyon Script, cursive", fontSize: 52, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: "0 0 4px", lineHeight: 1.0 }}>
