@@ -252,7 +252,9 @@ const STEP_VERBS = {
 function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }) {
   const [expanded, setExpanded] = useState(false);
   const reason = getStepReason(step);
-  const damp = isDampSkinProduct(step);
+  // Damp-skin tip only applies to leave-on humectant layers, not cleansers.
+  const dampEligible = step.category === "Serum" || step.category === "Essence";
+  const damp = dampEligible && isDampSkinProduct(step);
   const stepNum = String(index + 1).padStart(2, "0");
   const verb = STEP_VERBS[step.category] || (step.category || "").toUpperCase();
   const sessionTag = step.session === "am" ? "AM"

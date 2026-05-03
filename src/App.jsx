@@ -24,20 +24,6 @@ export default function App() {
   const [authLoading, setAuthLoading] = useState(true);
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
 
-  // -- Theme: auto by time, manual override ----------------------------------
-  const getAutoTheme = () => {
-    const h = new Date().getHours();
-    return (h >= 7 && h < 19) ? "light" : "dark";
-  };
-  const [themeOverride, setThemeOverride] = useLocalStorage("cygne_theme", null);
-  const theme = themeOverride || getAutoTheme();
-  const toggleTheme = () => setThemeOverride(t => {
-    if (t === null) return getAutoTheme() === "dark" ? "light" : "dark";
-    if (t === "light") return "dark";
-    return "light";
-  });
-  const isAuto = themeOverride === null;
-
   // Ensure fonts load
   useEffect(() => {
     const link = document.createElement("link");
@@ -611,7 +597,7 @@ export default function App() {
 
   // -- Main app ---------------------------------------------------------------
   return (
-    <div className={`theme-${theme}`} style={{ minHeight: "100vh", background: "var(--deep)", paddingBottom: 88, transition: "background 0.4s ease, color 0.4s ease" }}>
+    <div style={{ minHeight: "100vh", background: "var(--deep)", paddingBottom: 88 }}>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -652,39 +638,25 @@ export default function App() {
           --font-display:  'Fungis Heavy', 'Space Grotesk', sans-serif;
           --font-body:     'Fungis Normal', 'Space Grotesk', sans-serif;
           --font-signature:'Hellasta Signature', cursive;
-        }
-        .theme-dark {
-          --deep:      #0e100d;
-          --ink:       #151813;
-          --surface:   #1c201a;
-          --border:    rgba(200,215,190,0.09);
-          --parchment: #e8e2d9;
-          --clay:      #8b7355;
-          --muted:     #6b5a43;
-          --taupe:     #8b7355;
-          --overlay:   rgba(8,12,8,0.72);
-          --cta:       #323d30;
-        }
-        .theme-light {
-          --deep:      #f0ece6;
+          /* Surfaces (single light theme) */
+          --deep:      #faf9f4;
           --ink:       #f7f4f0;
           --surface:   #ffffff;
           --border:    rgba(0,0,0,0.10);
-          --parchment: #1a1612;
-          --clay:      #6b5338;
-          --muted:     #a8906c;
+          --parchment: #1c1c1a;
+          --clay:      #5a5a5a;
+          --muted:     #7a7a7a;
           --taupe:     #6b5338;
           --overlay:   rgba(30,25,20,0.5);
           --sage:      #526859;
-          --cta:       #3d5240;
+          --cta:       #2d3d2b;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         input, select, textarea { outline: none; }
         input:focus, select:focus, textarea:focus { border-color: var(--sage) !important; }
         input::placeholder, textarea::placeholder { color: var(--muted); opacity: 0.7; }
         ::-webkit-scrollbar { display: none; }
-        .theme-light ::-webkit-scrollbar { display: none; }
-        .theme-light button:focus { outline: none; }
+        button:focus { outline: none; }
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
         @keyframes cygneCheckDraw { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
@@ -717,26 +689,16 @@ export default function App() {
           to   { opacity: 1; transform: translateY(0); }
         }
         .cygne-swansong-intro { animation: cygneSwanSongIntro 500ms 200ms ease-out both; }
-        .theme-dark option { background: #1a1c1a; color: #e8e2d9; }
-        .theme-light option { background: #f7f4f0; color: #1a1612; }
-        .theme-light input,
-        .theme-light select,
-        .theme-light textarea {
-          background: #f7f4f0 !important;
-          color: #1a1612 !important;
-        }
-        .theme-light .modal-bg {
-          background: rgba(232,226,217,0.55) !important;
-        }
-        .theme-light option {
+        option { background: #f7f4f0; color: #1c1c1a; }
+        input, select, textarea {
           background: #f7f4f0;
-          color: #1a1612;
+          color: #1c1c1a;
         }
-        .theme-light .modal-bg { background: rgba(232,226,217,0.5) !important; }
+        .modal-bg { background: rgba(232,226,217,0.55); }
       `}</style>
 
       {/* Header */}
-      <div style={{ position: "sticky", top: 0, zIndex: 50, background: theme === "dark" ? "rgba(13,15,13,0.94)" : "rgba(240,236,230,0.94)", backdropFilter: "blur(16px)", borderBottom: "1px solid var(--border)", padding: "0 22px" }}>
+      <div style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(250,249,244,0.94)", backdropFilter: "blur(16px)", borderBottom: "1px solid var(--border)", padding: "0 22px" }}>
         <div style={{ position: "relative", maxWidth: 600, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "flex-end", height: 76 }}>
           <img
             src="/cygne-logo.png"
@@ -750,9 +712,7 @@ export default function App() {
               width: "auto",
               pointerEvents: "none",
               userSelect: "none",
-              filter: theme === "light"
-                ? "brightness(0.45) contrast(1.35) saturate(0.6)"
-                : "brightness(1.05) contrast(1.15)",
+              filter: "brightness(0.45) contrast(1.35) saturate(0.6)",
             }}
           />
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -782,7 +742,7 @@ export default function App() {
 
       {/* Content */}
       <div style={{ maxWidth: 600, margin: "0 auto", padding: "32px 22px 0", animation: "fadeUp 0.3s ease" }} key={tab}>
-        {tab === "dashboard" && <Dashboard products={products} setTab={setTab} checkIns={checkIns} swanPopupDismissed={swanPopupDismissed} onDismissSwanPopup={dismissSwanPopup} treatments={treatments} locationData={locationData} user={user} theme={theme} notifPermission={notifPermission} onRequestNotif={requestNotifications} notifDismissed={notifDismissed} onDismissNotif={() => setNotifDismissed(true)} journals={journals} setCheckIns={setCheckIns} onLoadDemo={() => setProducts(DEMO_PRODUCTS)} />}
+        {tab === "dashboard" && <Dashboard products={products} setTab={setTab} checkIns={checkIns} swanPopupDismissed={swanPopupDismissed} onDismissSwanPopup={dismissSwanPopup} treatments={treatments} locationData={locationData} user={user} notifPermission={notifPermission} onRequestNotif={requestNotifications} notifDismissed={notifDismissed} onDismissNotif={() => setNotifDismissed(true)} journals={journals} setCheckIns={setCheckIns} onLoadDemo={() => setProducts(DEMO_PRODUCTS)} />}
         {tab === "routine"   && <MyRoutine
           products={products}
           user={user}
@@ -832,7 +792,7 @@ export default function App() {
       </div>
 
       {/* Bottom nav */}
-      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: theme === "dark" ? "rgba(13,15,13,0.97)" : "rgba(240,236,230,0.97)", backdropFilter: "blur(16px)", borderTop: "1px solid var(--border)", zIndex: 50 }}>
+      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "rgba(250,249,244,0.97)", backdropFilter: "blur(16px)", borderTop: "1px solid var(--border)", zIndex: 50 }}>
         <div style={{ maxWidth: 600, margin: "0 auto", display: "flex" }}>
           {tabs.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}

@@ -10,7 +10,7 @@ import { SeasonalNudgeCard } from "./seasonal.jsx";
 import { getTreatmentPhase, TreatmentRecoveryCard, getCyclePhase } from "./progress.jsx";
 import { getCurrentCycleDay, daysBetweenLocal } from "./utils.jsx";
 
-function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSwanPopup, treatments, locationData, user, theme, notifPermission, onRequestNotif, notifDismissed, onDismissNotif, journals, setCheckIns, onLoadDemo }) {
+function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSwanPopup, treatments, locationData, user, notifPermission, onRequestNotif, notifDismissed, onDismissNotif, journals, setCheckIns, onLoadDemo }) {
   const { flags } = analyzeShelf(products);
   const conflicts = detectConflicts(products);
   const { am, pm } = buildRoutine(products);
