@@ -660,7 +660,21 @@ function getActivePauseState(treatments = [], products = []) {
   if (!candidates.length) return { pausedActives: [], reintroActives: [], treatment: null, phase: null };
   const { t: treatment, info } = candidates[0];
   const { phase } = info;
-  const tracked = ["retinol", "AHA", "BHA", "vitamin C"];
+
+  // Track every active actually present in the user's vanity (driven by their
+  // ingredients, not a hardcoded shortlist). Falls back to the core
+  // treatment-sensitive set when the user has no qualifying products yet so
+  // the recovery messaging still makes sense.
+  const present = new Set();
+  for (const p of products) {
+    if (p.inRoutine === false) continue;
+    Object.keys(detectActives(p.ingredients || [])).forEach(a => present.add(a));
+  }
+  if (present.size === 0) {
+    ["retinol", "AHA", "BHA", "vitamin C", "benzoyl peroxide"].forEach(a => present.add(a));
+  }
+  const tracked = Array.from(present);
+
   const isResumed = (act) => (phase.resume || []).some(r =>
     r === "Full Ritual" || r.toLowerCase().includes(act.toLowerCase())
   );
@@ -731,14 +745,25 @@ function buildTreatmentRoutineAdvice(phase, products, activeMap) {
       if (reason) paused.push({ name: p.name, reason });
     });
   } else {
-    const hasRetinol = !!activeMap["retinol"]?.length;
-    const hasAHA    = !!activeMap["AHA"]?.length;
-    const hasBHA    = !!activeMap["BHA"]?.length;
-    const hasVitC   = !!activeMap["vitamin C"]?.length;
-    if (hasRetinol) { isCleared("Retinol")    ? cleared.push("Retinol")       : paused.push({ name: "Retinol",       reason: "active" }); }
-    if (hasAHA)     { isCleared("AHA")        ? cleared.push("AHA Exfoliant") : paused.push({ name: "AHA Exfoliant", reason: "acid"   }); }
-    if (hasBHA)     { isCleared("BHA")        ? cleared.push("BHA Exfoliant") : paused.push({ name: "BHA Exfoliant", reason: "acid"   }); }
-    if (hasVitC)    { isCleared("Vitamin C")  ? cleared.push("Vitamin C")     : paused.push({ name: "Vitamin C",     reason: "active" }); }
+    // Scan every active present in the user's vanity (not a hardcoded
+    // shortlist). SPF + barrier-supporting ingredients (HA, ceramides) are
+    // never paused — they're treated as cleared baseline.
+    const SAFE = new Set(["SPF", "hyaluronic acid", "ceramides"]);
+    const displayName = (active) => active === "AHA" ? "AHA Exfoliant"
+      : active === "BHA" ? "BHA Exfoliant"
+      : active === "vitamin C" ? "Vitamin C"
+      : active.charAt(0).toUpperCase() + active.slice(1);
+    const reasonFor = (active) => (active === "AHA" || active === "BHA") ? "acid" : "active";
+    Object.entries(activeMap || {}).forEach(([active, prods]) => {
+      if (!prods || !prods.length) return;
+      if (SAFE.has(active)) return;
+      const display = displayName(active);
+      if (isCleared(active) || isCleared(display)) {
+        cleared.push(display);
+      } else {
+        paused.push({ name: display, reason: reasonFor(active) });
+      }
+    });
   }
 
   if (hasSPF) cleared.push("SPF — mandatory");
