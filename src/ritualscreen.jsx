@@ -526,7 +526,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
         <span style={{ color: "var(--clay)", opacity: 0.55 }}><Icon name={sessionIcon} size={15} /></span>
         <span style={{ fontFamily: "var(--font-body)", fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)" }}>{sessionLabel} Ritual</span>
-        <span style={{ fontSize: 9, fontFamily: "var(--font-body)", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#2d3d2b", background: "rgba(45,61,43,0.14)", padding: "2px 8px", borderRadius: 20 }}>Now</span>
+        <span style={{ fontSize: 9, fontFamily: "var(--font-body)", fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "#2d3d2b", background: "rgba(45,61,43,0.14)", padding: "2px 8px", borderRadius: 20 }}>Now</span>
       </div>
 
       {/* Steps */}
@@ -557,14 +557,14 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
               <SwanIcon size={22} />
             </span>
             <div>
-              <p style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--parchment)", margin: "0 0 2px" }}>Ritual complete.</p>
+              <p style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 400, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--parchment)", margin: "0 0 2px" }}>Ritual complete.</p>
               <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0 }}>
                 {`Your ${sessionLabel.toLowerCase()} ritual is done — how did your skin feel today?`}
               </p>
             </div>
           </div>
           <button onClick={() => setShowRitualCheckIn(true)}
-            style={{ width: "100%", padding: "14px 40px", background: "transparent", border: "1.5px solid var(--color-inky-moss)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 700, color: "var(--color-inky-moss)", cursor: "pointer", letterSpacing: "0.2em", textTransform: "uppercase", transition: "all 0.3s ease" }}
+            style={{ width: "100%", padding: "14px 40px", background: "transparent", border: "1.5px solid var(--color-inky-moss)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400, color: "var(--color-inky-moss)", cursor: "pointer", letterSpacing: "0.2em", textTransform: "uppercase", transition: "all 0.3s ease" }}
             onMouseEnter={e => { e.currentTarget.style.background = "var(--color-inky-moss)"; e.currentTarget.style.color = "var(--color-ivory)"; }}
             onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--color-inky-moss)"; }}>
             RITUAL COMPLETE
@@ -595,7 +595,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
                     <p style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 400, letterSpacing: "0.08em", color: "var(--parchment)", margin: "0 0 1px" }}>{p.name}</p>
                     <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0 }}>{p.brand}</p>
                   </div>
-                  <span style={{ fontSize: 9, fontFamily: "var(--font-body)", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: labelColor, background: scheduledTonight ? "rgba(45,61,43,0.12)" : "transparent", padding: "3px 8px", borderRadius: 20, border: scheduledTonight ? "1px solid rgba(45,61,43,0.25)" : "none" }}>{label}</span>
+                  <span style={{ fontSize: 9, fontFamily: "var(--font-body)", fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: labelColor, background: scheduledTonight ? "rgba(45,61,43,0.12)" : "transparent", padding: "3px 8px", borderRadius: 20, border: scheduledTonight ? "1px solid rgba(45,61,43,0.25)" : "none" }}>{label}</span>
                 </div>
               );
             })}
@@ -615,7 +615,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
                   <p style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 400, letterSpacing: "0.08em", color: "var(--parchment)", margin: "0 0 1px" }}>{p.name}</p>
                   <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0 }}>{p.brand} · {freqLabel}</p>
                 </div>
-                <span style={{ fontSize: 9, fontFamily: "var(--font-body)", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)" }}>{nextLabel}</span>
+                <span style={{ fontSize: 9, fontFamily: "var(--font-body)", fontWeight: 400, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)" }}>{nextLabel}</span>
               </div>
             );
           })}
@@ -630,7 +630,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
             <div key={i} style={{ padding: "15px 17px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 13, marginBottom: 10 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 7 }}>
                 <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--parchment)", flexShrink: 0, boxShadow: "0 0 6px rgba(232,227,214,0.4)" }} />
-                <span style={{ fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 700, color: "var(--parchment)", letterSpacing: "0.13em", textTransform: "uppercase" }}>{c.pair.join(" + ")}</span>
+                <span style={{ fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400, color: "var(--parchment)", letterSpacing: "0.13em", textTransform: "uppercase" }}>{c.pair.join(" + ")}</span>
                 <span style={{ marginLeft: "auto", fontSize: 9, fontFamily: "var(--font-body)", letterSpacing: "0.11em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.65 }}>{c.severity}</span>
               </div>
               <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: "0 0 9px", lineHeight: 1.6 }}>{c.reason}</p>
@@ -688,8 +688,8 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
               return (
                 <div key={i} style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "13px 15px", marginBottom: 8 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-                    <span style={{ fontSize: 9, fontFamily: "var(--font-body)", fontWeight: 700, letterSpacing: "0.13em", textTransform: "uppercase", color: "var(--parchment)", opacity: 0.7 }}>{r.verb}</span>
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--parchment)", margin: 0, flex: 1, fontWeight: 500, lineHeight: 1.3 }}>{r.title}</p>
+                    <span style={{ fontSize: 9, fontFamily: "var(--font-body)", fontWeight: 400, letterSpacing: "0.13em", textTransform: "uppercase", color: "var(--parchment)", opacity: 0.7 }}>{r.verb}</span>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--parchment)", margin: 0, flex: 1, fontWeight: 400, lineHeight: 1.3 }}>{r.title}</p>
                   </div>
                   <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.65 }}>{r.body}</p>
                   {r.action && (
@@ -702,7 +702,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 10 }}>
                       {targets.map(p => (
                         <button key={p.id} onClick={() => onEditProduct(p)}
-                          style={{ padding: "6px 11px", borderRadius: 20, background: "rgba(45,61,43,0.12)", border: "1px solid rgba(45,61,43,0.3)", fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 600, color: "#2d3d2b", cursor: "pointer", letterSpacing: "0.05em", display: "inline-flex", alignItems: "center", gap: 5 }}>
+                          style={{ padding: "6px 11px", borderRadius: 20, background: "rgba(45,61,43,0.12)", border: "1px solid rgba(45,61,43,0.3)", fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400, color: "#2d3d2b", cursor: "pointer", letterSpacing: "0.05em", display: "inline-flex", alignItems: "center", gap: 5 }}>
                           {p.name} <Icon name="chevron" size={10} />
                         </button>
                       ))}
@@ -711,7 +711,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
                   {targets.length === 0 && r.addCategory && onAddProduct && (
                     <div style={{ marginTop: 10 }}>
                       <button onClick={() => onAddProduct(r.addCategory)}
-                        style={{ padding: "8px 14px", borderRadius: 10, background: "rgba(45,61,43,0.15)", border: "1px solid rgba(45,61,43,0.35)", fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 600, color: "#2d3d2b", cursor: "pointer", letterSpacing: "0.05em" }}>
+                        style={{ padding: "8px 14px", borderRadius: 10, background: "rgba(45,61,43,0.15)", border: "1px solid rgba(45,61,43,0.35)", fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, color: "#2d3d2b", cursor: "pointer", letterSpacing: "0.05em" }}>
                         + Add {r.addCategory}
                       </button>
                     </div>

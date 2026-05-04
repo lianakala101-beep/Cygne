@@ -239,10 +239,10 @@ function RecommendationCard({ rec, onAdd, onDismiss }) {
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 4, flexWrap: "wrap" }}>
-            <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", fontWeight: 700, letterSpacing: "0.13em", textTransform: "uppercase", color: rec.tagColor, background: `${rec.tagColor}18`, padding: "2px 7px", borderRadius: 20 }}>{rec.tag}</span>
+            <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", fontWeight: 400, letterSpacing: "0.13em", textTransform: "uppercase", color: rec.tagColor, background: `${rec.tagColor}18`, padding: "2px 7px", borderRadius: 20 }}>{rec.tag}</span>
             <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.11em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.55 }}>{typeLabelMap[rec.type]}</span>
           </div>
-          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, color: "var(--parchment)", margin: 0, fontWeight: 500, lineHeight: 1.35 }}>{rec.title}</p>
+          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, color: "var(--parchment)", margin: 0, fontWeight: 400, lineHeight: 1.35 }}>{rec.title}</p>
         </div>
         <span style={{ color: "var(--clay)", opacity: 0.35, flexShrink: 0, marginTop: 5, display: "inline-block", transform: expanded ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>
           <Icon name="chevron" size={13} />
@@ -277,7 +277,7 @@ function RecommendationCard({ rec, onAdd, onDismiss }) {
               onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.18)"}
               onMouseLeave={e => e.currentTarget.style.background = "rgba(122,144,112,0.10)"}>
               <Icon name="plus" size={11} color="#7a9070" />
-              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 600, color: "#7a9070", letterSpacing: "0.08em", textTransform: "uppercase" }}>Add {rec.category} to vanity</span>
+              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 400, color: "#7a9070", letterSpacing: "0.08em", textTransform: "uppercase" }}>Add {rec.category} to vanity</span>
             </button>
           )}
         </div>
@@ -495,7 +495,7 @@ function RefinementsCard({ products, activeMap, conflicts }) {
         onMouseLeave={e => { if (!open) e.currentTarget.style.borderColor = "var(--border)"; }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#c49040", flexShrink: 0 }} />
-          <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 600, color: "var(--parchment)", letterSpacing: "0.02em" }}>Refine Your Ritual</span>
+          <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 400, color: "var(--parchment)", letterSpacing: "0.02em" }}>Refine Your Ritual</span>
           <span style={{ fontSize: 10, fontFamily: "Space Grotesk, sans-serif", background: "rgba(196,144,64,0.14)", color: "#c49040", padding: "2px 8px", borderRadius: 20, letterSpacing: "0.06em" }}>{refinements.length}</span>
         </div>
         <span style={{ color: "var(--clay)", opacity: 0.6, display: "inline-block", transform: open ? "rotate(90deg)" : "none", transition: "transform 0.22s" }}>
@@ -545,8 +545,8 @@ function RefinementItem({ r, vs, onEdit, onDismiss }) {
       onMouseEnter={e => e.currentTarget.style.borderColor = vs.border}
       onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}>
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", fontWeight: 700, letterSpacing: "0.13em", textTransform: "uppercase", color: vs.color, background: `${vs.color}18`, padding: "3px 8px", borderRadius: 20, flexShrink: 0 }}>{r.verb}</span>
-        <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--parchment)", margin: 0, flex: 1, fontWeight: 500, lineHeight: 1.3 }}>{r.title}</p>
+        <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", fontWeight: 400, letterSpacing: "0.13em", textTransform: "uppercase", color: vs.color, background: `${vs.color}18`, padding: "3px 8px", borderRadius: 20, flexShrink: 0 }}>{r.verb}</span>
+        <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--parchment)", margin: 0, flex: 1, fontWeight: 400, lineHeight: 1.3 }}>{r.title}</p>
         <span style={{ color: "var(--clay)", opacity: 0.5, flexShrink: 0, display: "inline-block", transform: open ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>
           <Icon name="chevron" size={12} />
         </span>
@@ -573,7 +573,7 @@ function RefinementItem({ r, vs, onEdit, onDismiss }) {
               style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4, padding: "8px 14px", background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.30)", borderRadius: 9, cursor: "pointer", transition: "background 0.15s" }}
               onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.18)"}
               onMouseLeave={e => e.currentTarget.style.background = "rgba(122,144,112,0.10)"}>
-              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 600, color: "#7a9070", letterSpacing: "0.08em", textTransform: "uppercase" }}>Edit {r.product.brand ? `${r.product.brand} ${r.product.name}` : r.product.name}</span>
+              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 400, color: "#7a9070", letterSpacing: "0.08em", textTransform: "uppercase" }}>Edit {r.product.brand ? `${r.product.brand} ${r.product.name}` : r.product.name}</span>
               <Icon name="chevron" size={11} color="#7a9070" />
             </button>
           )}

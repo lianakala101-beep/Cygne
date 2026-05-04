@@ -41,7 +41,7 @@ function RoutineFitSheet({ product, assessment, onAddNow, onDefer, onClose }) {
               <span style={{ padding: "2px 9px", borderRadius: 20, background: `${tagCfg.color}20`, border: `1px solid ${tagCfg.color}50`, fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: tagCfg.color }}>
                 {tagCfg.label}
               </span>
-              <span style={{ fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 600, color: "var(--parchment)" }}>{assessment.reason}</span>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, color: "var(--parchment)" }}>{assessment.reason}</span>
             </div>
             <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: 0, lineHeight: 1.65 }}>{assessment.detail}</p>
           </div>
@@ -52,17 +52,17 @@ function RoutineFitSheet({ product, assessment, onAddNow, onDefer, onClose }) {
           {isDefer ? (
             <>
               <button onClick={onDefer}
-                style={{ width: "100%", padding: "14px 0", background: "#2d3d2b", color: "#fdfcf9", border: "none", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}>
+                style={{ width: "100%", padding: "14px 0", background: "#2d3d2b", color: "#fdfcf9", border: "none", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}>
                 Save for Later
               </button>
               <button onClick={onAddNow}
-                style={{ width: "100%", padding: "13px 0", background: "transparent", color: "var(--clay)", border: "1px solid var(--border)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer" }}>
+                style={{ width: "100%", padding: "13px 0", background: "transparent", color: "var(--clay)", border: "1px solid var(--border)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer" }}>
                 Add to Ritual Anyway
               </button>
             </>
           ) : (
             <button onClick={onAddNow}
-              style={{ width: "100%", padding: "14px 0", background: "#2d3d2b", color: "#fdfcf9", border: "none", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}>
+              style={{ width: "100%", padding: "14px 0", background: "#2d3d2b", color: "#fdfcf9", border: "none", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}>
               Add to Ritual
             </button>
           )}
@@ -538,7 +538,7 @@ function ProductModal({ product, onSave, onClose, user }) {
                 {analyzing ? <span style={{ fontFamily: "var(--font-body)", fontSize: 9, color: "var(--sage)" }}>…</span> : <Icon name="camera" size={16} color="var(--sage)" />}
               </div>
               <div>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: 13, fontWeight: 600, color: "var(--parchment)", margin: "0 0 2px" }}>{analyzing ? "Analysing…" : "Scan a photo"}</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: 13, fontWeight: 400, color: "var(--parchment)", margin: "0 0 2px" }}>{analyzing ? "Analysing…" : "Scan a photo"}</p>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0 }}>Point at the product — Cygne reads the label.</p>
               </div>
             </div>
@@ -618,7 +618,7 @@ function ProductModal({ product, onSave, onClose, user }) {
                         return (
                           <div key={active.key} style={{ background: isOn ? "rgba(45,61,43,0.08)" : "var(--surface)", border: "1px solid " + (isOn ? "rgba(45,61,43,0.35)" : "var(--border)"), borderRadius: 11, padding: "10px 14px" }}>
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: isOn ? 8 : 0 }}>
-                              <span style={{ fontFamily: "var(--font-body)", fontSize: 12, color: isOn ? "var(--parchment)" : "var(--clay)", fontWeight: isOn ? 600 : 400 }}>{active.name}</span>
+                              <span style={{ fontFamily: "var(--font-body)", fontSize: 12, color: isOn ? "var(--parchment)" : "var(--clay)", fontWeight: 400 }}>{active.name}</span>
                               <button onClick={() => {
                                 if (isOn) {
                                   const current = typeof form.ingredients === "string"
@@ -699,7 +699,7 @@ function ProductModal({ product, onSave, onClose, user }) {
               {locked ? (
                 <div>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                    <span style={{ padding: "5px 14px", borderRadius: 20, background: locked.session === "am" ? "rgba(45,61,43,0.14)" : "rgba(232,226,217,0.10)", border: "1px solid " + (locked.session === "am" ? "rgba(45,61,43,0.4)" : "rgba(232,226,217,0.3)"), fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 700, color: locked.session === "am" ? "var(--sage)" : "#e8e2d9" }}>{locked.session === "am" ? "AM only" : "PM only"}</span>
+                    <span style={{ padding: "5px 14px", borderRadius: 20, background: locked.session === "am" ? "rgba(45,61,43,0.14)" : "rgba(232,226,217,0.10)", border: "1px solid " + (locked.session === "am" ? "rgba(45,61,43,0.4)" : "rgba(232,226,217,0.3)"), fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400, color: locked.session === "am" ? "var(--sage)" : "#e8e2d9" }}>{locked.session === "am" ? "AM only" : "PM only"}</span>
                     <span style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", opacity: 0.6 }}>locked by ingredients</span>
                   </div>
                   <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.5, opacity: 0.7 }}>{locked.reason}</p>
@@ -711,7 +711,7 @@ function ProductModal({ product, onSave, onClose, user }) {
                       const active = effectiveSession === s.id;
                       return (
                         <button key={s.id} onClick={() => { setSessionTouched(true); set("session", s.id); }}
-                          style={{ flex: 1, padding: "8px 0", borderRadius: 20, border: "1px solid " + (active ? "var(--sage)" : "var(--border)"), background: active ? "rgba(45,61,43,0.18)" : "transparent", color: active ? "var(--parchment)" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 10, fontWeight: active ? 600 : 400, cursor: "pointer" }}>
+                          style={{ flex: 1, padding: "8px 0", borderRadius: 20, border: "1px solid " + (active ? "var(--sage)" : "var(--border)"), background: active ? "rgba(45,61,43,0.18)" : "transparent", color: active ? "var(--parchment)" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400, cursor: "pointer" }}>
                           {s.label}
                         </button>
                       );
@@ -729,7 +729,7 @@ function ProductModal({ product, onSave, onClose, user }) {
             </div>
 
             <button onClick={save}
-              style={{ width: "100%", padding: "14px 0", background: "var(--sage)", border: "none", borderRadius: 12, fontFamily: "var(--font-body)", fontSize: 13, fontWeight: 600, color: "var(--ink)", cursor: "pointer", opacity: (!form.brand || !form.name) ? 0.4 : 1 }}>
+              style={{ width: "100%", padding: "14px 0", background: "var(--sage)", border: "none", borderRadius: 12, fontFamily: "var(--font-body)", fontSize: 13, fontWeight: 400, color: "var(--ink)", cursor: "pointer", opacity: (!form.brand || !form.name) ? 0.4 : 1 }}>
               Save to Vanity
             </button>
           </div>

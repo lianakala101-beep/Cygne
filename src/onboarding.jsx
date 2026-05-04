@@ -115,7 +115,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
         const active = single ? selected === opt : selected.includes(opt);
         return (
           <button key={opt} onClick={() => onToggle(opt)}
-            style={{ padding: "10px 18px", borderRadius: 24, border: `1px solid ${active ? "rgba(45,61,43,0.7)" : "var(--border)"}`, background: active ? "rgba(45,61,43,0.12)" : "var(--surface)", color: active ? "#5a7a60" : "#6b5a43", fontFamily: "var(--font-body)", fontSize: 12, fontWeight: active ? 600 : 400, cursor: "pointer", transition: "all 0.18s", letterSpacing: "0.02em" }}>
+            style={{ padding: "10px 18px", borderRadius: 24, border: `1px solid ${active ? "rgba(45,61,43,0.7)" : "var(--border)"}`, background: active ? "rgba(45,61,43,0.12)" : "var(--surface)", color: active ? "#5a7a60" : "#6b5a43", fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 400, cursor: "pointer", transition: "all 0.18s", letterSpacing: "0.02em" }}>
             {opt}
           </button>
         );
@@ -205,14 +205,14 @@ function OnboardingScreen({ onComplete, setLocationData }) {
           <div style={{ padding: "16px 18px", background: "rgba(45,61,43,0.1)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 14 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#2d3d2b" }} />
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "#2d3d2b", margin: 0, fontWeight: 500 }}>Location enabled</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "#2d3d2b", margin: 0, fontWeight: 400 }}>Location enabled</p>
             </div>
             <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: "6px 0 0" }}>Your environment data will appear on the home screen.</p>
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <button onClick={requestLocation}
-              style={{ display: "flex", alignItems: "center", gap: 8, padding: "13px 20px", background: "rgba(45,61,43,0.10)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 12, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 600, color: "#2d3d2b", cursor: "pointer", letterSpacing: "0.08em", transition: "all 0.2s" }}
+              style={{ display: "flex", alignItems: "center", gap: 8, padding: "13px 20px", background: "rgba(45,61,43,0.10)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 12, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 400, color: "#2d3d2b", cursor: "pointer", letterSpacing: "0.08em", transition: "all 0.2s" }}
               onMouseEnter={e => e.currentTarget.style.background = "rgba(45,61,43,0.18)"}
               onMouseLeave={e => e.currentTarget.style.background = "rgba(45,61,43,0.08)"}>
               <Icon name="target" size={14} />
@@ -251,7 +251,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
                 background: active ? "rgba(45,61,43,0.15)" : "var(--surface)",
                 color: active ? "#5a7a60" : "#6b5a43",
                 fontFamily: "var(--font-body)", fontSize: 12,
-                fontWeight: active ? 600 : 400, letterSpacing: "0.08em",
+                fontWeight: 400, letterSpacing: "0.08em",
                 textTransform: "uppercase", cursor: "pointer", transition: "all 0.18s",
               }}>
               {label}
@@ -424,7 +424,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
           </div>
         )}
         <button onClick={handleComplete}
-          style={{ width: "100%", padding: "15px 0", background: "rgba(232,227,214,0.12)", color: "rgba(232,227,214,0.95)", border: "1px solid rgba(232,227,214,0.28)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase", cursor: "pointer", transition: "background 0.2s" }}
+          style={{ width: "100%", padding: "15px 0", background: "rgba(232,227,214,0.12)", color: "rgba(232,227,214,0.95)", border: "1px solid rgba(232,227,214,0.28)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400, letterSpacing: "0.2em", textTransform: "uppercase", cursor: "pointer", transition: "background 0.2s" }}
           onMouseEnter={e => e.currentTarget.style.background = "rgba(232,227,214,0.2)"}
           onMouseLeave={e => e.currentTarget.style.background = "rgba(232,227,214,0.12)"}>
           Enter Cygne
@@ -486,7 +486,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       {step >= 0 && step < 5 && (
         <div style={{ position: "sticky", bottom: 0, background: "#f5f2ee", padding: "16px 24px 32px", marginTop: "auto" }}>
           <button onClick={() => canAdvance[step] && advance(1)}
-            style={{ width: "100%", padding: "14px 0", background: canAdvance[step] ? "#2d3d2b" : "#e0dbd5", color: canAdvance[step] ? "#fdfcf9" : "var(--clay)", border: `1px solid ${canAdvance[step] ? "transparent" : "var(--border)"}`, borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: canAdvance[step] ? "pointer" : "default", transition: "all 0.2s", opacity: canAdvance[step] ? 1 : 0.5 }}>
+            style={{ width: "100%", padding: "14px 0", background: canAdvance[step] ? "#2d3d2b" : "#e0dbd5", color: canAdvance[step] ? "#fdfcf9" : "var(--clay)", border: `1px solid ${canAdvance[step] ? "transparent" : "var(--border)"}`, borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 400, letterSpacing: "0.14em", textTransform: "uppercase", cursor: canAdvance[step] ? "pointer" : "default", transition: "all 0.2s", opacity: canAdvance[step] ? 1 : 0.5 }}>
             Continue
           </button>
           {step === 3 || step === 4 ? (
@@ -498,7 +498,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       {step === 5 && (
         <div style={{ maxWidth: 420, width: "100%", margin: "24px auto 0" }}>
           <button onClick={() => advance(1)}
-            style={{ width: "100%", padding: "14px 0", background: "#2d3d2b", color: "#fdfcf9", border: "none", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}>
+            style={{ width: "100%", padding: "14px 0", background: "#2d3d2b", color: "#fdfcf9", border: "none", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 400, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}>
             Continue
           </button>
         </div>
@@ -507,7 +507,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       {step >= 6 && step < TOTAL_STEPS - 1 && (
         <div style={{ position: "sticky", bottom: 0, background: "#f5f2ee", padding: "16px 24px 32px", marginTop: "auto" }}>
           <button onClick={() => advance(1)}
-            style={{ width: "100%", padding: "14px 0", background: "#2d3d2b", color: "#fdfcf9", border: "none", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}>
+            style={{ width: "100%", padding: "14px 0", background: "#2d3d2b", color: "#fdfcf9", border: "none", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 400, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}>
             Continue
           </button>
         </div>

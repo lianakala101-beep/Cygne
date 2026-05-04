@@ -85,7 +85,7 @@ function FlagCard({ f }) {
     <div style={{ display: "flex", gap: 14, padding: "14px 16px", background: v.bg, borderRadius: 12, border: `1px solid ${v.border}`, marginBottom: 8 }}>
       <div style={{ width: 6, height: 6, borderRadius: "50%", background: v.dot, flexShrink: 0, marginTop: 6 }} />
       <div>
-        <p style={{ fontFamily: "var(--sans)", fontSize: 13, color: v.text, margin: "0 0 3px", fontWeight: 500 }}>{f.label}</p>
+        <p style={{ fontFamily: "var(--sans)", fontSize: 13, color: v.text, margin: "0 0 3px", fontWeight: 400 }}>{f.label}</p>
         <p style={{ fontFamily: "var(--sans)", fontSize: 12, color: "var(--clay)", margin: 0, lineHeight: 1.5 }}>{f.detail}</p>
       </div>
     </div>

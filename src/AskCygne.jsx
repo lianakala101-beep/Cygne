@@ -180,7 +180,7 @@ export function AskCygneOverlay({ user, onClose }) {
           style={{ width: "140px", display: "block", margin: "0 auto 24px", background: "transparent", border: "none" }}
         />
         <p style={{
-          fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 10,
+          fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 10,
           letterSpacing: "0.25em", textTransform: "uppercase",
           color: "var(--color-inky-moss)", margin: "0 0 8px",
         }}>Ask Cygne</p>
@@ -230,7 +230,7 @@ export function AskCygneOverlay({ user, onClose }) {
                   padding: "14px 40px", background: "transparent",
                   border: "1.5px solid var(--color-inky-moss)", borderRadius: 0,
                   cursor: question.trim() ? "pointer" : "default",
-                  fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 700,
+                  fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400,
                   letterSpacing: "0.2em", textTransform: "uppercase",
                   color: "var(--color-inky-moss)", transition: "all 0.3s ease",
                   opacity: question.trim() ? 1 : 0.4,

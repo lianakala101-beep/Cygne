@@ -89,7 +89,7 @@ function AuthScreen({ onAuth }) {
       {/* Heading */}
       <p style={{
         fontFamily: "var(--font-display, 'Fungis', sans-serif)",
-        fontWeight: 700,
+        fontWeight: 400,
         fontSize: 13,
         letterSpacing: "0.15em",
         textTransform: "uppercase",

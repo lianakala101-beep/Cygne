@@ -70,7 +70,7 @@ export function AskCygneModal({ initialQuestion = "", context = "", onClose }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
           <p style={{
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
-            fontWeight: 700, fontSize: 11, letterSpacing: "0.2em",
+            fontWeight: 400, fontSize: 11, letterSpacing: "0.2em",
             color: "var(--color-inky-moss, #2d3d2b)", margin: 0,
           }}>
             ASK CYGNE
@@ -108,7 +108,7 @@ export function AskCygneModal({ initialQuestion = "", context = "", onClose }) {
             color: "var(--color-inky-moss, #2d3d2b)",
             borderRadius: 12,
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
-            fontWeight: 700, fontSize: 11, letterSpacing: "0.18em",
+            fontWeight: 400, fontSize: 11, letterSpacing: "0.18em",
             cursor: loading ? "default" : "pointer",
             opacity: loading || !question.trim() ? 0.5 : 1,
           }}

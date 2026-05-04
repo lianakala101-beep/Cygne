@@ -93,7 +93,7 @@ export function FaceHeatMap({ journals = [], products = [], user = {} }) {
     }}>
       <p style={{
         fontFamily: "var(--font-display, 'Fungis Heavy', 'Space Grotesk', sans-serif)",
-        fontWeight: 700, fontSize: 11, letterSpacing: "0.2em",
+        fontWeight: 400, fontSize: 11, letterSpacing: "0.2em",
         color: INKY, margin: "0 0 20px",
       }}>
         INFLAMMATION MAP
@@ -278,7 +278,7 @@ function ZoneInsightDrawer({ zoneId, journals, products, user, onClose, onAskCyg
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
           <h3 style={{
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
-            fontWeight: 700, fontSize: 14, letterSpacing: "0.18em",
+            fontWeight: 400, fontSize: 14, letterSpacing: "0.18em",
             color: INKY, margin: 0,
           }}>
             {zoneLabelDisplay(zoneId)}
@@ -355,7 +355,7 @@ function ZoneInsightDrawer({ zoneId, journals, products, user, onClose, onAskCyg
             color: INKY,
             borderRadius: 12,
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
-            fontWeight: 700, fontSize: 11, letterSpacing: "0.18em",
+            fontWeight: 400, fontSize: 11, letterSpacing: "0.18em",
             cursor: "pointer",
           }}
         >

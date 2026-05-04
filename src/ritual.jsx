@@ -16,7 +16,7 @@ function SessionPicker({ productId, product, initial, onSession }) {
       <div onClick={e => e.stopPropagation()} style={{ marginTop: 10 }}>
         <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 6px", opacity: 0.6 }}>Session</p>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ padding: "5px 12px", borderRadius: 8, background: isAM ? "rgba(122,144,112,0.14)" : "rgba(232,226,217,0.10)", border: "1px solid " + (isAM ? "rgba(122,144,112,0.4)" : "rgba(232,226,217,0.3)"), fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 700, color: isAM ? "var(--sage)" : "#e8e2d9" }}>{isAM ? "AM only" : "PM only"}</span>
+          <span style={{ padding: "5px 12px", borderRadius: 8, background: isAM ? "rgba(122,144,112,0.14)" : "rgba(232,226,217,0.10)", border: "1px solid " + (isAM ? "rgba(122,144,112,0.4)" : "rgba(232,226,217,0.3)"), fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 400, color: isAM ? "var(--sage)" : "#e8e2d9" }}>{isAM ? "AM only" : "PM only"}</span>
           <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", opacity: 0.5 }}>locked by ingredients</span>
         </div>
         <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", margin: "8px 0 0", lineHeight: 1.5, opacity: 0.6 }}>{locked.reason}</p>
@@ -119,7 +119,7 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
           <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 18, color: "var(--parchment)", fontWeight: 300, letterSpacing: "-0.01em" }}>${(product.price || 0).toFixed(2)}</span>
         )}
         {shelfStatus && (
-          <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 600, color: shelfStatus.color, background: shelfStatus.bg, border: `1px solid ${shelfStatus.border}`, padding: "3px 9px", borderRadius: 20 }}>
+          <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 400, color: shelfStatus.color, background: shelfStatus.bg, border: `1px solid ${shelfStatus.border}`, padding: "3px 9px", borderRadius: 20 }}>
             {shelfStatus.label}
           </span>
         )}
@@ -170,8 +170,8 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
               Remove <strong>{product.name}</strong> from your vanity? This cannot be undone.
             </p>
             <div style={{ display: "flex", gap: 10 }}>
-              <button onClick={() => setConfirmDelete(false)} style={{ flex: 1, padding: "12px 0", borderRadius: 10, border: "1px solid var(--border)", background: "transparent", color: "var(--parchment)", fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 600, cursor: "pointer", transition: "background 0.15s" }} onMouseEnter={e => e.currentTarget.style.background = "var(--surface)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>Cancel</button>
-              <button onClick={() => { setConfirmDelete(false); onDelete(product.id); }} style={{ flex: 1, padding: "12px 0", borderRadius: 10, border: "1px solid rgba(139,115,85,0.35)", background: "rgba(139,115,85,0.12)", color: "#8b7355", fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 600, cursor: "pointer", transition: "background 0.15s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(139,115,85,0.2)"} onMouseLeave={e => e.currentTarget.style.background = "rgba(139,115,85,0.12)"}>Remove</button>
+              <button onClick={() => setConfirmDelete(false)} style={{ flex: 1, padding: "12px 0", borderRadius: 10, border: "1px solid var(--border)", background: "transparent", color: "var(--parchment)", fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 400, cursor: "pointer", transition: "background 0.15s" }} onMouseEnter={e => e.currentTarget.style.background = "var(--surface)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>Cancel</button>
+              <button onClick={() => { setConfirmDelete(false); onDelete(product.id); }} style={{ flex: 1, padding: "12px 0", borderRadius: 10, border: "1px solid rgba(139,115,85,0.35)", background: "rgba(139,115,85,0.12)", color: "#8b7355", fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 400, cursor: "pointer", transition: "background 0.15s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(139,115,85,0.2)"} onMouseLeave={e => e.currentTarget.style.background = "rgba(139,115,85,0.12)"}>Remove</button>
             </div>
           </div>
         </div>
@@ -353,7 +353,7 @@ function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }
             background: "none", border: "none", padding: 0,
             cursor: "pointer",
             fontFamily: "var(--font-display)",
-            fontSize: 10, fontWeight: 700,
+            fontSize: 10, fontWeight: 400,
             letterSpacing: "0.22em", textTransform: "uppercase",
             color: "var(--color-inky-moss, #2d3d2b)",
             display: "inline-flex", alignItems: "center", gap: 4,
@@ -621,7 +621,7 @@ function FlightModeModal({ products, activeMap, onClose }) {
                 <div style={{ display: "flex", gap: 12, padding: "13px 16px", background: "rgba(139,115,85,0.07)", border: "1px solid rgba(139,115,85,0.22)", borderRadius: 12, marginBottom: 18 }}>
                   <span style={{ color: "#8b7355", flexShrink: 0, marginTop: 2, display: "inline-flex" }}><Icon name="plane" size={16} /></span>
                   <div>
-                    <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 600, color: "var(--parchment)", margin: "0 0 3px" }}>Check your sizes before packing.</p>
+                    <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 400, color: "var(--parchment)", margin: "0 0 3px" }}>Check your sizes before packing.</p>
                     <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>
                       Your {listed} {unique.length === 1 ? "is" : "are"} often over 100ml. Decant into travel bottles or pick up minis — carry-on limit is 100ml per liquid.
                     </p>
@@ -639,7 +639,7 @@ function FlightModeModal({ products, activeMap, onClose }) {
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {keep.map((item, i) => (
                     <div key={i} style={{ padding: "13px 16px", background: "rgba(122,144,112,0.06)", border: "1px solid rgba(122,144,112,0.2)", borderRadius: 12 }}>
-                      <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, color: "var(--parchment)", margin: "0 0 3px", fontWeight: 500 }}>{item.name}</p>
+                      <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, color: "var(--parchment)", margin: "0 0 3px", fontWeight: 400 }}>{item.name}</p>
                       <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>{item.reason}</p>
                     </div>
                   ))}
@@ -657,7 +657,7 @@ function FlightModeModal({ products, activeMap, onClose }) {
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {skip.map((item, i) => (
                     <div key={i} style={{ padding: "13px 16px", background: "rgba(139,115,85,0.06)", border: "1px solid rgba(139,115,85,0.18)", borderRadius: 12 }}>
-                      <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, color: "var(--parchment)", margin: "0 0 3px", fontWeight: 500 }}>{item.name}</p>
+                      <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, color: "var(--parchment)", margin: "0 0 3px", fontWeight: 400 }}>{item.name}</p>
                       <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>{item.reason}</p>
                     </div>
                   ))}

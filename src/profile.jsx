@@ -24,13 +24,13 @@ function Profile({ user, products, onLogout, locationData, setLocationData, loca
             {user.skinAgeBracket && (
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, paddingBottom: 12, borderBottom: "1px solid var(--border)" }}>
                 <span style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)" }}>Age Bracket</span>
-                <span style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--parchment)", fontWeight: 500 }}>{user.skinAgeBracket}</span>
+                <span style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--parchment)", fontWeight: 400 }}>{user.skinAgeBracket}</span>
               </div>
             )}
             {user.skinType && (
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: user.concerns?.length > 0 ? 12 : 0, paddingBottom: user.concerns?.length > 0 ? 12 : 0, borderBottom: user.concerns?.length > 0 ? "1px solid var(--border)" : "none" }}>
                 <span style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)" }}>Skin Type</span>
-                <span style={{ padding: "4px 12px", borderRadius: 20, background: "rgba(45,61,43,0.10)", border: "1px solid rgba(45,61,43,0.3)", fontFamily: "var(--font-body)", fontSize: 11, color: "#2d3d2b", fontWeight: 500 }}>{user.skinType}</span>
+                <span style={{ padding: "4px 12px", borderRadius: 20, background: "rgba(45,61,43,0.10)", border: "1px solid rgba(45,61,43,0.3)", fontFamily: "var(--font-body)", fontSize: 11, color: "#2d3d2b", fontWeight: 400 }}>{user.skinType}</span>
               </div>
             )}
             {user.concerns && user.concerns.length > 0 && (
@@ -122,7 +122,7 @@ function SkinEditor({ user, onUpdateUser }) {
           {user?.skinType ? (
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: user?.concerns?.length > 0 ? 10 : 0, paddingBottom: user?.concerns?.length > 0 ? 10 : 0, borderBottom: user?.concerns?.length > 0 ? "1px solid var(--border)" : "none" }}>
               <span style={{ fontFamily: "var(--sans)", fontSize: 10, color: "var(--clay)", letterSpacing: "0.06em" }}>Skin type</span>
-              <span style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(45,61,43,0.10)", border: "1px solid rgba(45,61,43,0.3)", fontFamily: "var(--sans)", fontSize: 10, color: "var(--sage)", fontWeight: 500 }}>{user.skinType}</span>
+              <span style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(45,61,43,0.10)", border: "1px solid rgba(45,61,43,0.3)", fontFamily: "var(--sans)", fontSize: 10, color: "var(--sage)", fontWeight: 400 }}>{user.skinType}</span>
             </div>
           ) : (
             <p style={{ fontFamily: "var(--sans)", fontSize: 11, color: "var(--clay)", margin: "0 0 8px", opacity: 0.5 }}>No skin type set.</p>
@@ -144,7 +144,7 @@ function SkinEditor({ user, onUpdateUser }) {
             {SKIN_TYPES.map(t => {
               const active = draftType === t;
               return (
-                <button key={t} onClick={() => setDraftType(active ? "" : t)} style={{ padding: "6px 14px", borderRadius: 20, border: `1px solid ${active ? "rgba(45,61,43,0.55)" : "var(--border)"}`, background: active ? "rgba(45,61,43,0.18)" : "transparent", fontFamily: "var(--sans)", fontSize: 11, color: active ? "var(--parchment)" : "var(--clay)", fontWeight: active ? 600 : 400, cursor: "pointer", transition: "all 0.15s" }}>
+                <button key={t} onClick={() => setDraftType(active ? "" : t)} style={{ padding: "6px 14px", borderRadius: 20, border: `1px solid ${active ? "rgba(45,61,43,0.55)" : "var(--border)"}`, background: active ? "rgba(45,61,43,0.18)" : "transparent", fontFamily: "var(--sans)", fontSize: 11, color: active ? "var(--parchment)" : "var(--clay)", fontWeight: 400, cursor: "pointer", transition: "all 0.15s" }}>
                   {t}
                 </button>
               );
@@ -155,15 +155,15 @@ function SkinEditor({ user, onUpdateUser }) {
             {SKIN_CONCERNS.map(c => {
               const active = draftConcerns.includes(c);
               return (
-                <button key={c} onClick={() => toggleConcern(c)} style={{ padding: "6px 14px", borderRadius: 20, border: `1px solid ${active ? "rgba(45,61,43,0.55)" : "var(--border)"}`, background: active ? "rgba(45,61,43,0.18)" : "transparent", fontFamily: "var(--sans)", fontSize: 11, color: active ? "var(--parchment)" : "var(--clay)", fontWeight: active ? 600 : 400, cursor: "pointer", transition: "all 0.15s" }}>
+                <button key={c} onClick={() => toggleConcern(c)} style={{ padding: "6px 14px", borderRadius: 20, border: `1px solid ${active ? "rgba(45,61,43,0.55)" : "var(--border)"}`, background: active ? "rgba(45,61,43,0.18)" : "transparent", fontFamily: "var(--sans)", fontSize: 11, color: active ? "var(--parchment)" : "var(--clay)", fontWeight: 400, cursor: "pointer", transition: "all 0.15s" }}>
                   {c}
                 </button>
               );
             })}
           </div>
           <div style={{ display: "flex", gap: 8 }}>
-            <button onClick={save} style={{ flex: 1, padding: "10px 0", background: "rgba(45,61,43,0.14)", border: "1px solid rgba(45,61,43,0.35)", borderRadius: 10, fontFamily: "var(--sans)", fontSize: 10, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer" }}>Save</button>
-            <button onClick={cancel} style={{ flex: 1, padding: "10px 0", background: "transparent", border: "1px solid var(--border)", borderRadius: 10, fontFamily: "var(--sans)", fontSize: 10, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", cursor: "pointer" }}>Cancel</button>
+            <button onClick={save} style={{ flex: 1, padding: "10px 0", background: "rgba(45,61,43,0.14)", border: "1px solid rgba(45,61,43,0.35)", borderRadius: 10, fontFamily: "var(--sans)", fontSize: 10, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer" }}>Save</button>
+            <button onClick={cancel} style={{ flex: 1, padding: "10px 0", background: "transparent", border: "1px solid var(--border)", borderRadius: 10, fontFamily: "var(--sans)", fontSize: 10, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", cursor: "pointer" }}>Cancel</button>
           </div>
         </div>
       )}
@@ -277,14 +277,14 @@ function IngredientProfile({ user, onUpdateUser }) {
                 const on = draftAllergens.includes(s);
                 return (
                   <button key={s} onClick={() => toggleAllergen(s)}
-                    style={{ padding: "5px 12px", borderRadius: 20, border: `1px solid ${on ? "rgba(139,115,85,0.5)" : "var(--border)"}`, background: on ? "rgba(139,115,85,0.10)" : "transparent", fontFamily: "var(--font-body)", fontSize: 10, color: on ? "#8b7355" : "var(--clay)", fontWeight: on ? 600 : 400, cursor: "pointer", transition: "all 0.15s" }}>
+                    style={{ padding: "5px 12px", borderRadius: 20, border: `1px solid ${on ? "rgba(139,115,85,0.5)" : "var(--border)"}`, background: on ? "rgba(139,115,85,0.10)" : "transparent", fontFamily: "var(--font-body)", fontSize: 10, color: on ? "#8b7355" : "var(--clay)", fontWeight: 400, cursor: "pointer", transition: "all 0.15s" }}>
                     {s}
                   </button>
                 );
               })}
               {draftAllergens.filter(a => !COMMON_ALLERGENS.includes(a)).map(a => (
                 <button key={a} onClick={() => toggleAllergen(a)}
-                  style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "5px 12px", borderRadius: 20, border: "1px solid rgba(139,115,85,0.5)", background: "rgba(139,115,85,0.10)", fontFamily: "var(--font-body)", fontSize: 10, color: "#8b7355", fontWeight: 600, cursor: "pointer" }}>
+                  style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "5px 12px", borderRadius: 20, border: "1px solid rgba(139,115,85,0.5)", background: "rgba(139,115,85,0.10)", fontFamily: "var(--font-body)", fontSize: 10, color: "#8b7355", fontWeight: 400, cursor: "pointer" }}>
                   {a} <Icon name="x" size={9} />
                 </button>
               ))}
@@ -305,14 +305,14 @@ function IngredientProfile({ user, onUpdateUser }) {
                 const on = draftLoved.includes(s);
                 return (
                   <button key={s} onClick={() => toggleLoved(s)}
-                    style={{ padding: "5px 12px", borderRadius: 20, border: `1px solid ${on ? "rgba(45,61,43,0.5)" : "var(--border)"}`, background: on ? "rgba(45,61,43,0.10)" : "transparent", fontFamily: "var(--font-body)", fontSize: 10, color: on ? "#2d3d2b" : "var(--clay)", fontWeight: on ? 600 : 400, cursor: "pointer", transition: "all 0.15s" }}>
+                    style={{ padding: "5px 12px", borderRadius: 20, border: `1px solid ${on ? "rgba(45,61,43,0.5)" : "var(--border)"}`, background: on ? "rgba(45,61,43,0.10)" : "transparent", fontFamily: "var(--font-body)", fontSize: 10, color: on ? "#2d3d2b" : "var(--clay)", fontWeight: 400, cursor: "pointer", transition: "all 0.15s" }}>
                     {s}
                   </button>
                 );
               })}
               {draftLoved.filter(l => !COMMON_LOVED.includes(l)).map(l => (
                 <button key={l} onClick={() => toggleLoved(l)}
-                  style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "5px 12px", borderRadius: 20, border: "1px solid rgba(45,61,43,0.5)", background: "rgba(45,61,43,0.10)", fontFamily: "var(--font-body)", fontSize: 10, color: "#2d3d2b", fontWeight: 600, cursor: "pointer" }}>
+                  style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "5px 12px", borderRadius: 20, border: "1px solid rgba(45,61,43,0.5)", background: "rgba(45,61,43,0.10)", fontFamily: "var(--font-body)", fontSize: 10, color: "#2d3d2b", fontWeight: 400, cursor: "pointer" }}>
                   {l} <Icon name="x" size={9} />
                 </button>
               ))}
@@ -326,8 +326,8 @@ function IngredientProfile({ user, onUpdateUser }) {
           </div>
 
           <div style={{ display: "flex", gap: 8 }}>
-            <button onClick={save} style={{ flex: 1, padding: "10px 0", background: "rgba(45,61,43,0.14)", border: "1px solid rgba(45,61,43,0.35)", borderRadius: 10, fontFamily: "var(--sans)", fontSize: 10, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer" }}>Save</button>
-            <button onClick={cancel} style={{ flex: 1, padding: "10px 0", background: "transparent", border: "1px solid var(--border)", borderRadius: 10, fontFamily: "var(--sans)", fontSize: 10, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", cursor: "pointer" }}>Cancel</button>
+            <button onClick={save} style={{ flex: 1, padding: "10px 0", background: "rgba(45,61,43,0.14)", border: "1px solid rgba(45,61,43,0.35)", borderRadius: 10, fontFamily: "var(--sans)", fontSize: 10, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer" }}>Save</button>
+            <button onClick={cancel} style={{ flex: 1, padding: "10px 0", background: "transparent", border: "1px solid var(--border)", borderRadius: 10, fontFamily: "var(--sans)", fontSize: 10, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", cursor: "pointer" }}>Cancel</button>
           </div>
         </div>
       )}
@@ -384,9 +384,9 @@ function SkinHistory({ user, onUpdateUser }) {
   const hasSomeHistory = history.onTretinoin || history.accutaneHistory || (history.prescriptions||[]).length || (history.sensitivities||[]).length || (history.dermaVisits||[]).length;
   const rowStyle = { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 0", borderBottom: "1px solid var(--border)" };
   const labelStyle = { fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)" };
-  const valStyle = { fontFamily: "var(--font-body)", fontSize: 11, color: "var(--parchment)", fontWeight: 500 };
+  const valStyle = { fontFamily: "var(--font-body)", fontSize: 11, color: "var(--parchment)", fontWeight: 400 };
   const inputStyle = { background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 8, padding: "8px 12px", fontFamily: "var(--font-body)", fontSize: 11, color: "var(--parchment)", width: "100%", outline: "none" };
-  const toggleBtnStyle = (on) => ({ padding: "5px 14px", borderRadius: 20, border: `1px solid ${on ? "rgba(45,61,43,0.5)" : "var(--border)"}`, background: on ? "rgba(45,61,43,0.14)" : "transparent", fontFamily: "var(--font-body)", fontSize: 10, color: on ? "var(--sage)" : "var(--clay)", fontWeight: on ? 600 : 400, cursor: "pointer", transition: "all 0.15s" });
+  const toggleBtnStyle = (on) => ({ padding: "5px 14px", borderRadius: 20, border: `1px solid ${on ? "rgba(45,61,43,0.5)" : "var(--border)"}`, background: on ? "rgba(45,61,43,0.14)" : "transparent", fontFamily: "var(--font-body)", fontSize: 10, color: on ? "var(--sage)" : "var(--clay)", fontWeight: 400, cursor: "pointer", transition: "all 0.15s" });
 
   return (
     <div style={{ marginBottom: 20 }}>
@@ -490,7 +490,7 @@ function SkinHistory({ user, onUpdateUser }) {
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
               {COMMON_SENSITIVITIES.map(s => {
                 const on = draft.sensitivities.includes(s);
-                return <button key={s} onClick={() => toggleSensitivity(s)} style={{ padding: "5px 12px", borderRadius: 20, border: `1px solid ${on ? "rgba(139,115,85,0.5)" : "var(--border)"}`, background: on ? "rgba(139,115,85,0.10)" : "transparent", fontFamily: "var(--font-body)", fontSize: 10, color: on ? "#8b7355" : "var(--clay)", fontWeight: on ? 600 : 400, cursor: "pointer", transition: "all 0.15s" }}>{s}</button>;
+                return <button key={s} onClick={() => toggleSensitivity(s)} style={{ padding: "5px 12px", borderRadius: 20, border: `1px solid ${on ? "rgba(139,115,85,0.5)" : "var(--border)"}`, background: on ? "rgba(139,115,85,0.10)" : "transparent", fontFamily: "var(--font-body)", fontSize: 10, color: on ? "#8b7355" : "var(--clay)", fontWeight: 400, cursor: "pointer", transition: "all 0.15s" }}>{s}</button>;
               })}
             </div>
           </div>
@@ -514,8 +514,8 @@ function SkinHistory({ user, onUpdateUser }) {
           </div>
 
           <div style={{ display: "flex", gap: 8 }}>
-            <button onClick={save} style={{ flex: 1, padding: "10px 0", background: "rgba(45,61,43,0.14)", border: "1px solid rgba(45,61,43,0.35)", borderRadius: 10, fontFamily: "var(--sans)", fontSize: 10, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer" }}>Save</button>
-            <button onClick={cancel} style={{ flex: 1, padding: "10px 0", background: "transparent", border: "1px solid var(--border)", borderRadius: 10, fontFamily: "var(--sans)", fontSize: 10, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", cursor: "pointer" }}>Cancel</button>
+            <button onClick={save} style={{ flex: 1, padding: "10px 0", background: "rgba(45,61,43,0.14)", border: "1px solid rgba(45,61,43,0.35)", borderRadius: 10, fontFamily: "var(--sans)", fontSize: 10, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer" }}>Save</button>
+            <button onClick={cancel} style={{ flex: 1, padding: "10px 0", background: "transparent", border: "1px solid var(--border)", borderRadius: 10, fontFamily: "var(--sans)", fontSize: 10, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", cursor: "pointer" }}>Cancel</button>
           </div>
         </div>
       )}
@@ -559,7 +559,7 @@ function ProfileSheet({ user, products, locationData, setLocationData, locationD
                   </span>
                 </div>
                 <div>
-                  <p style={{ fontFamily: "var(--sans)", fontSize: 16, fontWeight: 500, color: "var(--parchment)", margin: "0 0 2px" }}>{user?.name || "—"}</p>
+                  <p style={{ fontFamily: "var(--sans)", fontSize: 16, fontWeight: 400, color: "var(--parchment)", margin: "0 0 2px" }}>{user?.name || "—"}</p>
                   <p style={{ fontFamily: "var(--sans)", fontSize: 11, color: "var(--clay)", margin: 0 }}>{user?.email || ""}</p>
                 </div>
               </div>
@@ -604,7 +604,7 @@ function ProfileSheet({ user, products, locationData, setLocationData, locationD
                 </div>
                 <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
                   <button onClick={saveAccount}
-                    style={{ flex: 1, padding: "10px 0", background: "#2d3d2b", border: "none", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 600, color: "var(--ink)", cursor: "pointer" }}>
+                    style={{ flex: 1, padding: "10px 0", background: "#2d3d2b", border: "none", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 400, color: "var(--ink)", cursor: "pointer" }}>
                     Save
                   </button>
                   <button onClick={() => setEditingAccount(false)}

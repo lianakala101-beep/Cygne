@@ -100,7 +100,7 @@ function CheckInModal({ onSubmit, onClose }) {
             <div style={{ display: "flex", gap: 8 }}>
               {q.opts.map((opt, i) => (
                 <button key={opt} onClick={() => q.set(opt)}
-                  style={{ flex: 1, padding: "11px 0", borderRadius: 10, border: `1px solid ${q.val === opt ? "#2d3d2b" : "var(--border)"}`, background: q.val === opt ? "rgba(45,61,43,0.12)" : "transparent", color: q.val === opt ? "#2d3d2b" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 11, fontWeight: q.val === opt ? 600 : 400, cursor: "pointer", letterSpacing: "0.06em", transition: "all 0.18s" }}>
+                  style={{ flex: 1, padding: "11px 0", borderRadius: 10, border: `1px solid ${q.val === opt ? "#2d3d2b" : "var(--border)"}`, background: q.val === opt ? "rgba(45,61,43,0.12)" : "transparent", color: q.val === opt ? "#2d3d2b" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, cursor: "pointer", letterSpacing: "0.06em", transition: "all 0.18s" }}>
                   {q.labels[i]}
                 </button>
               ))}
@@ -114,7 +114,7 @@ function CheckInModal({ onSubmit, onClose }) {
           <div style={{ display: "flex", gap: 8 }}>
             {[false, true].map(opt => (
               <button key={String(opt)} onClick={() => { setBreakout(opt); if (!opt) setBreakoutZones([]); }}
-                style={{ flex: 1, padding: "11px 0", borderRadius: 10, border: `1px solid ${breakout === opt ? "#2d3d2b" : "var(--border)"}`, background: breakout === opt ? "rgba(45,61,43,0.12)" : "transparent", color: breakout === opt ? "#2d3d2b" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 11, fontWeight: breakout === opt ? 600 : 400, cursor: "pointer", letterSpacing: "0.06em", transition: "all 0.18s" }}>
+                style={{ flex: 1, padding: "11px 0", borderRadius: 10, border: `1px solid ${breakout === opt ? "#2d3d2b" : "var(--border)"}`, background: breakout === opt ? "rgba(45,61,43,0.12)" : "transparent", color: breakout === opt ? "#2d3d2b" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, cursor: "pointer", letterSpacing: "0.06em", transition: "all 0.18s" }}>
                 {opt ? "Yes" : "No"}
               </button>
             ))}
@@ -134,7 +134,7 @@ function CheckInModal({ onSubmit, onClose }) {
                       background: active ? "rgba(139,115,85,0.12)" : "transparent",
                       color: active ? "#8b7355" : "var(--clay)",
                       fontFamily: "var(--font-body)", fontSize: 11,
-                      fontWeight: active ? 600 : 400,
+                      fontWeight: 400,
                       cursor: "pointer", transition: "all 0.15s",
                       letterSpacing: "0.04em",
                     }}>
@@ -154,7 +154,7 @@ function CheckInModal({ onSubmit, onClose }) {
                       background: active ? "rgba(139,115,85,0.12)" : "transparent",
                       color: active ? "#8b7355" : "var(--clay)",
                       fontFamily: "var(--font-body)", fontSize: 11,
-                      fontWeight: active ? 600 : 400,
+                      fontWeight: 400,
                       cursor: "pointer", transition: "all 0.15s",
                       letterSpacing: "0.04em",
                     }}>
@@ -174,7 +174,7 @@ function CheckInModal({ onSubmit, onClose }) {
                       background: active ? "rgba(139,115,85,0.12)" : "transparent",
                       color: active ? "#8b7355" : "var(--clay)",
                       fontFamily: "var(--font-body)", fontSize: 11,
-                      fontWeight: active ? 600 : 400,
+                      fontWeight: 400,
                       cursor: "pointer", transition: "all 0.15s",
                       letterSpacing: "0.04em",
                     }}>
@@ -193,7 +193,7 @@ function CheckInModal({ onSubmit, onClose }) {
           <div style={{ display: "flex", gap: 8 }}>
             {[false, true].map(opt => (
               <button key={String(opt)} onClick={() => setTight(opt)}
-                style={{ flex: 1, padding: "11px 0", borderRadius: 10, border: `1px solid ${tight === opt ? "#2d3d2b" : "var(--border)"}`, background: tight === opt ? "rgba(45,61,43,0.12)" : "transparent", color: tight === opt ? "#2d3d2b" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 11, fontWeight: tight === opt ? 600 : 400, cursor: "pointer", letterSpacing: "0.06em", transition: "all 0.18s" }}>
+                style={{ flex: 1, padding: "11px 0", borderRadius: 10, border: `1px solid ${tight === opt ? "#2d3d2b" : "var(--border)"}`, background: tight === opt ? "rgba(45,61,43,0.12)" : "transparent", color: tight === opt ? "#2d3d2b" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, cursor: "pointer", letterSpacing: "0.06em", transition: "all 0.18s" }}>
                 {opt ? "Yes" : "No"}
               </button>
             ))}
@@ -205,7 +205,7 @@ function CheckInModal({ onSubmit, onClose }) {
             position: "relative",
             width: "100%", marginTop: 8, padding: "15px 0",
             background: "#2d3d2b", color: "#fdfcf9", border: "none", borderRadius: 10,
-            fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 700,
+            fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 400,
             letterSpacing: "0.14em", textTransform: "uppercase",
             cursor: submitState === "idle" ? "pointer" : "default",
             overflow: "visible",
@@ -299,7 +299,7 @@ function SkinJournalModal({ onSubmit, onClose, existing = null }) {
                     background: selected ? c.bg : "transparent",
                     color: selected ? c.color : "var(--clay)",
                     fontFamily: "var(--font-body)", fontSize: 10,
-                    fontWeight: selected ? 600 : 400, letterSpacing: "0.04em",
+                    fontWeight: 400, letterSpacing: "0.04em",
                     cursor: "pointer",
                     opacity: dimmed ? 0.4 : 1,
                     transition: "background 0.15s, border-color 0.15s, color 0.15s, opacity 0.25s ease-out",
@@ -319,7 +319,7 @@ function SkinJournalModal({ onSubmit, onClose, existing = null }) {
           <div style={{ display: "flex", gap: 8 }}>
             {[{ key: "good", label: "Good" }, { key: "poor", label: "Poor" }].map(opt => (
               <button key={opt.key} onClick={() => setSleep(s => s === opt.key ? null : opt.key)}
-                style={{ flex: 1, padding: "11px 0", borderRadius: 11, border: `1px solid ${sleep === opt.key ? "rgba(45,61,43,0.5)" : "var(--border)"}`, background: sleep === opt.key ? "rgba(45,61,43,0.10)" : "transparent", color: sleep === opt.key ? "#2d3d2b" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 11, fontWeight: sleep === opt.key ? 600 : 400, cursor: "pointer", transition: "all 0.15s" }}>
+                style={{ flex: 1, padding: "11px 0", borderRadius: 11, border: `1px solid ${sleep === opt.key ? "rgba(45,61,43,0.5)" : "var(--border)"}`, background: sleep === opt.key ? "rgba(45,61,43,0.10)" : "transparent", color: sleep === opt.key ? "#2d3d2b" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, cursor: "pointer", transition: "all 0.15s" }}>
                 {opt.label}
               </button>
             ))}
@@ -332,7 +332,7 @@ function SkinJournalModal({ onSubmit, onClose, existing = null }) {
           <div style={{ display: "flex", gap: 8 }}>
             {[{ key: "low", label: "Low" }, { key: "high", label: "High" }].map(opt => (
               <button key={opt.key} onClick={() => setStress(s => s === opt.key ? null : opt.key)}
-                style={{ flex: 1, padding: "11px 0", borderRadius: 11, border: `1px solid ${stress === opt.key ? "rgba(45,61,43,0.5)" : "var(--border)"}`, background: stress === opt.key ? "rgba(45,61,43,0.10)" : "transparent", color: stress === opt.key ? "#2d3d2b" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 11, fontWeight: stress === opt.key ? 600 : 400, cursor: "pointer", transition: "all 0.15s" }}>
+                style={{ flex: 1, padding: "11px 0", borderRadius: 11, border: `1px solid ${stress === opt.key ? "rgba(45,61,43,0.5)" : "var(--border)"}`, background: stress === opt.key ? "rgba(45,61,43,0.10)" : "transparent", color: stress === opt.key ? "#2d3d2b" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, cursor: "pointer", transition: "all 0.15s" }}>
                 {opt.label}
               </button>
             ))}
@@ -352,7 +352,7 @@ function SkinJournalModal({ onSubmit, onClose, existing = null }) {
 
         <button
           onClick={() => canSubmit && onSubmit({ date: today, condition, sleep, stress, notes: notes.trim() })}
-          style={{ width: "100%", padding: "15px 0", background: canSubmit ? "#2d3d2b" : "var(--surface)", color: canSubmit ? "#fdfcf9" : "var(--clay)", border: `1px solid ${canSubmit ? "transparent" : "var(--border)"}`, borderRadius: 13, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 600, letterSpacing: "0.08em", cursor: canSubmit ? "pointer" : "default", transition: "all 0.2s" }}>
+          style={{ width: "100%", padding: "15px 0", background: canSubmit ? "#2d3d2b" : "var(--surface)", color: canSubmit ? "#fdfcf9" : "var(--clay)", border: `1px solid ${canSubmit ? "transparent" : "var(--border)"}`, borderRadius: 13, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 400, letterSpacing: "0.08em", cursor: canSubmit ? "pointer" : "default", transition: "all 0.2s" }}>
           Save Entry
         </button>
       </div>
@@ -463,7 +463,7 @@ function CycleTracker({ products, activeMap, cycleDay: cycledayProp = 14, onSetC
           Your hormones shift every week. Your ritual should too. Enable this to receive phase-aware nudges drawn from what's already on your vanity.
         </p>
         <button onClick={() => onUpdateUser({ ...user, cycleTrackingEnabled: true })}
-          style={{ padding: "10px 20px", background: "rgba(45,61,43,0.10)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#2d3d2b", cursor: "pointer", transition: "all 0.2s" }}
+          style={{ padding: "10px 20px", background: "rgba(45,61,43,0.10)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "#2d3d2b", cursor: "pointer", transition: "all 0.2s" }}
           onMouseEnter={e => { e.currentTarget.style.background = "rgba(45,61,43,0.18)"; }}
           onMouseLeave={e => { e.currentTarget.style.background = "rgba(45,61,43,0.10)"; }}>
           Enable
@@ -486,7 +486,7 @@ function CycleTracker({ products, activeMap, cycleDay: cycledayProp = 14, onSetC
             <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 4px" }}>Sync Your Ritual With Your Rhythm</p>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <div style={{ width: 7, height: 7, borderRadius: "50%", background: phase.dot, flexShrink: 0 }} />
-              <span style={{ fontFamily: "var(--font-body)", fontSize: 16, fontWeight: 600, color: "var(--parchment)", letterSpacing: "0.02em" }}>{phase.name}</span>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: 16, fontWeight: 400, color: "var(--parchment)", letterSpacing: "0.02em" }}>{phase.name}</span>
               <span style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)" }}>Phase</span>
             </div>
           </div>
@@ -774,7 +774,7 @@ function AddTreatmentModal({ onSave, onClose }) {
             {TREATMENT_TYPES.map(t => (
               <button key={t.id} onClick={() => setTypeId(t.id)}
                 style={{ padding: "12px 16px", background: typeId === t.id ? "rgba(45,61,43,0.12)" : "var(--ink)", border: `1px solid ${typeId === t.id ? "rgba(45,61,43,0.4)" : "var(--border)"}`, borderRadius: 11, cursor: "pointer", textAlign: "left", transition: "all 0.18s" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--parchment)", margin: "0 0 2px", fontWeight: typeId === t.id ? 600 : 400 }}>{t.label}</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--parchment)", margin: "0 0 2px", fontWeight: 400 }}>{t.label}</p>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", margin: 0 }}>{t.description}</p>
               </button>
             ))}
@@ -789,7 +789,7 @@ function AddTreatmentModal({ onSave, onClose }) {
         </div>
 
         <button onClick={() => onSave({ id: Date.now().toString(), typeId, date, label: selected?.label })}
-          style={{ width: "100%", padding: "14px 0", background: "#2d3d2b", color: "#fdfcf9", border: "none", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}>
+          style={{ width: "100%", padding: "14px 0", background: "#2d3d2b", color: "#fdfcf9", border: "none", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 400, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}>
           Start Recovery Tracking
         </button>
       </div>
@@ -829,7 +829,7 @@ function TreatmentRecoveryCard({ treatment, products, activeMap, onDismiss, onRe
             <p style={{ fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 400, letterSpacing: "0.08em", color: "var(--parchment)", margin: "0 0 2px", lineHeight: 1.2 }}>{type.label}</p>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <div style={{ width: 5, height: 5, borderRadius: "50%", background: isLastPhase ? "#2d3d2b" : "#8b7355" }} />
-              <span style={{ fontFamily: "var(--font-body)", fontSize: 10, color: isLastPhase ? "#2d3d2b" : "#8b7355", fontWeight: 600, letterSpacing: "0.06em" }}>{phase.label}</span>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: 10, color: isLastPhase ? "#2d3d2b" : "#8b7355", fontWeight: 400, letterSpacing: "0.06em" }}>{phase.label}</span>
             </div>
             {startedLabel && (
               <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", margin: "5px 0 0", opacity: 0.6, letterSpacing: "0.04em" }}>{startedLabel}</p>
@@ -904,7 +904,7 @@ function TreatmentRecoveryCard({ treatment, products, activeMap, onDismiss, onRe
               <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                 <span style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", flex: 1 }}>Reset Day 1 to today?</span>
                 <button onClick={() => { onResetDate(); setConfirmReset(false); }}
-                  style={{ padding: "6px 12px", background: "rgba(139,115,85,0.12)", border: "1px solid rgba(139,115,85,0.35)", borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#8b7355", cursor: "pointer" }}>
+                  style={{ padding: "6px 12px", background: "rgba(139,115,85,0.12)", border: "1px solid rgba(139,115,85,0.35)", borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 400, letterSpacing: "0.1em", textTransform: "uppercase", color: "#8b7355", cursor: "pointer" }}>
                   Confirm
                 </button>
                 <button onClick={() => setConfirmReset(false)}
@@ -1186,7 +1186,7 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
           Track body acne zones, identify triggers, and get advice drawn from what's already on your vanity.
         </p>
         <button onClick={() => setEnabled(true)}
-          style={{ padding: "10px 20px", background: "rgba(45,61,43,0.10)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#2d3d2b", cursor: "pointer", transition: "all 0.2s" }}
+          style={{ padding: "10px 20px", background: "rgba(45,61,43,0.10)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "#2d3d2b", cursor: "pointer", transition: "all 0.2s" }}
           onMouseEnter={e => e.currentTarget.style.background = "rgba(45,61,43,0.18)"}
           onMouseLeave={e => e.currentTarget.style.background = "rgba(45,61,43,0.10)"}>
           Enable
@@ -1221,7 +1221,7 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
             const active = zones.includes(zone.id);
             return (
               <button key={zone.id} onClick={() => { toggleZone(zone.id); setExpandedZone(active ? null : zone.id); }}
-                style={{ padding: "9px 16px", borderRadius: 22, border: `1px solid ${active ? "rgba(45,61,43,0.5)" : "var(--border)"}`, background: active ? "rgba(45,61,43,0.10)" : "transparent", color: active ? "#2d3d2b" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 11, fontWeight: active ? 600 : 400, cursor: "pointer", transition: "all 0.18s" }}>
+                style={{ padding: "9px 16px", borderRadius: 22, border: `1px solid ${active ? "rgba(45,61,43,0.5)" : "var(--border)"}`, background: active ? "rgba(45,61,43,0.10)" : "transparent", color: active ? "#2d3d2b" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, cursor: "pointer", transition: "all 0.18s" }}>
                 {zone.label}
               </button>
             );
@@ -1234,7 +1234,7 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
             const active = zones.includes(zone.id);
             return (
               <button key={zone.id} onClick={() => { toggleZone(zone.id); setExpandedZone(active ? null : zone.id); }}
-                style={{ padding: "9px 16px", borderRadius: 22, border: `1px solid ${active ? "rgba(45,61,43,0.5)" : "var(--border)"}`, background: active ? "rgba(45,61,43,0.10)" : "transparent", color: active ? "#2d3d2b" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 11, fontWeight: active ? 600 : 400, cursor: "pointer", transition: "all 0.18s" }}>
+                style={{ padding: "9px 16px", borderRadius: 22, border: `1px solid ${active ? "rgba(45,61,43,0.5)" : "var(--border)"}`, background: active ? "rgba(45,61,43,0.10)" : "transparent", color: active ? "#2d3d2b" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, cursor: "pointer", transition: "all 0.18s" }}>
                 {zone.label}
               </button>
             );
@@ -1253,7 +1253,7 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
                   style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 18px", background: "none", border: "none", cursor: "pointer", textAlign: "left" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#2d3d2b" }} />
-                    <span style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--parchment)", fontWeight: 500 }}>{zone.label}</span>
+                    <span style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--parchment)", fontWeight: 400 }}>{zone.label}</span>
                   </div>
                   <span style={{ color: "var(--clay)", opacity: 0.4, transform: open ? "rotate(90deg)" : "none", transition: "transform 0.2s", display: "inline-flex" }}><Icon name="chevron" size={12} /></span>
                 </button>
@@ -1299,7 +1299,7 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
                 <div key={i} style={{ display: "flex", gap: 10, marginBottom: 7 }}>
                   <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#2d3d2b", flexShrink: 0, marginTop: 4 }} />
                   <div>
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--parchment)", margin: "0 0 2px", fontWeight: 500 }}>{d.product}</p>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--parchment)", margin: "0 0 2px", fontWeight: 400 }}>{d.product}</p>
                     <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>{d.note}</p>
                   </div>
                 </div>
@@ -1314,7 +1314,7 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
                 <div key={i} style={{ display: "flex", gap: 10, marginBottom: 7 }}>
                   <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#8b7355", flexShrink: 0, marginTop: 4 }} />
                   <div>
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--parchment)", margin: "0 0 2px", fontWeight: 500 }}>{g.product}</p>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--parchment)", margin: "0 0 2px", fontWeight: 400 }}>{g.product}</p>
                     <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>{g.reason}</p>
                   </div>
                 </div>
@@ -1381,7 +1381,7 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
                 setShowTriggerModal(false);
               }
             }}
-              style={{ width: "100%", padding: "14px 0", background: selectedTriggers.length > 0 ? "#2d3d2b" : "var(--ink)", color: selectedTriggers.length > 0 ? "#fdfcf9" : "var(--clay)", border: "none", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: selectedTriggers.length > 0 ? "pointer" : "default", opacity: selectedTriggers.length > 0 ? 1 : 0.5 }}>
+              style={{ width: "100%", padding: "14px 0", background: selectedTriggers.length > 0 ? "#2d3d2b" : "var(--ink)", color: selectedTriggers.length > 0 ? "#fdfcf9" : "var(--clay)", border: "none", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 400, letterSpacing: "0.14em", textTransform: "uppercase", cursor: selectedTriggers.length > 0 ? "pointer" : "default", opacity: selectedTriggers.length > 0 ? 1 : 0.5 }}>
               Save
             </button>
           </div>
@@ -1418,7 +1418,7 @@ function JournalFullView({ journals, onClose, onEditToday }) {
         </button>
         <h2 style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--parchment)", margin: 0 }}>Skin Journal</h2>
         <button onClick={onEditToday}
-          style={{ fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 600, color: "#2d3d2b", background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+          style={{ fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, color: "#2d3d2b", background: "none", border: "none", cursor: "pointer", padding: 0 }}>
           + Log
         </button>
       </div>
@@ -1438,7 +1438,7 @@ function JournalFullView({ journals, onClose, onEditToday }) {
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                       <div style={{ width: 8, height: 8, borderRadius: "50%", background: c ? c.color : "var(--clay)", flexShrink: 0 }} />
                       <span style={{ fontFamily: "var(--font-body)", fontSize: 12, color: isToday ? "var(--parchment)" : "var(--clay)" }}>{dateLabel}</span>
-                      <span style={{ fontFamily: "var(--font-body)", fontSize: 12, color: c ? c.color : "var(--parchment)", fontWeight: 600 }}>{c ? c.label : j.condition}</span>
+                      <span style={{ fontFamily: "var(--font-body)", fontSize: 12, color: c ? c.color : "var(--parchment)", fontWeight: 400 }}>{c ? c.label : j.condition}</span>
                     </div>
                     <div style={{ display: "flex", gap: 5 }}>
                       {j.sleep && <span style={{ fontSize: 9, fontFamily: "var(--font-body)", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--clay)", background: "var(--ink)", padding: "2px 7px", borderRadius: 20 }}>Sleep {j.sleep}</span>}
@@ -1554,7 +1554,7 @@ function WeekAtAGlance({ checkIns, journals, products = [], pausedActives = [] }
                 border: selected ? "1px solid rgba(45,61,43,0.45)" : d.isToday ? "1px solid rgba(45,61,43,0.25)" : "1px solid var(--border)",
                 borderRadius: 12, cursor: "pointer", transition: "all 0.15s",
               }}>
-              <span style={{ fontFamily: "var(--font-body)", fontSize: 10, fontWeight: d.isToday ? 700 : 500, letterSpacing: "0.08em", color: d.isToday ? "var(--parchment)" : "var(--clay)" }}>{d.label}</span>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400, letterSpacing: "0.08em", color: d.isToday ? "var(--parchment)" : "var(--clay)" }}>{d.label}</span>
               <div style={{ display: "flex", flexDirection: "column", gap: 3, minHeight: 32, justifyContent: "flex-start", alignItems: "center", width: "100%" }}>
                 {d.am.length > 0 && (
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 3, justifyContent: "center" }}>
@@ -1617,7 +1617,7 @@ function WeekAtAGlance({ checkIns, journals, products = [], pausedActives = [] }
                 if (slot.items.length === 0) return null;
                 return (
                   <div key={slot.key} style={{ padding: "12px 16px", borderBottom: "1px solid var(--border)" }}>
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 10px", opacity: 0.55 }}>{slot.label}</p>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 400, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 10px", opacity: 0.55 }}>{slot.label}</p>
                     {slot.items.map((p, j) => {
                       const freq = p.frequency || "daily";
                       const isAlternating = freq !== "daily";
@@ -1625,7 +1625,7 @@ function WeekAtAGlance({ checkIns, journals, products = [], pausedActives = [] }
                         <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: j < slot.items.length - 1 ? 8 : 0, opacity: p.scheduled ? 1 : 0.35 }}>
                           <div style={{ width: 8, height: 8, borderRadius: "50%", background: p.scheduled ? (slot.key === "am" ? "var(--sage)" : "var(--parchment)") : "var(--taupe)", flexShrink: 0, opacity: p.scheduled ? 1 : 0.5 }} />
                           <div style={{ flex: 1 }}>
-                            <p style={{ fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 500, color: "var(--parchment)", margin: "0 0 1px" }}>
+                            <p style={{ fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 400, color: "var(--parchment)", margin: "0 0 1px" }}>
                               {p.name}
                               {!p.scheduled && isAlternating && <span style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", opacity: 0.6, marginLeft: 6 }}>skipped</span>}
                             </p>
@@ -1647,17 +1647,17 @@ function WeekAtAGlance({ checkIns, journals, products = [], pausedActives = [] }
       {/* Stats row */}
       <div style={{ display: "flex", justifyContent: "space-between", gap: 12, paddingTop: 12, borderTop: "1px solid var(--border)" }}>
         <div style={{ textAlign: "center", flex: 1 }}>
-          <p style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700, letterSpacing: "0.05em", color: "var(--parchment)", margin: 0, lineHeight: 1 }}>{weekJournals}<span style={{ fontSize: 13, color: "var(--clay)", opacity: 0.6 }}>/7</span></p>
+          <p style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 400, letterSpacing: "0.05em", color: "var(--parchment)", margin: 0, lineHeight: 1 }}>{weekJournals}<span style={{ fontSize: 13, color: "var(--clay)", opacity: 0.6 }}>/7</span></p>
           <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", margin: "4px 0 0", opacity: 0.6 }}>Journaled</p>
         </div>
         <div style={{ width: 1, background: "var(--border)" }} />
         <div style={{ textAlign: "center", flex: 1 }}>
-          <p style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700, letterSpacing: "0.05em", color: "var(--parchment)", margin: 0, lineHeight: 1 }}>{weekCheckIns}</p>
+          <p style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 400, letterSpacing: "0.05em", color: "var(--parchment)", margin: 0, lineHeight: 1 }}>{weekCheckIns}</p>
           <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", margin: "4px 0 0", opacity: 0.6 }}>Check-ins</p>
         </div>
         <div style={{ width: 1, background: "var(--border)" }} />
         <div style={{ textAlign: "center", flex: 1 }}>
-          <p style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700, letterSpacing: "0.05em", color: "var(--parchment)", margin: 0, lineHeight: 1 }}>{adherencePct}<span style={{ fontSize: 13, color: "var(--clay)", opacity: 0.6 }}>%</span></p>
+          <p style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 400, letterSpacing: "0.05em", color: "var(--parchment)", margin: 0, lineHeight: 1 }}>{adherencePct}<span style={{ fontSize: 13, color: "var(--clay)", opacity: 0.6 }}>%</span></p>
           <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", margin: "4px 0 0", opacity: 0.6 }}>Adherence</p>
         </div>
       </div>
@@ -1665,7 +1665,7 @@ function WeekAtAGlance({ checkIns, journals, products = [], pausedActives = [] }
       {/* Best day summary */}
       {bestDay && bestDay.cond && (
         <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: "12px 0 0", opacity: 0.75, lineHeight: 1.5 }}>
-          Best day: <span style={{ color: bestDay.cond.color, fontWeight: 500 }}>{bestDay.date.toLocaleDateString("en-US", { weekday: "long" })}</span> — {bestDay.cond.label.toLowerCase()}.
+          Best day: <span style={{ color: bestDay.cond.color, fontWeight: 400 }}>{bestDay.date.toLocaleDateString("en-US", { weekday: "long" })}</span> — {bestDay.cond.label.toLowerCase()}.
         </p>
       )}
       {!hasAnyData && allRoutine.length === 0 && (
@@ -1761,7 +1761,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
                   <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 4px" }}>Skin Journal</p>
                   <p style={{ fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 400, letterSpacing: "0.08em", color: "var(--parchment)", margin: 0 }}>How is your skin today?</p>
                 </div>
-                <span style={{ fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 600, color: "#2d3d2b", letterSpacing: "0.06em" }}>+ Log</span>
+                <span style={{ fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, color: "#2d3d2b", letterSpacing: "0.06em" }}>+ Log</span>
               </button>
             ) : (
               <div onClick={() => setShowJournal(true)}
@@ -1789,7 +1789,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
                 <div key={j.date} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 18px", background: "var(--surface)", border: "1px solid var(--border)", marginTop: -1, borderRadius: 0 }}>
                   <div style={{ width: 7, height: 7, borderRadius: "50%", background: c ? c.color : "var(--clay)", flexShrink: 0 }} />
                   <span style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", flex: 1 }}>{label}</span>
-                  <span style={{ fontFamily: "var(--font-body)", fontSize: 11, color: c ? c.color : "var(--parchment)", fontWeight: 500 }}>{c ? c.label : j.condition}</span>
+                  <span style={{ fontFamily: "var(--font-body)", fontSize: 11, color: c ? c.color : "var(--parchment)", fontWeight: 400 }}>{c ? c.label : j.condition}</span>
                   {j.notes && <span style={{ fontFamily: "var(--font-body)", fontSize: 9, color: "var(--clay)", opacity: 0.5, maxWidth: 80, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{j.notes}</span>}
                 </div>
               );
@@ -1818,7 +1818,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
               {daysSince === null ? "Log your first check-in to start tracking." : "Last check-in " + daysSince + " day" + (daysSince !== 1 ? "s" : "") + " ago."}
             </p>
           </div>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 600, color: "#2d3d2b", flexShrink: 0, marginLeft: 12 }}>Check in <Icon name="arrow-right" size={11} /></span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, color: "#2d3d2b", flexShrink: 0, marginLeft: 12 }}>Check in <Icon name="arrow-right" size={11} /></span>
         </button>
       ) : (
         <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "14px 18px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, marginBottom: 24 }}>
@@ -1999,7 +1999,7 @@ function LocationManager({ locationData, setLocationData, locationDenied, setLoc
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <span style={{ color: "var(--clay)", opacity: 0.6, display: "inline-flex" }}><Icon name="target" size={14} /></span>
             <div>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "var(--parchment)", margin: "0 0 2px", fontWeight: 500 }}>{locationData.city}{locationData.country ? `, ${locationData.country}` : ""}</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "var(--parchment)", margin: "0 0 2px", fontWeight: 400 }}>{locationData.city}{locationData.country ? `, ${locationData.country}` : ""}</p>
               <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", margin: 0 }}>{locationData.lat.toFixed(3)}°, {locationData.lon.toFixed(3)}°</p>
             </div>
           </div>
@@ -2023,7 +2023,7 @@ function LocationManager({ locationData, setLocationData, locationDenied, setLoc
           : "Share your location so Cygne can read local humidity, UV index, and temperature — and adjust your ritual advice accordingly."}
       </p>
       <button onClick={requestLocation}
-        style={{ display: "flex", alignItems: "center", gap: 7, padding: "10px 18px", background: "rgba(45,61,43,0.10)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 600, color: "#2d3d2b", cursor: "pointer", letterSpacing: "0.12em", textTransform: "uppercase", transition: "all 0.2s" }}
+        style={{ display: "flex", alignItems: "center", gap: 7, padding: "10px 18px", background: "rgba(45,61,43,0.10)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400, color: "#2d3d2b", cursor: "pointer", letterSpacing: "0.12em", textTransform: "uppercase", transition: "all 0.2s" }}
         onMouseEnter={e => e.currentTarget.style.background = "rgba(45,61,43,0.18)"}
         onMouseLeave={e => e.currentTarget.style.background = "rgba(45,61,43,0.10)"}>
         {loading ? "Requesting..." : locationDenied ? "Try Again" : "Enable Location"}

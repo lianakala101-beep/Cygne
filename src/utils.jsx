@@ -77,7 +77,7 @@ function SwanWelcomeScreen({ user, onDone }) {
           Takes about 2 minutes
         </p>
         <button onClick={onDone}
-          style={{ width: "100%", padding: "16px 0", background: "rgba(232,226,217,0.12)", border: "1px solid rgba(232,226,217,0.2)", borderRadius: 14, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 600, color: "rgba(232,226,217,0.9)", cursor: "pointer", letterSpacing: "0.04em" }}>
+          style={{ width: "100%", padding: "16px 0", background: "rgba(232,226,217,0.12)", border: "1px solid rgba(232,226,217,0.2)", borderRadius: 14, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 400, color: "rgba(232,226,217,0.9)", cursor: "pointer", letterSpacing: "0.04em" }}>
           Add my products <Icon name="arrow-right" size={14} />
         </button>
       </div>

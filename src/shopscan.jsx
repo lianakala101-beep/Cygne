@@ -123,7 +123,7 @@ function ShopScanModal({ products, user = {}, onClose }) {
                 onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(45,61,43,0.5)"; e.currentTarget.style.background = "rgba(45,61,43,0.06)"; }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.background = "var(--surface)"; }}>
                 <div style={{ color: "var(--clay)", marginBottom: 10, display: "flex", justifyContent: "center" }}><Icon name="camera" size={28} /></div>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--parchment)", margin: "0 0 4px", fontWeight: 500 }}>Scan product</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--parchment)", margin: "0 0 4px", fontWeight: 400 }}>Scan product</p>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", margin: 0 }}>Tap to open camera or choose a photo</p>
               </button>
               {/* Skin context preview */}
@@ -168,7 +168,7 @@ function ShopScanModal({ products, user = {}, onClose }) {
 
               {/* Product name */}
               <div style={{ marginBottom: 14 }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "var(--parchment)", margin: "0 0 2px", fontWeight: 500 }}>{result.name || "Product"}</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "var(--parchment)", margin: "0 0 2px", fontWeight: 400 }}>{result.name || "Product"}</p>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0 }}>{result.brand}{result.category ? ` · ${result.category}` : ""}</p>
               </div>
 
@@ -219,7 +219,7 @@ function ShopScanModal({ products, user = {}, onClose }) {
                   Scan Another
                 </button>
                 <button onClick={onClose}
-                  style={{ flex: 1, padding: "12px 0", background: "#2d3d2b", border: "none", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 10, color: "#fdfcf9", fontWeight: 700, cursor: "pointer", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                  style={{ flex: 1, padding: "12px 0", background: "#2d3d2b", border: "none", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 10, color: "#fdfcf9", fontWeight: 400, cursor: "pointer", letterSpacing: "0.1em", textTransform: "uppercase" }}>
                   Done
                 </button>
               </div>

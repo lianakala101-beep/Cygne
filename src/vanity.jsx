@@ -376,7 +376,7 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo
               <p style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 400, letterSpacing: "0.08em", color: "var(--clay)", margin: "0 0 8px" }}>Your vanity is empty.</p>
               <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", opacity: 0.6, margin: "0 0 28px", lineHeight: 1.6 }}>Scan a product to add it, or add one manually.</p>
               <button onClick={onAdd}
-                style={{ padding: "12px 28px", background: "rgba(45,61,43,0.10)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer" }}>
+                style={{ padding: "12px 28px", background: "rgba(45,61,43,0.10)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer" }}>
                 + Add Product
               </button>
             </div>
@@ -395,10 +395,10 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo
                 <div style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.2)", borderRadius: 12, padding: "12px 14px", marginBottom: 14 }}>
                   <span style={{ color: "#8b7355", flexShrink: 0, display: "inline-flex" }}><Icon name="sparkle" size={14} /></span>
                   <div style={{ flex: 1 }}>
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 600, color: "var(--parchment)", margin: "0 0 2px" }}>Sample vanity</p>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 400, color: "var(--parchment)", margin: "0 0 2px" }}>Sample vanity</p>
                     <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0 }}>These are example products to show you how Cygne works. Scan your own to replace them.</p>
                   </div>
-                  <button onClick={onClearDemo} style={{ fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 600, background: "transparent", border: "1px solid rgba(139,115,85,0.3)", borderRadius: 8, color: "var(--clay)", padding: "6px 10px", cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}>Clear demo</button>
+                  <button onClick={onClearDemo} style={{ fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, background: "transparent", border: "1px solid rgba(139,115,85,0.3)", borderRadius: 8, color: "var(--clay)", padding: "6px 10px", cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}>Clear demo</button>
                 </div>
               )}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
@@ -463,7 +463,7 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo
                   )}
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
                     <div>
-                      <p style={{ fontFamily: "var(--font-body)", fontSize: 13, fontWeight: 600, color: "var(--parchment)", margin: "0 0 2px" }}>{item.product.name}</p>
+                      <p style={{ fontFamily: "var(--font-body)", fontSize: 13, fontWeight: 400, color: "var(--parchment)", margin: "0 0 2px" }}>{item.product.name}</p>
                       <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0 }}>{item.product.brand} · {item.product.category}</p>
                     </div>
                     <span style={{ padding: "2px 9px", borderRadius: 20, background: tagCfg.bg, border: `1px solid ${tagCfg.color}40`, fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: tagCfg.color, flexShrink: 0, marginLeft: 10 }}>
@@ -473,7 +473,7 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo
                   <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: "0 0 14px", lineHeight: 1.6, opacity: 0.8 }}>{item.reason}</p>
                   <div style={{ display: "flex", gap: 8 }}>
                     <button onClick={() => onAddFromWaiting(item)}
-                      style={{ flex: 1, padding: "9px 0", background: nowReady ? "#2d3d2b" : "rgba(45,61,43,0.10)", color: nowReady ? "#fdfcf9" : "var(--sage)", border: `1px solid ${nowReady ? "#2d3d2b" : "rgba(45,61,43,0.3)"}`, borderRadius: 9, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s" }}>
+                      style={{ flex: 1, padding: "9px 0", background: nowReady ? "#2d3d2b" : "rgba(45,61,43,0.10)", color: nowReady ? "#fdfcf9" : "var(--sage)", border: `1px solid ${nowReady ? "#2d3d2b" : "rgba(45,61,43,0.3)"}`, borderRadius: 9, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s" }}>
                       Add to Ritual
                     </button>
                     <button onClick={() => onDismissWaiting(item)}
