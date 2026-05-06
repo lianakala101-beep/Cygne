@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { invokeEdgeFunction } from "../supabase.js";
+import { supabase, invokeEdgeFunction } from "../supabase.js";
 
 /**
- * Minimal Ask Cygne overlay. Posts the question to the rapid-action
- * edge function and renders the response. Used by FaceHeatMap to
- * deep-link into a zone-specific question; will be the foundation for
- * the broader Ask Cygne feature.
+ * Minimal Ask Cygne overlay. Posts the question + caller-supplied context
+ * to the ask-cygne edge function (which adds the system prompt, cache, and
+ * 3/day usage limit) and renders the response. Used by FaceHeatMap to
+ * deep-link into a zone-specific question.
  */
 export function AskCygneModal({ initialQuestion = "", context = "", onClose }) {
   const [question, setQuestion] = useState(initialQuestion);
@@ -19,21 +19,30 @@ export function AskCygneModal({ initialQuestion = "", context = "", onClose }) {
     setError(null);
     setAnswer("");
     try {
-      const data = await invokeEdgeFunction("rapid-action", {
-        model: "claude-sonnet-4-6",
-        max_tokens: 800,
-        messages: [{
-          role: "user",
-          content: [{
-            type: "text",
-            text: context
-              ? `${context}\n\nQuestion: ${q}`
-              : q,
-          }],
-        }],
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        setError("Please sign in to use Ask Cygne.");
+        return;
+      }
+      const data = await invokeEdgeFunction("ask-cygne", {
+        userId: session.user.id,
+        question: q,
+        sessionId: `${session.user.id}_${Date.now()}`,
+        context,
       });
-      const text = data?.content?.[0]?.text || data?.text || "No response.";
-      setAnswer(text);
+      if (data?.error === "limit_reached") {
+        setError(data.message || "You've used your reflections for today. Try again tomorrow.");
+        return;
+      }
+      if (data?.error) {
+        setError(data.message || data.error);
+        return;
+      }
+      if (!data?.response) {
+        setError("No response received. Please try again.");
+        return;
+      }
+      setAnswer(data.response);
     } catch (e) {
       setError(String(e?.message || e));
     } finally {
