@@ -515,7 +515,7 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
           aria-hidden="true"
           style={{
             position: "absolute", bottom: 10, right: 14,
-            height: 100, width: "auto",
+            height: 48, width: "auto",
             opacity: 0.06,
             filter: "brightness(0.3) saturate(0.5)",
             pointerEvents: "none", userSelect: "none",
@@ -539,7 +539,7 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
             color: "var(--color-inky-moss, #2d3d2b)",
             margin: 0,
           }}>
-            Swan Song
+            Swan Sense
           </p>
         </div>
 
