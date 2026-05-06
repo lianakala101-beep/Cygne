@@ -495,37 +495,64 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
     );
   }
 
-  // -- INLINE (settled) version — small card at bottom of home ---------------
+  // -- INLINE (settled) version — note-card on home dashboard -----------------
   return (
     <div style={{ position: "relative", marginTop: 8 }}>
       <div style={{
         position: "relative",
-        background: "linear-gradient(158deg, #3d3a28 0%, #2a2619 45%, #1e1a14 100%)",
+        background: "var(--color-ivory, #faf9f4)",
         borderRadius: 14,
-        padding: "16px 18px 14px",
+        padding: "20px 22px 22px",
         overflow: "hidden",
         isolation: "isolate",
-        boxShadow: "0 4px 18px rgba(0,0,0,0.35)",
-        border: "1px solid rgba(139,115,85,0.15)",
+        boxShadow: "0 1px 3px rgba(28,28,26,0.05), 0 8px 24px rgba(28,28,26,0.06)",
+        border: "1px solid rgba(45,61,43,0.14)",
       }}>
+        {/* Faint logo watermark */}
         <img
           src="/cygne-logo.png"
           alt=""
           aria-hidden="true"
           style={{
-            position: "absolute", bottom: 8, right: 12,
-            height: 88, width: "auto",
-            opacity: 0.08,
+            position: "absolute", bottom: 10, right: 14,
+            height: 100, width: "auto",
+            opacity: 0.06,
+            filter: "brightness(0.3) saturate(0.5)",
             pointerEvents: "none", userSelect: "none",
           }}
         />
-        <div style={{ position: "absolute", inset: 0, borderRadius: 14, pointerEvents: "none", backgroundImage: grain, backgroundSize: "180px 180px", opacity: 0.6 }} />
+        {/* Paper / linen texture — multiplies the noise into the ivory base */}
+        <div style={{
+          position: "absolute", inset: 0,
+          pointerEvents: "none",
+          backgroundImage: grain,
+          backgroundSize: "220px 220px",
+          opacity: 0.55,
+          mixBlendMode: "multiply",
+        }} />
 
-        <div style={{ marginBottom: 10 }}>
-          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 8, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(232,226,217,0.55)", margin: 0 }}>Swan Song</p>
+        <div style={{ position: "relative", marginBottom: 12 }}>
+          <p style={{
+            fontFamily: "var(--font-body)",
+            fontSize: 9, fontWeight: 400,
+            letterSpacing: "0.28em", textTransform: "uppercase",
+            color: "var(--color-inky-moss, #2d3d2b)",
+            margin: 0,
+          }}>
+            Swan Song
+          </p>
         </div>
 
-        <p style={{ fontFamily: "var(--font-signature)", fontSize: 34, fontWeight: 400, lineHeight: 1.35, color: "rgba(232,227,214,0.9)", letterSpacing: "0.01em", margin: 0 }}>{renderInsightLines(line)}</p>
+        <p style={{
+          position: "relative",
+          fontFamily: "var(--font-signature)",
+          fontSize: 34, fontWeight: 400,
+          lineHeight: 1.35, letterSpacing: "0.01em",
+          color: "var(--color-ink, #1c1c1a)",
+          margin: 0,
+        }}>
+          {renderInsightLines(line)}
+        </p>
       </div>
     </div>
   );
