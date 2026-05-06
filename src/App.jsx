@@ -146,6 +146,10 @@ export default function App() {
         // Profile data
         ingredientProfile: meta.ingredientProfile || null,
         medicalHistory: meta.medicalHistory || null,
+        // Onboarding-captured preferences (skin goals, special occasion,
+        // consistency, routine philosophy, climate, environment, travel,
+        // fragrance sensitivity, ingredients to avoid)
+        skinProfile: meta.skinProfile || null,
       });
       // Restore notification state
       if (meta.notifEnabled || meta.amReminderEnabled || meta.pmReminderEnabled) {
