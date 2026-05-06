@@ -62,6 +62,7 @@ const ACTIVE_RULES = {
   "vitamin C":       { keywords: ["ascorbic acid", "l-ascorbic acid", "ascorbyl glucoside", "sodium ascorbyl phosphate", "magnesium ascorbyl phosphate", "ascorbyl tetraisopalmitate"], pmOnly: false },
   AHA:               { keywords: ["glycolic acid", "lactic acid", "mandelic acid", "malic acid", "tartaric acid"], pmOnly: true, dailyPadSafe: true },
   BHA:               { keywords: ["salicylic acid", "betaine salicylate"], pmOnly: true, dailyPadSafe: true },
+  PHA:               { keywords: ["gluconolactone", "lactobionic acid", "galactose", "polyhydroxy"], pmOnly: false, dailyPadSafe: true },
   "hyaluronic acid": { keywords: ["hyaluronic acid", "sodium hyaluronate"], pmOnly: false },
   peptides:          { keywords: ["palmitoyl", "acetyl hexapeptide", "matrixyl", "argireline", "copper peptide", "tripeptide"], pmOnly: false },
   "benzoyl peroxide":{ keywords: ["benzoyl peroxide"], pmOnly: false },
@@ -75,12 +76,16 @@ const ACTIVE_SESSION = {
 };
 
 const CONFLICT_RULES = [
-  { pair: ["retinol", "vitamin C"],       severity: "warning", reason: "These degrade each other and heighten irritation. Use Vitamin C in the morning, retinol at night." },
-  { pair: ["retinol", "AHA"],             severity: "warning", reason: "Retinol + AHA together risks barrier damage. Alternate on separate evenings." },
-  { pair: ["retinol", "BHA"],             severity: "warning", reason: "Retinol + BHA is too active at once. Rotate to different nights." },
-  { pair: ["vitamin C", "niacinamide"],   severity: "caution", reason: "At high concentrations these may reduce each other's efficacy. Apply with a gap, or use on alternating days." },
-  { pair: ["AHA", "BHA"],                severity: "caution", reason: "Daily AHA + BHA risks chronic over-exfoliation. Alternate days or use one per session." },
-  { pair: ["retinol", "benzoyl peroxide"],severity: "warning", reason: "Benzoyl peroxide oxidizes and deactivates retinol. Keep these in entirely separate rituals." },
+  { pair: ["retinol", "vitamin C"],         severity: "warning", reason: "These degrade each other and heighten irritation. Use Vitamin C in the morning, retinol at night." },
+  { pair: ["retinol", "AHA"],               severity: "warning", reason: "Retinol + AHA together risks barrier damage. Alternate on separate evenings." },
+  { pair: ["retinol", "BHA"],               severity: "warning", reason: "Retinol + BHA is too active at once. Rotate to different nights." },
+  { pair: ["retinol", "PHA"],               severity: "caution", reason: "PHA is gentler than AHA/BHA but still exfoliating. Alternate evenings with retinol to avoid stacking." },
+  { pair: ["vitamin C", "niacinamide"],     severity: "caution", reason: "At high concentrations these may reduce each other's efficacy. Apply with a gap, or use on alternating days." },
+  { pair: ["AHA", "BHA"],                   severity: "caution", reason: "Daily AHA + BHA risks chronic over-exfoliation. Alternate days or use one per session." },
+  { pair: ["AHA", "PHA"],                   severity: "caution", reason: "Layering PHA on top of AHA compounds exfoliation. Use one per session." },
+  { pair: ["BHA", "PHA"],                   severity: "caution", reason: "Layering PHA on top of BHA compounds exfoliation. Use one per session." },
+  { pair: ["retinol", "benzoyl peroxide"],  severity: "warning", reason: "Benzoyl peroxide oxidizes and deactivates retinol. Keep these in entirely separate rituals." },
+  { pair: ["vitamin C", "benzoyl peroxide"],severity: "warning", reason: "Benzoyl peroxide oxidizes Vitamin C and degrades both. Use in separate sessions — Vitamin C AM, BP at a different time." },
 ];
 
 const SAMPLE_PRODUCTS = [

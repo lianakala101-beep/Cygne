@@ -63,8 +63,44 @@ function buildRoutine(products) {
   return { am: sort(am), pm: sort(pm), periodic };
 }
 
+// Many toning pads list their acid blend on the box but not in app data.
+// Treat anything categorized as a toning pad / pad-named product as having
+// at minimum BHA-like exfoliating action, and surface AHA when "aha" or
+// "glycolic" appears in the name.
+const PAD_NAME_RE = /\b(pad|peel|scrub|exfolian)/i;
+export function isExfoliantLike(product) {
+  if (!product) return false;
+  if (product.category === "Exfoliant") return true;
+  if (product.category === "Toning Pad") return true;
+  if (PAD_NAME_RE.test(product.name || "")) return true;
+  const a = detectActives(product.ingredients || []);
+  return !!(a.AHA || a.BHA || a.PHA);
+}
+
+// Like detectActives, but also infers an exfoliant signature from the
+// product's category and name when the ingredient list doesn't list explicit
+// acids. Used by conflict detection so toning pads still get flagged when
+// stacked with retinol or other exfoliants.
+export function detectActivesFromProduct(product) {
+  if (!product) return {};
+  const actives = { ...detectActives(product.ingredients || []) };
+  const name = (product.name || "").toLowerCase();
+  const isPadCategory = product.category === "Toning Pad";
+  const looksLikePad = PAD_NAME_RE.test(product.name || "");
+  if ((isPadCategory || looksLikePad) && !actives.AHA && !actives.BHA && !actives.PHA) {
+    // Default an unspecified pad to BHA — most clarifying pads are salicylic.
+    actives.BHA = true;
+  }
+  if (/\baha\b|glycolic|lactic|mandelic/i.test(name) && !actives.AHA) actives.AHA = true;
+  if (/\bbha\b|salicylic/i.test(name) && !actives.BHA) actives.BHA = true;
+  if (/\bpha\b|gluconolactone|lactobionic|polyhydroxy/i.test(name) && !actives.PHA) actives.PHA = true;
+  if (/retinol|retinaldehyde|tretinoin/i.test(name) && !actives.retinol) actives.retinol = true;
+  if (/benzoyl peroxide|\bbpo\b/i.test(name) && !actives["benzoyl peroxide"]) actives["benzoyl peroxide"] = true;
+  return actives;
+}
+
 function detectConflicts(products) {
-  const pam = products.map(p => ({ product: p, actives: Object.keys(detectActives(p.ingredients)) }));
+  const pam = products.map(p => ({ product: p, actives: Object.keys(detectActivesFromProduct(p)) }));
   return CONFLICT_RULES.reduce((acc, rule) => {
     const [a, b] = rule.pair;
     const pA = pam.filter(p => p.actives.includes(a)).map(p => p.product);
@@ -89,8 +125,8 @@ function analyzeShelf(products) {
       flags.push({ severity: "caution", label: `${active} in ${prods.length} products`, detail: prods.map(p => p.name).join(", ") });
     }
   }
-  const exfCount = products.filter(p => { const a = detectActives(p.ingredients); return a.AHA || a.BHA || p.category === "Exfoliant"; }).length;
-  if (exfCount > 1) flags.push({ severity: "warning", label: `${exfCount} exfoliants detected`, detail: "Multiple exfoliants risk barrier damage. Alternate days — never layer." });
+  const exfCount = products.filter(p => isExfoliantLike(p)).length;
+  if (exfCount > 1) flags.push({ severity: "warning", label: `${exfCount} exfoliants detected`, detail: "Multiple exfoliants — including toning pads — risk barrier damage. Alternate days, never layer in the same session." });
   if (!products.some(p => p.category === "SPF" || p.category === "SPF Moisturizer" || detectActives(p.ingredients || []).SPF)) flags.push({ severity: "missing", label: "No SPF in your vanity", detail: "Daily SPF is non-negotiable — even indoors, even in winter." });
   if (!products.some(p => p.category === "Moisturizer" || p.category === "SPF Moisturizer" || p.category === "Oil")) flags.push({ severity: "missing", label: "No moisturizer detected", detail: "A moisturizer is a foundational step in every ritual." });
   return { activeMap, flags };
@@ -117,6 +153,16 @@ export function isDampSkinProduct(product) {
       : [];
   const lower = ingArr.map(i => i.toLowerCase());
   return DAMP_KEYWORDS.some(k => lower.some(ing => ing.includes(k)));
+}
+
+// Returns the conflict rules a single product participates in, given the
+// full product list. Used by Vanity cards to surface per-product warnings.
+export function getProductConflicts(product, products = []) {
+  if (!product) return [];
+  return detectConflicts(products).filter(c =>
+    (c.productsA || []).some(p => p.id === product.id) ||
+    (c.productsB || []).some(p => p.id === product.id)
+  );
 }
 
 export { isScheduledToday, getNextUseLabel, getCurrentSession, detectActives, buildRoutine, detectConflicts, analyzeShelf, calcSpending };
