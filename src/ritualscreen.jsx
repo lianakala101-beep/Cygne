@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Icon, Section, FlagCard, SwanIcon } from "./components.jsx";
-import { detectActives, analyzeShelf, buildRoutine, detectConflicts, isScheduledToday } from "./engine.js";
+import { detectActives, analyzeShelf, buildRoutine, detectConflicts, isScheduledToday, applyPhilosophy } from "./engine.js";
 import { FREQUENCIES } from "./constants.js";
 import { buildRecommendations, buildRefinements } from "./intelligence.jsx";
 import { RoutineStep } from "./ritual.jsx";
@@ -396,7 +396,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
 
   const { mode: ritualMode, key: ritualKey, cyclePhase } = getRitualMode(products, [], user, cycleDay, isFlightMode);
   const baseSteps = session === "am" ? am : pm;
-  const steps = ritualMode.filterSteps(baseSteps);
+  const steps = applyPhilosophy(ritualMode.filterSteps(baseSteps), user?.skinProfile?.routinePhilosophy);
   const filteredOut = baseSteps.filter(s => !steps.find(x => x.id === s.id));
   const allDone = steps.length > 0 && steps.every(s => isStepChecked(s.id));
   const sessionLabel = session === "am" ? "Morning" : "Evening";

@@ -56,7 +56,20 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
     return () => document.removeEventListener("pointerdown", close);
   }, [menuOpen]);
   const ingredientList = (product.ingredients || []).map(i => i.toLowerCase());
-  const allergenHits = (user?.ingredientProfile?.allergens || []).filter(a =>
+  // Merge allergen-style avoidance lists from three sources:
+  //   1. user.ingredientProfile.allergens — explicit allergen list
+  //   2. skinProfile.ingredientsToAvoid   — free-text from onboarding
+  //   3. skinProfile.fragrance            — auto-add fragrance keywords
+  //                                         when the user opted to avoid it
+  const explicitAllergens = user?.ingredientProfile?.allergens || [];
+  const avoidText = user?.skinProfile?.ingredientsToAvoid || "";
+  const avoidList = avoidText.split(/[,\n;]+/).map(s => s.trim()).filter(Boolean);
+  const fragrancePref = (user?.skinProfile?.fragrance || "").toLowerCase();
+  const fragranceTerms = (fragrancePref.startsWith("yes") || fragrancePref.startsWith("sometimes"))
+    ? ["fragrance", "parfum", "perfume", "essential oil"]
+    : [];
+  const allAvoidance = [...explicitAllergens, ...avoidList, ...fragranceTerms];
+  const allergenHits = allAvoidance.filter(a =>
     ingredientList.some(i => i.includes(a.toLowerCase()))
   );
   const lovedHits = (user?.ingredientProfile?.loved || []).filter(l =>

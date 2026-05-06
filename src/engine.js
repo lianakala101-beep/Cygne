@@ -155,6 +155,27 @@ export function isDampSkinProduct(product) {
   return DAMP_KEYWORDS.some(k => lower.some(ing => ing.includes(k)));
 }
 
+// Trim an ordered step list to match the user's stated routine philosophy.
+// Categories considered "optional" cascade out as the philosophy gets
+// shorter:
+//   Multi-Step / blank   → keep everything
+//   Somewhere In Between → drop Mask + Oil
+//   Minimalist           → also drop Eye Cream + Mist + Toning Pad
+// Active core layers (Cleanser, Toner, Essence, Serum, Moisturizer, SPF,
+// Prescription) are always preserved regardless of philosophy.
+export function applyPhilosophy(steps, philosophy = "") {
+  if (!Array.isArray(steps) || !steps.length) return steps;
+  const p = String(philosophy).toLowerCase();
+  if (!p || p.includes("multi-step")) return steps;
+  const drop = new Set();
+  if (p.includes("somewhere") || p.includes("between")) {
+    ["Mask", "Oil"].forEach(c => drop.add(c));
+  } else if (p.includes("minimal")) {
+    ["Mask", "Oil", "Eye Cream", "Mist", "Toning Pad"].forEach(c => drop.add(c));
+  }
+  return steps.filter(s => !drop.has(s.category));
+}
+
 // Returns the conflict rules a single product participates in, given the
 // full product list. Used by Vanity cards to surface per-product warnings.
 export function getProductConflicts(product, products = []) {

@@ -261,7 +261,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         ))}
 
         <div style={{ marginBottom: 20 }}>
-          <SeasonalNudgeCard products={products} activeMap={activeMap} locationData={locationData} />
+          <SeasonalNudgeCard products={products} activeMap={activeMap} locationData={locationData} user={user} />
         </div>
 
         {/* Current session routine card */}

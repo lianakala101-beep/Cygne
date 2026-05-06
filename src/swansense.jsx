@@ -403,12 +403,35 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
   }
 
   if (hasOccasion) {
-    predictions.push({
-      type: "occasion_focus",
-      level: "cycle",
-      headline: `Pacing toward your ${occasion.toLowerCase()}`,
-      detail: "Hold off on introducing new actives in the four weeks before. Stay with what's working, prioritize hydration, and book any in-office treatments at least three weeks out so any redness has time to settle.",
-    });
+    // Optional date: skinProfile.occasionDate (ISO YYYY-MM-DD). If set, render
+    // a real countdown and bump priority as the date approaches.
+    const occasionDate = skinProfile.occasionDate;
+    let countdownLine = null;
+    let level = "cycle";
+    if (occasionDate) {
+      const target = new Date(occasionDate + "T00:00:00").getTime();
+      const today = Date.now();
+      const days = Math.ceil((target - today) / 86400000);
+      if (Number.isFinite(days) && days >= 0) {
+        const weeks = Math.round(days / 7);
+        if (days <= 7) countdownLine = `${days} day${days === 1 ? "" : "s"} until your ${occasion.toLowerCase()}.`;
+        else if (weeks <= 8) countdownLine = `${weeks} weeks until your ${occasion.toLowerCase()}.`;
+        else countdownLine = `${weeks} weeks out from your ${occasion.toLowerCase()} — early days, keep building.`;
+        if (days <= 28) level = "alert";
+        else if (weeks <= 8) level = "caution";
+      }
+    }
+    const headline = countdownLine || `Pacing toward your ${occasion.toLowerCase()}`;
+    const detail = (() => {
+      if (occasionDate) {
+        const days = Math.ceil((new Date(occasionDate + "T00:00:00").getTime() - Date.now()) / 86400000);
+        if (days <= 7)  return "Final week — stay with what's working. No new actives, no peels, no aggressive masks. Hydration and SPF only.";
+        if (days <= 28) return "Inside the four-week window. Hold any new actives or treatments. Lean into hydration and barrier support so skin reads even and luminous.";
+        if (days <= 56) return "Inside two months. This is your build window — establish actives now so they're past purging by the date. Schedule any in-office treatments at least three weeks out.";
+      }
+      return "Hold off on introducing new actives in the four weeks before. Stay with what's working, prioritize hydration, and book any in-office treatments at least three weeks out so any redness has time to settle.";
+    })();
+    predictions.push({ type: "occasion_focus", level, headline, detail });
   }
 
   // Return top 3, prioritising alert > caution > cycle > positive

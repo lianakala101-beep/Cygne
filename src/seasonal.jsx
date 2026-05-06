@@ -113,13 +113,50 @@ const SEASON_CONFIG = {
   }
 };
 
-function SeasonalNudgeCard({ products, activeMap }) {
+// Pre-empts the season-specific shelf nudge with climate + environment
+// signals from onboarding when those create a more pressing message than
+// the seasonal default. Returns null if no profile context applies, in
+// which case the seasonal nudge is used as-is.
+function getProfileNudge(season, products, activeMap, user) {
+  const skinProfile = user?.skinProfile || {};
+  const climate = (skinProfile.climate || "").toLowerCase();
+  const environment = (skinProfile.environment || "").toLowerCase();
+  const hasHA = !!activeMap["hyaluronic acid"]?.length;
+  const hasCeramides = products.some(p => (p.ingredients || []).some(i => i.includes("ceramide")));
+  const hasSPF = hasSPFCoverage(products, activeMap);
+
+  // Outdoor lifestyle is the strongest override — UV beats every other angle.
+  if (environment === "outdoors" && !hasSPF) {
+    return "You spend most of your day outdoors and there's no SPF in your vanity. UV exposure compounds — this is the single most consequential gap in your routine right now.";
+  }
+
+  // Dry/cold climate compounds winter dryness — call it out specifically.
+  if (season === "winter" && (climate === "dry" || climate === "cold") && !hasCeramides && !hasHA) {
+    return `Winter on top of a ${climate} climate means barrier loss accelerates. A humectant + ceramide pairing should outrank any active introduction until skin stabilizes.`;
+  }
+
+  // Tropical/humid climate in summer — lean lighter textures.
+  if (season === "summer" && (climate === "tropical" || climate === "humid")) {
+    if (!hasSPF) return "Tropical summer with no SPF is the highest-risk combination for cumulative UV damage. SPF first, every other change second.";
+    return "Your humid climate doesn't need heavy occlusives in summer. Lean on hydrating gels and lightweight SPF — your skin's own sebum is doing more sealing than you think.";
+  }
+
+  // Indoor + dry climate often means HVAC dehydration year-round.
+  if (environment === "indoors" && climate === "dry" && !hasHA) {
+    return "Indoor heating or AC plus a dry climate dehydrates skin year-round, not just in winter. A hyaluronic-acid layer applied on damp skin compounds with whatever else you're using.";
+  }
+
+  return null;
+}
+
+function SeasonalNudgeCard({ products, activeMap, user }) {
   const season = getSeason();
   const cfg = SEASON_CONFIG[season];
   const [dismissed, setDismissed] = useState(false);
   const [fading, setFading] = useState(false);
 
-  const nudge = cfg.shelfNudge(products, activeMap);
+  const profileNudge = getProfileNudge(season, products, activeMap, user);
+  const nudge = profileNudge || cfg.shelfNudge(products, activeMap);
 
   const handleDismiss = () => {
     setFading(true);
