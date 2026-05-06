@@ -110,6 +110,23 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
   // -- SKIN TYPE & CONCERN RULES --------------------------------------------
   const skinType = user.skinType || "";
   const concerns = user.concerns || [];
+  const knownActives = (user.knownActives || []).map(a => a.toLowerCase());
+  const skinAgeBracket = user.skinAgeBracket || "";
+  const skinProfile = user.skinProfile || {};
+  const skinGoals = skinProfile.skinGoals || [];
+  const fragrancePref = (skinProfile.fragrance || "").toLowerCase();
+  const avoidsFragrance = fragrancePref.startsWith("yes") || fragrancePref.startsWith("sometimes");
+  const ingredientsToAvoid = (skinProfile.ingredientsToAvoid || "")
+    .split(/[,\n;]+/).map(s => s.trim().toLowerCase()).filter(Boolean);
+
+  // Suppress an "introduce active X" recommendation if the user already
+  // flagged X in onboarding's knownActives — they have history with it.
+  // We check by lowercased substring across the rec's title/trigger.
+  const suppressKnown = (rec) => {
+    if (rec.type !== "addition") return false;
+    const haystack = `${rec.title} ${rec.trigger}`.toLowerCase();
+    return knownActives.some(a => a && haystack.includes(a));
+  };
 
   if (skinType === "Dry" || concerns.includes("Dehydration")) {
     if (!hasCeramides) recs.push({
@@ -215,7 +232,92 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
     cygne: false,
   });
 
-  return recs.sort((a, b) => {
+  // -- SKIN GOALS (from onboarding) -----------------------------------------
+  if (skinGoals.includes("Glassy & Luminous") && !hasVitC) recs.push({
+    type: "addition", priority: 4,
+    title: "Vitamin C supports your luminosity goal",
+    body: "You said you'd love glassy, luminous skin in 3 months. Vitamin C is the most evidence-backed brightening active — paired with daily SPF, it builds visible radiance over 8–12 weeks.",
+    tag: "Goal: Luminous", tagColor: "#c4a060", category: "Serum", trigger: "goal-luminous-vitc", cygne: true,
+    note: "10–15% L-ascorbic acid in the AM, layered before SPF.",
+  });
+  if (skinGoals.includes("Clear & Smooth") && !hasBHA && !hasAHA) recs.push({
+    type: "addition", priority: 4,
+    title: "An exfoliant supports your clarity goal",
+    body: "You're working toward clear, smooth skin. A weekly BHA (oily/congested) or AHA (texture) is the most direct path — physical scrubs don't reach pore-level congestion.",
+    tag: "Goal: Clear", tagColor: "#c49040", category: "Exfoliant", trigger: "goal-clear-exfoliant", cygne: true,
+    note: "BHA 2× per week PM. Build up tolerance before layering with retinol.",
+  });
+  if (skinGoals.includes("Firm & Refined") && !hasPeptides && !hasRetinol) recs.push({
+    type: "addition", priority: 4,
+    title: "Retinol or peptides support your firmness goal",
+    body: "Firm, refined skin comes from collagen support. Retinol is the strongest evidence; peptides are the gentlest entry. Either belongs in a long-term firmness ritual.",
+    tag: "Goal: Firm", tagColor: "#9a8070", category: "Serum", trigger: "goal-firm-retinoid-or-peptide", cygne: true,
+    note: "Start with peptides if retinol feels intimidating — they layer well with most other actives.",
+  });
+  if (skinGoals.includes("Hydrated & Plump") && !hasHA && !hasCeramides) recs.push({
+    type: "addition", priority: 4,
+    title: "Hydration stack for plump skin",
+    body: "Plump skin is well-hydrated skin. A hyaluronic-acid serum draws water in; a ceramide moisturizer seals it. They work together — neither is sufficient alone.",
+    tag: "Goal: Plump", tagColor: "#8aa8c4", category: "Serum", trigger: "goal-plump-ha-ceramide", cygne: true,
+    note: "HA serum on damp skin → ceramide cream on top.",
+  });
+
+  // -- SKIN AGE BRACKET ------------------------------------------------------
+  // 35+ benefits from a peptide layer if not already present and not on retinol.
+  if (/35|40|45|50|55|60/.test(skinAgeBracket) && !hasPeptides && !hasRetinol) {
+    recs.push({
+      type: "addition", priority: 5,
+      title: "Peptides for sustained collagen support",
+      body: "From the mid-30s onward, collagen production declines about 1% per year. Peptides signal the skin to rebuild — gentler than retinoids and additive to any ritual.",
+      tag: "Age Support", tagColor: "#9a8070", category: "Serum", trigger: "age-peptides", cygne: true,
+      note: "Look for matrixyl, copper peptides, or palmitoyl tripeptide. Layers AM or PM.",
+    });
+  }
+
+  // -- FRAGRANCE PREFERENCE --------------------------------------------------
+  if (avoidsFragrance) {
+    const fragranced = products.filter(p => {
+      const ings = (p.ingredients || []).map(i => i.toLowerCase());
+      return ings.some(i => /fragrance|parfum|perfume|essential oil/.test(i));
+    });
+    if (fragranced.length) {
+      recs.push({
+        type: "swap", priority: 2,
+        title: `${fragranced.length} fragranced product${fragranced.length === 1 ? "" : "s"} in your vanity`,
+        body: `You said you avoid fragrance. ${fragranced.map(p => p.name).join(", ")} list${fragranced.length === 1 ? "s" : ""} fragrance, parfum, or essential oil. These are the most common irritation triggers for sensitive skin.`,
+        tag: "Fragrance Watch", tagColor: "#9a8070", trigger: "fragrance-products",
+        action: "Swap for fragrance-free alternatives in the same category, or hold these for occasional use only.",
+        cygne: false,
+      });
+    }
+  }
+
+  // -- INGREDIENTS-TO-AVOID --------------------------------------------------
+  if (ingredientsToAvoid.length) {
+    const matches = [];
+    products.forEach(p => {
+      const ings = (p.ingredients || []).map(i => i.toLowerCase());
+      const hits = ingredientsToAvoid.filter(avoid => ings.some(i => i.includes(avoid)));
+      if (hits.length) matches.push({ product: p, hits });
+    });
+    if (matches.length) {
+      recs.push({
+        type: "swap", priority: 1,
+        title: `${matches.length} product${matches.length === 1 ? "" : "s"} contain${matches.length === 1 ? "s" : ""} ingredients you wanted to avoid`,
+        body: matches.map(m => `${m.product.name}: ${m.hits.join(", ")}`).join(" · "),
+        tag: "Avoid List", tagColor: "#8a3a2a", trigger: "ingredients-to-avoid",
+        action: "Replace with formulations that omit these ingredients, or move them out of your daily ritual.",
+        cygne: false,
+      });
+    }
+  }
+
+  // Apply known-active suppression to additions only (don't suppress
+  // conflict fixes or simplifications even if user said they "know" the
+  // active — the conflict exists regardless of familiarity).
+  const filtered = recs.filter(r => !suppressKnown(r));
+
+  return filtered.sort((a, b) => {
     const typeOrder = { addition: 0, swap: 1, simplify: 2 };
     return (typeOrder[a.type] - typeOrder[b.type]) || (a.priority - b.priority);
   });

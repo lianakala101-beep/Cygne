@@ -12,6 +12,15 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
   const cycleDay = getCurrentCycleDay(user);
   const activeMap = analyzeShelf(products).activeMap;
 
+  // Onboarding-derived context
+  const skinProfile = user?.skinProfile || {};
+  const climate = (skinProfile.climate || "").toLowerCase();
+  const environment = (skinProfile.environment || "").toLowerCase();
+  const fragrancePref = (skinProfile.fragrance || "").toLowerCase();
+  const avoidsFragrance = fragrancePref.startsWith("yes") || fragrancePref.startsWith("sometimes");
+  const occasion = skinProfile.specialOccasion || "";
+  const hasOccasion = occasion && !/not right now/i.test(occasion);
+
   // -- Journal-based predictions ----------------------------------------------
   const recentJournals = journals.slice(-5);
   const poorSleepCount  = recentJournals.filter(j => j.sleep === "poor").length;
@@ -337,6 +346,68 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
       level: "caution",
       headline: "Not the right week for in-clinic treatments",
       detail: "Your skin is more reactive and slower to heal in the late luteal and menstrual phases. If you have a peel or microneedling appointment coming up, consider rescheduling to your follicular phase (days 6–13) for better results and less downtime.",
+    });
+  }
+
+  // -- Onboarding profile-driven predictions ----------------------------------
+  const hasHA = !!(activeMap["hyaluronic acid"]?.length);
+  const hasCeramides = !!(activeMap["ceramides"]?.length);
+  const hasSPF = !!(activeMap["SPF"]?.length) || products.some(p => p.category === "SPF" || p.category === "SPF Moisturizer");
+
+  if ((climate === "dry" || climate === "cold") && !hasHA && !hasCeramides) {
+    predictions.push({
+      type: "climate_barrier",
+      level: "caution",
+      headline: `${climate.charAt(0).toUpperCase() + climate.slice(1)} climate, no barrier support`,
+      detail: `You're based somewhere ${climate}, but your ritual doesn't include a humectant or ceramide layer. Trans-epidermal water loss compounds in low humidity — a hyaluronic-acid serum or ceramide cream goes further than any active right now.`,
+    });
+  }
+
+  if (environment === "outdoors" && !hasSPF) {
+    predictions.push({
+      type: "outdoor_no_spf",
+      level: "alert",
+      headline: "Outdoors most days, no SPF in your routine",
+      detail: "You log most of your day outdoors. UV exposure without daily SPF is the single biggest accelerator of premature aging and pigmentation — adding broad-spectrum SPF should outrank every other change.",
+    });
+  } else if (environment === "outdoors" && hasSPF) {
+    predictions.push({
+      type: "outdoor_spf_reapply",
+      level: "cycle",
+      headline: "Outdoor day — reapply SPF every two hours",
+      detail: "Single-application SPF degrades within ~2 hours, especially with sweat and friction. A stick or powder reapplication option keeps you covered without disturbing makeup.",
+    });
+  }
+
+  if (avoidsFragrance) {
+    const fragranced = products.filter(p => {
+      const ings = (p.ingredients || []).map(i => i.toLowerCase());
+      return ings.some(i => /fragrance|parfum|perfume|essential oil/.test(i));
+    });
+    const recentIrritation = checkIns.slice(-5).some(c => c.irritation === "mild" || c.irritation === "moderate");
+    if (fragranced.length && recentIrritation) {
+      predictions.push({
+        type: "fragrance_irritation",
+        level: "caution",
+        headline: "Fragrance + recent irritation — pause and isolate",
+        detail: `You said you avoid fragrance, but ${fragranced.length} product${fragranced.length === 1 ? "" : "s"} in your vanity list${fragranced.length === 1 ? "s" : ""} it. Recent check-ins show irritation. Hold the fragranced product${fragranced.length === 1 ? "" : "s"} for 5–7 days and see if your skin settles.`,
+      });
+    } else if (fragranced.length) {
+      predictions.push({
+        type: "fragrance_watch",
+        level: "cycle",
+        headline: `${fragranced.length} fragranced product${fragranced.length === 1 ? "" : "s"} on your shelf`,
+        detail: `You flagged sensitivity to fragrance in onboarding. ${fragranced.map(p => p.name).join(", ")} list${fragranced.length === 1 ? "s" : ""} fragrance — worth checking whether they correlate with any flare-ups.`,
+      });
+    }
+  }
+
+  if (hasOccasion) {
+    predictions.push({
+      type: "occasion_focus",
+      level: "cycle",
+      headline: `Pacing toward your ${occasion.toLowerCase()}`,
+      detail: "Hold off on introducing new actives in the four weeks before. Stay with what's working, prioritize hydration, and book any in-office treatments at least three weeks out so any redness has time to settle.",
     });
   }
 
