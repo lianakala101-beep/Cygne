@@ -393,7 +393,7 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
           <span aria-hidden="true" style={{
             position: "absolute", top: "50%", left: "50%",
             transform: "translate(-50%, -50%)",
-            fontFamily: "'Pinyon Script', cursive",
+            fontFamily: "var(--script)",
             fontSize: 160, lineHeight: 1,
             color: "#f5f0e8", opacity: 0.07,
             pointerEvents: "none", userSelect: "none",
@@ -434,37 +434,35 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
     );
   }
 
-  // -- INLINE (settled) version — small card at bottom of home ---------------
+  // -- INLINE (settled) version — ivory SwanSense card ----------------------
   return (
     <div style={{ position: "relative", marginTop: 8 }}>
       <div style={{
         position: "relative",
-        background: "linear-gradient(158deg, #3d3a28 0%, #2a2619 45%, #1e1a14 100%)",
+        background: "var(--color-ivory, #faf9f4)",
         borderRadius: 14,
         padding: "16px 18px 14px",
         overflow: "hidden",
         isolation: "isolate",
-        boxShadow: "0 4px 18px rgba(0,0,0,0.35)",
-        border: "1px solid rgba(139,115,85,0.15)",
+        border: "1px solid var(--color-ivory-shadow, #f0ebe0)",
+        boxShadow: "0 2px 12px rgba(28,28,26,0.06)",
       }}>
-        <span aria-hidden="true" style={{
-          position: "absolute", top: "50%", left: "50%",
-          transform: "translate(-50%, -50%)",
-          fontFamily: "'Pinyon Script', cursive",
-          fontSize: 160, lineHeight: 1,
-          color: "#f5f0e8", opacity: 0.07,
+        <div style={{ position: "absolute", inset: 0, borderRadius: 14, pointerEvents: "none", backgroundImage: grain, backgroundSize: "180px 180px", opacity: 0.4 }} />
+        <img src="/cygne-logo.png" alt="" style={{
+          position: "absolute", bottom: 10, right: 14,
+          height: 48, width: "auto", opacity: 0.06,
           pointerEvents: "none", userSelect: "none",
-          whiteSpace: "nowrap",
-          zIndex: -1,
-        }}>Cygne</span>
-        <div style={{ position: "absolute", inset: 0, borderRadius: 14, pointerEvents: "none", backgroundImage: grain, backgroundSize: "180px 180px", opacity: 0.6 }} />
-        <div style={{ position: "absolute", bottom: 8, right: 12, opacity: 0.18, color: "rgba(232,220,180,0.9)", pointerEvents: "none" }}><SwanIcon size={44} /></div>
+        }} />
 
         <div style={{ marginBottom: 10 }}>
-          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 8, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(232,226,217,0.55)", margin: 0 }}>Swan Song</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 8, letterSpacing: "0.28em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: 0 }}>Swan Sense</p>
         </div>
 
-        <p style={{ fontFamily: "var(--font-signature)", fontSize: 34, fontWeight: 400, lineHeight: 1.35, color: "rgba(232,227,214,0.9)", letterSpacing: "0.01em", margin: 0 }}>{renderInsightLines(line)}</p>
+        <p style={{ fontFamily: "var(--script)", fontSize: 26, fontWeight: 400, lineHeight: 1.35, color: "var(--color-ink, #1c1c1a)", letterSpacing: "0.01em", margin: "0 0 8px" }}>{renderInsightLines(line)}</p>
+
+        {hasMeaningful && meaningfulPredictions[0].detail && (
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-stone, #5a5a5a)", margin: 0, lineHeight: 1.65 }}>{meaningfulPredictions[0].detail}</p>
+        )}
       </div>
     </div>
   );
