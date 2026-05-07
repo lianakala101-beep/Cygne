@@ -307,12 +307,12 @@ function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }
         fontFamily: "var(--font-display)",
         fontSize: 26, fontWeight: 700,
         letterSpacing: "0.04em", textTransform: "uppercase",
-        color: "var(--parchment)",
+        color: "var(--color-inky-moss, #2d3d2b)",
         lineHeight: 1.05,
         margin: "0 0 8px",
         textDecoration: checked ? "line-through" : "none",
         textDecorationThickness: "2px",
-        textDecorationColor: "rgba(232,226,217,0.55)",
+        textDecorationColor: "rgba(45,61,43,0.45)",
         transition: "text-decoration-color 280ms ease",
       }}>
         {verb}
