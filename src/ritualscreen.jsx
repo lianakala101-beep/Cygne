@@ -8,7 +8,6 @@ import { RecommendationCard } from "./intelligence.jsx";
 import { CheckInModal } from "./progress.jsx";
 import { getCyclePhase, getActivePauseState } from "./progress.jsx";
 import { getNextUseLabel } from "./constants.js";
-import { AskCygneModal } from "./components/AskCygneModal.jsx";
 import { getSeason } from "./seasonal.jsx";
 import { getRitualPeriod, getRitualTimeLabel } from "./utils/ritualPeriod.js";
 
@@ -381,7 +380,6 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
   const [showRitualCheckIn, setShowRitualCheckIn] = useState(false);
   const todayCheckedIn = checkIns.some(c => c.date === today);
   const [hintVisible, setHintVisible] = useState(() => !localStorage.getItem("ritual_hint_dismissed"));
-  const [askState, setAskState] = useState(null); // { question, context } | null
 
   const isStepChecked = (id) => completedSteps.includes(id);
 
@@ -544,8 +542,6 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
                 checked={isStepChecked(p.id)}
                 onCheck={() => toggleStep(p.id)}
                 scheduled={isScheduledToday(p)}
-                session={session}
-                onAskCygne={(q, ctx) => setAskState({ question: q, context: ctx })}
               />)}
             </div>
           </div>
@@ -735,17 +731,6 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
         </div>
       )}
 
-      {askState && (
-        <AskCygneModal
-          initialQuestion={askState.question}
-          context={askState.context}
-          user={user}
-          products={products}
-          journals={journals}
-          checkIns={checkIns}
-          onClose={() => setAskState(null)}
-        />
-      )}
     </div>
   );
 }

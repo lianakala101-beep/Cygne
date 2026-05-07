@@ -9,6 +9,7 @@ import { WeekendNudgeCard } from "./weekend.jsx";
 import { SeasonalNudgeCard } from "./seasonal.jsx";
 import { getTreatmentPhase, TreatmentRecoveryCard, getCyclePhase } from "./progress.jsx";
 import { getCurrentCycleDay, daysBetweenLocal } from "./utils.jsx";
+import { AskCygneButton } from "./AskCygne.jsx";
 import { AskCygneModal } from "./components/AskCygneModal.jsx";
 
 function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSwanPopup, treatments, locationData, user, notifPermission, onRequestNotif, notifDismissed, onDismissNotif, journals, setCheckIns, onLoadDemo }) {
@@ -157,7 +158,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
 
         {/* 1. Swan Song card (intelligence) — always fully visible */}
         <div className="cygne-swansong-intro" style={{ marginBottom: 20 }}>
-          <SwanSongCard currentSession={currentSession} asPopup={false} user={user} predictions={swanSensePredictions} onAskCygne={askCygne} />
+          <SwanSongCard currentSession={currentSession} asPopup={false} user={user} predictions={swanSensePredictions} />
         </div>
 
         {/* 2. Cycle phase — ambient pill, tap to expand */}
@@ -322,6 +323,11 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, color: "var(--parchment)", margin: 0 }}>No conflicts detected. Your ritual is clean.</p>
           </div>
         )}
+
+        {/* Ask Cygne — standalone entry point above the utility buttons */}
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}>
+          <AskCygneButton onClick={() => askCygne("", "")} />
+        </div>
 
         {/* 5. Travel Edit + Shop Scan — utility buttons at bottom */}
         <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>

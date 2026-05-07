@@ -262,7 +262,8 @@ const STEP_VERBS = {
   "Lip":             "LIP",
 };
 
-function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true, session = "am", onAskCygne }) {
+function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }) {
+  const [expanded, setExpanded] = useState(false);
   const reason = getStepReason(step);
   // Damp-skin tip only applies to leave-on humectant layers, not cleansers.
   const dampEligible = step.category === "Serum" || step.category === "Essence";
@@ -357,25 +358,9 @@ function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true, 
         </p>
       )}
 
-      {onAskCygne && (
+      {reason && (
         <button
-          onClick={(e) => {
-            e.stopPropagation();
-            const period = session === "pm" ? "evening" : "morning";
-            const productName = step.name || verb;
-            const ingredients = (step.ingredients || []).slice(0, 12).join(", ");
-            const ctxLines = [
-              `Product: ${productName}${step.brand ? ` by ${step.brand}` : ""}.`,
-              `Category: ${step.category} (rendered as ${verb} in ritual).`,
-              ingredients ? `Ingredients: ${ingredients}.` : null,
-              freqLabel ? `Frequency: ${freqLabel}.` : null,
-              reason ? `Why this step: ${reason}` : null,
-            ].filter(Boolean);
-            onAskCygne(
-              `Why is ${productName} in my ${period} ritual?`,
-              ctxLines.join(" "),
-            );
-          }}
+          onClick={(e) => { e.stopPropagation(); setExpanded(x => !x); }}
           style={{
             marginTop: 12,
             background: "none", border: "none", padding: 0,
@@ -387,8 +372,20 @@ function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true, 
             display: "inline-flex", alignItems: "center", gap: 4,
           }}
         >
-          WHY?
+          {expanded ? "HIDE" : "WHY?"}
         </button>
+      )}
+
+      {expanded && reason && (
+        <p style={{
+          fontFamily: "var(--font-body)",
+          fontSize: 12, fontWeight: 400,
+          color: "var(--clay)",
+          margin: "10px 0 0",
+          lineHeight: 1.7,
+        }}>
+          {reason}
+        </p>
       )}
     </div>
   );
@@ -419,7 +416,7 @@ function renderInsightLines(text) {
   ));
 }
 
-function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = {}, predictions = [], onAskCygne }) {
+function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = {}, predictions = [] }) {
   const now = new Date();
   const isBirthday = user.birthMonth && user.birthDay &&
     (now.getMonth() + 1) === parseInt(user.birthMonth) &&
@@ -559,41 +556,16 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
           </p>
         </div>
 
-        {onAskCygne && hasMeaningful ? (
-          <button
-            onClick={() => {
-              const top = meaningfulPredictions[0];
-              const headline = top?.headline || line;
-              const detail = top?.detail || "";
-              onAskCygne(String(headline), String(detail));
-            }}
-            style={{
-              position: "relative",
-              background: "none", border: "none", padding: 0,
-              cursor: "pointer", textAlign: "left",
-              fontFamily: "var(--font-signature)",
-              fontSize: 34, fontWeight: 400,
-              lineHeight: 1.35, letterSpacing: "0.01em",
-              color: "var(--color-ink, #1c1c1a)",
-              margin: 0,
-              WebkitTapHighlightColor: "transparent",
-            }}
-            aria-label="Ask Cygne about this insight"
-          >
-            {renderInsightLines(line)}
-          </button>
-        ) : (
-          <p style={{
-            position: "relative",
-            fontFamily: "var(--font-signature)",
-            fontSize: 34, fontWeight: 400,
-            lineHeight: 1.35, letterSpacing: "0.01em",
-            color: "var(--color-ink, #1c1c1a)",
-            margin: 0,
-          }}>
-            {renderInsightLines(line)}
-          </p>
-        )}
+        <p style={{
+          position: "relative",
+          fontFamily: "var(--font-signature)",
+          fontSize: 34, fontWeight: 400,
+          lineHeight: 1.35, letterSpacing: "0.01em",
+          color: "var(--color-ink, #1c1c1a)",
+          margin: 0,
+        }}>
+          {renderInsightLines(line)}
+        </p>
       </div>
     </div>
   );
