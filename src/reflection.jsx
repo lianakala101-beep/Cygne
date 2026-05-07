@@ -480,7 +480,7 @@ function ExpandedEntry({ entry, onClose }) {
       <p style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: "0 0 6px" }}>
         Week {entry.weekNumber}
       </p>
-      <h2 style={{ fontFamily: CURSIVE, fontSize: 28, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: TEXT, margin: "0 0 6px", textAlign: "center" }}>
+      <h2 style={{ fontFamily: CURSIVE, fontSize: 28, fontWeight: 400, letterSpacing: "0.02em", color: TEXT, margin: "0 0 6px", textAlign: "center" }}>
         {getMoonPhase(new Date(entry.date))}
       </h2>
       <p style={{ fontFamily: SANS, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: "0 0 26px" }}>
@@ -562,7 +562,7 @@ function GalleryEntry({ entry, onExpand, caption }) {
       <p style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: "0 0 4px" }}>
         Week {entry.weekNumber}
       </p>
-      <h3 style={{ fontFamily: CURSIVE, fontSize: 24, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: TEXT, margin: "0 0 4px" }}>
+      <h3 style={{ fontFamily: CURSIVE, fontSize: 24, fontWeight: 400, letterSpacing: "0.02em", color: TEXT, margin: "0 0 4px" }}>
         {getMoonPhase(new Date(entry.date))}
       </h3>
       <p style={{ fontFamily: SANS, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: TEXT_SOFT, margin: "0 0 18px", opacity: 0.7 }}>
@@ -612,6 +612,15 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [signedUrls, setSignedUrls] = useState({}); // { [entryId]: signedUrl }
+  // Ephemeral confirmation flash. Set true right after a successful
+  // handleComplete and auto-cleared so the "Captured" line doesn't linger
+  // as a persistent subtitle.
+  const [justCaptured, setJustCaptured] = useState(false);
+  useEffect(() => {
+    if (!justCaptured) return;
+    const t = setTimeout(() => setJustCaptured(false), 4500);
+    return () => clearTimeout(t);
+  }, [justCaptured]);
 
   // Fingerprint that changes whenever any entry id appears or its url
   // pointer flips (e.g. a same-week recapture replaces an earlier entry —
@@ -729,6 +738,7 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
       };
       await onAddReflection(entry);
       setCapturing(false);
+      setJustCaptured(true);
     } catch (e) {
       console.error("[Cygne reflection] save failed:", e);
       setError("Couldn't save that reflection. Please try again.");
@@ -746,12 +756,12 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
     }}>
       {/* Header */}
       <div style={{ maxWidth: 560, margin: "0 auto 18px", textAlign: "center" }}>
-        <p style={{ fontFamily: "var(--heading)", fontSize: 9, letterSpacing: "0.30em", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: "0 0 12px" }}>
+        <h1 style={{ fontFamily: "var(--font-display)", fontSize: 38, fontWeight: 700, color: "var(--color-inky-moss)", margin: "0 0 8px", letterSpacing: "0.15em", textTransform: "uppercase", lineHeight: 1.15 }}>
           Reflection
-        </p>
-        <h1 style={{ fontFamily: "var(--font-display)", fontSize: 34, fontWeight: 700, color: "var(--color-inky-moss)", margin: "0 0 10px", letterSpacing: "0.15em", textTransform: "uppercase", lineHeight: 1.2 }}>
-          A Living Gallery.
         </h1>
+        <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontStyle: "italic", fontSize: 12, color: TEXT_SOFT, margin: "0 0 12px", letterSpacing: "0.04em", opacity: 0.75 }}>
+          A living gallery.
+        </p>
         {reflections.length === 0 && (
           <p style={{ fontFamily: SANS, fontSize: 12, color: TEXT_SOFT, margin: 0, lineHeight: 1.75, maxWidth: 360, marginLeft: "auto", marginRight: "auto" }}>
             One triptych a week. A quiet record of how your skin is moving through the seasons.
@@ -766,11 +776,11 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
       )}
 
       <div style={{ textAlign: "center", marginBottom: 24 }}>
-        {capturedThisWeek ? (
-          <p style={{ fontFamily: CURSIVE, fontSize: 16, letterSpacing: "0.05em", color: TEXT_SOFT, opacity: 0.7, margin: 0 }}>
+        {justCaptured ? (
+          <p style={{ fontFamily: CURSIVE, fontSize: 16, letterSpacing: "0.05em", color: TEXT_SOFT, opacity: 0.85, margin: 0, transition: "opacity 600ms ease" }}>
             Captured — return on your next reset day
           </p>
-        ) : (
+        ) : capturedThisWeek ? null : (
           <button onClick={() => setCapturing(true)} disabled={saving}
             style={{
               display: "inline-flex", alignItems: "center", gap: 10,
@@ -809,28 +819,16 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
       {/* Gallery */}
       {galleryItems.length > 0 && (
         <div style={{ maxWidth: 560, margin: "0 auto" }}>
-          {galleryItems.map((item, idx) => {
-            if (item.type === "entry") {
-              return (
-                <GalleryEntry
-                  key={item.data.id}
-                  entry={decorate(item.data)}
-                  onExpand={() => setExpandedId(item.data.id)}
-                  caption={idx === 0 ? "The week is behind you." : null}
-                />
-              );
-            }
-            // Current week with no photo — the "Capture this week" button above is the prompt
-            const isCurrentWeek = item.weekNum === currentWeek && item.year === isoWeekYear(now);
-            if (isCurrentWeek) return null;
-            // Past week with no photo — minimal muted label only
-            return (
-              <MissedWeekLabel
-                key={`missed-${item.year}-W${item.weekNum}`}
-                weekNum={item.weekNum}
+          {galleryItems
+            .filter(item => item.type === "entry")
+            .map((item, idx) => (
+              <GalleryEntry
+                key={item.data.id}
+                entry={decorate(item.data)}
+                onExpand={() => setExpandedId(item.data.id)}
+                caption={idx === 0 ? "The week is behind you." : null}
               />
-            );
-          })}
+            ))}
         </div>
       )}
 
