@@ -9,7 +9,8 @@ import { WeekendNudgeCard } from "./weekend.jsx";
 import { SeasonalNudgeCard } from "./seasonal.jsx";
 import { getTreatmentPhase, TreatmentRecoveryCard, getCyclePhase } from "./progress.jsx";
 import { getCurrentCycleDay, daysBetweenLocal } from "./utils.jsx";
-import { AskCygneButton, AskCygneOverlay } from "./AskCygne.jsx";
+import { AskCygneButton } from "./AskCygne.jsx";
+import { AskCygneModal } from "./components/AskCygneModal.jsx";
 
 function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSwanPopup, treatments, locationData, user, notifPermission, onRequestNotif, notifDismissed, onDismissNotif, journals, setCheckIns, onLoadDemo }) {
   const { flags } = analyzeShelf(products);
@@ -155,13 +156,8 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         })()}
 
         {/* 1. Swan Song card (intelligence) — always fully visible */}
-        <div className="cygne-swansong-intro" style={{ marginBottom: 14 }}>
+        <div className="cygne-swansong-intro" style={{ marginBottom: 20 }}>
           <SwanSongCard currentSession={currentSession} asPopup={false} user={user} predictions={swanSensePredictions} />
-        </div>
-
-        {/* Ask Cygne entry point — opens the personalized reflection overlay */}
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: 24 }}>
-          <AskCygneButton onClick={() => setAskOpen(true)} />
         </div>
 
         {/* 2. Cycle phase — ambient pill, tap to expand */}
@@ -327,6 +323,11 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           </div>
         )}
 
+        {/* Ask Cygne — opens the personalized bottom-sheet overlay */}
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}>
+          <AskCygneButton onClick={() => setAskOpen(true)} />
+        </div>
+
         {/* 5. Travel Edit + Shop Scan — utility buttons at bottom */}
         <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
           <button onClick={() => setFlightOpen(true)}
@@ -365,7 +366,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         <FlightModeModal products={products} activeMap={activeMap} onClose={() => setFlightOpen(false)} />
       )}
       {askOpen && (
-        <AskCygneOverlay
+        <AskCygneModal
           user={user}
           products={products}
           journals={journals}

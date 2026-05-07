@@ -332,6 +332,19 @@ export default function App() {
   // -- Reflection entries ------------------------------------------------------
   // Persist immediately on save so a disconnect right after capture doesn't
   // lose the week's triptych + insight snapshot.
+  //
+  // Inline data URLs (entry.inline) can be 300–500KB each. Round-tripping
+  // them through auth.user_metadata busts size limits and the entry
+  // disappears on next load. We keep `inline` in local state (and
+  // localStorage) so the gallery renders immediately, but strip it before
+  // syncing to Supabase. Entries with a stored Storage `path` round-trip
+  // cleanly via the signed-URL refresh on load.
+  const stripInlineForCloud = (rs) => rs.map(r => {
+    if (!r) return r;
+    const { inline: _drop, ...rest } = r;
+    return rest;
+  });
+
   const addReflection = async (entry) => {
     if (!profileLoaded.current && authSession) {
       console.warn("[Cygne] reflection save blocked — profile not loaded yet");
@@ -342,18 +355,19 @@ export default function App() {
     setReflections(next);
     if (authSession) {
       try {
-        await supabase.auth.updateUser({ data: { reflections: next } });
-        console.log("[Cygne] reflection saved to Supabase — total:", next.length);
+        await supabase.auth.updateUser({ data: { reflections: stripInlineForCloud(next) } });
+        console.log("[Cygne] reflection saved to Supabase — total:", next.length, "(inline stripped)");
       } catch (e) {
         console.error("[Cygne] reflection save failed:", e);
       }
     }
   };
 
-  // Belt-and-suspenders sync for reflections.
+  // Belt-and-suspenders sync for reflections — same inline-stripping
+  // applies so we don't blow the user_metadata size limit.
   useEffect(() => {
     if (!profileLoaded.current || !authSession) return;
-    supabase.auth.updateUser({ data: { reflections } }).catch(() => {});
+    supabase.auth.updateUser({ data: { reflections: stripInlineForCloud(reflections) } }).catch(() => {});
   }, [reflections]);
 
   // -- Weekly reflection reminder --------------------------------------------

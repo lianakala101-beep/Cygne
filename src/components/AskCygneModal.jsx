@@ -2,12 +2,19 @@ import { useState, useEffect } from "react";
 import { supabase, invokeEdgeFunction } from "../supabase.js";
 
 /**
- * Minimal Ask Cygne overlay. Posts the question + caller-supplied context
- * to the ask-cygne edge function (which adds the system prompt, cache, and
- * 3/day usage limit) and renders the response. Used by FaceHeatMap to
- * deep-link into a zone-specific question.
+ * Bottom-sheet Ask Cygne overlay. Posts the question + caller-supplied
+ * context (either a pre-built string or raw products/journals/checkIns
+ * arrays) to the ask-cygne edge function and renders the response.
  */
-export function AskCygneModal({ initialQuestion = "", context = "", onClose }) {
+export function AskCygneModal({
+  initialQuestion = "",
+  context = "",
+  products = [],
+  journals = [],
+  checkIns = [],
+  user = null,
+  onClose,
+}) {
   const [question, setQuestion] = useState(initialQuestion);
   const [loading, setLoading] = useState(false);
   const [answer, setAnswer] = useState("");
@@ -28,7 +35,16 @@ export function AskCygneModal({ initialQuestion = "", context = "", onClose }) {
         userId: session.user.id,
         question: q,
         sessionId: `${session.user.id}_${Date.now()}`,
+        // Forward whatever context the caller supplied. Pre-built string
+        // takes precedence on the server; raw arrays/skinProfile are used
+        // to build context server-side when no string is passed.
         context,
+        products,
+        journals,
+        checkIns,
+        skinType: user?.skinType,
+        concerns: user?.concerns,
+        skinProfile: user?.skinProfile,
       });
       if (data?.error === "limit_reached") {
         setError(data.message || "You've used your reflections for today. Try again tomorrow.");

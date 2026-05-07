@@ -613,6 +613,12 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
   const [error, setError] = useState(null);
   const [signedUrls, setSignedUrls] = useState({}); // { [entryId]: signedUrl }
 
+  // Fingerprint that changes whenever any entry id appears or its url
+  // pointer flips (e.g. a same-week recapture replaces an earlier entry —
+  // length stays the same but the entry's id and date change).
+  const reflectionsFingerprint = reflections
+    .map(r => `${r.id}:${r.date}:${r.path || ""}:${r.url ? "u" : ""}:${r.inline ? "i" : ""}`)
+    .join("|");
   const sorted = [...reflections].sort((a, b) => new Date(b.date) - new Date(a.date));
 
   // Does this ISO week already have a captured reflection?
@@ -659,7 +665,7 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
 
     return items.reverse();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sorted.length]);
+  }, [reflectionsFingerprint]);
   const capturedThisWeek = reflections.some(r => {
     if (r.weekNumber !== currentWeek) return false;
     const d = new Date(r.date);
@@ -685,7 +691,7 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
       if (!cancelled) setSignedUrls(prev => ({ ...prev, ...next }));
     })();
     return () => { cancelled = true; };
-  }, [reflections.length]);
+  }, [reflectionsFingerprint]);
 
   const decorate = (entry) => ({
     ...entry,
