@@ -763,7 +763,7 @@ export default function App() {
         {tab === "dashboard" && <Dashboard products={products} setTab={setTab} checkIns={checkIns} swanPopupDismissed={swanPopupDismissed} onDismissSwanPopup={dismissSwanPopup} treatments={treatments} locationData={locationData} user={{ ...(user || {}), id: authSession?.user?.id }} notifPermission={notifPermission} onRequestNotif={requestNotifications} notifDismissed={notifDismissed} onDismissNotif={() => setNotifDismissed(true)} journals={journals} setCheckIns={setCheckIns} onLoadDemo={() => setProducts(DEMO_PRODUCTS)} />}
         {tab === "routine"   && <MyRoutine
           products={products}
-          user={user}
+          user={{ ...(user || {}), id: authSession?.user?.id }}
           cycleDay={getCurrentCycleDay(user)}
           isFlightMode={false}
           journals={journals}
@@ -795,7 +795,8 @@ export default function App() {
           }}
           onDismissWaiting={(item) => setWaitingRoom(prev => prev.filter(x => x !== item))}
           checkIns={checkIns}
-          user={user}
+          journals={journals}
+          user={{ ...(user || {}), id: authSession?.user?.id }}
         />}
         {tab === "reflection" && <Reflection
           reflections={reflections}

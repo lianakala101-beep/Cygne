@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Icon, Section, Pill } from "./components.jsx";
 import { detectActives, analyzeShelf, calcSpending, getProductConflicts } from "./engine.js";
+import { AskCygneModal } from "./components/AskCygneModal.jsx";
 import { assessRoutineFit, DEFER_TAG_CONFIG } from "./modals.jsx";
 import { ProductModal } from "./productmodal.jsx";
 
@@ -26,7 +27,7 @@ const GLASS_CARD = {
   flexDirection: "column",
 };
 
-function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, user = {}, conflicts = [] }) {
+function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, user = {}, conflicts = [], onAskCygne }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const menuRef = useRef(null);
@@ -78,6 +79,28 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
                 <button onClick={() => { setMenuOpen(false); onToggleRoutine(product.id); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#1c1c1a", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "left" }}>
                   <Icon name="sparkle" size={12} /><span>{inRoutine ? "Remove from ritual" : "Add to ritual"}</span>
                 </button>
+                {onAskCygne && (
+                  <button
+                    onClick={() => {
+                      setMenuOpen(false);
+                      const productName = product.name || "this product";
+                      const ingredients = (product.ingredients || []).slice(0, 12).join(", ");
+                      const ctxLines = [
+                        `Product: ${productName}${product.brand ? ` by ${product.brand}` : ""}.`,
+                        `Category: ${product.category || "uncategorized"}.`,
+                        ingredients ? `Ingredients: ${ingredients}.` : null,
+                        product.session ? `Session: ${product.session}.` : null,
+                        product.frequency && product.frequency !== "daily" ? `Frequency: ${product.frequency}.` : null,
+                      ].filter(Boolean);
+                      onAskCygne(
+                        `Tell me about ${productName} and how it works with my other products.`,
+                        ctxLines.join(" "),
+                      );
+                    }}
+                    style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#1c1c1a", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "left" }}>
+                    <Icon name="swan" size={12} /><span>Ask Cygne</span>
+                  </button>
+                )}
                 <div style={{ height: 1, background: "rgba(192,192,192,0.25)", margin: "4px 12px" }} />
                 <button onClick={() => { setMenuOpen(false); setConfirmDelete(true); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#8b7355", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "left" }}>
                   <Icon name="trash" size={12} /><span>Remove</span>
@@ -362,9 +385,10 @@ function ClearAllButton({ onClearAll }) {
   );
 }
 
-function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo, onClearAll, onSession, waitingRoom = [], onAddFromWaiting, onDismissWaiting, checkIns = [], user = {} }) {
+function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo, onClearAll, onSession, waitingRoom = [], onAddFromWaiting, onDismissWaiting, checkIns = [], user = {}, journals = [] }) {
   const [view, setView] = useState("shelf");
   const [filter, setFilter] = useState("All");
+  const [askState, setAskState] = useState(null); // { question, context } | null
   const { activeMap } = analyzeShelf(products);
   const spending = calcSpending(products);
   const cats = ["All", ...new Set(products.map(p => p.category))];
@@ -428,7 +452,7 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo
                 </div>
               )}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
-                {filtered.map(p => <GlassProductCard key={p.id} product={p} onEdit={onEdit} onDelete={onDelete} onToggleRoutine={onToggleRoutine} onSession={onSession} user={user} conflicts={getProductConflicts(p, products)} />)}
+                {filtered.map(p => <GlassProductCard key={p.id} product={p} onEdit={onEdit} onDelete={onDelete} onToggleRoutine={onToggleRoutine} onSession={onSession} user={user} conflicts={getProductConflicts(p, products)} onAskCygne={(q, ctx) => setAskState({ question: q, context: ctx })} />)}
                 <button onClick={onAdd} style={{ ...GLASS_CARD, background: "rgba(250,249,244,0.25)", border: "1px dashed rgba(192,192,192,0.4)", cursor: "pointer", aspectRatio: "1 / 1", alignItems: "center", justifyContent: "center", gap: 8 }}>
                   <span style={{ fontSize: 20, color: "#7a7a7a", lineHeight: 1 }}>+</span>
                   <span style={{ fontFamily: "var(--font-display, 'Fungis', sans-serif)", fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: "#7a7a7a" }}>Add Product</span>
@@ -512,6 +536,18 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo
             })}
           </div>
         </div>
+      )}
+
+      {askState && (
+        <AskCygneModal
+          initialQuestion={askState.question}
+          context={askState.context}
+          user={user}
+          products={products}
+          journals={journals}
+          checkIns={checkIns}
+          onClose={() => setAskState(null)}
+        />
       )}
     </div>
   );
