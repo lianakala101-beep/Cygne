@@ -118,7 +118,11 @@ function detectConflicts(products) {
 function analyzeShelf(products) {
   const activeMap = {};
   const flags = [];
-  products.forEach(p => { Object.keys(detectActives(p.ingredients)).forEach(a => { if (!activeMap[a]) activeMap[a] = []; activeMap[a].push(p); }); });
+  // Use the product-aware detector so toning pads (and pad-named or
+  // active-named products with sparse ingredient lists) participate in
+  // activeMap. This is what every downstream consumer — intelligence,
+  // swansense, treatment recovery — already expects.
+  products.forEach(p => { Object.keys(detectActivesFromProduct(p)).forEach(a => { if (!activeMap[a]) activeMap[a] = []; activeMap[a].push(p); }); });
   for (const [active, prods] of Object.entries(activeMap)) {
     if (prods.length > 1 && !["hyaluronic acid", "ceramides"].includes(active)) {
       if (active === "niacinamide" && prods.length <= 2) continue;

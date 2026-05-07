@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Icon, Section } from "./components.jsx";
-import { detectActives, analyzeShelf, detectConflicts, buildRoutine, hasSPFCoverage } from "./engine.js";
+import { detectActives, detectActivesFromProduct, analyzeShelf, detectConflicts, buildRoutine, hasSPFCoverage } from "./engine.js";
 import { getAutoSession } from "./productmodal.jsx";
 import { RAMP_SCHEDULES, RAMP_ACTIVES, IntroduceSlowlyCard, getRampWeek } from "./ramp.jsx";
 import { getCurrentCycleDay, getTreatmentElapsed, daysBetweenLocal } from "./utils.jsx";
@@ -665,10 +665,14 @@ function getActivePauseState(treatments = [], products = []) {
   // ingredients, not a hardcoded shortlist). Falls back to the core
   // treatment-sensitive set when the user has no qualifying products yet so
   // the recovery messaging still makes sense.
+  //
+  // Uses detectActivesFromProduct so a Toning Pad / pad-named product with
+  // no listed acids still surfaces as having BHA (and thus gets paused or
+  // reintroduced through every treatment phase, not just Acute).
   const present = new Set();
   for (const p of products) {
     if (p.inRoutine === false) continue;
-    Object.keys(detectActives(p.ingredients || [])).forEach(a => present.add(a));
+    Object.keys(detectActivesFromProduct(p)).forEach(a => present.add(a));
   }
   if (present.size === 0) {
     ["retinol", "AHA", "BHA", "vitamin C", "benzoyl peroxide"].forEach(a => present.add(a));
