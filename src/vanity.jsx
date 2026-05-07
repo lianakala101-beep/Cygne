@@ -118,10 +118,10 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
             <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#1c1c1a", margin: "5px 0 0", fontWeight: 300, letterSpacing: "0.01em" }}>${(product.price || 0).toFixed(0)}</p>
           )}
           {conflicts.length > 0 && (() => {
-            const hasWarning = conflicts.some(c => c.severity === "warning");
-            const tone = hasWarning
-              ? { color: "#8a3a2a", bg: "rgba(138,58,42,0.08)", border: "rgba(138,58,42,0.28)" }
-              : { color: "#8b7355", bg: "rgba(139,115,85,0.08)", border: "rgba(139,115,85,0.28)" };
+            // Single warm clay tone for every conflict, regardless of severity.
+            // Matches the rest of the app's amber/clay accent language so the
+            // badge reads as a quiet caution, not an emergency.
+            const tone = { color: "#8b7355", bg: "rgba(139,115,85,0.10)", border: "rgba(139,115,85,0.30)" };
             const labelText = conflicts.length === 1
               ? conflicts[0].pair.join(" + ")
               : `${conflicts.length} conflicts`;
