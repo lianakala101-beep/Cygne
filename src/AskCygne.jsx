@@ -84,7 +84,7 @@ export function AskCygneButton({ onClick }) {
 }
 
 // ── Full-page overlay ───────────────────────────────────────────────────────
-export function AskCygneOverlay({ user, onClose }) {
+export function AskCygneOverlay({ user, products = [], journals = [], checkIns = [], onClose }) {
   const [question, setQuestion]   = useState("");
   const [phase, setPhase]         = useState("input"); // input | loading | response | error | limit
   const [response, setResponse]   = useState("");
@@ -108,7 +108,20 @@ export function AskCygneOverlay({ user, onClose }) {
       const userId    = user?.id || "local";
       const sessionId = `${userId}_${Date.now()}`;
       const { data, error } = await supabase.functions.invoke("ask-cygne", {
-        body: { userId, question: question.trim(), sessionId },
+        body: {
+          userId,
+          question: question.trim(),
+          sessionId,
+          // Pass full context so the edge function can build a personalized prompt.
+          // The function reads skinType/concerns/skinProfile/products/journals/checkIns
+          // and constructs the USER CONTEXT block fed to Claude.
+          skinType: user?.skinType,
+          concerns: user?.concerns,
+          skinProfile: user?.skinProfile,
+          products,
+          journals,
+          checkIns,
+        },
       });
       if (error) { setErrorMsg(error.message || "Something went wrong."); setPhase("error"); return; }
       if (data?.error === "limit_reached") { setPhase("limit"); return; }

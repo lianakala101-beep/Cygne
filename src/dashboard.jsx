@@ -9,6 +9,7 @@ import { WeekendNudgeCard } from "./weekend.jsx";
 import { SeasonalNudgeCard } from "./seasonal.jsx";
 import { getTreatmentPhase, TreatmentRecoveryCard, getCyclePhase } from "./progress.jsx";
 import { getCurrentCycleDay, daysBetweenLocal } from "./utils.jsx";
+import { AskCygneButton, AskCygneOverlay } from "./AskCygne.jsx";
 
 function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSwanPopup, treatments, locationData, user, notifPermission, onRequestNotif, notifDismissed, onDismissNotif, journals, setCheckIns, onLoadDemo }) {
   const { flags } = analyzeShelf(products);
@@ -19,6 +20,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
   const [flightOpen, setFlightOpen] = useState(false);
   const [shopScanOpen, setShopScanOpen] = useState(false);
   const [cycleExpanded, setCycleExpanded] = useState(false);
+  const [askOpen, setAskOpen] = useState(false);
   const currentCycleDay = getCurrentCycleDay(user);
   const { activeMap } = analyzeShelf(products);
   const swanSensePredictions = getSwanSensePredictions(products, checkIns, user, locationData, journals);
@@ -153,8 +155,13 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         })()}
 
         {/* 1. Swan Song card (intelligence) — always fully visible */}
-        <div className="cygne-swansong-intro" style={{ marginBottom: 20 }}>
+        <div className="cygne-swansong-intro" style={{ marginBottom: 14 }}>
           <SwanSongCard currentSession={currentSession} asPopup={false} user={user} predictions={swanSensePredictions} />
+        </div>
+
+        {/* Ask Cygne entry point — opens the personalized reflection overlay */}
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 24 }}>
+          <AskCygneButton onClick={() => setAskOpen(true)} />
         </div>
 
         {/* 2. Cycle phase — ambient pill, tap to expand */}
@@ -356,6 +363,15 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
       {shopScanOpen && <ShopScanModal products={products} user={user} onClose={() => setShopScanOpen(false)} />}
       {flightOpen && (
         <FlightModeModal products={products} activeMap={activeMap} onClose={() => setFlightOpen(false)} />
+      )}
+      {askOpen && (
+        <AskCygneOverlay
+          user={user}
+          products={products}
+          journals={journals}
+          checkIns={checkIns}
+          onClose={() => setAskOpen(false)}
+        />
       )}
     </div>
   );
