@@ -15,7 +15,7 @@ import { SwanWelcomeScreen, useLocalStorage, DEMO_PRODUCTS, DEMO_VERSION, getCur
 import { WeekendNudgeCard } from "./weekend.jsx";
 import { SeasonalNudgeCard } from "./seasonal.jsx";
 import { AuthScreen } from "./auth.jsx";
-import { Reflection, isoWeekNumber } from "./reflection.jsx";
+import { Reflection, isoWeekNumber, isoWeekYear } from "./reflection.jsx";
 import { supabase } from "./supabase.js";
 
 export default function App() {
@@ -193,7 +193,25 @@ export default function App() {
         setRampLog(meta.rampLog);
       }
       if (meta.reflections && Array.isArray(meta.reflections)) {
-        setReflections(meta.reflections);
+        // Merge cloud + local by id. Cloud is the canonical record but
+        // local-only entries (cloud write failed mid-flight) must survive
+        // reload — and local copies preserve `inline` data URLs that may
+        // have been stripped from the cloud payload, so prefer them when
+        // the cloud version is missing one.
+        setReflections(prev => {
+          const byId = new Map();
+          for (const r of meta.reflections) if (r?.id) byId.set(r.id, r);
+          for (const r of prev) {
+            if (!r?.id) continue;
+            const cloud = byId.get(r.id);
+            if (!cloud) {
+              byId.set(r.id, r);
+            } else if (!cloud.url && !cloud.path && r.inline) {
+              byId.set(r.id, { ...cloud, inline: r.inline });
+            }
+          }
+          return Array.from(byId.values());
+        });
       }
       if (meta.waitingRoom && Array.isArray(meta.waitingRoom)) {
         setWaitingRoom(meta.waitingRoom);
@@ -333,14 +351,15 @@ export default function App() {
   // Persist immediately on save so a disconnect right after capture doesn't
   // lose the week's triptych + insight snapshot.
   //
-  // Inline data URLs (entry.inline) can be 300–500KB each. Round-tripping
-  // them through auth.user_metadata busts size limits and the entry
-  // disappears on next load. We keep `inline` in local state (and
-  // localStorage) so the gallery renders immediately, but strip it before
-  // syncing to Supabase. Entries with a stored Storage `path` round-trip
-  // cleanly via the signed-URL refresh on load.
+  // Inline data URLs (entry.inline) can be 300–500KB each. When Supabase
+  // Storage upload succeeds, the entry has a `path` and we drop `inline` —
+  // the signed URL refreshes on load and we keep user_metadata small.
+  // When the storage upload FAILS (no bucket, RLS, network), inline is the
+  // only copy of the photo we have, so we must let it through to
+  // user_metadata or the entry won't round-trip on reload.
   const stripInlineForCloud = (rs) => rs.map(r => {
     if (!r) return r;
+    if (!r.path) return r;          // no storage — keep inline as the carrier
     const { inline: _drop, ...rest } = r;
     return rest;
   });
@@ -350,8 +369,14 @@ export default function App() {
       console.warn("[Cygne] reflection save blocked — profile not loaded yet");
       return;
     }
-    // Replace any existing entry for the same ISO week so re-captures overwrite.
-    const next = [...reflections.filter(r => r.weekNumber !== entry.weekNumber || new Date(r.date).getFullYear() !== new Date(entry.date).getFullYear()), entry];
+    // Replace any existing entry for the same ISO (week, week-year) so a
+    // re-capture overwrites cleanly. ISO week-year is used here (not the
+    // calendar year) so a year boundary doesn't misclassify the match.
+    const entryISOYear = isoWeekYear(new Date(entry.date));
+    const next = [
+      ...reflections.filter(r => r.weekNumber !== entry.weekNumber || isoWeekYear(new Date(r.date)) !== entryISOYear),
+      entry,
+    ];
     setReflections(next);
     if (authSession) {
       try {

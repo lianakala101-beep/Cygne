@@ -40,7 +40,7 @@ export function isoWeekNumber(date = new Date()) {
 
 // ISO week year — the year that "owns" this ISO week (may differ from calendar year
 // in the first/last days of January/December).
-function isoWeekYear(d) {
+export function isoWeekYear(d) {
   const dt = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
   const day = dt.getUTCDay() || 7;
   dt.setUTCDate(dt.getUTCDate() + 4 - day);
@@ -631,9 +631,11 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
   const sorted = [...reflections].sort((a, b) => new Date(b.date) - new Date(a.date));
 
   // Does this ISO week already have a captured reflection?
+  // Use ISO week-year (not calendar year) for the year comparison so the
+  // ISO week 53 boundary doesn't false-match across calendar years.
   const now = new Date();
   const currentWeek = isoWeekNumber(now);
-  const currentYear = now.getFullYear();
+  const currentISOYear = isoWeekYear(now);
 
   // Build gallery items: real entries + placeholders for missed weeks.
   // Only computed when there is at least one reflection.
@@ -675,10 +677,12 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
     return items.reverse();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reflectionsFingerprint]);
+  // Lock is scoped strictly to (ISO week, ISO week-year). Past-week
+  // entries — even matching weekNumber across years — never block a
+  // current-week capture.
   const capturedThisWeek = reflections.some(r => {
     if (r.weekNumber !== currentWeek) return false;
-    const d = new Date(r.date);
-    return d.getFullYear() === currentYear;
+    return isoWeekYear(new Date(r.date)) === currentISOYear;
   });
 
   // Refresh signed URLs on mount / when the reflection set changes. Signed
