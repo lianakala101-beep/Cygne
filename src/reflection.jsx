@@ -477,13 +477,13 @@ function ExpandedEntry({ entry, onClose }) {
         <Icon name="x" size={18} />
       </button>
 
-      <p style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: "0 0 6px" }}>
+      <p style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: "var(--color-pebble, #7a7a7a)", margin: "0 0 6px" }}>
         Week {entry.weekNumber}
       </p>
-      <h2 style={{ fontFamily: CURSIVE, fontSize: 28, fontWeight: 400, letterSpacing: "0.02em", color: TEXT, margin: "0 0 6px", textAlign: "center" }}>
+      <h2 style={{ fontFamily: "var(--script)", fontSize: 30, fontWeight: 400, letterSpacing: "0.01em", color: "var(--color-ink, #1c1c1a)", margin: "0 0 6px", textAlign: "center", lineHeight: 1.15 }}>
         {getMoonPhase(new Date(entry.date))}
       </h2>
-      <p style={{ fontFamily: SANS, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: "0 0 26px" }}>
+      <p style={{ fontFamily: SANS, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-pebble, #7a7a7a)", margin: "0 0 26px" }}>
         {formatDateLong(entry.date)}
       </p>
 
@@ -559,13 +559,13 @@ function GalleryEntry({ entry, onExpand, caption }) {
         transition: "opacity 500ms ease-out, transform 500ms ease-out",
         willChange: "opacity, transform",
       }}>
-      <p style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: "0 0 4px" }}>
+      <p style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: "var(--color-pebble, #7a7a7a)", margin: "0 0 4px" }}>
         Week {entry.weekNumber}
       </p>
-      <h3 style={{ fontFamily: CURSIVE, fontSize: 24, fontWeight: 400, letterSpacing: "0.02em", color: TEXT, margin: "0 0 4px" }}>
+      <h3 style={{ fontFamily: "var(--script)", fontSize: 28, fontWeight: 400, letterSpacing: "0.01em", color: "var(--color-ink, #1c1c1a)", margin: "0 0 4px", lineHeight: 1.15 }}>
         {getMoonPhase(new Date(entry.date))}
       </h3>
-      <p style={{ fontFamily: SANS, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: TEXT_SOFT, margin: "0 0 18px", opacity: 0.7 }}>
+      <p style={{ fontFamily: SANS, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--color-pebble, #7a7a7a)", margin: "0 0 18px" }}>
         {formatDateLong(entry.date)}
       </p>
       <div style={{
@@ -577,7 +577,7 @@ function GalleryEntry({ entry, onExpand, caption }) {
         <TriptychImage src={src} alt={`Reflection week ${entry.weekNumber}`} />
       </div>
       {caption && (
-        <p style={{ fontFamily: CURSIVE, fontSize: 22, color: TEXT_SOFT, textAlign: "center", margin: "12px 0 0", letterSpacing: "0.02em", opacity: 0.85 }}>
+        <p style={{ fontFamily: "var(--script)", fontSize: 16, fontWeight: 400, color: "var(--color-stone, #5a5a5a)", textAlign: "center", margin: "12px 0 0", letterSpacing: "0.01em", lineHeight: 1.3 }}>
           {caption}
         </p>
       )}
@@ -756,10 +756,10 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
     }}>
       {/* Header */}
       <div style={{ maxWidth: 560, margin: "0 auto 18px", textAlign: "center" }}>
-        <h1 style={{ fontFamily: "var(--font-display)", fontSize: 38, fontWeight: 700, color: "var(--color-inky-moss)", margin: "0 0 8px", letterSpacing: "0.15em", textTransform: "uppercase", lineHeight: 1.15 }}>
+        <h1 style={{ fontFamily: "var(--font-display)", fontSize: 48, fontWeight: 700, color: "var(--color-inky-moss)", margin: "0 0 6px", letterSpacing: "0.15em", textTransform: "uppercase", lineHeight: 1.1 }}>
           Reflection
         </h1>
-        <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontStyle: "italic", fontSize: 12, color: TEXT_SOFT, margin: "0 0 12px", letterSpacing: "0.04em", opacity: 0.75 }}>
+        <p style={{ fontFamily: "var(--script)", fontWeight: 400, fontSize: 22, color: "var(--color-stone, #5a5a5a)", margin: "0 0 14px", letterSpacing: "0.01em", lineHeight: 1.2 }}>
           A living gallery.
         </p>
         {reflections.length === 0 && (
