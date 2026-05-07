@@ -52,21 +52,28 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
   return (
     <div>
       {/* Hero */}
-      <div style={{ marginBottom: products.length === 0 ? 28 : 36 }}>
-        <p style={{ fontFamily: "var(--font-signature)", fontSize: 44, fontWeight: 400, letterSpacing: "0.01em", color: "var(--parchment)", margin: "0 0 12px", lineHeight: 1.05 }}>
-          {(() => {
-            const h = new Date().getHours();
-            if (h >= 5  && h < 12) return user?.name ? `good morning, ${user.name.split(" ")[0]}` : "good morning";
-            if (h >= 12 && h < 17) return user?.name ? `good afternoon, ${user.name.split(" ")[0]}` : "good afternoon";
-            return user?.name ? `good evening, ${user.name.split(" ")[0]}` : "good evening";
-          })()}
-        </p>
-        {products.length === 0 && (
-          <h1 style={{ fontFamily: "var(--script)", fontSize: 52, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: "0 0 4px", lineHeight: 1.0 }}>
-            Welcome.
-          </h1>
-        )}
-      </div>
+      {(() => {
+        const h = new Date().getHours();
+        const slot = h >= 5 && h < 12 ? "morning" : h >= 12 && h < 17 ? "afternoon" : "evening";
+        const titleText = slot === "morning" ? "Good Morning." : slot === "afternoon" ? "Good Afternoon." : "Good Evening.";
+        const firstName = user?.name?.split(" ")[0] || "";
+        const subline = firstName ? `good ${slot}, ${firstName}` : `good ${slot}`;
+        return (
+          <div style={{ marginBottom: products.length === 0 ? 20 : 16 }}>
+            <h1 style={{ fontFamily: "var(--font-display)", fontSize: 44, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: "0 0 4px", lineHeight: 1.05 }}>
+              {titleText}
+            </h1>
+            <p style={{ fontFamily: "var(--font-signature)", fontSize: 30, fontWeight: 400, letterSpacing: "0.01em", color: "var(--parchment)", margin: 0, lineHeight: 1.15 }}>
+              {subline}
+            </p>
+            {products.length === 0 && (
+              <p style={{ fontFamily: "var(--font-body)", fontStyle: "italic", fontSize: 14, color: "var(--clay)", margin: "10px 0 0", lineHeight: 1.5 }}>
+                Welcome.
+              </p>
+            )}
+          </div>
+        );
+      })()}
 
       {/* -- Empty state ------------------------------------------------- */}
       {products.length === 0 && (() => {
@@ -157,7 +164,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         })()}
 
         {/* 1. Swan Song card (intelligence) — always fully visible */}
-        <div className="cygne-swansong-intro" style={{ marginBottom: 20 }}>
+        <div className="cygne-swansong-intro" style={{ marginBottom: 14 }}>
           <SwanSongCard currentSession={currentSession} asPopup={false} user={user} predictions={swanSensePredictions} />
         </div>
 
@@ -198,23 +205,29 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           );
         })()}
 
-        {/* 3. Check-in signal + reminders */}
+        {/* 3. Check-in signal — pill styled to match the cycle phase pill */}
         {(() => {
           const last = checkIns.length ? checkIns.reduce((a, b) => new Date(a.date) > new Date(b.date) ? a : b) : null;
           const daysSince = last ? daysBetweenLocal(last.date) : null;
           const due = daysSince === null || daysSince >= 7;
           const msg = daysSince === null
-            ? "No check-ins yet - log your first in Progress."
-            : daysSince === 0 ? "Check-in logged today."
-            : daysSince < 7 ? `Last check-in ${daysSince}d ago.`
-            : "Check-in overdue.";
-          const color = due ? (daysSince === null ? "var(--clay)" : "#8b7355") : "#6e8a72";
+            ? "No check-ins yet"
+            : daysSince === 0 ? "Check-in logged today"
+            : daysSince < 7 ? `Last check-in ${daysSince}d ago`
+            : "Check-in overdue";
+          // Tone tracks the dot color so the pill, dot, and text all live in
+          // the same hue family — same visual structure as the cycle pill.
+          const tone = !due
+            ? { dot: "rgba(122,144,112,0.85)", bg: "rgba(122,144,112,0.10)", border: "rgba(122,144,112,0.30)" }
+            : daysSince === null
+              ? { dot: "rgba(139,115,85,0.7)",  bg: "rgba(139,115,85,0.06)", border: "rgba(139,115,85,0.22)" }
+              : { dot: "rgba(139,115,85,0.85)", bg: "rgba(139,115,85,0.10)", border: "rgba(139,115,85,0.30)" };
           return (
             <button onClick={() => setTab("progress")}
-              style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20, background: "none", border: "none", padding: "4px 0", cursor: "pointer", fontFamily: "inherit" }}>
-              <div style={{ width: 5, height: 5, borderRadius: "50%", background: color, flexShrink: 0 }} />
-              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", letterSpacing: "0.03em", textDecoration: "underline", textDecorationColor: "rgba(139,115,85,0.3)", textUnderlineOffset: 3 }}>{msg}</span>
-              <span style={{ color: "var(--clay)", opacity: 0.6, display: "inline-flex" }}><Icon name="chevron" size={10} /></span>
+              style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "7px 13px", background: tone.bg, border: `1px solid ${tone.border}`, borderRadius: 999, marginBottom: 20, cursor: "pointer", fontFamily: "inherit" }}>
+              <div style={{ width: 5, height: 5, borderRadius: "50%", background: tone.dot, flexShrink: 0 }} />
+              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 400, color: "var(--parchment)", letterSpacing: "0.02em" }}>{msg}</span>
+              <span style={{ color: "var(--clay)", opacity: 0.6, marginLeft: 2, display: "inline-flex" }}><Icon name="chevron" size={10} /></span>
             </button>
           );
         })()}
