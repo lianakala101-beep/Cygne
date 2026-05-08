@@ -763,9 +763,6 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
         <h1 style={{ fontFamily: "var(--font-display)", fontSize: 42, fontWeight: 700, color: "var(--color-inky-moss)", margin: "0 0 6px", letterSpacing: "0.15em", textTransform: "uppercase", lineHeight: 1.1 }}>
           Reflection
         </h1>
-        <p style={{ fontFamily: "var(--font-body)", fontStyle: "italic", fontWeight: 400, fontSize: 14, color: "var(--color-pebble, #7a7a7a)", margin: "0 0 14px", letterSpacing: "0.02em", lineHeight: 1.3 }}>
-          A living gallery.
-        </p>
         {reflections.length === 0 && (
           <p style={{ fontFamily: SANS, fontSize: 12, color: TEXT_SOFT, margin: 0, lineHeight: 1.75, maxWidth: 360, marginLeft: "auto", marginRight: "auto" }}>
             One triptych a week. A quiet record of how your skin is moving through the seasons.
