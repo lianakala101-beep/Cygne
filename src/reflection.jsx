@@ -796,9 +796,7 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
             ? "Saving..."
             : capturedThisWeek
               ? "Retake This Week"
-              : reflections.length === 0
-                ? "Capture your first reflection"
-                : "Capture this week"}
+              : "Capture This Week"}
         </button>
         {justCaptured && (
           <p style={{ fontFamily: "var(--font-body)", fontStyle: "italic", fontSize: 13, color: "var(--color-stone, #5a5a5a)", margin: "12px 0 0", letterSpacing: "0.02em", transition: "opacity 600ms ease" }}>
