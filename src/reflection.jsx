@@ -577,7 +577,7 @@ function GalleryEntry({ entry, onExpand, caption }) {
         <TriptychImage src={src} alt={`Reflection week ${entry.weekNumber}`} />
       </div>
       {caption && (
-        <p style={{ fontFamily: "var(--script)", fontSize: 16, fontWeight: 400, color: "var(--color-stone, #5a5a5a)", textAlign: "center", margin: "12px 0 0", letterSpacing: "0.01em", lineHeight: 1.3 }}>
+        <p style={{ fontFamily: "var(--font-body)", fontStyle: "italic", fontSize: 14, fontWeight: 400, color: "var(--color-stone, #5a5a5a)", textAlign: "center", margin: "12px 0 0", letterSpacing: "0.02em", lineHeight: 1.4 }}>
           {caption}
         </p>
       )}
@@ -760,10 +760,10 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
     }}>
       {/* Header */}
       <div style={{ maxWidth: 560, margin: "0 auto 18px", textAlign: "center" }}>
-        <h1 style={{ fontFamily: "var(--font-display)", fontSize: 48, fontWeight: 700, color: "var(--color-inky-moss)", margin: "0 0 6px", letterSpacing: "0.15em", textTransform: "uppercase", lineHeight: 1.1 }}>
+        <h1 style={{ fontFamily: "var(--font-display)", fontSize: 42, fontWeight: 700, color: "var(--color-inky-moss)", margin: "0 0 6px", letterSpacing: "0.15em", textTransform: "uppercase", lineHeight: 1.1 }}>
           Reflection
         </h1>
-        <p style={{ fontFamily: "var(--script)", fontWeight: 400, fontSize: 22, color: "var(--color-stone, #5a5a5a)", margin: "0 0 14px", letterSpacing: "0.01em", lineHeight: 1.2 }}>
+        <p style={{ fontFamily: "var(--font-body)", fontStyle: "italic", fontWeight: 400, fontSize: 14, color: "var(--color-pebble, #7a7a7a)", margin: "0 0 14px", letterSpacing: "0.02em", lineHeight: 1.3 }}>
           A living gallery.
         </p>
         {reflections.length === 0 && (
@@ -780,28 +780,33 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
       )}
 
       <div style={{ textAlign: "center", marginBottom: 24 }}>
-        {justCaptured ? (
-          <p style={{ fontFamily: CURSIVE, fontSize: 16, letterSpacing: "0.05em", color: TEXT_SOFT, opacity: 0.85, margin: 0, transition: "opacity 600ms ease" }}>
+        <button onClick={() => setCapturing(true)} disabled={saving}
+          style={{
+            display: "inline-flex", alignItems: "center", gap: 10,
+            padding: "14px 40px", borderRadius: 0,
+            background: "transparent", color: "var(--color-inky-moss)",
+            border: "1.5px solid var(--color-inky-moss)",
+            cursor: saving ? "default" : "pointer",
+            fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400,
+            letterSpacing: "0.2em", textTransform: "uppercase",
+            transition: "all 0.3s ease",
+            opacity: saving ? 0.6 : 1,
+          }}
+          onMouseEnter={e => { if (!saving) { e.currentTarget.style.background = "var(--color-inky-moss)"; e.currentTarget.style.color = "var(--color-ivory)"; } }}
+          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--color-inky-moss)"; }}>
+          <Icon name="camera" size={14} />
+          {saving
+            ? "Saving..."
+            : capturedThisWeek
+              ? "Retake This Week"
+              : reflections.length === 0
+                ? "Capture your first reflection"
+                : "Capture this week"}
+        </button>
+        {justCaptured && (
+          <p style={{ fontFamily: "var(--font-body)", fontStyle: "italic", fontSize: 13, color: "var(--color-stone, #5a5a5a)", margin: "12px 0 0", letterSpacing: "0.02em", transition: "opacity 600ms ease" }}>
             Captured — return on your next reset day
           </p>
-        ) : capturedThisWeek ? null : (
-          <button onClick={() => setCapturing(true)} disabled={saving}
-            style={{
-              display: "inline-flex", alignItems: "center", gap: 10,
-              padding: "14px 40px", borderRadius: 0,
-              background: "transparent", color: "var(--color-inky-moss)",
-              border: "1.5px solid var(--color-inky-moss)",
-              cursor: saving ? "default" : "pointer",
-              fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400,
-              letterSpacing: "0.2em", textTransform: "uppercase",
-              transition: "all 0.3s ease",
-              opacity: saving ? 0.6 : 1,
-            }}
-            onMouseEnter={e => { if (!saving) { e.currentTarget.style.background = "var(--color-inky-moss)"; e.currentTarget.style.color = "var(--color-ivory)"; } }}
-            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--color-inky-moss)"; }}>
-            <Icon name="camera" size={14} />
-            {saving ? "Saving..." : reflections.length === 0 ? "Capture your first reflection" : "Capture this week"}
-          </button>
         )}
       </div>
 
