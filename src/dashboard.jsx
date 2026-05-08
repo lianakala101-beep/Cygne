@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Icon, Section, FlagCard, SwanIcon } from "./components.jsx";
 import { analyzeShelf, detectConflicts, buildRoutine, calcSpending, getCurrentSession } from "./engine.js";
 import { getSwanSensePredictions } from "./swansense.jsx";
@@ -11,6 +11,9 @@ import { getTreatmentPhase, TreatmentRecoveryCard, getCyclePhase } from "./progr
 import { getCurrentCycleDay, daysBetweenLocal } from "./utils.jsx";
 import { AskCygneButton } from "./AskCygne.jsx";
 import { AskCygneModal } from "./components/AskCygneModal.jsx";
+import { MonthlyRecap } from "./components/MonthlyRecap.jsx";
+
+const RECAP_MONTH_NAMES = ["january","february","march","april","may","june","july","august","september","october","november","december"];
 
 function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSwanPopup, treatments, locationData, user, notifPermission, onRequestNotif, notifDismissed, onDismissNotif, journals, setCheckIns, onLoadDemo }) {
   const { flags } = analyzeShelf(products);
@@ -23,6 +26,26 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
   const [cycleExpanded, setCycleExpanded] = useState(false);
   const [askState, setAskState] = useState(null); // { question, context } | null
   const askCygne = (question, context) => setAskState({ question: question || "", context: context || "" });
+
+  // Month-in-Review state.
+  // recapOffset 0 = current month, -1 = previous month (used by the auto-show on the 1st).
+  const [recapOpen, setRecapOpen] = useState(false);
+  const [recapOffset, setRecapOffset] = useState(0);
+  const _now = new Date();
+  const recapMonthLabel = RECAP_MONTH_NAMES[_now.getMonth()];
+  // Auto-show on the 1st of the month — but only once per (year, month). The
+  // recap on the 1st reviews the month that just ended, so we offset to -1.
+  useEffect(() => {
+    if (_now.getDate() !== 1) return;
+    const prev = new Date(_now.getFullYear(), _now.getMonth() - 1, 1);
+    const key = `recap_shown_${prev.getFullYear()}_${String(prev.getMonth() + 1).padStart(2, "0")}`;
+    try {
+      if (localStorage.getItem(key)) return;
+      localStorage.setItem(key, "1");
+    } catch { /* ignore quota */ }
+    setRecapOffset(-1);
+    setRecapOpen(true);
+  }, []);
   const currentCycleDay = getCurrentCycleDay(user);
   const { activeMap } = analyzeShelf(products);
   const swanSensePredictions = getSwanSensePredictions(products, checkIns, user, locationData, journals);
@@ -164,8 +187,22 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         })()}
 
         {/* 1. Swan Song card (intelligence) — always fully visible */}
-        <div className="cygne-swansong-intro" style={{ marginBottom: 14 }}>
+        <div className="cygne-swansong-intro" style={{ marginBottom: 8 }}>
           <SwanSongCard currentSession={currentSession} asPopup={false} user={user} predictions={swanSensePredictions} />
+        </div>
+        <div style={{ textAlign: "right", marginBottom: 18 }}>
+          <button
+            onClick={() => { setRecapOffset(0); setRecapOpen(true); }}
+            style={{
+              background: "none", border: "none", padding: 0, cursor: "pointer",
+              fontFamily: "var(--font-body)",
+              fontSize: 10, letterSpacing: "0.04em",
+              color: "var(--color-pebble, #7a7a7a)",
+              fontWeight: 400,
+            }}
+          >
+            {recapMonthLabel} in review →
+          </button>
         </div>
 
         {/* 2. Cycle phase — ambient pill, tap to expand */}
@@ -388,6 +425,17 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           journals={journals}
           checkIns={checkIns}
           onClose={() => setAskState(null)}
+        />
+      )}
+      {recapOpen && (
+        <MonthlyRecap
+          offset={recapOffset}
+          journals={journals}
+          checkIns={checkIns}
+          treatments={treatments}
+          products={products}
+          user={user}
+          onClose={() => setRecapOpen(false)}
         />
       )}
     </div>
