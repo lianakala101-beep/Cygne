@@ -9,7 +9,13 @@ function ShopScanModal({ products, user = {}, onClose }) {
   const [imgPreview, setImgPreview] = useState(null);
   const [result, setResult] = useState(null);
   const [scanError, setScanError] = useState(null);
-  const fileRef = useRef();
+  // Two separate inputs so we can offer Camera vs. Photo Library explicitly.
+  // iOS Safari treats `capture` as a request to open the camera directly; a
+  // bare input without `capture` opens the native sheet (Camera / Photo
+  // Library / Browse). Splitting them gives the user a deterministic path
+  // to each on every platform.
+  const cameraRef = useRef();
+  const libraryRef = useRef();
   const { activeMap } = analyzeShelf(products);
 
   const analyze = async (file) => {
@@ -117,15 +123,29 @@ function ShopScanModal({ products, user = {}, onClose }) {
               {scanError && (
                 <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#8b7355", margin: "0 0 12px", padding: "8px 12px", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.2)", borderRadius: 8 }}>{scanError}</p>
               )}
-              <input ref={fileRef} type="file" accept="image/*" capture="environment" style={{ display: "none" }} onChange={handleFile} />
-              <button onClick={() => fileRef.current?.click()}
-                style={{ width: "100%", padding: "36px 20px", border: "1.5px dashed var(--border)", borderRadius: 16, background: "var(--surface)", cursor: "pointer", transition: "border-color 0.2s, background 0.2s" }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(45,61,43,0.5)"; e.currentTarget.style.background = "rgba(45,61,43,0.06)"; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.background = "var(--surface)"; }}>
-                <div style={{ color: "var(--clay)", marginBottom: 10, display: "flex", justifyContent: "center" }}><Icon name="camera" size={28} /></div>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--parchment)", margin: "0 0 4px", fontWeight: 400 }}>Scan product</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", margin: 0 }}>Tap to open camera or choose a photo</p>
-              </button>
+              {/* Camera input — capture="environment" tells iOS / Android to open the rear camera */}
+              <input ref={cameraRef} type="file" accept="image/*" capture="environment" style={{ display: "none" }} onChange={handleFile} />
+              {/* Library input — no capture attribute so it opens the OS photo picker */}
+              <input ref={libraryRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleFile} />
+
+              <div style={{ width: "100%", padding: "26px 20px 20px", border: "1.5px dashed var(--border)", borderRadius: 16, background: "var(--surface)", textAlign: "center" }}>
+                <div style={{ color: "var(--clay)", marginBottom: 8, display: "flex", justifyContent: "center" }}><Icon name="camera" size={28} /></div>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--parchment)", margin: "0 0 14px", fontWeight: 400 }}>Scan product</p>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button onClick={() => cameraRef.current?.click()}
+                    style={{ flex: 1, padding: "11px 0", background: "transparent", border: "1px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 10, cursor: "pointer", fontFamily: "var(--font-display)", fontSize: 10, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", transition: "background 0.2s, color 0.2s" }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "var(--color-inky-moss, #2d3d2b)"; e.currentTarget.style.color = "var(--color-ivory, #faf9f4)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--color-inky-moss, #2d3d2b)"; }}>
+                    Take Photo
+                  </button>
+                  <button onClick={() => libraryRef.current?.click()}
+                    style={{ flex: 1, padding: "11px 0", background: "transparent", border: "1px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 10, cursor: "pointer", fontFamily: "var(--font-display)", fontSize: 10, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", transition: "background 0.2s, color 0.2s" }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "var(--color-inky-moss, #2d3d2b)"; e.currentTarget.style.color = "var(--color-ivory, #faf9f4)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--color-inky-moss, #2d3d2b)"; }}>
+                    Choose Photo
+                  </button>
+                </div>
+              </div>
               {/* Skin context preview */}
               {(user.skinType || user.concerns?.length > 0) && (
                 <div style={{ marginTop: 16, padding: "12px 14px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10 }}>
