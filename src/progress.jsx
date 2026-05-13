@@ -5,7 +5,6 @@ import { getAutoSession } from "./productmodal.jsx";
 import { RAMP_SCHEDULES, RAMP_ACTIVES, IntroduceSlowlyCard, getRampWeek } from "./ramp.jsx";
 import { getCurrentCycleDay, getTreatmentElapsed, daysBetweenLocal } from "./utils.jsx";
 import { FaceHeatMap } from "./components/FaceHeatMap.jsx";
-import { MonthlyRecap } from "./components/MonthlyRecap.jsx";
 import { AskCygneModal } from "./components/AskCygneModal.jsx";
 
 
@@ -1573,17 +1572,6 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
       {/* -- Header ----------------------------------------------------------- */}
       <div style={{ marginBottom: 20, paddingTop: 44 }}>
         <h1 style={{ fontFamily: "var(--font-display)", fontSize: 38, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-inky-moss)", margin: 0, lineHeight: 1.15 }}>Your Progress</h1>
-      </div>
-
-      {/* -- Monthly recap --------------------------------------------------- */}
-      {sectionLabel("calendar", "Monthly Recap")}
-      <div style={{ marginBottom: 28 }}>
-        <MonthlyRecap
-          journals={journals}
-          checkIns={checkIns}
-          treatments={treatments}
-          reflections={reflections}
-        />
       </div>
 
       {/* -- Inflammation Heat Map ------------------------------------------ */}
