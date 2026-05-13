@@ -480,7 +480,7 @@ function ExpandedEntry({ entry, onClose }) {
       <p style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: "var(--color-pebble, #7a7a7a)", margin: "0 0 6px" }}>
         Week {entry.weekNumber}
       </p>
-      <h2 style={{ fontFamily: "var(--script)", fontSize: 30, fontWeight: 400, letterSpacing: "0.01em", color: "var(--color-ink, #1c1c1a)", margin: "0 0 6px", textAlign: "center", lineHeight: 1.15 }}>
+      <h2 style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-ink, #1c1c1a)", margin: "0 0 6px", textAlign: "center", lineHeight: 1.2 }}>
         {getMoonPhase(new Date(entry.date))}
       </h2>
       <p style={{ fontFamily: SANS, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-pebble, #7a7a7a)", margin: "0 0 26px" }}>
@@ -562,7 +562,7 @@ function GalleryEntry({ entry, onExpand, caption }) {
       <p style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: "var(--color-pebble, #7a7a7a)", margin: "0 0 4px" }}>
         Week {entry.weekNumber}
       </p>
-      <h3 style={{ fontFamily: "var(--script)", fontSize: 28, fontWeight: 400, letterSpacing: "0.01em", color: "var(--color-ink, #1c1c1a)", margin: "0 0 4px", lineHeight: 1.15 }}>
+      <h3 style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-ink, #1c1c1a)", margin: "0 0 4px", lineHeight: 1.2 }}>
         {getMoonPhase(new Date(entry.date))}
       </h3>
       <p style={{ fontFamily: SANS, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--color-pebble, #7a7a7a)", margin: "0 0 18px" }}>

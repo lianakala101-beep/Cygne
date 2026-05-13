@@ -659,17 +659,8 @@ export default function App() {
           font-style: normal;
           font-display: swap;
         }
-        @font-face {
-          font-family: 'Hellasta Signature';
-          src: url('/fonts/hellastasignature.ttf') format('truetype');
-          font-weight: 400;
-          font-style: normal;
-          font-display: swap;
-        }
         :root {
           --sage:      #6e8a72;
-          --script:    'Hellasta Signature', cursive;
-          --cursive:   'Hellasta Signature', cursive;
           --sans:      'Space Grotesk', sans-serif;
           /* Cygne design system tokens */
           --color-ivory:        #faf9f4;
@@ -680,7 +671,6 @@ export default function App() {
           --color-pebble:       #7a7a7a;
           --font-display:  'Fungis Heavy', 'Space Grotesk', sans-serif;
           --font-body:     'Fungis Normal', 'Space Grotesk', sans-serif;
-          --font-signature:'Hellasta Signature', cursive;
           /* Surfaces (single light theme) */
           --deep:      #faf9f4;
           --ink:       #f7f4f0;
@@ -768,8 +758,10 @@ export default function App() {
                 display: "flex", alignItems: "center", justifyContent: "center",
               }}>
                 <span style={{
-                  fontFamily: "var(--script)",
-                  fontSize: 22,
+                  fontFamily: "var(--font-display)",
+                  fontWeight: 700,
+                  fontSize: 14,
+                  letterSpacing: "0.02em",
                   color: "var(--sage)",
                   lineHeight: 1,
                   userSelect: "none",

@@ -125,20 +125,20 @@ const LOGO_SRC = (
   + "RQAUZxRRQA95ncgsQSM9h35/rSm5kZgSwJCheQOgAAH5AVHRQA5pWcAMxYAADPYU2iigAooooAKKKKACiiigAooooAKKKKACiiigD//2Q=="
 );
 
+// The Cygne wordmark is always the brand logo image — never a text render.
 function Wordmark({ size = 28 }) {
   return (
-    <span style={{
-      fontFamily: "var(--font-signature, 'Hellasta Signature', cursive)",
-      fontSize: size * 0.95,
-      fontWeight: 400,
-      letterSpacing: "0.04em",
-      lineHeight: 1,
-      display: "block",
-      background: "linear-gradient(135deg, #505050 0%, #B8B8B8 22%, #EBEBEB 38%, #C4C4C4 55%, #909090 70%, #D8D8D8 85%, #585858 100%)",
-      WebkitBackgroundClip: "text",
-      WebkitTextFillColor: "transparent",
-      backgroundClip: "text",
-    }}>Cygne</span>
+    <img
+      src="/cygne-logo.png"
+      alt="Cygne"
+      style={{
+        height: size,
+        width: "auto",
+        display: "block",
+        userSelect: "none",
+        pointerEvents: "none",
+      }}
+    />
   );
 }
 
