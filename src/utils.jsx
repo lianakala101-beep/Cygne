@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Icon, LOGO_SRC, SwanIcon } from "./components.jsx";
+import { Icon, SwanIcon } from "./components.jsx";
 
 /** Compress an image file to JPEG, max 1080px on longest side, keeps output well under 1MB */
 export async function compressImage(file, maxDim = 1080, quality = 0.82) {

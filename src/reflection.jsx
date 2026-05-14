@@ -586,23 +586,6 @@ function GalleryEntry({ entry, onExpand, caption }) {
 }
 
 // ---------------------------------------------------------------------------
-// PLACEHOLDER ENTRY — shown for weeks without a captured reflection
-// ---------------------------------------------------------------------------
-
-function MissedWeekLabel({ weekNum }) {
-  return (
-    <div style={{
-      textAlign: "center", margin: "8px 0",
-      fontFamily: "var(--font-display)", fontWeight: 400,
-      fontSize: 9, letterSpacing: "0.2em",
-      color: "var(--color-pebble)", opacity: 0.5,
-    }}>
-      · week {weekNum} ·
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
 // MAIN REFLECTION SCREEN
 // ---------------------------------------------------------------------------
 

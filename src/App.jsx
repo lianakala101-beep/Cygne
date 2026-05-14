@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Icon, Wordmark, LOGO_SRC } from "./components.jsx";
+import { Icon } from "./components.jsx";
 import { analyzeShelf, detectConflicts, buildRoutine, detectActives } from "./engine.js";
 import { RAMP_SCHEDULES, RAMP_ACTIVES } from "./ramp.jsx";
 import { SplashScreen } from "./splash.jsx";

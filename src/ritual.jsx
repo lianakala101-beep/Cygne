@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Icon, Section, Wordmark, SwanIcon } from "./components.jsx";
+import { Icon, Section, SwanIcon } from "./components.jsx";
 import { detectActives, analyzeShelf, buildRoutine, isDampSkinProduct, hasSPFCoverage } from "./engine.js";
 import { FREQUENCIES } from "./constants.js";
 import { getLockedSession, getAutoSession } from "./productmodal.jsx";
