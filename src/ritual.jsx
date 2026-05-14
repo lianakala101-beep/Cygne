@@ -33,7 +33,7 @@ function SessionPicker({ productId, product, initial, onSession }) {
           const active = selected === s.id;
           return (
             <button key={s.id} onClick={e => { e.stopPropagation(); setSelected(s.id); if (onSession) onSession(productId, s.id); }}
-              style={{ flex: 1, padding: "7px 0", borderRadius: 8, border: "1px solid " + (active ? "rgba(122,144,112,0.55)" : "var(--border)"), background: active ? "rgba(122,144,112,0.18)" : "transparent", color: active ? "var(--parchment)" : "var(--clay)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: active ? 700 : 400, cursor: "pointer" }}>
+              style={{ flex: 1, padding: "7px 0", borderRadius: 8, border: "1px solid " + (active ? "rgba(122,144,112,0.55)" : "var(--border)"), background: active ? "rgba(122,144,112,0.18)" : "transparent", color: active ? "var(--parchment)" : "var(--clay)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 400, cursor: "pointer" }}>
               {s.label}
             </button>
           );
@@ -161,7 +161,7 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
         style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 14px", background: inRoutine ? "rgba(122,144,112,0.08)" : "var(--ink)", border: `1px solid ${inRoutine ? "rgba(122,144,112,0.3)" : "var(--border)"}`, borderRadius: 10, cursor: "pointer", transition: "all 0.18s" }}
         onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(122,144,112,0.5)"}
         onMouseLeave={e => e.currentTarget.style.borderColor = inRoutine ? "rgba(122,144,112,0.3)" : "var(--border)"}>
-        <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: inRoutine ? "var(--sage)" : "var(--clay)", fontWeight: inRoutine ? 600 : 400 }}>
+        <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: inRoutine ? "var(--sage)" : "var(--clay)", fontWeight: 400 }}>
           {inRoutine ? "In ritual" : "Not in ritual"}
         </span>
         <div style={{ width: 28, height: 16, borderRadius: 8, background: inRoutine ? "var(--sage)" : "var(--border)", position: "relative", transition: "background 0.2s", flexShrink: 0 }}>
@@ -350,7 +350,7 @@ function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }
       {damp && (
         <p style={{
           fontFamily: "var(--font-body)",
-          fontStyle: "italic", fontSize: 11,
+          fontSize: 11,
           color: "rgba(139,115,85,0.85)",
           margin: "8px 0 0",
         }}>
@@ -559,7 +559,6 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
         <p style={{
           position: "relative",
           fontFamily: "var(--font-body)",
-          fontStyle: "italic",
           fontSize: 22, fontWeight: 400,
           lineHeight: 1.4, letterSpacing: "0.01em",
           color: "var(--color-ink, #1c1c1a)",
@@ -637,7 +636,7 @@ function FlightModeModal({ products, activeMap, onClose }) {
         <div style={{ display: "flex", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10, padding: 3, marginBottom: 24 }}>
           {[{ id: "edit", label: "Your Edit" }, { id: "tips", label: "Flight Tips" }].map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
-              style={{ flex: 1, padding: "8px 0", borderRadius: 8, border: "none", background: tab === t.id ? "#6e8a72" : "transparent", color: tab === t.id ? "#0d0f0d" : "var(--clay)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: tab === t.id ? 700 : 400, cursor: "pointer", letterSpacing: "0.12em", textTransform: "uppercase", transition: "all 0.18s" }}>
+              style={{ flex: 1, padding: "8px 0", borderRadius: 8, border: "none", background: tab === t.id ? "#6e8a72" : "transparent", color: tab === t.id ? "#0d0f0d" : "var(--clay)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 400, cursor: "pointer", letterSpacing: "0.12em", textTransform: "uppercase", transition: "all 0.18s" }}>
               {t.label}
             </button>
           ))}

@@ -454,7 +454,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
       {/* -- Swan guiding line ---------------------------------------------- */}
       {guidingLine && (
         ritualKey === "menstrual" ? (
-          <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 13, letterSpacing: "0.04em", color: "var(--color-inky-moss)", opacity: 0.8, fontStyle: "italic", textTransform: "none", lineHeight: 1.6, textAlign: "left", margin: "0 0 16px" }}>{guidingLine}</p>
+          <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 13, letterSpacing: "0.04em", color: "var(--color-inky-moss)", opacity: 0.8, textTransform: "none", lineHeight: 1.6, textAlign: "left", margin: "0 0 16px" }}>{guidingLine}</p>
         ) : (
           <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 13, letterSpacing: "0.02em", color: "var(--color-stone)", margin: "0 0 22px", lineHeight: 1.6 }}>{guidingLine}</p>
         )
