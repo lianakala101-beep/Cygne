@@ -12,6 +12,7 @@ import { getCurrentCycleDay, daysBetweenLocal } from "./utils.jsx";
 import { AskCygneButton } from "./AskCygne.jsx";
 import { AskCygneModal } from "./components/AskCygneModal.jsx";
 import { MonthlyRecap } from "./components/MonthlyRecap.jsx";
+import { useSwanSenseDaily } from "./hooks/useSwanSenseDaily.js";
 
 const RECAP_MONTH_NAMES = ["january","february","march","april","may","june","july","august","september","october","november","december"];
 
@@ -49,6 +50,17 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
   const currentCycleDay = getCurrentCycleDay(user);
   const { activeMap } = analyzeShelf(products);
   const swanSensePredictions = getSwanSensePredictions(products, checkIns, user, locationData, journals);
+
+  // LLM-generated daily Swan Sense line — fetched once per (user, day), cached
+  // in localStorage + the server-side ask_cygne_cache table. Falls back to the
+  // rule-based prediction when missing / loading.
+  const { line: swanDailyLine } = useSwanSenseDaily({
+    user,
+    products,
+    journals,
+    checkIns,
+    cycleDay: currentCycleDay,
+  });
 
   const allAlerts = [
     ...conflicts.map(c => ({ severity: c.severity, label: `${c.pair[0]} + ${c.pair[1]}`, detail: c.reason })),
@@ -188,7 +200,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
 
         {/* 1. Swan Song card (intelligence) — always fully visible */}
         <div className="cygne-swansong-intro" style={{ marginBottom: 8 }}>
-          <SwanSongCard currentSession={currentSession} asPopup={false} user={user} predictions={swanSensePredictions} />
+          <SwanSongCard currentSession={currentSession} asPopup={false} user={user} predictions={swanSensePredictions} dailyLine={swanDailyLine} />
         </div>
         <div style={{ textAlign: "right", marginBottom: 18 }}>
           <button

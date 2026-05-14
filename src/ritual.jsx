@@ -416,7 +416,7 @@ function renderInsightLines(text) {
   ));
 }
 
-function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = {}, predictions = [] }) {
+function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = {}, predictions = [], dailyLine = null }) {
   const now = new Date();
   const isBirthday = user.birthMonth && user.birthDay &&
     (now.getMonth() + 1) === parseInt(user.birthMonth) &&
@@ -435,12 +435,19 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
   });
   const hasMeaningful = meaningfulPredictions.length > 0;
 
-  // Line: SwanSense prediction > birthday > "not enough data yet"
+  // Line precedence: birthday > LLM daily line > rule-based prediction >
+  // "not enough data yet". The LLM line takes priority over the rule-based
+  // prediction once we have it, since it's already personalized to the
+  // user's full context — but we keep the rule engine running underneath
+  // so the popup detail (and any future surfaces) still have structured
+  // data to render.
   const line = isBirthday
     ? BIRTHDAY_LINES[now.getFullYear() % BIRTHDAY_LINES.length]
-    : hasMeaningful
-      ? meaningfulPredictions[0].headline
-      : NO_DATA_LINE;
+    : (dailyLine && dailyLine.trim())
+      ? dailyLine.trim()
+      : hasMeaningful
+        ? meaningfulPredictions[0].headline
+        : NO_DATA_LINE;
 
   const grain ="url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E\")";
 
