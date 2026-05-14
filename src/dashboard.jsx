@@ -90,7 +90,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
               {subline}
             </p>
             {products.length === 0 && (
-              <p style={{ fontFamily: "var(--font-body)", fontStyle: "italic", fontSize: 14, color: "var(--clay)", margin: "10px 0 0", lineHeight: 1.5 }}>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 14, color: "var(--clay)", margin: "10px 0 0", lineHeight: 1.5 }}>
                 Welcome.
               </p>
             )}
