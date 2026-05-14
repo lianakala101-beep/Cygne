@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Pill, Icon, LOGO_SRC } from "./components.jsx";
+import { Pill, Icon } from "./components.jsx";
 
 
 const SKIN_TYPES = ["Dry", "Oily", "Combination", "Sensitive", "Normal"];
@@ -404,7 +404,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       {/* Top — logo + welcome, matching splash layout */}
       <div style={{ padding: "72px 36px 0" }}>
         <img
-          src={LOGO_SRC}
+          src="/cygne-logo.png"
           alt="Cygne"
           style={{ height: 170, width: "auto", display: "block", filter: "brightness(1.25) contrast(1.05)", mixBlendMode: "lighten" }}
         />
