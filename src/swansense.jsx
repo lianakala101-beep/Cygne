@@ -435,9 +435,19 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
     }
   }
 
+  // Adherence-aware tone shaping. When the user told onboarding they only
+  // log skincare "When I Remember", down-rank the streak / risk warnings —
+  // those readings need a steady log to be reliable, and the lecturing
+  // tone fights the user instead of meeting them where they are.
+  const adherence = (skinProfile.consistency || "").toLowerCase();
+  const lowAdherence = adherence.startsWith("when i remember");
+  const tonedPredictions = lowAdherence
+    ? predictions.filter(p => p.type !== "active_streak" && p.type !== "stress_streak")
+    : predictions;
+
   // Return top 3, prioritising alert > caution > cycle > positive
   const order = { alert: 0, caution: 1, cycle: 2, positive: 3 };
-  return predictions.sort((a, b) => (order[a.level] ?? 4) - (order[b.level] ?? 4)).slice(0, 3);
+  return tonedPredictions.sort((a, b) => (order[a.level] ?? 4) - (order[b.level] ?? 4)).slice(0, 3);
 }
 
 function SwanSenseCard({ products, checkIns = [], user = {}, locationData = null, journals = [] }) {

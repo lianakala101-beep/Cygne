@@ -36,6 +36,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
   // New profile screens
   const [skinGoals, setSkinGoals] = useState([]);
   const [specialOccasion, setSpecialOccasion] = useState("");
+  const [occasionDate, setOccasionDate] = useState("");
   const [consistency, setConsistency] = useState("");
   const [routinePhilosophy, setRoutinePhilosophy] = useState("");
   const [climate, setClimate] = useState("");
@@ -88,6 +89,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       skinProfile: {
         skinGoals,
         specialOccasion: specialOccasion || null,
+        occasionDate: occasionDate || null,
         consistency: consistency || null,
         routinePhilosophy: routinePhilosophy || null,
         climate: climate || null,
@@ -287,10 +289,31 @@ function OnboardingScreen({ onComplete, setLocationData }) {
         <PillSelect
           options={["Wedding", "Vacation", "Event or Shoot", "Just For Me", "Not Right Now"]}
           selected={specialOccasion}
-          onToggle={v => setSpecialOccasion(prev => prev === v ? "" : v)}
+          onToggle={v => {
+            // Clear the date when the user picks a non-event option so the
+            // SwanSense countdown gate doesn't fire on stale data.
+            setSpecialOccasion(prev => prev === v ? "" : v);
+            if (v === "Just For Me" || v === "Not Right Now") setOccasionDate("");
+          }}
           single={true}
         />
       </div>
+      {/* Date picker — only when an actual event is selected */}
+      {specialOccasion && specialOccasion !== "Just For Me" && specialOccasion !== "Not Right Now" && (
+        <div style={{ marginTop: 24 }}>
+          <label style={labelSt}>When is it?</label>
+          <input
+            type="date"
+            value={occasionDate}
+            min={new Date().toISOString().split("T")[0]}
+            onChange={e => setOccasionDate(e.target.value)}
+            style={inputSt}
+          />
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-stone, #5a5a5a)", margin: "8px 0 0", lineHeight: 1.55 }}>
+            Cygne will pace your ritual toward this date — holding new actives in the final four weeks, leaning into hydration as it approaches.
+          </p>
+        </div>
+      )}
     </div>,
 
     // 9 — Consistency

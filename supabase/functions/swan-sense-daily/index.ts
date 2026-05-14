@@ -49,6 +49,7 @@ function buildContext(body: any): string {
   if (profile) {
     if (profile.skinGoals?.length) parts.push(`Goals: ${profile.skinGoals.join(", ")}.`);
     if (profile.routinePhilosophy)  parts.push(`Routine philosophy: ${profile.routinePhilosophy}.`);
+    if (profile.consistency)        parts.push(`Adherence: ${profile.consistency}.`);
     if (profile.climate)            parts.push(`Climate: ${profile.climate}.`);
     if (profile.environment)        parts.push(`Environment: ${profile.environment}.`);
     if (profile.specialOccasion && profile.occasionDate) {
@@ -95,6 +96,7 @@ WRITE: one to two sentences total. Editorial. Observational. Never clinical, nev
 - No bullets, no lists, no markdown, no quotation marks around the line.
 - No disclaimers, no medical advice, no "consult a dermatologist".
 - If context is thin, write a soft seasonal or cycle-aware line.
+- Match the user's adherence tone: "Daily, Without Fail" can be direct and observational; "A Few Times a Week" stays gentle; "When I Remember" should be warm and never scold or guilt — celebrate small motion.
 
 OUTPUT only the line itself. Nothing before or after.`;
 
