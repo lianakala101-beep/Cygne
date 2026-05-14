@@ -86,7 +86,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             <h1 style={{ fontFamily: "var(--font-display)", fontSize: 44, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: "0 0 4px", lineHeight: 1.05 }}>
               {titleText}
             </h1>
-            <p style={{ fontFamily: "var(--font-signature)", fontSize: 30, fontWeight: 400, letterSpacing: "0.01em", color: "var(--parchment)", margin: 0, lineHeight: 1.15 }}>
+            <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 22, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--color-stone, #5a5a5a)", margin: 0, lineHeight: 1.2 }}>
               {subline}
             </p>
             {products.length === 0 && (
@@ -109,7 +109,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           <div>
             <div style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: 28 }}>
               <span style={{ color: "var(--clay)", flexShrink: 0, marginTop: 6, display: "inline-flex" }}><SwanIcon size={18} /></span>
-              <p style={{ fontFamily: "var(--script)", fontSize: 21, color: "var(--clay)", margin: 0, lineHeight: 1.5 }}>
+              <p style={{ fontFamily: "var(--font-body)", fontStyle: "italic", fontSize: 14, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>
                 Your ritual lives here. Let's build it around you.
               </p>
             </div>
