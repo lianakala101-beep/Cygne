@@ -577,7 +577,7 @@ function GalleryEntry({ entry, onExpand, caption }) {
         <TriptychImage src={src} alt={`Reflection week ${entry.weekNumber}`} />
       </div>
       {caption && (
-        <p style={{ fontFamily: "var(--font-body)", fontStyle: "italic", fontSize: 14, fontWeight: 400, color: "var(--color-stone, #5a5a5a)", textAlign: "center", margin: "12px 0 0", letterSpacing: "0.02em", lineHeight: 1.4 }}>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 400, color: "var(--color-stone, #5a5a5a)", textAlign: "center", margin: "12px 0 0", letterSpacing: "0.02em", lineHeight: 1.4 }}>
           {caption}
         </p>
       )}
@@ -799,7 +799,7 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
               : "Capture This Week"}
         </button>
         {justCaptured && (
-          <p style={{ fontFamily: "var(--font-body)", fontStyle: "italic", fontSize: 13, color: "var(--color-stone, #5a5a5a)", margin: "12px 0 0", letterSpacing: "0.02em", transition: "opacity 600ms ease" }}>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "var(--color-stone, #5a5a5a)", margin: "12px 0 0", letterSpacing: "0.02em", transition: "opacity 600ms ease" }}>
             Captured — return on your next reset day
           </p>
         )}

@@ -338,6 +338,157 @@ export function MonthlyRecap({
           </p>
         </div>
       </div>
+
+      {isEmpty ? (
+        <p style={{
+          fontFamily: "var(--font-body)", fontSize: 13,
+          color: PEBBLE, textAlign: "center", margin: "20px 0 8px",
+          lineHeight: 1.6,
+        }}>
+          Nothing logged this month yet. Check-ins and journals will fill in here.
+        </p>
+      ) : (
+        <>
+          {/* Stats row */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginBottom: 22 }}>
+            <Stat label="Days logged" value={data.activeDays} />
+            <Stat
+              label={data.dominant ? data.dominant[0] : "Entries"}
+              value={data.dominant ? data.dominant[1] : data.monthJournals.length}
+            />
+            <Stat label="Irritation" value={data.irritation} />
+          </div>
+
+          {/* Day-of-week header */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 4, marginBottom: 4 }}>
+            {DOW.map((d, i) => (
+              <div key={i} style={{
+                fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.16em",
+                color: PEBBLE, textAlign: "center", textTransform: "uppercase",
+              }}>{d}</div>
+            ))}
+          </div>
+
+          {/* Calendar grid */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 4, marginBottom: 22 }}>
+            {cells.map((d, i) => {
+              if (!d) return <div key={`b-${i}`} />;
+              const cell = data.byDay[dayKey(new Date(view.year, view.month, d))];
+              const cond = bestCondition(cell?.journal);
+              const dot = cond ? CONDITION_DOT[cond] : (cell?.checkIns.length ? "rgba(45,61,43,0.4)" : null);
+              const todayCell = isToday(d);
+              return (
+                <div key={d} style={{
+                  aspectRatio: "1 / 1",
+                  display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                  background: todayCell ? "rgba(45,61,43,0.06)" : "transparent",
+                  border: todayCell ? "1px solid rgba(45,61,43,0.30)" : "1px solid transparent",
+                  borderRadius: 6,
+                  position: "relative",
+                }}>
+                  <span style={{
+                    fontFamily: "var(--font-body)", fontSize: 10,
+                    color: cell?.journal || cell?.checkIns.length ? INK : PEBBLE,
+                    opacity: cell?.journal || cell?.checkIns.length ? 1 : 0.55,
+                    lineHeight: 1,
+                  }}>{d}</span>
+                  {dot && (
+                    <span style={{
+                      width: 5, height: 5, borderRadius: "50%",
+                      background: dot,
+                      marginTop: 3,
+                      border: cell?.treatment ? "1px solid rgba(139,115,85,0.6)" : "none",
+                    }} />
+                  )}
+                  {!dot && cell?.treatment && (
+                    <span style={{
+                      width: 5, height: 5, borderRadius: "50%",
+                      background: "transparent",
+                      border: "1px solid rgba(139,115,85,0.6)",
+                      marginTop: 3,
+                    }} />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Top zones */}
+          {data.topZones.length > 0 && (
+            <div style={{ marginBottom: 18 }}>
+              <p style={{
+                fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em",
+                textTransform: "uppercase", color: PEBBLE, margin: "0 0 8px",
+              }}>
+                Most-flagged zones
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {data.topZones.map(([zone, count]) => (
+                  <div key={zone} style={{
+                    display: "flex", alignItems: "center", justifyContent: "space-between",
+                    padding: "6px 0", borderBottom: "1px solid rgba(45,61,43,0.08)",
+                  }}>
+                    <span style={{
+                      fontFamily: "var(--font-body)", fontSize: 12, color: INK,
+                    }}>{zoneLabelDisplay(zone)}</span>
+                    <span style={{
+                      fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400,
+                      letterSpacing: "0.1em", color: STONE,
+                    }}>{count}×</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Footer counts — reflections + treatments */}
+          {(data.monthReflections.length > 0 || data.monthTreatments.length > 0 || data.breakouts > 0) && (
+            <div style={{
+              display: "flex", flexWrap: "wrap", gap: 14,
+              paddingTop: 14, borderTop: "1px solid rgba(45,61,43,0.08)",
+            }}>
+              {data.monthReflections.length > 0 && (
+                <FooterCount label="Reflections" value={data.monthReflections.length} />
+              )}
+              {data.monthTreatments.length > 0 && (
+                <FooterCount label="Treatments" value={data.monthTreatments.length} />
+              )}
+              {data.breakouts > 0 && (
+                <FooterCount label="Breakout days" value={data.breakouts} />
+              )}
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+function Stat({ label, value }) {
+  return (
+    <div style={{ textAlign: "center" }}>
+      <div style={{
+        fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 28,
+        color: INKY, lineHeight: 1, marginBottom: 4,
+      }}>{value}</div>
+      <div style={{
+        fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em",
+        textTransform: "uppercase", color: PEBBLE,
+      }}>{label}</div>
+    </div>
+  );
+}
+
+function FooterCount({ label, value }) {
+  return (
+    <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
+      <span style={{
+        fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 14, color: INKY, lineHeight: 1,
+      }}>{value}</span>
+      <span style={{
+        fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.12em",
+        textTransform: "uppercase", color: PEBBLE,
+      }}>{label}</span>
     </div>
   );
 }

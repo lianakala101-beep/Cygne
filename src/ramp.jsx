@@ -578,7 +578,7 @@ function WeeklyRitualCalendar({ rampProducts, products }) {
               <span style={{
                 fontFamily: "var(--font-body)",
                 fontSize: 10,
-                fontWeight: active ? 700 : 500,
+                fontWeight: 400,
                 letterSpacing: "0.08em",
                 color: active ? "var(--parchment)" : "var(--clay)",
               }}>{day.label}</span>

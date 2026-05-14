@@ -48,7 +48,7 @@ function WordReveal({ text }) {
       </p>
       {disclaimerText && (
         <p style={{
-          fontFamily: "var(--font-display)", fontWeight: 400, fontStyle: "italic",
+          fontFamily: "var(--font-display)", fontWeight: 400,
           fontSize: 10, color: "var(--color-pebble)", marginTop: 24,
           lineHeight: 1.7, letterSpacing: "0.04em",
         }}>
@@ -264,7 +264,7 @@ export function AskCygneOverlay({ user, products = [], journals = [], checkIns =
               alt="Cygne"
               style={{ width: "140px", display: "block", margin: "0 auto 24px", background: "transparent", border: "none", animation: "askCygnePulse 1.5s ease-in-out infinite" }}
             />
-            <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontStyle: "italic", fontSize: 16, color: "var(--color-pebble)", margin: 0, letterSpacing: "0.03em" }}>
+            <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 16, color: "var(--color-pebble)", margin: 0, letterSpacing: "0.03em" }}>
               reading your ritual...
             </p>
           </div>
@@ -284,7 +284,7 @@ export function AskCygneOverlay({ user, products = [], journals = [], checkIns =
         {/* LIMIT */}
         {phase === "limit" && (
           <div style={{ textAlign: "center" }}>
-            <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontStyle: "italic", fontSize: 20, color: "var(--color-inky-moss)", margin: "0 0 32px", letterSpacing: "0.02em" }}>
+            <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 20, color: "var(--color-inky-moss)", margin: "0 0 32px", letterSpacing: "0.02em" }}>
               return tomorrow for fresh insight
             </p>
             {ctaButton("Close", onClose, true)}

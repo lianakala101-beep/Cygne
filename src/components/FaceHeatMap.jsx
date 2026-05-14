@@ -163,7 +163,7 @@ export function FaceHeatMap({ journals = [], products = [], user = {} }) {
         <>
           <p style={{
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
-            fontWeight: 400, fontStyle: "italic",
+            fontWeight: 400,
             fontSize: 13, color: PEBBLE,
             textAlign: "center", marginTop: 16,
           }}>
@@ -302,7 +302,7 @@ function ZoneInsightDrawer({ zoneId, journals, products, user, onClose, onAskCyg
         {dominantPhase && (
           <p style={{
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
-            fontStyle: "italic", fontSize: 12,
+            fontSize: 12,
             color: INKY,
             margin: "0 0 18px",
           }}>
