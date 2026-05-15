@@ -93,17 +93,24 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
       {(() => {
         const h = new Date().getHours();
         const slot = h >= 5 && h < 12 ? "morning" : h >= 12 && h < 17 ? "afternoon" : "evening";
-        const titleText = slot === "morning" ? "Good Morning." : slot === "afternoon" ? "Good Afternoon." : "Good Evening.";
+        const greeting = slot === "morning" ? "Good Morning" : slot === "afternoon" ? "Good Afternoon" : "Good Evening";
         const firstName = user?.name?.split(" ")[0] || "";
-        const subline = firstName ? `good ${slot}, ${firstName}` : `good ${slot}`;
         return (
           <div style={{ marginBottom: products.length === 0 ? 20 : 16 }}>
-            <h1 style={{ fontFamily: "var(--font-display)", fontSize: 44, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: "0 0 4px", lineHeight: 1.05 }}>
-              {titleText}
-            </h1>
-            <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 22, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: 0, lineHeight: 1.2 }}>
-              {subline}
-            </p>
+            {firstName ? (
+              <>
+                <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 26, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: "0 0 6px", lineHeight: 1.1 }}>
+                  {greeting},
+                </p>
+                <h1 style={{ fontFamily: "var(--font-display)", fontSize: 56, fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: 0, lineHeight: 1 }}>
+                  {firstName}
+                </h1>
+              </>
+            ) : (
+              <h1 style={{ fontFamily: "var(--font-display)", fontSize: 44, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: 0, lineHeight: 1.05 }}>
+                {greeting}.
+              </h1>
+            )}
             {products.length === 0 && (
               <p style={{ fontFamily: "var(--font-body)", fontSize: 14, color: "var(--clay)", margin: "10px 0 0", lineHeight: 1.5 }}>
                 Welcome.
