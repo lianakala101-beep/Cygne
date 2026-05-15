@@ -261,9 +261,9 @@ function BreathText({ text, style }) {
 }
 
 // --- RITUAL PROGRESS TRACKER -------------------------------------------------
-// Horizontal shoreline with a swan that glides from left to moon as the ritual
-// is checked off. Swan bobs continuously via etherealGlide and transitions
-// smoothly (400ms ease) to its completion-percentage position.
+// Static shoreline ripple with a swan marker at the completion-percentage
+// position. No motion — the swan re-renders at its new position when ritual
+// steps are checked off.
 function RitualProgressTracker({ completed, total }) {
   if (total <= 0) return null;
   const pct = Math.max(0, Math.min(1, completed / total));
@@ -281,19 +281,16 @@ function RitualProgressTracker({ completed, total }) {
           stroke="rgba(139,115,85,0.55)" strokeWidth="1.1" fill="none" strokeLinecap="round" />
       </svg>
 
-      {/* Swan — dark sage, bobs continuously, glides along the shoreline */}
       <div style={{
         position: "absolute", top: "50%",
         left: `calc(10px + (100% - 30px) * ${pct})`,
         transform: "translate(-50%, -50%)",
-        transition: "left 400ms ease",
         pointerEvents: "none",
       }}>
         <span style={{
           display: "inline-block",
           color: "var(--color-inky-moss)",
           opacity: 0.35,
-          animation: "etherealGlide 3s ease-in-out infinite",
         }}>
           <SwanIcon size={20} outlineOnly />
         </span>
@@ -550,7 +547,6 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
             <span style={{
               color: "#2d3d2b",
               display: "inline-flex",
-              animation: "etherealGlide 3s ease-in-out infinite",
             }}>
               <SwanIcon size={22} />
             </span>

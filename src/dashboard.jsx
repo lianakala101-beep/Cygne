@@ -202,7 +202,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         })()}
 
         {/* 1. Swan Song card (intelligence) — always fully visible */}
-        <div className="cygne-swansong-intro" style={{ marginBottom: 8 }}>
+        <div style={{ marginBottom: 8 }}>
           <SwanSongCard currentSession={currentSession} asPopup={false} user={user} predictions={swanSensePredictions} dailyLine={swanDailyLine} />
         </div>
         <div style={{ textAlign: "right", marginBottom: 18 }}>
