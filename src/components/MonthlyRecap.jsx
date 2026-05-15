@@ -334,7 +334,7 @@ export function MonthlyRecap({
             fontStyle: "italic", fontSize: 12, fontWeight: 400,
             color: "var(--color-inky-moss, #2d3d2b)", margin: 0, letterSpacing: "0.02em",
           }}>
-            your ritual, refined.
+            built around you.
           </p>
         </div>
       </div>
