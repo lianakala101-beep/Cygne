@@ -1696,7 +1696,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
       {/* -- Introduce Slowly (hidden during Acute recovery; empty state otherwise) */}
       <div style={{ marginBottom: 28 }}>
         {/acute/i.test(pausePhase?.label) ? (
-          <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 11, letterSpacing: "0.15em", color: "var(--color-pebble)", textAlign: "center", margin: "16px 0" }}>
+          <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 11, letterSpacing: "0.15em", color: "var(--color-inky-moss)", textAlign: "center", margin: "16px 0" }}>
             Introduce Slowly is paused while you recover.
           </p>
         ) : (

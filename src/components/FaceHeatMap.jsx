@@ -164,7 +164,7 @@ export function FaceHeatMap({ journals = [], products = [], user = {} }) {
           <p style={{
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
             fontWeight: 400,
-            fontSize: 13, color: PEBBLE,
+            fontSize: 13, color: "var(--color-inky-moss, #2d3d2b)",
             textAlign: "center", marginTop: 16,
           }}>
             your map is taking shape
@@ -172,7 +172,7 @@ export function FaceHeatMap({ journals = [], products = [], user = {} }) {
           <p style={{
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
             fontSize: 10, letterSpacing: "0.1em",
-            color: PEBBLE, opacity: 0.6,
+            color: "var(--color-inky-moss, #2d3d2b)", opacity: 0.7,
             textAlign: "center", marginTop: 6, textTransform: "uppercase",
           }}>
             log skin observations to reveal your patterns
@@ -292,7 +292,7 @@ function ZoneInsightDrawer({ zoneId, journals, products, user, onClose, onAskCyg
         {/* Stats */}
         <p style={{
           fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
-          fontWeight: 400, fontSize: 13, color: STONE,
+          fontWeight: 400, fontSize: 13, color: "var(--color-inky-moss, #2d3d2b)",
           margin: "0 0 12px",
         }}>
           Logged {flareCount} time{flareCount === 1 ? "" : "s"} this month
@@ -315,7 +315,7 @@ function ZoneInsightDrawer({ zoneId, journals, products, user, onClose, onAskCyg
           <p style={{
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
             fontWeight: 400, fontSize: 10, letterSpacing: "0.15em",
-            color: PEBBLE, textTransform: "uppercase",
+            color: "var(--color-inky-moss, #2d3d2b)", textTransform: "uppercase",
             margin: "0 0 8px",
           }}>
             Products present during flare-ups
@@ -323,7 +323,7 @@ function ZoneInsightDrawer({ zoneId, journals, products, user, onClose, onAskCyg
           {topProducts.length === 0 ? (
             <p style={{
               fontFamily: "var(--font-body, 'Fungis Normal', 'Space Grotesk', sans-serif)",
-              fontSize: 12, color: STONE, opacity: 0.7, margin: 0,
+              fontSize: 12, color: "var(--color-inky-moss, #2d3d2b)", opacity: 0.75, margin: 0,
             }}>
               Not enough data yet.
             </p>
@@ -339,7 +339,7 @@ function ZoneInsightDrawer({ zoneId, journals, products, user, onClose, onAskCyg
                     borderBottom: "1px solid rgba(45,61,43,0.08)",
                   }}
                 >
-                  {p.name || "(unnamed)"}{p.brand ? <span style={{ color: STONE }}> · {p.brand}</span> : null}
+                  {p.name || "(unnamed)"}{p.brand ? <span style={{ color: "var(--color-inky-moss, #2d3d2b)" }}> · {p.brand}</span> : null}
                 </li>
               ))}
             </ul>

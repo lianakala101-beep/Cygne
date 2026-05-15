@@ -154,7 +154,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       {skinAge && (
         <div style={{ marginTop: 20, padding: "13px 16px", background: "rgba(45,61,43,0.08)", border: "1px solid rgba(45,61,43,0.25)", borderRadius: 12 }}>
           <p style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: "#2d3d2b", margin: "0 0 5px" }}>{skinAge.bracket}</p>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-stone, #5a5a5a)", margin: 0, lineHeight: 1.65 }}>{skinAge.note}</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-inky-moss, #2d3d2b)", margin: 0, lineHeight: 1.65 }}>{skinAge.note}</p>
         </div>
       )}
     </div>,
@@ -209,7 +209,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
               <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#2d3d2b" }} />
               <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "var(--color-inky-moss, #2d3d2b)", margin: 0, fontWeight: 400 }}>Location enabled</p>
             </div>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-stone, #5a5a5a)", margin: "6px 0 0" }}>Your environment data will appear on the home screen.</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-inky-moss, #2d3d2b)", margin: "6px 0 0" }}>Your environment data will appear on the home screen.</p>
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -309,7 +309,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
             onChange={e => setOccasionDate(e.target.value)}
             style={inputSt}
           />
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-stone, #5a5a5a)", margin: "8px 0 0", lineHeight: 1.55 }}>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-inky-moss, #2d3d2b)", margin: "8px 0 0", lineHeight: 1.55 }}>
             Cygne will pace your ritual toward this date — holding new actives in the final four weeks, leaning into hydration as it approaches.
           </p>
         </div>
@@ -431,7 +431,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
           alt="Cygne"
           style={{ height: 170, width: "auto", display: "block", filter: "brightness(1.25) contrast(1.05)", mixBlendMode: "lighten" }}
         />
-        <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 11, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-stone, #5a5a5a)", margin: "6px 0 0 130px", lineHeight: 1 }}>built around you</p>
+        <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 11, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: "6px 0 0 130px", lineHeight: 1 }}>built around you</p>
       </div>
 
       {/* Bottom — welcome message + skin age + Enter button */}
@@ -439,11 +439,11 @@ function OnboardingScreen({ onComplete, setLocationData }) {
         <p style={{ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-ink, #1c1c1a)", margin: "0 0 8px", lineHeight: 1.2 }}>
           {name ? `Welcome, ${name}.` : "Welcome."}
         </p>
-        <p style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 400, letterSpacing: "0.12em", color: "var(--color-stone, #5a5a5a)", margin: "0 0 24px" }}>Your ritual begins.</p>
+        <p style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 400, letterSpacing: "0.12em", color: "var(--color-inky-moss, #2d3d2b)", margin: "0 0 24px" }}>Your ritual begins.</p>
         {skinAge && (
           <div style={{ padding: "12px 16px", background: "rgba(45,61,43,0.06)", border: "1px solid rgba(45,61,43,0.18)", borderRadius: 12, marginBottom: 28, width: "100%" }}>
             <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: "0 0 5px" }}>{skinAge.bracket}</p>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-stone, #5a5a5a)", margin: 0, lineHeight: 1.7 }}>{skinAge.note}</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-inky-moss, #2d3d2b)", margin: 0, lineHeight: 1.7 }}>{skinAge.note}</p>
           </div>
         )}
         <button onClick={handleComplete}
@@ -540,11 +540,11 @@ function OnboardingScreen({ onComplete, setLocationData }) {
 }
 
 // Onboarding text styles
-const obEyebrow = { fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-stone, #5a5a5a)", margin: "0 0 10px" };
+const obEyebrow = { fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: "0 0 10px" };
 const obHeading = { fontFamily: "var(--font-display)", fontSize: 28, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-ink, #1c1c1a)", margin: "0 0 12px", lineHeight: 1.2 };
-const obSub = { fontFamily: "var(--font-body)", fontSize: 13, color: "var(--color-stone, #5a5a5a)", margin: 0, lineHeight: 1.7 };
+const obSub = { fontFamily: "var(--font-body)", fontSize: 13, color: "var(--color-inky-moss, #2d3d2b)", margin: 0, lineHeight: 1.7 };
 const inputSt = { width: "100%", padding: "12px 16px", background: "#ffffff", border: "1px solid rgba(45,61,43,0.25)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 14, color: "var(--color-ink, #1c1c1a)", outline: "none" };
-const labelSt = { fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-stone, #5a5a5a)", display: "block", marginBottom: 6 };
+const labelSt = { fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", display: "block", marginBottom: 6 };
 
 
 export { OnboardingScreen };

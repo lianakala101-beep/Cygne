@@ -189,13 +189,13 @@ function Section({ label, body, rootRef, divider = true }) {
       <p style={{
         fontFamily: "var(--font-display)",
         fontWeight: 700, fontSize: 9, letterSpacing: "0.22em",
-        textTransform: "uppercase", color: PEBBLE,
+        textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)",
         margin: "0 0 14px",
       }}>{label}</p>
       <p style={{
         fontFamily: "var(--font-body)",
         fontWeight: 400, fontSize: 15,
-        color: STONE, margin: 0, lineHeight: 1.7,
+        color: "var(--color-inky-moss, #2d3d2b)", margin: 0, lineHeight: 1.7,
       }}>{body}</p>
     </section>
   );
@@ -293,7 +293,7 @@ export function MonthlyRecap({
           <p style={{
             fontFamily: "var(--font-body)",
             fontSize: 11, fontWeight: 400, letterSpacing: "0.18em",
-            textTransform: "uppercase", color: PEBBLE,
+            textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)",
             margin: "6px 0 0",
           }}>
             {view.year} · IN REVIEW
@@ -332,7 +332,7 @@ export function MonthlyRecap({
           <p style={{
             fontFamily: "var(--font-body)",
             fontStyle: "italic", fontSize: 12, fontWeight: 400,
-            color: PEBBLE, margin: 0, letterSpacing: "0.02em",
+            color: "var(--color-inky-moss, #2d3d2b)", margin: 0, letterSpacing: "0.02em",
           }}>
             your ritual, refined.
           </p>
@@ -342,7 +342,7 @@ export function MonthlyRecap({
       {isEmpty ? (
         <p style={{
           fontFamily: "var(--font-body)", fontSize: 13,
-          color: PEBBLE, textAlign: "center", margin: "20px 0 8px",
+          color: "var(--color-inky-moss, #2d3d2b)", textAlign: "center", margin: "20px 0 8px",
           lineHeight: 1.6,
         }}>
           Nothing logged this month yet. Check-ins and journals will fill in here.
@@ -364,7 +364,7 @@ export function MonthlyRecap({
             {DOW.map((d, i) => (
               <div key={i} style={{
                 fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.16em",
-                color: PEBBLE, textAlign: "center", textTransform: "uppercase",
+                color: "var(--color-inky-moss, #2d3d2b)", textAlign: "center", textTransform: "uppercase",
               }}>{d}</div>
             ))}
           </div>
@@ -418,7 +418,7 @@ export function MonthlyRecap({
             <div style={{ marginBottom: 18 }}>
               <p style={{
                 fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em",
-                textTransform: "uppercase", color: PEBBLE, margin: "0 0 8px",
+                textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: "0 0 8px",
               }}>
                 Most-flagged zones
               </p>
@@ -433,7 +433,7 @@ export function MonthlyRecap({
                     }}>{zoneLabelDisplay(zone)}</span>
                     <span style={{
                       fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400,
-                      letterSpacing: "0.1em", color: STONE,
+                      letterSpacing: "0.1em", color: "var(--color-inky-moss, #2d3d2b)",
                     }}>{count}×</span>
                   </div>
                 ))}
@@ -473,7 +473,7 @@ function Stat({ label, value }) {
       }}>{value}</div>
       <div style={{
         fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em",
-        textTransform: "uppercase", color: PEBBLE,
+        textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)",
       }}>{label}</div>
     </div>
   );
@@ -487,7 +487,7 @@ function FooterCount({ label, value }) {
       }}>{value}</span>
       <span style={{
         fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.12em",
-        textTransform: "uppercase", color: PEBBLE,
+        textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)",
       }}>{label}</span>
     </div>
   );

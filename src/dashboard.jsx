@@ -101,7 +101,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             <h1 style={{ fontFamily: "var(--font-display)", fontSize: 44, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: "0 0 4px", lineHeight: 1.05 }}>
               {titleText}
             </h1>
-            <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 22, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--color-stone, #5a5a5a)", margin: 0, lineHeight: 1.2 }}>
+            <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 22, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: 0, lineHeight: 1.2 }}>
               {subline}
             </p>
             {products.length === 0 && (
