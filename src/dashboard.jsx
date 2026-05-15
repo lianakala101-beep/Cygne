@@ -99,12 +99,12 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           <div style={{ marginBottom: products.length === 0 ? 20 : 16 }}>
             {firstName ? (
               <>
-                <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 26, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: "0 0 6px", lineHeight: 1.1 }}>
+                <h1 style={{ fontFamily: "var(--font-display)", fontSize: 40, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: "0 0 6px", lineHeight: 1.05 }}>
                   {greeting},
-                </p>
-                <h1 style={{ fontFamily: "var(--font-display)", fontSize: 56, fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: 0, lineHeight: 1 }}>
-                  {firstName}
                 </h1>
+                <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 22, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: 0, lineHeight: 1.1 }}>
+                  {firstName}
+                </p>
               </>
             ) : (
               <h1 style={{ fontFamily: "var(--font-display)", fontSize: 44, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: 0, lineHeight: 1.05 }}>
