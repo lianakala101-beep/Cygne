@@ -375,7 +375,10 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
 
   const [ritualDismissed, setRitualDismissed] = useState(false);
   const [showRitualCheckIn, setShowRitualCheckIn] = useState(false);
-  const todayCheckedIn = checkIns.some(c => c.date === today);
+  // CheckInModal stores `date` as a full ISO timestamp, so normalize to the
+  // YYYY-MM-DD prefix before comparing — without this the "Ritual complete"
+  // banner never auto-dismisses after the user submits a check-in.
+  const todayCheckedIn = checkIns.some(c => typeof c?.date === "string" && c.date.split("T")[0] === today);
   const [hintVisible, setHintVisible] = useState(() => !localStorage.getItem("ritual_hint_dismissed"));
 
   const isStepChecked = (id) => completedSteps.includes(id);
