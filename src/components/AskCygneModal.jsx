@@ -76,7 +76,7 @@ export function AskCygneModal({
       onClick={onClose}
       style={{
         position: "fixed", inset: 0, zIndex: 300,
-        background: "rgba(28,28,26,0.55)",
+        background: "rgba(28,28,26,0.45)",
         backdropFilter: "blur(10px)",
         display: "flex", alignItems: "flex-end", justifyContent: "center",
       }}
@@ -86,39 +86,62 @@ export function AskCygneModal({
         style={{
           width: "100%", maxWidth: 520,
           background: "var(--color-ivory, #faf9f4)",
-          borderRadius: "20px 20px 0 0",
-          padding: "24px 22px 32px",
-          maxHeight: "85vh", overflowY: "auto",
+          borderRadius: 0,
+          padding: "32px 26px 40px",
+          maxHeight: "88vh", overflowY: "auto",
           color: "var(--color-ink, #1c1c1a)",
+          position: "relative",
         }}
       >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+        <button
+          onClick={onClose}
+          aria-label="Close"
+          style={{
+            position: "absolute", top: 18, right: 22,
+            background: "none", border: "none", cursor: "pointer",
+            color: "var(--color-stone, #5a5a5a)",
+            fontSize: 22, lineHeight: 1, padding: 4,
+            WebkitTapHighlightColor: "transparent",
+            WebkitAppearance: "none", appearance: "none",
+          }}
+        >×</button>
+
+        <div style={{ textAlign: "center", marginBottom: 26 }}>
+          <img
+            src="/cygne-logo.png"
+            alt=""
+            style={{ height: 56, width: "auto", display: "block", margin: "0 auto 14px", filter: "brightness(0.45) contrast(1.35) saturate(0.6)" }}
+          />
           <p style={{
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
-            fontWeight: 400, fontSize: 11, letterSpacing: "0.2em",
-            color: "var(--color-inky-moss, #2d3d2b)", margin: 0,
+            fontWeight: 700, fontSize: 13, letterSpacing: "0.32em",
+            textTransform: "uppercase",
+            color: "var(--color-inky-moss, #2d3d2b)",
+            margin: 0,
           }}>
-            ASK CYGNE
+            Ask Cygne
           </p>
-          <button
-            onClick={onClose}
-            style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-stone, #5a5a5a)", fontSize: 18, lineHeight: 1 }}
-          >×</button>
         </div>
 
         <textarea
           value={question}
           onChange={e => setQuestion(e.target.value)}
-          rows={2}
+          rows={3}
+          placeholder="What would you like to ask?"
           style={{
             width: "100%", boxSizing: "border-box",
-            padding: "12px 14px",
+            padding: "14px 16px",
             background: "var(--color-ivory-shadow, #f0ebe0)",
-            border: "1px solid rgba(45,61,43,0.18)",
-            borderRadius: 12,
+            border: "1px solid rgba(45,61,43,0.14)",
+            borderRadius: 0,
             fontFamily: "var(--font-body, 'Fungis Normal', 'Space Grotesk', sans-serif)",
-            fontSize: 13, color: "var(--color-ink, #1c1c1a)",
-            resize: "none", outline: "none",
+            fontSize: 14, lineHeight: 1.55,
+            color: "var(--color-ink, #1c1c1a)",
+            caretColor: "var(--color-inky-moss, #2d3d2b)",
+            resize: "none",
+            outline: "none",
+            WebkitAppearance: "none", appearance: "none",
+            WebkitTapHighlightColor: "transparent",
           }}
         />
 
@@ -126,26 +149,30 @@ export function AskCygneModal({
           onClick={() => ask(question)}
           disabled={loading || !question.trim()}
           style={{
-            marginTop: 12, width: "100%",
-            padding: "12px 0",
+            marginTop: 14, width: "100%",
+            padding: "14px 0",
             background: "transparent",
-            border: "1px solid var(--color-inky-moss, #2d3d2b)",
+            border: "1.5px solid var(--color-inky-moss, #2d3d2b)",
             color: "var(--color-inky-moss, #2d3d2b)",
-            borderRadius: 12,
+            borderRadius: 0,
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
-            fontWeight: 400, fontSize: 11, letterSpacing: "0.18em",
-            cursor: loading ? "default" : "pointer",
-            opacity: loading || !question.trim() ? 0.5 : 1,
+            fontWeight: 700, fontSize: 11, letterSpacing: "0.24em",
+            textTransform: "uppercase",
+            cursor: loading || !question.trim() ? "default" : "pointer",
+            opacity: loading || !question.trim() ? 0.45 : 1,
+            WebkitAppearance: "none", appearance: "none",
+            WebkitTapHighlightColor: "transparent",
           }}
         >
-          {loading ? "THINKING…" : "ASK"}
+          {loading ? "Thinking" : "Ask"}
         </button>
 
         {error && (
           <p style={{
-            marginTop: 14,
+            marginTop: 18,
             fontFamily: "var(--font-body, 'Fungis Normal', sans-serif)",
-            fontSize: 12, color: "#a04a3c",
+            fontSize: 12, lineHeight: 1.55,
+            color: "#8b7355",
           }}>
             {error}
           </p>
@@ -153,12 +180,12 @@ export function AskCygneModal({
 
         {answer && (
           <div style={{
-            marginTop: 18, padding: "16px 16px",
-            background: "rgba(45,61,43,0.06)",
-            border: "1px solid rgba(45,61,43,0.15)",
-            borderRadius: 12,
+            marginTop: 24, padding: "20px 20px",
+            background: "var(--color-ivory-shadow, #f0ebe0)",
+            borderTop: "1px solid rgba(45,61,43,0.18)",
+            borderRadius: 0,
             fontFamily: "var(--font-body, 'Fungis Normal', 'Space Grotesk', sans-serif)",
-            fontSize: 13, lineHeight: 1.6,
+            fontSize: 14, lineHeight: 1.7,
             color: "var(--color-ink, #1c1c1a)",
             whiteSpace: "pre-wrap",
           }}>
