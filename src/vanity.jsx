@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Icon, Section, Pill } from "./components.jsx";
-import { detectActives, analyzeShelf, calcSpending, getProductConflicts } from "./engine.js";
+import { detectActives, analyzeShelf, calcSpending } from "./engine.js";
 import { AskCygneModal } from "./components/AskCygneModal.jsx";
 import { assessRoutineFit, DEFER_TAG_CONFIG } from "./modals.jsx";
 import { ProductModal } from "./productmodal.jsx";
@@ -27,7 +27,7 @@ const GLASS_CARD = {
   flexDirection: "column",
 };
 
-function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, user = {}, conflicts = [], onAskCygne }) {
+function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, user = {}, onAskCygne }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const menuRef = useRef(null);
@@ -59,11 +59,6 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
               </div>
             )
           }
-
-          {/* In-ritual indicator dot */}
-          {inRoutine && (
-            <div style={{ position: "absolute", top: 10, left: 10, width: 7, height: 7, borderRadius: "50%", background: "#c0c0c0", boxShadow: "0 0 0 2px rgba(255,255,255,0.85)" }} />
-          )}
 
           {/* ⋯ menu */}
           <div ref={menuRef} style={{ position: "absolute", top: 6, right: 6 }}>
@@ -117,32 +112,6 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
           {product.price > 0 && (
             <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#1c1c1a", margin: "5px 0 0", fontWeight: 300, letterSpacing: "0.01em" }}>${(product.price || 0).toFixed(0)}</p>
           )}
-          {conflicts.length > 0 && (() => {
-            // Single warm clay tone for every conflict, regardless of severity.
-            // Matches the rest of the app's amber/clay accent language so the
-            // badge reads as a quiet caution, not an emergency.
-            const tone = { color: "#8b7355", bg: "rgba(139,115,85,0.10)", border: "rgba(139,115,85,0.30)" };
-            const labelText = conflicts.length === 1
-              ? conflicts[0].pair.join(" + ")
-              : `${conflicts.length} conflicts`;
-            return (
-              <div
-                title={conflicts.map(c => `${c.pair.join(" + ")}: ${c.reason}`).join("\n\n")}
-                style={{
-                  display: "inline-flex", alignItems: "center", gap: 5,
-                  marginTop: 8, padding: "3px 8px",
-                  background: tone.bg, border: `1px solid ${tone.border}`,
-                  borderRadius: 20,
-                  fontFamily: "var(--font-body)",
-                  fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase",
-                  color: tone.color,
-                }}
-              >
-                <Icon name="warning" size={9} />
-                <span>{labelText}</span>
-              </div>
-            );
-          })()}
         </div>
       </div>
 
@@ -452,7 +421,7 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo
                 </div>
               )}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
-                {filtered.map(p => <GlassProductCard key={p.id} product={p} onEdit={onEdit} onDelete={onDelete} onToggleRoutine={onToggleRoutine} onSession={onSession} user={user} conflicts={getProductConflicts(p, products)} onAskCygne={(q, ctx) => setAskState({ question: q, context: ctx })} />)}
+                {filtered.map(p => <GlassProductCard key={p.id} product={p} onEdit={onEdit} onDelete={onDelete} onToggleRoutine={onToggleRoutine} onSession={onSession} user={user} onAskCygne={(q, ctx) => setAskState({ question: q, context: ctx })} />)}
                 <button onClick={onAdd} style={{ ...GLASS_CARD, background: "rgba(250,249,244,0.25)", border: "1px dashed rgba(192,192,192,0.4)", cursor: "pointer", aspectRatio: "1 / 1", alignItems: "center", justifyContent: "center", gap: 8 }}>
                   <span style={{ fontSize: 20, color: "#7a7a7a", lineHeight: 1 }}>+</span>
                   <span style={{ fontFamily: "var(--font-display, 'Fungis', sans-serif)", fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: "#7a7a7a" }}>Add Product</span>
