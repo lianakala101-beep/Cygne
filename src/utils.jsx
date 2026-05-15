@@ -169,4 +169,23 @@ function getTreatmentElapsed(treatmentDate) {
   return daysBetweenLocal(treatmentDate) + 1;
 }
 
-export { SwanWelcomeScreen, useLocalStorage, DEMO_PRODUCTS, DEMO_VERSION, daysBetweenLocal, getCurrentCycleDay, getTreatmentElapsed, toLocalMidnight };
+// ISO week of the year (1..53). Kept here (eagerly loaded) so App.jsx can use
+// it without pulling in the lazy-loaded reflection.jsx chunk.
+function isoWeekNumber(date = new Date()) {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const day = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - day);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
+}
+
+// ISO week year — the year that "owns" this ISO week (may differ from calendar
+// year at the boundary).
+function isoWeekYear(d) {
+  const dt = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const day = dt.getUTCDay() || 7;
+  dt.setUTCDate(dt.getUTCDate() + 4 - day);
+  return dt.getUTCFullYear();
+}
+
+export { SwanWelcomeScreen, useLocalStorage, DEMO_PRODUCTS, DEMO_VERSION, daysBetweenLocal, getCurrentCycleDay, getTreatmentElapsed, toLocalMidnight, isoWeekNumber, isoWeekYear };

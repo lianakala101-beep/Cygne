@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { lazy, Suspense, useState, useEffect } from "react";
 import { Icon, Section, FlagCard, SwanIcon } from "./components.jsx";
 import { analyzeShelf, detectConflicts, buildRoutine, calcSpending, getCurrentSession } from "./engine.js";
 import { getSwanSensePredictions } from "./swansense.jsx";
@@ -10,9 +10,12 @@ import { SeasonalNudgeCard } from "./seasonal.jsx";
 import { getTreatmentPhase, TreatmentRecoveryCard, getCyclePhase } from "./progress.jsx";
 import { getCurrentCycleDay, daysBetweenLocal } from "./utils.jsx";
 import { AskCygneButton } from "./AskCygne.jsx";
-import { AskCygneModal } from "./components/AskCygneModal.jsx";
-import { MonthlyRecap } from "./components/MonthlyRecap.jsx";
 import { useSwanSenseDaily } from "./hooks/useSwanSenseDaily.js";
+
+// Code-split: both overlays only render on user action, so let Vite ship them
+// in their own chunks instead of in the dashboard's initial paint bundle.
+const AskCygneModal = lazy(() => import("./components/AskCygneModal.jsx").then(m => ({ default: m.AskCygneModal })));
+const MonthlyRecap  = lazy(() => import("./components/MonthlyRecap.jsx").then(m => ({ default: m.MonthlyRecap })));
 
 const RECAP_MONTH_NAMES = ["january","february","march","april","may","june","july","august","september","october","november","december"];
 
@@ -432,28 +435,30 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
       {flightOpen && (
         <FlightModeModal products={products} activeMap={activeMap} onClose={() => setFlightOpen(false)} />
       )}
-      {askState && (
-        <AskCygneModal
-          initialQuestion={askState.question}
-          context={askState.context}
-          user={user}
-          products={products}
-          journals={journals}
-          checkIns={checkIns}
-          onClose={() => setAskState(null)}
-        />
-      )}
-      {recapOpen && (
-        <MonthlyRecap
-          offset={recapOffset}
-          journals={journals}
-          checkIns={checkIns}
-          treatments={treatments}
-          products={products}
-          user={user}
-          onClose={() => setRecapOpen(false)}
-        />
-      )}
+      <Suspense fallback={null}>
+        {askState && (
+          <AskCygneModal
+            initialQuestion={askState.question}
+            context={askState.context}
+            user={user}
+            products={products}
+            journals={journals}
+            checkIns={checkIns}
+            onClose={() => setAskState(null)}
+          />
+        )}
+        {recapOpen && (
+          <MonthlyRecap
+            offset={recapOffset}
+            journals={journals}
+            checkIns={checkIns}
+            treatments={treatments}
+            products={products}
+            user={user}
+            onClose={() => setRecapOpen(false)}
+          />
+        )}
+      </Suspense>
     </div>
   );
 }

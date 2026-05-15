@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "./components.jsx";
 import { supabase } from "./supabase.js";
 import { getSwanSensePredictions } from "./swansense.jsx";
-import { compressImageBlob } from "./utils.jsx";
+import { compressImageBlob, isoWeekNumber, isoWeekYear } from "./utils.jsx";
 
 // ---------------------------------------------------------------------------
 // Reflection — a weekly triptych gallery of the user's skin journey.
@@ -27,25 +27,6 @@ const ANGLES = [
   { key: "left",  label: "Tilt Left",  hint: "Turn your head gently to the left." },
   { key: "right", label: "Tilt Right", hint: "Turn your head gently to the right." },
 ];
-
-// ISO week of the year (1..53). Used as the per-entry week number so the
-// label wheel lines up with the seasons.
-export function isoWeekNumber(date = new Date()) {
-  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-  const day = d.getUTCDay() || 7;
-  d.setUTCDate(d.getUTCDate() + 4 - day);
-  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-  return Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
-}
-
-// ISO week year — the year that "owns" this ISO week (may differ from calendar year
-// in the first/last days of January/December).
-export function isoWeekYear(d) {
-  const dt = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-  const day = dt.getUTCDay() || 7;
-  dt.setUTCDate(dt.getUTCDate() + 4 - day);
-  return dt.getUTCFullYear();
-}
 
 // Monday of the given ISO week/year (UTC).
 function isoWeekToMonday(weekNum, isoYear) {

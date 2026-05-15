@@ -1,22 +1,26 @@
-import { useState, useRef, useEffect } from "react";
+import { lazy, Suspense, useState, useRef, useEffect } from "react";
 import { Icon } from "./components.jsx";
 import { analyzeShelf, detectConflicts, buildRoutine, detectActives } from "./engine.js";
 import { RAMP_SCHEDULES, RAMP_ACTIVES } from "./ramp.jsx";
 import { SplashScreen } from "./splash.jsx";
-import { OnboardingScreen } from "./onboarding.jsx";
 import { Dashboard } from "./dashboard.jsx";
 import { MyRoutine } from "./ritualscreen.jsx";
 import { Shelf } from "./vanity.jsx";
 import { Progress } from "./progress.jsx";
-import { ProfileSheet } from "./profile.jsx";
-import { ScanModal } from "./modals.jsx";
-import { ProductModal, RoutineFitSheet } from "./productmodal.jsx";
-import { SwanWelcomeScreen, useLocalStorage, DEMO_PRODUCTS, DEMO_VERSION, getCurrentCycleDay, daysBetweenLocal, toLocalMidnight } from "./utils.jsx";
+import { SwanWelcomeScreen, useLocalStorage, DEMO_PRODUCTS, DEMO_VERSION, getCurrentCycleDay, daysBetweenLocal, toLocalMidnight, isoWeekNumber, isoWeekYear } from "./utils.jsx";
 import { WeekendNudgeCard } from "./weekend.jsx";
 import { SeasonalNudgeCard } from "./seasonal.jsx";
 import { AuthScreen } from "./auth.jsx";
-import { Reflection, isoWeekNumber, isoWeekYear } from "./reflection.jsx";
 import { supabase } from "./supabase.js";
+
+// Code-split: gated by user action or onboarding state, so their chunks load
+// on demand rather than blocking initial paint.
+const OnboardingScreen = lazy(() => import("./onboarding.jsx").then(m => ({ default: m.OnboardingScreen })));
+const Reflection       = lazy(() => import("./reflection.jsx").then(m => ({ default: m.Reflection })));
+const ProfileSheet     = lazy(() => import("./profile.jsx").then(m => ({ default: m.ProfileSheet })));
+const ScanModal        = lazy(() => import("./modals.jsx").then(m => ({ default: m.ScanModal })));
+const ProductModal     = lazy(() => import("./productmodal.jsx").then(m => ({ default: m.ProductModal })));
+const RoutineFitSheet  = lazy(() => import("./productmodal.jsx").then(m => ({ default: m.RoutineFitSheet })));
 
 export default function App() {
   // -- Auth state --------------------------------------------------------------
@@ -631,7 +635,11 @@ export default function App() {
 
   // -- Needs onboarding (new signup) ------------------------------------------
   if (needsOnboarding || (!user && authSession)) {
-    return <OnboardingScreen onComplete={handleOnboardingComplete} setLocationData={setLocationData} />;
+    return (
+      <Suspense fallback={<div style={{ minHeight: "100vh", background: "var(--color-ivory)" }} />}>
+        <OnboardingScreen onComplete={handleOnboardingComplete} setLocationData={setLocationData} />
+      </Suspense>
+    );
   }
 
   // -- First run welcome (just completed onboarding) --------------------------
@@ -815,15 +823,19 @@ export default function App() {
           journals={journals}
           user={{ ...(user || {}), id: authSession?.user?.id }}
         />}
-        {tab === "reflection" && <Reflection
-          reflections={reflections}
-          onAddReflection={addReflection}
-          products={products}
-          checkIns={checkIns}
-          user={{ ...(user || {}), id: authSession?.user?.id }}
-          locationData={locationData}
-          journals={journals}
-        />}
+        {tab === "reflection" && (
+          <Suspense fallback={null}>
+            <Reflection
+              reflections={reflections}
+              onAddReflection={addReflection}
+              products={products}
+              checkIns={checkIns}
+              user={{ ...(user || {}), id: authSession?.user?.id }}
+              locationData={locationData}
+              journals={journals}
+            />
+          </Suspense>
+        )}
         {tab === "progress"  && <Progress products={products} checkIns={checkIns} setCheckIns={setCheckIns} treatments={treatments} setTreatments={setTreatments} saveTreatment={saveTreatment} removeTreatment={removeTreatment} updateTreatmentDate={updateTreatmentDate} user={user} onAdvanceRamp={advanceRamp} onHoldRamp={holdRamp} onResetRampStart={resetRampStartDate} journals={journals} setJournals={setJournals} onUpdateUser={updateUser} reflections={reflections} />}
       </div>
 
@@ -841,30 +853,31 @@ export default function App() {
         </div>
       </div>
 
-      {modal && <ProductModal product={modal === "add" ? null : modal} onSave={saveProduct} onClose={() => setModal(null)} user={user} />}
-      {profileOpen && <ProfileSheet user={user} products={products} locationData={locationData} setLocationData={setLocationData} locationDenied={locationDenied} setLocationDenied={setLocationDenied} onUpdateUser={updateUser} onLogout={handleLogout} onClose={() => setProfileOpen(false)} />}
-      {fitSheet && (
-        <RoutineFitSheet
-          product={fitSheet.product}
-          assessment={fitSheet.assessment}
-          onAddNow={() => {
-            setModal(fitSheet.product);
-            setFitSheet(null);
-          }}
-          onDefer={() => {
-            setWaitingRoom(prev => [...prev, {
-              product: fitSheet.product,
-              reason: fitSheet.assessment.reason,
-              detail: fitSheet.assessment.detail,
-              deferTag: fitSheet.assessment.deferTag,
-              savedAt: new Date().toISOString(),
-            }]);
-            setFitSheet(null);
-          }}
-          onClose={() => setFitSheet(null)}
-        />
-      )}
-      {scanOpen && <ScanModal products={products} onAddToShelf={p => {
+      <Suspense fallback={null}>
+        {modal && <ProductModal product={modal === "add" ? null : modal} onSave={saveProduct} onClose={() => setModal(null)} user={user} />}
+        {profileOpen && <ProfileSheet user={user} products={products} locationData={locationData} setLocationData={setLocationData} locationDenied={locationDenied} setLocationDenied={setLocationDenied} onUpdateUser={updateUser} onLogout={handleLogout} onClose={() => setProfileOpen(false)} />}
+        {fitSheet && (
+          <RoutineFitSheet
+            product={fitSheet.product}
+            assessment={fitSheet.assessment}
+            onAddNow={() => {
+              setModal(fitSheet.product);
+              setFitSheet(null);
+            }}
+            onDefer={() => {
+              setWaitingRoom(prev => [...prev, {
+                product: fitSheet.product,
+                reason: fitSheet.assessment.reason,
+                detail: fitSheet.assessment.detail,
+                deferTag: fitSheet.assessment.deferTag,
+                savedAt: new Date().toISOString(),
+              }]);
+              setFitSheet(null);
+            }}
+            onClose={() => setFitSheet(null)}
+          />
+        )}
+        {scanOpen && <ScanModal products={products} onAddToShelf={p => {
           const ingredients = Array.isArray(p.ingredients) ? p.ingredients.join(", ") : (p.ingredients || "");
           // Infer category from ingredients/name when the scan didn't return one
           const inferCategory = () => {
@@ -891,6 +904,7 @@ export default function App() {
             ingredients,
           });
         }} onClose={() => setScanOpen(false)} />}
+      </Suspense>
     </div>
   );
 }
