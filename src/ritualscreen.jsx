@@ -365,13 +365,25 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
 
   const sessionKey = `ritual_complete_${today}_${period}`;
 
-  // AM and PM completions live under separate localStorage keys.
+  // AM and PM completions live under separate localStorage keys. The useState
+  // initializer only runs on first mount, so when the period flips (auto-switch
+  // after AM is done, or the user taps "switch to evening") we must re-hydrate
+  // from the new key. Otherwise the AM-completed array stays in state, any
+  // session:"both" product (cleanser/moisturizer/SPF/etc.) shows pre-checked
+  // under PM because the ids match, and the next toggleStep writes the stale
+  // AM array into the PM localStorage key.
   const [completedSteps, setCompletedSteps] = useState(() => {
     try {
       const raw = localStorage.getItem(sessionKey);
       return raw ? JSON.parse(raw) : [];
     } catch { return []; }
   });
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(sessionKey);
+      setCompletedSteps(raw ? JSON.parse(raw) : []);
+    } catch { setCompletedSteps([]); }
+  }, [sessionKey]);
 
   const [ritualDismissed, setRitualDismissed] = useState(false);
   const [showRitualCheckIn, setShowRitualCheckIn] = useState(false);
