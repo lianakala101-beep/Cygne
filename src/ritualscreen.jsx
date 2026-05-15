@@ -420,26 +420,6 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
           text="Your Ritual"
           style={{ fontFamily: "var(--font-display)", fontSize: 42, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-inky-moss)", margin: 0, lineHeight: 1.15 }}
         />
-        {/* AM / PM manual toggle */}
-        <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 8, marginTop: 10 }}>
-          <span style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 9, letterSpacing: "0.15em", color: period === "AM" ? "var(--color-inky-moss)" : "var(--color-pebble)", transition: "color 0.2s" }}>
-            MORNING
-          </span>
-          <div
-            onClick={() => setManualPeriod(period === "AM" ? "PM" : "AM")}
-            style={{ width: 28, height: 14, borderRadius: 7, background: "var(--color-inky-moss)", cursor: "pointer", position: "relative", opacity: 0.7, flexShrink: 0 }}>
-            <div style={{
-              position: "absolute", top: 2,
-              left: period === "AM" ? 2 : 16,
-              width: 10, height: 10, borderRadius: "50%",
-              background: "var(--color-ivory)",
-              transition: "left 0.2s ease",
-            }} />
-          </div>
-          <span style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 9, letterSpacing: "0.15em", color: period === "PM" ? "var(--color-inky-moss)" : "var(--color-pebble)", transition: "color 0.2s" }}>
-            EVENING
-          </span>
-        </div>
       </div>
 
       {/* Decorative wave — between header and steps */}
@@ -506,11 +486,16 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
       )}
 
       {/* Session header */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
         <span style={{ color: "var(--clay)", opacity: 0.55 }}><Icon name={sessionIcon} size={15} /></span>
         <span style={{ fontFamily: "var(--font-body)", fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)" }}>{sessionLabel} Ritual</span>
         <span style={{ fontSize: 9, fontFamily: "var(--font-body)", fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "#2d3d2b", background: "rgba(45,61,43,0.14)", padding: "2px 8px", borderRadius: 20 }}>Now</span>
       </div>
+      <button
+        onClick={() => setManualPeriod(period === "AM" ? "PM" : "AM")}
+        style={{ background: "none", border: "none", padding: 0, margin: "0 0 20px 25px", cursor: "pointer", fontFamily: "var(--font-display)", fontSize: 9, fontWeight: 400, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-pebble)" }}>
+        Switch to {period === "AM" ? "Evening" : "Morning"}
+      </button>
 
       {/* Steps */}
       {steps.length > 0
