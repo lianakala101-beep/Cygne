@@ -822,6 +822,9 @@ export default function App() {
           checkIns={checkIns}
           journals={journals}
           user={{ ...(user || {}), id: authSession?.user?.id }}
+          rampLog={rampLog}
+          onAdvanceRamp={advanceRamp}
+          onHoldRamp={holdRamp}
         />}
         {tab === "reflection" && (
           <Suspense fallback={null}>
