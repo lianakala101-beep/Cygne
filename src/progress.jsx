@@ -1574,12 +1574,6 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
         <h1 style={{ fontFamily: "var(--font-display)", fontSize: 38, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-inky-moss)", margin: 0, lineHeight: 1.15 }}>Your Progress</h1>
       </div>
 
-      {/* -- Inflammation Heat Map ------------------------------------------ */}
-      {sectionLabel("map-pin", "Inflammation Map")}
-      <div style={{ marginBottom: 28 }}>
-        <FaceHeatMap journals={journals} onAskCygne={(q, ctx) => setAskCygneQuestion({ q, ctx })} />
-      </div>
-
       {/* -- Skin Journal ------------------------------------------------------ */}
       {sectionLabel("book-open", "Your Journal")}
       {(() => {
@@ -1671,6 +1665,12 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
           <button onClick={() => setShowCheckIn(true)} style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.08em", color: "var(--clay)", background: "none", border: "1px solid var(--border)", borderRadius: 20, padding: "5px 12px", cursor: "pointer" }}>Update</button>
         </div>
       )}
+
+      {/* -- Inflammation Heat Map ------------------------------------------ */}
+      {sectionLabel("map-pin", "Inflammation Map")}
+      <div style={{ marginBottom: 28 }}>
+        <FaceHeatMap journals={journals} onAskCygne={(q, ctx) => setAskCygneQuestion({ q, ctx })} />
+      </div>
 
       {/* -- Consistency score — only when there are check-ins ------------------ */}
       {consistencyPct !== null && (
