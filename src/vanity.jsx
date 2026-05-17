@@ -39,6 +39,146 @@ const CARD_IMG_BG = {
   Exfoliant:   "linear-gradient(145deg, #e8e2d8 0%, #d8d0c3 100%)",
   Mask:        "linear-gradient(145deg, #edeae2 0%, #ddd5c7 100%)",
 };
+
+// Ghosted SVG illustrations rendered next to each category section header.
+// One per category — atmospheric, never competing with the title. Single
+// stroke, no fill, inky-moss currentColor inherited from the wrapper.
+function CategoryIllustration({ category }) {
+  const props = {
+    viewBox: "0 0 100 100",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.25,
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    style: { width: "100%", height: "100%", display: "block" },
+    "aria-hidden": "true",
+    focusable: "false",
+  };
+  switch (category) {
+    case "Cleanser":
+      // Foam / bubble cluster
+      return (
+        <svg {...props}>
+          <circle cx="32" cy="56" r="14" />
+          <circle cx="54" cy="44" r="18" />
+          <circle cx="74" cy="60" r="11" />
+          <circle cx="44" cy="70" r="8" />
+          <circle cx="64" cy="74" r="6" />
+          <circle cx="24" cy="38" r="5" />
+          <circle cx="78" cy="40" r="4" />
+        </svg>
+      );
+    case "Serum":
+      // Dropper bottle
+      return (
+        <svg {...props}>
+          <line x1="46" y1="10" x2="54" y2="10" />
+          <path d="M 42 14 L 58 14 L 58 26 L 42 26 Z" />
+          <line x1="44" y1="26" x2="44" y2="32" />
+          <line x1="56" y1="26" x2="56" y2="32" />
+          <path d="M 34 32 L 66 32 L 66 86 Q 66 92 60 92 L 40 92 Q 34 92 34 86 Z" />
+          <line x1="40" y1="58" x2="60" y2="58" />
+        </svg>
+      );
+    case "Moisturizer":
+      // Round jar — wide squat lid + body
+      return (
+        <svg {...props}>
+          <ellipse cx="50" cy="28" rx="30" ry="5" />
+          <line x1="20" y1="28" x2="20" y2="38" />
+          <line x1="80" y1="28" x2="80" y2="38" />
+          <ellipse cx="50" cy="38" rx="30" ry="5" />
+          <path d="M 20 38 L 20 80 Q 20 86 26 86 L 74 86 Q 80 86 80 80 L 80 38" />
+        </svg>
+      );
+    case "SPF":
+      // Tube with cap + small sun motif
+      return (
+        <svg {...props}>
+          <path d="M 40 8 L 60 8 L 60 22 L 40 22 Z" />
+          <line x1="40" y1="22" x2="60" y2="22" />
+          <path d="M 36 22 L 32 90 Q 32 92 34 92 L 66 92 Q 68 92 68 90 L 64 22" />
+          <circle cx="50" cy="56" r="6" />
+          <line x1="50" y1="44" x2="50" y2="48" />
+          <line x1="50" y1="64" x2="50" y2="68" />
+          <line x1="38" y1="56" x2="42" y2="56" />
+          <line x1="58" y1="56" x2="62" y2="56" />
+        </svg>
+      );
+    case "Treatment":
+      // Small vial with cork + liquid line
+      return (
+        <svg {...props}>
+          <path d="M 44 10 L 56 10 L 56 18 L 44 18 Z" />
+          <line x1="44" y1="18" x2="38" y2="32" />
+          <line x1="56" y1="18" x2="62" y2="32" />
+          <path d="M 38 32 L 38 84 Q 38 92 46 92 L 54 92 Q 62 92 62 84 L 62 32 Z" />
+          <line x1="40" y1="64" x2="60" y2="64" />
+        </svg>
+      );
+    case "Toner":
+    case "Toning Pad":
+      // Tall slim bottle with shoulder
+      return (
+        <svg {...props}>
+          <line x1="44" y1="10" x2="56" y2="10" />
+          <line x1="44" y1="10" x2="44" y2="22" />
+          <line x1="56" y1="10" x2="56" y2="22" />
+          <line x1="44" y1="22" x2="34" y2="34" />
+          <line x1="56" y1="22" x2="66" y2="34" />
+          <path d="M 34 34 L 34 86 Q 34 92 40 92 L 60 92 Q 66 92 66 86 L 66 34" />
+        </svg>
+      );
+    case "Exfoliant":
+      // Bottle with hatched texture hint
+      return (
+        <svg {...props}>
+          <path d="M 42 10 L 58 10 L 58 22 L 42 22 Z" />
+          <path d="M 36 22 L 36 86 Q 36 92 42 92 L 58 92 Q 64 92 64 86 L 64 22 Z" />
+          <line x1="42" y1="44" x2="58" y2="40" />
+          <line x1="42" y1="54" x2="58" y2="50" />
+          <line x1="42" y1="64" x2="58" y2="60" />
+        </svg>
+      );
+    case "Mask":
+      // Half-moon mask / pouch
+      return (
+        <svg {...props}>
+          <path d="M 22 30 L 78 30 L 70 86 Q 70 90 66 90 L 34 90 Q 30 90 30 86 Z" />
+          <line x1="40" y1="22" x2="60" y2="22" />
+          <line x1="40" y1="22" x2="40" y2="30" />
+          <line x1="60" y1="22" x2="60" y2="30" />
+        </svg>
+      );
+    case "Eye Cream":
+      // Small squat tube
+      return (
+        <svg {...props}>
+          <path d="M 36 18 L 64 18 L 64 26 L 36 26 Z" />
+          <path d="M 32 26 L 30 84 Q 30 90 36 90 L 64 90 Q 70 90 70 84 L 68 26 Z" />
+        </svg>
+      );
+    case "Oil":
+      // Faceted oil bottle
+      return (
+        <svg {...props}>
+          <line x1="46" y1="8" x2="54" y2="8" />
+          <line x1="46" y1="8" x2="46" y2="22" />
+          <line x1="54" y1="8" x2="54" y2="22" />
+          <path d="M 46 22 L 30 36 L 30 86 Q 30 92 36 92 L 64 92 Q 70 92 70 86 L 70 36 L 54 22 Z" />
+        </svg>
+      );
+    default:
+      // Leaf — calm, on-brand fallback for any uncategorized item
+      return (
+        <svg {...props}>
+          <path d="M 28 80 Q 28 32 72 24 Q 78 64 28 80 Z" />
+          <path d="M 30 78 Q 50 60 70 28" />
+        </svg>
+      );
+  }
+}
 const GLASS_CARD = {
   backdropFilter: "blur(12px)",
   WebkitBackdropFilter: "blur(12px)",
@@ -518,13 +658,47 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo
                   ))}
                 </div>
               )}
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
-                {filtered.map(p => <GlassProductCard key={p.id} product={p} onEdit={onEdit} onDelete={onDelete} onToggleRoutine={onToggleRoutine} onSession={onSession} user={user} onAskCygne={(q, ctx) => setAskState({ question: q, context: ctx })} />)}
-                <button onClick={onAdd} style={{ ...GLASS_CARD, background: "rgba(250,249,244,0.25)", border: "1px dashed rgba(192,192,192,0.4)", cursor: "pointer", aspectRatio: "1 / 1", alignItems: "center", justifyContent: "center", gap: 8 }}>
-                  <span style={{ fontSize: 20, color: "#7a7a7a", lineHeight: 1 }}>+</span>
-                  <span style={{ fontFamily: "var(--font-display, 'Fungis', sans-serif)", fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: "#7a7a7a" }}>Add Product</span>
-                </button>
-              </div>
+              {(() => {
+                // Group filtered products by category, preserving first-seen order.
+                const order = [];
+                const byCat = {};
+                filtered.forEach(p => {
+                  const cat = p.category || "Other";
+                  if (!byCat[cat]) { byCat[cat] = []; order.push(cat); }
+                  byCat[cat].push(p);
+                });
+                return order.map(cat => (
+                  <section key={cat} style={{ marginBottom: 28 }}>
+                    <div style={{ position: "relative", marginBottom: 12, minHeight: 44, paddingRight: 100 }}>
+                      <h2 style={{
+                        fontFamily: "var(--font-display)",
+                        fontSize: 13, fontWeight: 700, letterSpacing: "0.22em",
+                        textTransform: "uppercase",
+                        color: "var(--color-inky-moss)",
+                        margin: 0, paddingTop: 8,
+                        lineHeight: 1.3,
+                      }}>{cat}</h2>
+                      <div aria-hidden="true" style={{
+                        position: "absolute",
+                        top: -8, right: 0,
+                        width: 88, height: 88,
+                        color: "var(--color-inky-moss)",
+                        opacity: 0.13,
+                        pointerEvents: "none",
+                      }}>
+                        <CategoryIllustration category={cat} />
+                      </div>
+                    </div>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
+                      {byCat[cat].map(p => <GlassProductCard key={p.id} product={p} onEdit={onEdit} onDelete={onDelete} onToggleRoutine={onToggleRoutine} onSession={onSession} user={user} onAskCygne={(q, ctx) => setAskState({ question: q, context: ctx })} />)}
+                    </div>
+                  </section>
+                ));
+              })()}
+              <button onClick={onAdd} style={{ ...GLASS_CARD, width: "100%", background: "rgba(250,249,244,0.25)", border: "1px dashed rgba(192,192,192,0.4)", cursor: "pointer", padding: "18px 0", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10, marginTop: 4 }}>
+                <span style={{ fontSize: 18, color: "#7a7a7a", lineHeight: 1 }}>+</span>
+                <span style={{ fontFamily: "var(--font-display, 'Fungis', sans-serif)", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "#7a7a7a" }}>Add Product</span>
+              </button>
             </>
           )}
         </>
