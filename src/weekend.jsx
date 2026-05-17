@@ -102,7 +102,7 @@ function WeekendNudgeCard({ products, activeMap }) {
           <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: cfg.accent }}>{cfg.label}</span>
           <p style={{ fontFamily: "var(--font-body)", fontSize: 18, fontWeight: 400, color: "var(--parchment)", margin: "2px 0 0", lineHeight: 1.3, letterSpacing: "0.005em" }}>{cfg.headline}</p>
         </div>
-        <button onClick={() => setDismissed(true)} style={{ background: "none", border: "none", color: "var(--clay)", opacity: 0.35, cursor: "pointer", padding: "2px 4px", display: "inline-flex" }}><Icon name="x" size={12} /></button>
+        <button onClick={() => setDismissed(true)} aria-label="Dismiss" style={{ background: "none", border: "none", color: "var(--clay)", opacity: 0.35, cursor: "pointer", padding: "2px 4px", display: "inline-flex" }}><Icon name="x" size={12} /></button>
       </div>
       {advice.skip.length > 0 && (
         <div style={{ marginBottom: 10 }}>

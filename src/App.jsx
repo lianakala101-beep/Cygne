@@ -697,7 +697,30 @@ export default function App() {
         input:focus, select:focus, textarea:focus { border-color: var(--sage) !important; }
         input::placeholder, textarea::placeholder { color: var(--muted); opacity: 0.7; }
         ::-webkit-scrollbar { display: none; }
+        /* Keyboard focus: visible inky-moss ring for :focus-visible only, so
+           mouse/touch interactions stay clean but keyboard navigation is
+           always discoverable. */
         button:focus { outline: none; }
+        button:focus-visible,
+        a:focus-visible,
+        [role="button"]:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        textarea:focus-visible {
+          outline: 2px solid var(--color-inky-moss, #2d3d2b);
+          outline-offset: 2px;
+          border-radius: 2px;
+        }
+        /* Respect prefers-reduced-motion — disable non-essential transitions
+           and keyframes for users who opt out of animation. */
+        @media (prefers-reduced-motion: reduce) {
+          *, *::before, *::after {
+            animation-duration: 0.001ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.001ms !important;
+            scroll-behavior: auto !important;
+          }
+        }
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
         @keyframes cygneCheckDraw { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }

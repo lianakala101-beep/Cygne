@@ -77,7 +77,7 @@ function AuthScreen({ onAuth }) {
       {/* Logo */}
       <img
         src="/cygne-logo.png"
-        alt=""
+        alt="Cygne"
         style={{
           width: "48%",
           maxWidth: 200,

@@ -354,7 +354,7 @@ function RecommendationCard({ rec, onAdd, onDismiss }) {
             style={{ background: "none", border: "none", cursor: "pointer", color: "var(--clay)", opacity: 0.3, padding: "0 0 0 2px", flexShrink: 0, marginTop: 3, fontSize: 15, lineHeight: 1 }}
             onMouseEnter={e => e.currentTarget.style.opacity = "0.65"}
             onMouseLeave={e => e.currentTarget.style.opacity = "0.3"}
-            title="Dismiss">×</button>
+            aria-label="Dismiss" title="Dismiss">×</button>
         )}
       </div>
       {expanded && (
@@ -657,7 +657,7 @@ function RefinementItem({ r, vs, onEdit, onDismiss }) {
             style={{ background: "none", border: "none", cursor: "pointer", color: "var(--clay)", opacity: 0.3, padding: "0 0 0 2px", flexShrink: 0, fontSize: 15, lineHeight: 1 }}
             onMouseEnter={e => e.currentTarget.style.opacity = "0.65"}
             onMouseLeave={e => e.currentTarget.style.opacity = "0.3"}
-            title="Dismiss">×</button>
+            aria-label="Dismiss" title="Dismiss">×</button>
         )}
       </div>
       {open && (

@@ -285,6 +285,7 @@ function ZoneInsightDrawer({ zoneId, journals, products, user, onClose, onAskCyg
           </h3>
           <button
             onClick={onClose}
+            aria-label="Close"
             style={{ background: "none", border: "none", cursor: "pointer", color: STONE, fontSize: 18, lineHeight: 1 }}
           >×</button>
         </div>

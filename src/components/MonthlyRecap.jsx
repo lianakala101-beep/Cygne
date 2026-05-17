@@ -278,6 +278,7 @@ export function MonthlyRecap({
           color: PEBBLE, fontSize: 22, lineHeight: 1, padding: 6,
           fontFamily: "var(--font-display)",
         }}
+        aria-label="Close"
       >×</button>
 
       <div style={{ maxWidth: 540, margin: "0 auto", padding: "60px 28px 44px" }}>
