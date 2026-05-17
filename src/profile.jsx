@@ -109,9 +109,9 @@ function SkinEditor({ user, onUpdateUser }) {
   return (
     <div style={{ marginBottom: 20 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-        <p style={{ fontFamily: "var(--sans)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--clay)", margin: 0 }}>Your Skin</p>
+        <p style={{ fontFamily: "var(--sans)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: 0 }}>Your Skin</p>
         {!editing && (
-          <button onClick={() => setEditing(true)} style={{ background: "none", border: "none", fontFamily: "var(--sans)", fontSize: 10, color: "var(--sage)", cursor: "pointer", letterSpacing: "0.08em", padding: 0 }}>
+          <button onClick={() => setEditing(true)} style={{ background: "none", border: "none", fontFamily: "var(--sans)", fontSize: 10, color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer", letterSpacing: "0.14em", textTransform: "uppercase", padding: 0 }}>
             Edit
           </button>
         )}
@@ -122,7 +122,7 @@ function SkinEditor({ user, onUpdateUser }) {
           {user?.skinType ? (
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: user?.concerns?.length > 0 ? 10 : 0, paddingBottom: user?.concerns?.length > 0 ? 10 : 0, borderBottom: user?.concerns?.length > 0 ? "1px solid var(--border)" : "none" }}>
               <span style={{ fontFamily: "var(--sans)", fontSize: 10, color: "var(--clay)", letterSpacing: "0.06em" }}>Skin type</span>
-              <span style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(45,61,43,0.10)", border: "1px solid rgba(45,61,43,0.3)", fontFamily: "var(--sans)", fontSize: 10, color: "var(--sage)", fontWeight: 400 }}>{user.skinType}</span>
+              <span style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(45,61,43,0.10)", border: "1px solid rgba(45,61,43,0.3)", fontFamily: "var(--sans)", fontSize: 10, color: "var(--color-inky-moss, #2d3d2b)", fontWeight: 400 }}>{user.skinType}</span>
             </div>
           ) : (
             <p style={{ fontFamily: "var(--sans)", fontSize: 11, color: "var(--clay)", margin: "0 0 8px", opacity: 0.5 }}>No skin type set.</p>
@@ -162,7 +162,7 @@ function SkinEditor({ user, onUpdateUser }) {
             })}
           </div>
           <div style={{ display: "flex", gap: 8 }}>
-            <button onClick={save} style={{ flex: 1, padding: "10px 0", background: "rgba(45,61,43,0.14)", border: "1px solid rgba(45,61,43,0.35)", borderRadius: 10, fontFamily: "var(--sans)", fontSize: 10, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer" }}>Save</button>
+            <button onClick={save} style={{ flex: 1, padding: "10px 0", background: "rgba(45,61,43,0.14)", border: "1px solid rgba(45,61,43,0.35)", borderRadius: 10, fontFamily: "var(--sans)", fontSize: 10, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer" }}>Save</button>
             <button onClick={cancel} style={{ flex: 1, padding: "10px 0", background: "transparent", border: "1px solid var(--border)", borderRadius: 10, fontFamily: "var(--sans)", fontSize: 10, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", cursor: "pointer" }}>Cancel</button>
           </div>
         </div>
@@ -231,8 +231,8 @@ function IngredientProfile({ user, onUpdateUser }) {
   return (
     <div style={{ marginBottom: 20 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-        <p style={{ fontFamily: "var(--sans)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--clay)", margin: 0 }}>Ingredient Profile</p>
-        {!editing && <button onClick={() => setEditing(true)} style={{ background: "none", border: "none", fontFamily: "var(--sans)", fontSize: 10, color: "var(--sage)", cursor: "pointer", letterSpacing: "0.08em", padding: 0 }}>Edit</button>}
+        <p style={{ fontFamily: "var(--sans)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: 0 }}>Ingredient Profile</p>
+        {!editing && <button onClick={() => setEditing(true)} style={{ background: "none", border: "none", fontFamily: "var(--sans)", fontSize: 10, color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer", letterSpacing: "0.08em", padding: 0 }}>Edit</button>}
       </div>
 
       {!editing ? (
@@ -326,7 +326,7 @@ function IngredientProfile({ user, onUpdateUser }) {
           </div>
 
           <div style={{ display: "flex", gap: 8 }}>
-            <button onClick={save} style={{ flex: 1, padding: "10px 0", background: "rgba(45,61,43,0.14)", border: "1px solid rgba(45,61,43,0.35)", borderRadius: 10, fontFamily: "var(--sans)", fontSize: 10, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer" }}>Save</button>
+            <button onClick={save} style={{ flex: 1, padding: "10px 0", background: "rgba(45,61,43,0.14)", border: "1px solid rgba(45,61,43,0.35)", borderRadius: 10, fontFamily: "var(--sans)", fontSize: 10, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer" }}>Save</button>
             <button onClick={cancel} style={{ flex: 1, padding: "10px 0", background: "transparent", border: "1px solid var(--border)", borderRadius: 10, fontFamily: "var(--sans)", fontSize: 10, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", cursor: "pointer" }}>Cancel</button>
           </div>
         </div>
@@ -386,13 +386,13 @@ function SkinHistory({ user, onUpdateUser }) {
   const labelStyle = { fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)" };
   const valStyle = { fontFamily: "var(--font-body)", fontSize: 11, color: "var(--parchment)", fontWeight: 400 };
   const inputStyle = { background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 8, padding: "8px 12px", fontFamily: "var(--font-body)", fontSize: 11, color: "var(--parchment)", width: "100%", outline: "none" };
-  const toggleBtnStyle = (on) => ({ padding: "5px 14px", borderRadius: 20, border: `1px solid ${on ? "rgba(45,61,43,0.5)" : "var(--border)"}`, background: on ? "rgba(45,61,43,0.14)" : "transparent", fontFamily: "var(--font-body)", fontSize: 10, color: on ? "var(--sage)" : "var(--clay)", fontWeight: 400, cursor: "pointer", transition: "all 0.15s" });
+  const toggleBtnStyle = (on) => ({ padding: "5px 14px", borderRadius: 20, border: `1px solid ${on ? "rgba(45,61,43,0.5)" : "var(--border)"}`, background: on ? "rgba(45,61,43,0.14)" : "transparent", fontFamily: "var(--font-body)", fontSize: 10, color: on ? "var(--color-inky-moss, #2d3d2b)" : "var(--clay)", fontWeight: 400, cursor: "pointer", transition: "all 0.15s" });
 
   return (
     <div style={{ marginBottom: 20 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-        <p style={{ fontFamily: "var(--sans)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--clay)", margin: 0 }}>Skin History</p>
-        {!editing && <button onClick={() => setEditing(true)} style={{ background: "none", border: "none", fontFamily: "var(--sans)", fontSize: 10, color: "var(--sage)", cursor: "pointer", letterSpacing: "0.08em", padding: 0 }}>Edit</button>}
+        <p style={{ fontFamily: "var(--sans)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: 0 }}>Skin History</p>
+        {!editing && <button onClick={() => setEditing(true)} style={{ background: "none", border: "none", fontFamily: "var(--sans)", fontSize: 10, color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer", letterSpacing: "0.08em", padding: 0 }}>Edit</button>}
       </div>
 
       {!editing ? (
@@ -480,7 +480,7 @@ function SkinHistory({ user, onUpdateUser }) {
               <input style={{ ...inputStyle, flex: 1 }} placeholder="e.g. Clindamycin, Spironolactone" value={draft.newRx}
                 onChange={e => setDraft(d => ({ ...d, newRx: e.target.value }))}
                 onKeyDown={e => e.key === "Enter" && addRx()} />
-              <button onClick={addRx} style={{ padding: "8px 14px", background: "rgba(45,61,43,0.12)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 10, color: "var(--sage)", cursor: "pointer" }}>Add</button>
+              <button onClick={addRx} style={{ padding: "8px 14px", background: "rgba(45,61,43,0.12)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 10, color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer" }}>Add</button>
             </div>
           </div>
 
@@ -509,12 +509,12 @@ function SkinHistory({ user, onUpdateUser }) {
                 onChange={e => setDraft(d => ({ ...d, newVisitDate: e.target.value }))} />
               <input style={{ ...inputStyle, flex: 1 }} placeholder="Note e.g. prescribed adapalene" value={draft.newVisitNote}
                 onChange={e => setDraft(d => ({ ...d, newVisitNote: e.target.value }))} />
-              <button onClick={addVisit} style={{ padding: "8px 14px", background: "rgba(45,61,43,0.12)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 10, color: "var(--sage)", cursor: "pointer" }}>Log</button>
+              <button onClick={addVisit} style={{ padding: "8px 14px", background: "rgba(45,61,43,0.12)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 10, color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer" }}>Log</button>
             </div>
           </div>
 
           <div style={{ display: "flex", gap: 8 }}>
-            <button onClick={save} style={{ flex: 1, padding: "10px 0", background: "rgba(45,61,43,0.14)", border: "1px solid rgba(45,61,43,0.35)", borderRadius: 10, fontFamily: "var(--sans)", fontSize: 10, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer" }}>Save</button>
+            <button onClick={save} style={{ flex: 1, padding: "10px 0", background: "rgba(45,61,43,0.14)", border: "1px solid rgba(45,61,43,0.35)", borderRadius: 10, fontFamily: "var(--sans)", fontSize: 10, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer" }}>Save</button>
             <button onClick={cancel} style={{ flex: 1, padding: "10px 0", background: "transparent", border: "1px solid var(--border)", borderRadius: 10, fontFamily: "var(--sans)", fontSize: 10, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", cursor: "pointer" }}>Cancel</button>
           </div>
         </div>
@@ -541,11 +541,10 @@ function ProfileSheet({ user, products, locationData, setLocationData, locationD
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 400, display: "flex", alignItems: "flex-end", justifyContent: "center" }}
       >
-      <div style={{ position: "absolute", inset: 0, background: "var(--overlay)", backdropFilter: "blur(12px)" }} onClick={onClose} />
-      <div style={{ position: "relative", background: "var(--surface)", width: "100%", maxWidth: 520, borderRadius: "22px 22px 0 0", border: "1px solid var(--border)", borderBottom: "none", maxHeight: "88vh", overflowY: "auto", zIndex: 1 }}>
-        {/* Handle */}
+      <div style={{ position: "absolute", inset: 0, background: "rgba(28,28,26,0.45)", backdropFilter: "blur(10px)" }} onClick={onClose} />
+      <div style={{ position: "relative", background: "var(--color-ivory, #faf9f4)", width: "100%", maxWidth: 520, borderRadius: 0, maxHeight: "88vh", overflowY: "auto", zIndex: 1 }}>
         <div style={{ display: "flex", justifyContent: "center", padding: "12px 0 0" }}>
-          <div style={{ width: 32, height: 3, borderRadius: 2, background: "var(--border)" }} />
+          <div style={{ width: 32, height: 3, borderRadius: 2, background: "rgba(45,61,43,0.18)" }} />
         </div>
 
         <div style={{ padding: "16px 24px 52px" }}>
@@ -554,7 +553,7 @@ function ProfileSheet({ user, products, locationData, setLocationData, locationD
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: editingAccount ? 16 : 0 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 <div style={{ width: 44, height: 44, borderRadius: "50%", flexShrink: 0, background: "rgba(45,61,43,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <span style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 28, color: "var(--sage)", lineHeight: 1 }}>
+                  <span style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 28, color: "var(--color-inky-moss, #2d3d2b)", lineHeight: 1 }}>
                     {(accountDraft.name || user?.name || "?").trim()[0].toUpperCase()}
                   </span>
                 </div>
@@ -566,54 +565,65 @@ function ProfileSheet({ user, products, locationData, setLocationData, locationD
               <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                 {!editingAccount && (
                   <button onClick={() => { setAccountDraft({ name: user?.name || "", email: user?.email || "", birthYear: user?.birthYear || "", birthMonth: user?.birthMonth || "", birthDay: user?.birthDay || "" }); setEditingAccount(true); }}
-                    style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)", background: "none", border: "none", cursor: "pointer", opacity: 0.6 }}>
+                    style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", background: "none", border: "none", cursor: "pointer" }}>
                     Edit
                   </button>
                 )}
-                <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: 4 }}><Icon name="x" size={18} /></button>
+                <button onClick={onClose} aria-label="Close" style={{ background: "none", border: "none", color: "var(--color-stone, #5a5a5a)", cursor: "pointer", padding: 4 }}><Icon name="x" size={18} /></button>
               </div>
             </div>
 
-            {editingAccount && (
-              <div style={{ background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 13, padding: "16px 16px", display: "flex", flexDirection: "column", gap: 12 }}>
-                <div>
-                  <label style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", display: "block", marginBottom: 5 }}>Name</label>
-                  <input value={accountDraft.name} onChange={e => setAccountDraft(d => ({ ...d, name: e.target.value }))}
-                    style={{ width: "100%", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 12px", fontFamily: "var(--font-body)", fontSize: 13, color: "var(--parchment)", outline: "none", boxSizing: "border-box" }} />
-                </div>
-                <div>
-                  <label style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", display: "block", marginBottom: 5 }}>Email</label>
-                  <input value={accountDraft.email} onChange={e => setAccountDraft(d => ({ ...d, email: e.target.value }))} type="email"
-                    style={{ width: "100%", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 12px", fontFamily: "var(--font-body)", fontSize: 13, color: "var(--parchment)", outline: "none", boxSizing: "border-box" }} />
-                </div>
-                <div>
-                  <label style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", display: "block", marginBottom: 5 }}>Birthday</label>
-                  <div style={{ display: "flex", gap: 8 }}>
-                    <input value={accountDraft.birthYear} onChange={e => setAccountDraft(d => ({ ...d, birthYear: e.target.value }))} placeholder="Year" maxLength={4}
-                      style={{ flex: 1, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 12px", fontFamily: "var(--font-body)", fontSize: 13, color: "var(--parchment)", outline: "none", minWidth: 0 }} />
-                    <input
-                      value={accountDraft.birthMonth && accountDraft.birthDay ? `${accountDraft.birthMonth}/${accountDraft.birthDay}` : accountDraft.birthMonth || ""}
-                      onChange={e => {
-                        const val = e.target.value.replace(/[^0-9/]/g, "");
-                        const parts = val.split("/");
-                        setAccountDraft(d => ({ ...d, birthMonth: parts[0] || "", birthDay: parts[1] || "" }));
-                      }}
-                      placeholder="MM / DD" maxLength={5}
-                      style={{ flex: 1, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 12px", fontFamily: "var(--font-body)", fontSize: 13, color: "var(--parchment)", outline: "none", minWidth: 0 }} />
+            {editingAccount && (() => {
+              const inputStyle = {
+                width: "100%", boxSizing: "border-box",
+                background: "var(--color-ivory-shadow, #f0ebe0)",
+                border: "1px solid rgba(45,61,43,0.14)",
+                borderRadius: 0, padding: "11px 14px",
+                fontFamily: "var(--font-body)", fontSize: 13,
+                color: "var(--color-ink, #1c1c1a)",
+                caretColor: "var(--color-inky-moss, #2d3d2b)",
+                outline: "none",
+                WebkitAppearance: "none", appearance: "none",
+                WebkitTapHighlightColor: "transparent",
+              };
+              const labelStyle = { fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", display: "block", marginBottom: 6 };
+              return (
+                <div style={{ background: "var(--color-ivory-shadow, #f0ebe0)", borderTop: "1px solid rgba(45,61,43,0.18)", padding: "18px 16px", display: "flex", flexDirection: "column", gap: 14 }}>
+                  <div>
+                    <label style={labelStyle}>Name</label>
+                    <input value={accountDraft.name} onChange={e => setAccountDraft(d => ({ ...d, name: e.target.value }))} style={inputStyle} />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Email</label>
+                    <input value={accountDraft.email} onChange={e => setAccountDraft(d => ({ ...d, email: e.target.value }))} type="email" style={inputStyle} />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Birthday</label>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <input value={accountDraft.birthYear} onChange={e => setAccountDraft(d => ({ ...d, birthYear: e.target.value }))} placeholder="Year" maxLength={4} style={{ ...inputStyle, flex: 1, minWidth: 0 }} />
+                      <input
+                        value={accountDraft.birthMonth && accountDraft.birthDay ? `${accountDraft.birthMonth}/${accountDraft.birthDay}` : accountDraft.birthMonth || ""}
+                        onChange={e => {
+                          const val = e.target.value.replace(/[^0-9/]/g, "");
+                          const parts = val.split("/");
+                          setAccountDraft(d => ({ ...d, birthMonth: parts[0] || "", birthDay: parts[1] || "" }));
+                        }}
+                        placeholder="MM / DD" maxLength={5} style={{ ...inputStyle, flex: 1, minWidth: 0 }} />
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+                    <button onClick={saveAccount}
+                      style={{ flex: 1, padding: "12px 0", background: "transparent", border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 700, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
+                      Save
+                    </button>
+                    <button onClick={() => setEditingAccount(false)}
+                      style={{ flex: 1, padding: "12px 0", background: "transparent", border: "1px solid rgba(45,61,43,0.22)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-stone, #5a5a5a)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
+                      Cancel
+                    </button>
                   </div>
                 </div>
-                <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
-                  <button onClick={saveAccount}
-                    style={{ flex: 1, padding: "10px 0", background: "#2d3d2b", border: "none", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 400, color: "var(--ink)", cursor: "pointer" }}>
-                    Save
-                  </button>
-                  <button onClick={() => setEditingAccount(false)}
-                    style={{ flex: 1, padding: "10px 0", background: "none", border: "1px solid var(--border)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", cursor: "pointer" }}>
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            )}
+              );
+            })()}
           </div>
           {/* Stats */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 24 }}>
@@ -642,9 +652,7 @@ function ProfileSheet({ user, products, locationData, setLocationData, locationD
 
           {/* Sign out */}
           <button onClick={onLogout}
-            style={{ width: "100%", padding: "12px 0", background: "none", color: "var(--clay)", border: "1px solid var(--border)", borderRadius: 10, fontFamily: "var(--sans)", fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", cursor: "pointer", transition: "border-color 0.2s, color 0.2s" }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = "#8b7355"; e.currentTarget.style.color = "#8b7355"; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--clay)"; }}>
+            style={{ width: "100%", padding: "13px 0", background: "transparent", color: "var(--color-inky-moss, #2d3d2b)", border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 700, letterSpacing: "0.22em", textTransform: "uppercase", cursor: "pointer", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" }}>
             Sign Out
           </button>
         </div>
