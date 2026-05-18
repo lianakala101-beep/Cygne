@@ -28,14 +28,6 @@ export default function App() {
   const [authLoading, setAuthLoading] = useState(true);
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
 
-  // Ensure fonts load
-  useEffect(() => {
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap";
-    document.head.appendChild(link);
-  }, []);
-
   const requestNotifications = () => {
     setNotifPermission("granted");
     setNotifDismissed(false);
@@ -649,27 +641,15 @@ export default function App() {
   // -- Main app ---------------------------------------------------------------
   return (
     <div style={{ minHeight: "100vh", background: "var(--deep)", paddingBottom: 88 }}>
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-      <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
       <style>{`
-        @font-face {
-          font-family: 'Fungis Heavy';
-          src: url('/fonts/FUNGIS%20Heavy.otf') format('opentype');
-          font-weight: 700;
-          font-style: normal;
-          font-display: swap;
-        }
-        @font-face {
-          font-family: 'Fungis Normal';
-          src: url('/fonts/FUNGIS%20Regular.otf') format('opentype');
-          font-weight: 400;
-          font-style: normal;
-          font-display: swap;
-        }
+        /* Fonts are declared once in src/index.css. Everything below is
+           the runtime token sheet — colors and aliases the legacy inline
+           styles reference. --sans now resolves to Fungis Normal so any
+           stale "var(--font-body)" callsite ends up in the same family as the
+           rest of the app. */
         :root {
           --sage:      #6e8a72;
-          --sans:      'Space Grotesk', sans-serif;
+          --sans:      'Fungis Normal', 'Fungis', sans-serif;
           /* Cygne design system tokens */
           --color-ivory:        #faf9f4;
           --color-ivory-shadow: #f0ebe0;
@@ -677,8 +657,8 @@ export default function App() {
           --color-inky-moss:    #2d3d2b;
           --color-stone:        #5a5a5a;
           --color-pebble:       #7a7a7a;
-          --font-display:  'Fungis Heavy', 'Space Grotesk', sans-serif;
-          --font-body:     'Fungis Normal', 'Space Grotesk', sans-serif;
+          --font-display:  'Fungis Heavy', 'Fungis', sans-serif;
+          --font-body:     'Fungis Normal', 'Fungis', sans-serif;
           /* Surfaces (single light theme) */
           --deep:      #faf9f4;
           --ink:       #f7f4f0;
@@ -860,7 +840,7 @@ export default function App() {
             <button key={t.id} onClick={() => setTab(t.id)}
               style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", padding: "12px 0 18px", background: "none", border: "none", cursor: "pointer", color: tab === t.id ? "var(--sage)" : "var(--clay)", transition: "color 0.2s", gap: 5, position: "relative", opacity: tab === t.id ? 1 : 0.65 }}>
               <Icon name={t.icon} size={tab === t.id ? 20 : 18} />
-              <span style={{ fontFamily: "var(--sans)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", fontWeight: 400 }}>{t.label}</span>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", fontWeight: 400 }}>{t.label}</span>
               {tab === t.id && <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 18, height: 1, background: "var(--sage)" }} />}
             </button>
           ))}

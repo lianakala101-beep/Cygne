@@ -341,10 +341,10 @@ function RecommendationCard({ rec, onAdd, onDismiss }) {
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 4, flexWrap: "wrap" }}>
-            <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", fontWeight: 400, letterSpacing: "0.13em", textTransform: "uppercase", color: rec.tagColor, background: `${rec.tagColor}18`, padding: "2px 7px", borderRadius: 20 }}>{rec.tag}</span>
-            <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.11em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.55 }}>{typeLabelMap[rec.type]}</span>
+            <span style={{ fontSize: 9, fontFamily: "var(--font-body), sans-serif", fontWeight: 400, letterSpacing: "0.13em", textTransform: "uppercase", color: rec.tagColor, background: `${rec.tagColor}18`, padding: "2px 7px", borderRadius: 20 }}>{rec.tag}</span>
+            <span style={{ fontSize: 9, fontFamily: "var(--font-body), sans-serif", letterSpacing: "0.11em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.55 }}>{typeLabelMap[rec.type]}</span>
           </div>
-          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, color: "var(--parchment)", margin: 0, fontWeight: 400, lineHeight: 1.35 }}>{rec.title}</p>
+          <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 13, color: "var(--parchment)", margin: 0, fontWeight: 400, lineHeight: 1.35 }}>{rec.title}</p>
         </div>
         <span style={{ color: "var(--clay)", opacity: 0.35, flexShrink: 0, marginTop: 5, display: "inline-block", transform: expanded ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>
           <Icon name="chevron" size={13} />
@@ -359,17 +359,17 @@ function RecommendationCard({ rec, onAdd, onDismiss }) {
       </div>
       {expanded && (
         <div style={{ marginTop: 13, paddingTop: 13, borderTop: "1px solid var(--border)" }}>
-          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", margin: "0 0 10px", lineHeight: 1.65 }}>{rec.body}</p>
+          <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 12, color: "var(--clay)", margin: "0 0 10px", lineHeight: 1.65 }}>{rec.body}</p>
           {rec.action && (
             <div style={{ display: "flex", gap: 8, padding: "9px 12px", background: "rgba(122,144,112,0.06)", borderRadius: 9, border: "1px solid rgba(122,144,112,0.14)", marginBottom: 8 }}>
               <span style={{ color: "#7a9070", flexShrink: 0, marginTop: 1 }}><Icon name="check" size={11} /></span>
-              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--parchment)", margin: 0, lineHeight: 1.6 }}>{rec.action}</p>
+              <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--parchment)", margin: 0, lineHeight: 1.6 }}>{rec.action}</p>
             </div>
           )}
           {rec.note && (
             <div style={{ display: "flex", gap: 8, padding: "9px 12px", background: "var(--surface)", borderRadius: 9, border: "1px solid var(--border)", marginBottom: 8 }}>
               <span style={{ color: "var(--clay)", opacity: 0.45, flexShrink: 0, marginTop: 1 }}><Icon name="info" size={11} /></span>
-              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{rec.note}</p>
+              <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{rec.note}</p>
             </div>
           )}
           {rec.type === "addition" && rec.category && onAdd && (
@@ -379,7 +379,7 @@ function RecommendationCard({ rec, onAdd, onDismiss }) {
               onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.18)"}
               onMouseLeave={e => e.currentTarget.style.background = "rgba(122,144,112,0.10)"}>
               <Icon name="plus" size={11} color="#7a9070" />
-              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 400, color: "#7a9070", letterSpacing: "0.08em", textTransform: "uppercase" }}>Add {rec.category} to vanity</span>
+              <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 10, fontWeight: 400, color: "#7a9070", letterSpacing: "0.08em", textTransform: "uppercase" }}>Add {rec.category} to vanity</span>
             </button>
           )}
         </div>
@@ -597,8 +597,8 @@ function RefinementsCard({ products, activeMap, conflicts }) {
         onMouseLeave={e => { if (!open) e.currentTarget.style.borderColor = "var(--border)"; }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#c49040", flexShrink: 0 }} />
-          <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 400, color: "var(--parchment)", letterSpacing: "0.02em" }}>Refine Your Ritual</span>
-          <span style={{ fontSize: 10, fontFamily: "Space Grotesk, sans-serif", background: "rgba(196,144,64,0.14)", color: "#c49040", padding: "2px 8px", borderRadius: 20, letterSpacing: "0.06em" }}>{refinements.length}</span>
+          <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 12, fontWeight: 400, color: "var(--parchment)", letterSpacing: "0.02em" }}>Refine Your Ritual</span>
+          <span style={{ fontSize: 10, fontFamily: "var(--font-body), sans-serif", background: "rgba(196,144,64,0.14)", color: "#c49040", padding: "2px 8px", borderRadius: 20, letterSpacing: "0.06em" }}>{refinements.length}</span>
         </div>
         <span style={{ color: "var(--clay)", opacity: 0.6, display: "inline-block", transform: open ? "rotate(90deg)" : "none", transition: "transform 0.22s" }}>
           <Icon name="chevron" size={14} />
@@ -611,7 +611,7 @@ function RefinementsCard({ products, activeMap, conflicts }) {
           {/* Verb filter pills */}
           <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
             <button onClick={() => setActiveVerb(null)}
-              style={{ padding: "5px 12px", borderRadius: 20, border: `1px solid ${activeVerb === null ? "var(--sage)" : "var(--border)"}`, background: activeVerb === null ? "rgba(122,144,112,0.10)" : "transparent", color: activeVerb === null ? "var(--parchment)" : "var(--clay)", fontFamily: "Space Grotesk, sans-serif", fontSize: 9, fontWeight: 400, cursor: "pointer", letterSpacing: "0.1em", textTransform: "uppercase", transition: "all 0.15s" }}>
+              style={{ padding: "5px 12px", borderRadius: 20, border: `1px solid ${activeVerb === null ? "var(--sage)" : "var(--border)"}`, background: activeVerb === null ? "rgba(122,144,112,0.10)" : "transparent", color: activeVerb === null ? "var(--parchment)" : "var(--clay)", fontFamily: "var(--font-body), sans-serif", fontSize: 9, fontWeight: 400, cursor: "pointer", letterSpacing: "0.1em", textTransform: "uppercase", transition: "all 0.15s" }}>
               All
             </button>
             {verbs.map(v => {
@@ -619,7 +619,7 @@ function RefinementsCard({ products, activeMap, conflicts }) {
               const isActive = activeVerb === v;
               return (
                 <button key={v} onClick={() => setActiveVerb(isActive ? null : v)}
-                  style={{ padding: "5px 12px", borderRadius: 20, border: `1px solid ${isActive ? vs.border : "var(--border)"}`, background: isActive ? vs.bg : "transparent", color: isActive ? vs.color : "var(--clay)", fontFamily: "Space Grotesk, sans-serif", fontSize: 9, fontWeight: 400, cursor: "pointer", letterSpacing: "0.1em", textTransform: "uppercase", transition: "all 0.15s" }}>
+                  style={{ padding: "5px 12px", borderRadius: 20, border: `1px solid ${isActive ? vs.border : "var(--border)"}`, background: isActive ? vs.bg : "transparent", color: isActive ? vs.color : "var(--clay)", fontFamily: "var(--font-body), sans-serif", fontSize: 9, fontWeight: 400, cursor: "pointer", letterSpacing: "0.1em", textTransform: "uppercase", transition: "all 0.15s" }}>
                   {v}
                 </button>
               );
@@ -647,8 +647,8 @@ function RefinementItem({ r, vs, onEdit, onDismiss }) {
       onMouseEnter={e => e.currentTarget.style.borderColor = vs.border}
       onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}>
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", fontWeight: 400, letterSpacing: "0.13em", textTransform: "uppercase", color: vs.color, background: `${vs.color}18`, padding: "3px 8px", borderRadius: 20, flexShrink: 0 }}>{r.verb}</span>
-        <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--parchment)", margin: 0, flex: 1, fontWeight: 400, lineHeight: 1.3 }}>{r.title}</p>
+        <span style={{ fontSize: 9, fontFamily: "var(--font-body), sans-serif", fontWeight: 400, letterSpacing: "0.13em", textTransform: "uppercase", color: vs.color, background: `${vs.color}18`, padding: "3px 8px", borderRadius: 20, flexShrink: 0 }}>{r.verb}</span>
+        <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 12, color: "var(--parchment)", margin: 0, flex: 1, fontWeight: 400, lineHeight: 1.3 }}>{r.title}</p>
         <span style={{ color: "var(--clay)", opacity: 0.5, flexShrink: 0, display: "inline-block", transform: open ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>
           <Icon name="chevron" size={12} />
         </span>
@@ -662,11 +662,11 @@ function RefinementItem({ r, vs, onEdit, onDismiss }) {
       </div>
       {open && (
         <div style={{ marginTop: 11, paddingTop: 11, borderTop: "1px solid var(--border)" }}>
-          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: "0 0 9px", lineHeight: 1.65 }}>{r.body}</p>
+          <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--clay)", margin: "0 0 9px", lineHeight: 1.65 }}>{r.body}</p>
           {r.action && (
             <div style={{ display: "flex", gap: 8, padding: "9px 11px", background: `${vs.color}0d`, borderRadius: 8, border: `1px solid ${vs.color}28`, marginBottom: r.product && onEdit ? 8 : 0 }}>
               <span style={{ color: vs.color, flexShrink: 0, marginTop: 1 }}><Icon name="check" size={11} /></span>
-              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--parchment)", margin: 0, lineHeight: 1.55 }}>{r.action}</p>
+              <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--parchment)", margin: 0, lineHeight: 1.55 }}>{r.action}</p>
             </div>
           )}
           {r.product && onEdit && (
@@ -675,7 +675,7 @@ function RefinementItem({ r, vs, onEdit, onDismiss }) {
               style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4, padding: "8px 14px", background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.30)", borderRadius: 9, cursor: "pointer", transition: "background 0.15s" }}
               onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.18)"}
               onMouseLeave={e => e.currentTarget.style.background = "rgba(122,144,112,0.10)"}>
-              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 400, color: "#7a9070", letterSpacing: "0.08em", textTransform: "uppercase" }}>Edit {r.product.brand ? `${r.product.brand} ${r.product.name}` : r.product.name}</span>
+              <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 10, fontWeight: 400, color: "#7a9070", letterSpacing: "0.08em", textTransform: "uppercase" }}>Edit {r.product.brand ? `${r.product.brand} ${r.product.name}` : r.product.name}</span>
               <Icon name="chevron" size={11} color="#7a9070" />
             </button>
           )}

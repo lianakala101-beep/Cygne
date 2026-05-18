@@ -194,11 +194,11 @@ function SeasonalNudgeCard({ products, activeMap, user }) {
         <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 16, letterSpacing: "0.03em", color: "var(--color-inky-moss)", margin: "0 0 6px", lineHeight: 1.5 }}>{cfg.headline}</p>
 
         {/* Body */}
-        <p style={{ fontFamily: "var(--sans)", fontSize: 11, color: "var(--clay)", margin: "0 0 12px", lineHeight: 1.65 }}>{cfg.body}</p>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: "0 0 12px", lineHeight: 1.65 }}>{cfg.body}</p>
 
         {/* Shelf-specific nudge */}
         <div style={{ padding: "11px 14px", background: "rgba(0,0,0,0.12)", borderRadius: 4, borderLeft: "2px solid " + cfg.accent }}>
-          <p style={{ fontFamily: "var(--sans)", fontSize: 11, color: "var(--parchment)", margin: 0, lineHeight: 1.65 }}>{nudge}</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--parchment)", margin: 0, lineHeight: 1.65 }}>{nudge}</p>
         </div>
       </div>
     </div>

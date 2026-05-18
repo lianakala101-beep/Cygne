@@ -332,8 +332,8 @@ export function MonthlyRecap({
           />
           <p style={{
             fontFamily: "var(--font-body)",
-            fontStyle: "italic", fontSize: 12, fontWeight: 400,
-            color: "var(--color-inky-moss, #2d3d2b)", margin: 0, letterSpacing: "0.02em",
+            fontSize: 12, fontWeight: 400, letterSpacing: "0.14em", textTransform: "uppercase",
+            color: "var(--color-inky-moss, #2d3d2b)", margin: 0,
           }}>
             built around you.
           </p>

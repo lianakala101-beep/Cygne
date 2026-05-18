@@ -20,7 +20,7 @@ const OVERLAY    = "var(--overlay)";
 const CTA_BG     = "var(--cta)";
 const CTA_BORDER = "rgba(160,160,160,0.40)";
 const CURSIVE    = "var(--font-display)";
-const SANS       = "var(--sans)";
+const SANS       = "var(--font-body)";
 
 const ANGLES = [
   { key: "front", label: "Front", hint: "Face the lens. Chin level, shoulders soft." },

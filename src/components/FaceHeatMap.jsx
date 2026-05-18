@@ -92,7 +92,7 @@ export function FaceHeatMap({ journals = [], products = [], user = {} }) {
       border: "1px solid rgba(45,61,43,0.10)",
     }}>
       <p style={{
-        fontFamily: "var(--font-display, 'Fungis Heavy', 'Space Grotesk', sans-serif)",
+        fontFamily: "var(--font-display, 'Fungis Heavy', 'Fungis Normal', sans-serif)",
         fontWeight: 400, fontSize: 11, letterSpacing: "0.2em",
         color: INKY, margin: "0 0 20px",
       }}>
@@ -323,7 +323,7 @@ function ZoneInsightDrawer({ zoneId, journals, products, user, onClose, onAskCyg
           </p>
           {topProducts.length === 0 ? (
             <p style={{
-              fontFamily: "var(--font-body, 'Fungis Normal', 'Space Grotesk', sans-serif)",
+              fontFamily: "var(--font-body, 'Fungis Normal', 'Fungis Normal', sans-serif)",
               fontSize: 12, color: "var(--color-inky-moss, #2d3d2b)", opacity: 0.75, margin: 0,
             }}>
               Not enough data yet.
@@ -334,7 +334,7 @@ function ZoneInsightDrawer({ zoneId, journals, products, user, onClose, onAskCyg
                 <li
                   key={p.id}
                   style={{
-                    fontFamily: "var(--font-body, 'Fungis Normal', 'Space Grotesk', sans-serif)",
+                    fontFamily: "var(--font-body, 'Fungis Normal', 'Fungis Normal', sans-serif)",
                     fontSize: 13, color: "var(--color-ink, #1c1c1a)",
                     padding: "6px 0",
                     borderBottom: "1px solid rgba(45,61,43,0.08)",

@@ -14,10 +14,30 @@
   font-display: swap;
 }
 
+/* Also expose the two weights as separately-named families so inline
+   fontFamily strings that reference 'Fungis Heavy' / 'Fungis Normal'
+   resolve to the same files. Single source of truth for both naming
+   conventions used across the app. */
+@font-face {
+  font-family: 'Fungis Normal';
+  src: url('/fonts/FUNGIS Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Fungis Heavy';
+  src: url('/fonts/FUNGIS Heavy.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  /* Fonts */
-  --font-display: 'Fungis', sans-serif;
-  --font-body: 'Space Grotesk', sans-serif;
+  /* Fonts — every visible word in the app uses one of these two. */
+  --font-display: 'Fungis Heavy', 'Fungis', sans-serif;
+  --font-body: 'Fungis Normal', 'Fungis', sans-serif;
   --font-weight-normal: 400;
   --font-weight-heavy: 700;
   --tracking-fungis: 0.15em;

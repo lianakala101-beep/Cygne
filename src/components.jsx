@@ -51,7 +51,7 @@ const Icon = ({ name, size = 20 }) => {
 
 // --- SHARED -------------------------------------------------------------------
 const labelSt = { display: "block", fontFamily: "var(--heading)", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--clay)", marginBottom: 8 };
-const inputSt = { width: "100%", padding: "12px 14px", background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 0, color: "var(--parchment)", fontFamily: "var(--sans)", fontSize: 14, outline: "none", boxSizing: "border-box" };
+const inputSt = { width: "100%", padding: "12px 14px", background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 0, color: "var(--parchment)", fontFamily: "var(--font-body)", fontSize: 14, outline: "none", boxSizing: "border-box" };
 
 function Pill({ children, active, onClick }) {
   return (
@@ -85,8 +85,8 @@ function FlagCard({ f }) {
     <div style={{ display: "flex", gap: 14, padding: "14px 16px", background: v.bg, borderRadius: 12, border: `1px solid ${v.border}`, marginBottom: 8 }}>
       <div style={{ width: 6, height: 6, borderRadius: "50%", background: v.dot, flexShrink: 0, marginTop: 6 }} />
       <div>
-        <p style={{ fontFamily: "var(--sans)", fontSize: 13, color: v.text, margin: "0 0 3px", fontWeight: 400 }}>{f.label}</p>
-        <p style={{ fontFamily: "var(--sans)", fontSize: 12, color: "var(--clay)", margin: 0, lineHeight: 1.5 }}>{f.detail}</p>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: v.text, margin: "0 0 3px", fontWeight: 400 }}>{f.label}</p>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: 0, lineHeight: 1.5 }}>{f.detail}</p>
       </div>
     </div>
   );
