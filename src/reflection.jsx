@@ -724,7 +724,7 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
     }}>
       {/* Header */}
       <div style={{ maxWidth: 560, margin: "0 auto 18px", textAlign: "center" }}>
-        <h1 style={{ fontFamily: "var(--font-display)", fontSize: 42, fontWeight: 700, color: "var(--color-inky-moss)", margin: "0 0 6px", letterSpacing: "0.15em", textTransform: "uppercase", lineHeight: 1.1 }}>
+        <h1 style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700, color: "var(--color-inky-moss)", margin: "0 0 6px", letterSpacing: "0.15em", textTransform: "uppercase", lineHeight: 1.15 }}>
           Reflection
         </h1>
         {reflections.length === 0 && (
