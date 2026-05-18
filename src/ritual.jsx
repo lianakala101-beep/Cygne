@@ -592,8 +592,8 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
         <p style={{
           position: "relative",
           fontFamily: "var(--font-body)",
-          fontSize: 22, fontWeight: 400,
-          lineHeight: 1.4, letterSpacing: "0.01em",
+          fontSize: 15, fontWeight: 400,
+          lineHeight: 1.55, letterSpacing: "0.01em",
           color: "var(--color-ink, #1c1c1a)",
           margin: 0,
         }}>
