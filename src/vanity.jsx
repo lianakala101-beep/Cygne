@@ -213,11 +213,11 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
           {product.imageUrl
             ? <img src={product.imageUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
             : (
-              <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6 }}>
-                <span style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 36, color: "rgba(160,160,160,0.45)", lineHeight: 1 }}>
-                  {product.brand?.[0]?.toUpperCase() || "·"}
-                </span>
-                <span style={{ fontFamily: "var(--font-display, 'Fungis', sans-serif)", fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(160,160,160,0.55)" }}>
+              <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10 }}>
+                <div aria-hidden="true" style={{ width: 56, height: 56, color: "var(--color-inky-moss, #2d3d2b)", opacity: 0.3, pointerEvents: "none" }}>
+                  <CategoryIllustration category={product.category} />
+                </div>
+                <span style={{ fontFamily: "var(--font-display, 'Fungis', sans-serif)", fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", opacity: 0.6 }}>
                   {product.category}
                 </span>
               </div>
