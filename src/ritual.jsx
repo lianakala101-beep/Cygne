@@ -416,7 +416,26 @@ function renderInsightLines(text) {
   ));
 }
 
-function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = {}, predictions = [], dailyLine = null }) {
+// Stable per-day generic editorial lines used when the LLM daily call fails.
+// Pick by local day-of-year so the same user sees the same line all day even
+// across reloads.
+const GENERIC_FALLBACK_LINES = [
+  "Consistency, not intensity, builds skin.",
+  "Today's ritual is tomorrow's resilience.",
+  "Quiet care compounds.",
+  "Your skin is reading every choice you make.",
+  "The barrier remembers what you do today.",
+  "Less, done well, beats more, done sometimes.",
+  "Hydration is the floor every active stands on.",
+];
+function genericFallbackLine() {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  const doy = Math.floor((now - start) / 86400000);
+  return GENERIC_FALLBACK_LINES[doy % GENERIC_FALLBACK_LINES.length];
+}
+
+function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = {}, predictions = [], dailyLine = null, dailyLoading = false, dailyFailed = false }) {
   const now = new Date();
   const isBirthday = user.birthMonth && user.birthDay &&
     (now.getMonth() + 1) === parseInt(user.birthMonth) &&
@@ -434,20 +453,27 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
     return key && !key.startsWith("baseline_");
   });
   const hasMeaningful = meaningfulPredictions.length > 0;
+  const trimmedDaily = dailyLine && dailyLine.trim();
 
-  // Line precedence: birthday > LLM daily line > rule-based prediction >
-  // "not enough data yet". The LLM line takes priority over the rule-based
-  // prediction once we have it, since it's already personalized to the
-  // user's full context — but we keep the rule engine running underneath
-  // so the popup detail (and any future surfaces) still have structured
-  // data to render.
+  // Line precedence:
+  //   birthday → birthday line
+  //   LLM line landed → LLM line
+  //   loading + no LLM line yet → em dash (subtle placeholder, no spinner)
+  //   LLM call failed and no rule-based prediction → generic editorial line
+  //   else → rule-based prediction or "no data yet"
+  // The LLM line takes priority over the rule-based prediction once it lands;
+  // we keep the rule engine running underneath so popup detail still renders.
   const line = isBirthday
     ? BIRTHDAY_LINES[now.getFullYear() % BIRTHDAY_LINES.length]
-    : (dailyLine && dailyLine.trim())
-      ? dailyLine.trim()
-      : hasMeaningful
-        ? meaningfulPredictions[0].headline
-        : NO_DATA_LINE;
+    : trimmedDaily
+      ? trimmedDaily
+      : dailyLoading
+        ? "—"
+        : dailyFailed && !hasMeaningful
+          ? genericFallbackLine()
+          : hasMeaningful
+            ? meaningfulPredictions[0].headline
+            : NO_DATA_LINE;
 
   const grain ="url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E\")";
 

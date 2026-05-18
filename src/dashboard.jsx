@@ -57,7 +57,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
   // LLM-generated daily Swan Sense line — fetched once per (user, day), cached
   // in localStorage + the server-side ask_cygne_cache table. Falls back to the
   // rule-based prediction when missing / loading.
-  const { line: swanDailyLine } = useSwanSenseDaily({
+  const { line: swanDailyLine, loading: swanLoading, failed: swanFailed } = useSwanSenseDaily({
     user,
     products,
     journals,
@@ -210,7 +210,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
 
         {/* 1. Swan Song card (intelligence) — always fully visible */}
         <div style={{ marginBottom: 8 }}>
-          <SwanSongCard currentSession={currentSession} asPopup={false} user={user} predictions={swanSensePredictions} dailyLine={swanDailyLine} />
+          <SwanSongCard currentSession={currentSession} asPopup={false} user={user} predictions={swanSensePredictions} dailyLine={swanDailyLine} dailyLoading={swanLoading} dailyFailed={swanFailed} />
         </div>
         <div style={{ textAlign: "right", marginBottom: 18 }}>
           <button

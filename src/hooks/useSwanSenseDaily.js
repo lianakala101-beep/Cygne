@@ -23,22 +23,25 @@ function writeLocal(userId, line) {
 }
 
 /**
- * Returns { line, loading } for today's Swan Sense headline.
+ * Returns { line, loading, failed } for today's Swan Sense headline.
  *
  * - Pulls from localStorage immediately so the dashboard mounts with
  *   yesterday's text invisible (no flash).
  * - Fetches a fresh line from the swan-sense-daily edge function on mount.
  *   The edge function caches per (userId, UTC date) so multiple devices
- *   converge on the same line for the day.
+ *   converge on the same line for the day. invokeEdgeFunction always sends
+ *   Authorization: Bearer ${session.access_token} — never the anon key.
  * - The hook is idempotent within a session — once we've fetched (or
  *   short-circuited from cache) we don't refetch on prop changes.
  *
- * Caller is responsible for falling back to the rule-based headline when
- * line is null.
+ * `failed` is true when the edge call threw and we have no cached line.
+ * The card consumer uses it to switch to a generic editorial fallback
+ * instead of the "no data" hint.
  */
 export function useSwanSenseDaily({ user, products, journals, checkIns, cycleDay }) {
   const [line, setLine] = useState(() => readLocal(user?.id));
   const [loading, setLoading] = useState(false);
+  const [failed, setFailed] = useState(false);
   const fetchedRef = useRef(false);
 
   useEffect(() => {
@@ -52,6 +55,7 @@ export function useSwanSenseDaily({ user, products, journals, checkIns, cycleDay
     fetchedRef.current = true;
     let cancelled = false;
     setLoading(true);
+    setFailed(false);
     (async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -73,9 +77,14 @@ export function useSwanSenseDaily({ user, products, journals, checkIns, cycleDay
         if (data?.line) {
           writeLocal(session.user.id, data.line);
           setLine(data.line);
+        } else {
+          // Empty response counts as a soft failure — flip the flag so the
+          // consumer renders the generic fallback instead of "no data yet".
+          setFailed(true);
         }
       } catch (e) {
         console.warn("[swan-sense-daily] fetch failed:", e?.message || e);
+        if (!cancelled) setFailed(true);
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -85,5 +94,5 @@ export function useSwanSenseDaily({ user, products, journals, checkIns, cycleDay
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
-  return { line, loading };
+  return { line, loading, failed };
 }
