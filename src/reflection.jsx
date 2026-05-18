@@ -72,17 +72,46 @@ export function weekLabel(weekNumber) {
 }
 
 // Lunar phase for a given date — names only, no glyphs.
+//
+// Anchor: the new moon at 2000-01-06 18:14 UTC, a NASA-published lunation
+// instant. Mean synodic period 29.53058867 days (Meeus, "Astronomical
+// Algorithms", 2nd ed., ch. 49).
+//
+// Classification follows the public convention used by timeanddate.com and
+// most lunar calendars: the four principal phases (New, First Quarter, Full,
+// Last Quarter) are *instants* — we widen each to a ±0.5-day window so a
+// day-of capture still reads the principal name. Everything else falls into
+// one of the four intermediate phases by quadrant.
+const SYNODIC_MONTH = 29.53058867;
+const REFERENCE_NEW_MOON_MS = Date.UTC(2000, 0, 6, 18, 14, 0);
+
 export function getMoonPhase(date) {
-  const phases = [
-    "New Moon", "Waxing Crescent", "First Quarter", "Waxing Gibbous",
-    "Full Moon", "Waning Gibbous", "Last Quarter", "Waning Crescent",
-  ];
-  const synodicMonth = 29.53058867;
-  const knownNewMoon = new Date("2000-01-06T18:14:00Z");
-  const daysSince = (date - knownNewMoon) / (1000 * 60 * 60 * 24);
-  const phase = ((daysSince % synodicMonth) + synodicMonth) % synodicMonth;
-  const index = Math.round(phase / (synodicMonth / 8)) % 8;
-  return phases[index];
+  const daysSince = (date.getTime() - REFERENCE_NEW_MOON_MS) / 86400000;
+  const phaseDays = ((daysSince % SYNODIC_MONTH) + SYNODIC_MONTH) % SYNODIC_MONTH;
+  const fraction = phaseDays / SYNODIC_MONTH; // 0..1 across the cycle
+
+  // Principal-phase tolerance: ±0.5 day, expressed as a fraction of the cycle.
+  const principalWindow = 0.5 / SYNODIC_MONTH;
+
+  // Snap to the nearest principal anchor at 0 / 0.25 / 0.5 / 0.75. The 0
+  // anchor wraps to 1, so we check both edges when measuring distance.
+  const nearestPrincipal = Math.round(fraction * 4) / 4;
+  const dist = Math.min(
+    Math.abs(fraction - nearestPrincipal),
+    Math.abs(fraction - nearestPrincipal - 1),
+    Math.abs(fraction - nearestPrincipal + 1),
+  );
+  if (dist < principalWindow) {
+    if (nearestPrincipal === 0 || nearestPrincipal === 1) return "New Moon";
+    if (nearestPrincipal === 0.25) return "First Quarter";
+    if (nearestPrincipal === 0.5)  return "Full Moon";
+    if (nearestPrincipal === 0.75) return "Last Quarter";
+  }
+  // Otherwise pick the intermediate phase by quadrant.
+  if (fraction < 0.25) return "Waxing Crescent";
+  if (fraction < 0.5)  return "Waxing Gibbous";
+  if (fraction < 0.75) return "Waning Gibbous";
+  return "Waning Crescent";
 }
 
 function formatDateLong(iso) {
