@@ -145,8 +145,20 @@ function dataUrlToBlob(dataUrl) {
 // We prefer signed URLs so the gallery works with private buckets + RLS
 // (which is the right default for per-user photos). Falls back to a public
 // URL, then to the inline data URL if storage isn't configured at all.
+// The first folder segment of the upload path must equal the caller's
+// auth.uid()::text for the RLS policy in the reflections bucket migration
+// to allow the write. A loose "local" or missing userId would write to a
+// folder no one can ever read back. Refuse those uploads up-front so we
+// fall through to the inline data-URL fallback cleanly instead of leaving
+// orphaned objects in storage.
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 async function uploadTriptych(userId, entryId, dataUrl) {
   const blob = dataUrlToBlob(dataUrl);
+  if (!userId || !UUID_RE.test(String(userId))) {
+    console.warn("[Cygne reflection] refusing storage upload — invalid userId:", userId, "(expected auth UUID). Falling back to inline.");
+    return { path: null, url: null, inline: dataUrl };
+  }
   const path = `${userId}/${entryId}.jpg`;
   console.log("[Cygne reflection] uploading to reflections/" + path, "| size:", blob.size, "bytes");
   try {
@@ -154,7 +166,7 @@ async function uploadTriptych(userId, entryId, dataUrl) {
       .from("reflections")
       .upload(path, blob, { contentType: "image/jpeg", upsert: true });
     if (upErr) {
-      console.warn("[Cygne reflection] upload error:", upErr.message, upErr);
+      console.warn("[Cygne reflection] upload error:", upErr.status || "", upErr.message, upErr);
       return { path: null, url: null, inline: dataUrl };
     }
     console.log("[Cygne reflection] upload ok:", upData);
@@ -167,7 +179,7 @@ async function uploadTriptych(userId, entryId, dataUrl) {
       console.log("[Cygne reflection] signed URL:", signed.signedUrl);
       return { path, url: signed.signedUrl };
     }
-    console.warn("[Cygne reflection] createSignedUrl error:", signedErr?.message || "no url");
+    console.warn("[Cygne reflection] createSignedUrl error:", signedErr?.status || "", signedErr?.message || "no url");
 
     // Public URL fallback (only works if bucket is public).
     const { data: pub } = supabase.storage.from("reflections").getPublicUrl(path);
@@ -185,6 +197,12 @@ async function uploadTriptych(userId, entryId, dataUrl) {
 
 // Re-generate a fresh signed URL for an entry on load. Signed URLs expire,
 // so we refresh them each session rather than trusting whatever was stored.
+// On failure, the error.status is logged so the user can distinguish:
+//   400/404 → object missing (path wrong, or bucket recreated and the file
+//             is gone — re-apply the migration won't bring data back)
+//   401/403 → RLS denies (policies missing or auth.uid() doesn't match
+//             the first folder segment — re-apply the migration to fix)
+//   else    → network or transport issue
 async function refreshSignedUrl(path) {
   if (!path) return null;
   try {
@@ -192,7 +210,8 @@ async function refreshSignedUrl(path) {
       .from("reflections")
       .createSignedUrl(path, 60 * 60 * 24 * 7); // 1 week
     if (error) {
-      console.warn("[Cygne reflection] refresh signed URL error for", path, "|", error.message);
+      const status = error.status || error.statusCode || "?";
+      console.warn("[Cygne reflection] refresh signed URL failed for", path, "| status:", status, "| message:", error.message);
       return null;
     }
     return data?.signedUrl || null;

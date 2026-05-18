@@ -6,6 +6,11 @@
 -- src/reflection.jsx uploadTriptych writes:
 --   path = `${userId}/${entryId}.jpg`
 -- and how createSignedUrl reads it back.
+--
+-- This script is idempotent — safe to re-run from the SQL editor whenever
+-- the bucket loses its policies (e.g. after a bucket recreate). Every
+-- policy is dropped-if-exists before being created, and the bucket insert
+-- is gated on conflict.
 
 -- ── 1. Bucket ─────────────────────────────────────────────────────────────
 -- Private bucket (public = false). The client retrieves images via signed
@@ -14,11 +19,19 @@ insert into storage.buckets (id, name, public)
 values ('reflections', 'reflections', false)
 on conflict (id) do nothing;
 
--- ── 2. RLS policies on storage.objects ────────────────────────────────────
--- storage.objects already has RLS enabled by default on a Supabase project,
--- but the policy set is empty for a new bucket. We add per-action policies
--- scoped to the bucket and to (path-first-segment == auth.uid()).
---
+-- ── 2. RLS on storage.objects ─────────────────────────────────────────────
+-- Supabase enables RLS on storage.objects by default, but be explicit so a
+-- re-run of this script always lands in the same known-good state.
+alter table storage.objects enable row level security;
+
+-- Drop any prior policies of these names so the migration is re-runnable.
+-- Postgres has no `create policy if not exists`, so we drop-then-create.
+drop policy if exists "Users read own reflection objects"   on storage.objects;
+drop policy if exists "Users insert own reflection objects" on storage.objects;
+drop policy if exists "Users update own reflection objects" on storage.objects;
+drop policy if exists "Users delete own reflection objects" on storage.objects;
+
+-- ── 3. Per-action policies ────────────────────────────────────────────────
 -- (storage.foldername(name))[1] is the top-level folder. We require it to
 -- equal the calling user's uid stringified, which gives us per-user
 -- isolation without needing a separate ownership column.
