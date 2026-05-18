@@ -99,7 +99,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           <div style={{ marginBottom: products.length === 0 ? 20 : 16 }}>
             {firstName ? (
               <>
-                <h1 style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: "0 0 2px", lineHeight: 1 }}>
+                <h1 style={{ fontFamily: "var(--font-display)", fontSize: 30, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: "0 0 2px", lineHeight: 1 }}>
                   {greeting},
                 </h1>
                 <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 14, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: 0, lineHeight: 1.1 }}>
@@ -107,7 +107,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
                 </p>
               </>
             ) : (
-              <h1 style={{ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: 0, lineHeight: 1.05 }}>
+              <h1 style={{ fontFamily: "var(--font-display)", fontSize: 30, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: 0, lineHeight: 1.05 }}>
                 {greeting}.
               </h1>
             )}
