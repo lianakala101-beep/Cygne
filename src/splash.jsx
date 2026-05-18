@@ -60,9 +60,9 @@ function SplashScreen({ onDone }) {
           fontFamily: "var(--font-display, 'Fungis', sans-serif)",
           fontSize: 13,
           fontWeight: 400,
-          letterSpacing: "0.15em",
+          letterSpacing: "0.18em",
           textTransform: "uppercase",
-          color: "#7a7a7a",
+          color: "var(--color-inky-moss, #2d3d2b)",
           margin: 0,
         }}>Built Around You</p>
 

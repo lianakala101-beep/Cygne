@@ -140,7 +140,7 @@ function AuthScreen({ onAuth }) {
               </svg>
             )}
           </div>
-          <span style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 10, letterSpacing: "0.15em", color: "var(--color-stone)" }}>
+          <span style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 10, letterSpacing: "0.18em", color: "var(--color-inky-moss, #2d3d2b)" }}>
             REMEMBER ME
           </span>
         </div>
@@ -190,8 +190,8 @@ function AuthScreen({ onAuth }) {
           background: "none",
           border: "none",
           fontFamily: "var(--font-body, 'Fungis Normal', sans-serif)",
-          fontSize: 11,
-          color: "#7a7a7a",
+          fontSize: 12,
+          color: "var(--color-inky-moss, #2d3d2b)",
           cursor: "pointer",
           padding: "8px 0",
           letterSpacing: "0.04em",
@@ -216,8 +216,8 @@ function AuthScreen({ onAuth }) {
             background: "none",
             border: "none",
             fontFamily: "var(--font-body, 'Fungis Normal', sans-serif)",
-            fontSize: 11,
-            color: "var(--color-pebble, #7a7a7a)",
+            fontSize: 12,
+            color: "var(--color-inky-moss, #2d3d2b)",
             cursor: "pointer",
             padding: "4px 0",
             letterSpacing: "0.04em",
@@ -228,7 +228,7 @@ function AuthScreen({ onAuth }) {
       )}
 
       {resetSent && (
-        <p style={{ fontSize: 11, color: "var(--color-stone, #5a5a5a)", marginTop: 12, textAlign: "center", letterSpacing: "0.02em" }}>
+        <p style={{ fontSize: 12, color: "var(--color-inky-moss, #2d3d2b)", marginTop: 12, textAlign: "center", letterSpacing: "0.02em" }}>
           Reset link sent — check your email.
         </p>
       )}

@@ -61,23 +61,23 @@ function SwanWelcomeScreen({ user, onDone }) {
   return (
     <div style={{ position: "fixed", inset: 0, background: "var(--color-ivory)", display: "flex", flexDirection: "column", alignItems: "flex-start", justifyContent: "space-between", padding: "72px 36px 64px", zIndex: 500 }}>
       <div>
-        <div style={{ marginBottom: 32, color: "rgba(232,226,217,0.95)" }}><SwanIcon size={56} /></div>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(232,226,217,0.5)", margin: "0 0 14px" }}>
+        <div style={{ marginBottom: 32, color: "var(--color-inky-moss, #2d3d2b)" }}><SwanIcon size={56} /></div>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: "0 0 14px" }}>
           {name ? "Welcome, " + name + "." : "Welcome."}
         </p>
-        <h1 style={{ fontFamily: "var(--font-display)", fontSize: 38, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(232,226,217,0.95)", margin: "0 0 20px", lineHeight: 1.2 }}>
+        <h1 style={{ fontFamily: "var(--font-display)", fontSize: 38, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-ink, #1c1c1a)", margin: "0 0 20px", lineHeight: 1.2 }}>
           Your ritual starts here.
         </h1>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "rgba(232,226,217,0.55)", lineHeight: 1.7, maxWidth: 320 }}>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "var(--color-inky-moss, #2d3d2b)", lineHeight: 1.7, maxWidth: 320 }}>
           Add the products already on your shelf. Cygne will build your ritual, sequence your steps, and start learning your skin.
         </p>
       </div>
       <div style={{ width: "100%" }}>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "rgba(232,226,217,0.35)", letterSpacing: "0.06em", marginBottom: 16, textAlign: "center" }}>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--color-inky-moss, #2d3d2b)", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 16, textAlign: "center" }}>
           Takes about 2 minutes
         </p>
         <button onClick={onDone}
-          style={{ width: "100%", padding: "16px 0", background: "rgba(232,226,217,0.12)", border: "1px solid rgba(232,226,217,0.2)", borderRadius: 14, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 400, color: "rgba(232,226,217,0.9)", cursor: "pointer", letterSpacing: "0.04em" }}>
+          style={{ width: "100%", padding: "15px 0", background: "transparent", border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 10, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, fontFamily: "var(--font-display)", fontSize: 12, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer" }}>
           Add my products <Icon name="arrow-right" size={14} />
         </button>
       </div>

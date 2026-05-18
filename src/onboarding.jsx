@@ -117,7 +117,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
         const active = single ? selected === opt : selected.includes(opt);
         return (
           <button key={opt} onClick={() => onToggle(opt)}
-            style={{ padding: "10px 18px", borderRadius: 24, border: `1px solid ${active ? "var(--color-inky-moss, #2d3d2b)" : "rgba(45,61,43,0.25)"}`, background: active ? "rgba(45,61,43,0.10)" : "transparent", color: active ? "var(--color-inky-moss, #2d3d2b)" : "var(--color-stone, #5a5a5a)", fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 400, cursor: "pointer", transition: "all 0.18s", letterSpacing: "0.02em" }}>
+            style={{ padding: "10px 18px", borderRadius: 24, border: `1px solid ${active ? "var(--color-inky-moss, #2d3d2b)" : "rgba(45,61,43,0.35)"}`, background: active ? "rgba(45,61,43,0.12)" : "transparent", color: "var(--color-inky-moss, #2d3d2b)", fontFamily: "var(--font-body)", fontSize: 12, fontWeight: active ? 700 : 400, cursor: "pointer", transition: "all 0.18s", letterSpacing: "0.02em" }}>
             {opt}
           </button>
         );
@@ -142,12 +142,12 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       <h2 style={obHeading}>When were you born?</h2>
       <p style={obSub}>Your birth year helps calibrate advice to your skin's life stage. Month and day are optional — for a birthday message.</p>
       <div style={{ display: "flex", flexDirection: "column", gap: 14, marginTop: 32 }}>
-        <div><label style={labelSt}>Birth year <span style={{ opacity: 0.5 }}>required</span></label>
+        <div><label style={labelSt}>Birth year <span style={{ opacity: 0.7, fontSize: 9 }}>required</span></label>
           <input style={inputSt} type="number" min="1940" max="2010" value={birthYear} onChange={e => setBirthYear(e.target.value)} placeholder="1990" /></div>
         <div style={{ display: "flex", gap: 10 }}>
-          <div style={{ flex: 1 }}><label style={labelSt}>Month <span style={{ opacity: 0.5 }}>optional</span></label>
+          <div style={{ flex: 1 }}><label style={labelSt}>Month <span style={{ opacity: 0.7, fontSize: 9 }}>optional</span></label>
             <input style={inputSt} type="number" min="1" max="12" value={birthMonth} onChange={e => setBirthMonth(e.target.value)} placeholder="MM" /></div>
-          <div style={{ flex: 1 }}><label style={labelSt}>Day <span style={{ opacity: 0.5 }}>optional</span></label>
+          <div style={{ flex: 1 }}><label style={labelSt}>Day <span style={{ opacity: 0.7, fontSize: 9 }}>optional</span></label>
             <input style={inputSt} type="number" min="1" max="31" value={birthDay} onChange={e => setBirthDay(e.target.value)} placeholder="DD" /></div>
         </div>
       </div>
@@ -221,7 +221,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
               {locationLoading ? "Requesting..." : "Enable Location"}
             </button>
             <button onClick={() => advance(1)}
-              style={{ background: "none", border: "none", fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-stone, #5a5a5a)", cursor: "pointer", padding: "8px 0", letterSpacing: "0.06em" }}>
+              style={{ background: "none", border: "none", fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer", padding: "8px 0", letterSpacing: "0.06em" }}>
               Skip for now
             </button>
           </div>
@@ -249,11 +249,11 @@ function OnboardingScreen({ onComplete, setLocationData }) {
             <button key={d} onClick={() => setResetDay(d)}
               style={{
                 padding: "14px 0", borderRadius: 12,
-                border: `1px solid ${active ? "var(--color-inky-moss, #2d3d2b)" : "rgba(45,61,43,0.25)"}`,
-                background: active ? "rgba(45,61,43,0.10)" : "transparent",
-                color: active ? "var(--color-inky-moss, #2d3d2b)" : "var(--color-stone, #5a5a5a)",
+                border: `1px solid ${active ? "var(--color-inky-moss, #2d3d2b)" : "rgba(45,61,43,0.35)"}`,
+                background: active ? "rgba(45,61,43,0.12)" : "transparent",
+                color: "var(--color-inky-moss, #2d3d2b)",
                 fontFamily: "var(--font-body)", fontSize: 12,
-                fontWeight: 400, letterSpacing: "0.08em",
+                fontWeight: active ? 700 : 400, letterSpacing: "0.08em",
                 textTransform: "uppercase", cursor: "pointer", transition: "all 0.18s",
               }}>
               {label}
@@ -261,7 +261,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
           );
         })}
       </div>
-      <p style={{ ...obSub, marginTop: 18, fontSize: 11, opacity: 0.7 }}>
+      <p style={{ ...obSub, marginTop: 18, fontSize: 11 }}>
         You'll get a gentle nudge that evening: "The week is behind you. Let's capture your reflection."
       </p>
     </div>,
@@ -495,7 +495,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       {/* Back button */}
       {step > 0 && step < TOTAL_STEPS - 1 && (
         <button onClick={() => advance(-1)}
-          style={{ position: "absolute", top: 52, left: 24, background: "none", border: "none", color: "var(--color-stone, #5a5a5a)", cursor: "pointer", fontFamily: "var(--font-body)", fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", display: "flex", alignItems: "center", gap: 6, zIndex: 11 }}>
+          style={{ position: "absolute", top: 52, left: 24, background: "none", border: "none", color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer", fontFamily: "var(--font-body)", fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", display: "flex", alignItems: "center", gap: 6, zIndex: 11 }}>
           <Icon name="chevron" size={12} style={{ transform: "rotate(180deg)" }} /> Back
         </button>
       )}
@@ -509,11 +509,11 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       {step >= 0 && step < 5 && (
         <div style={{ position: "sticky", bottom: 0, background: "var(--color-ivory, #faf9f4)", padding: "16px 24px 32px", marginTop: "auto" }}>
           <button onClick={() => canAdvance[step] && advance(1)}
-            style={{ width: "100%", padding: "14px 0", background: "transparent", color: "var(--color-inky-moss, #2d3d2b)", border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: canAdvance[step] ? "pointer" : "default", transition: "background 0.2s, color 0.2s", opacity: canAdvance[step] ? 1 : 0.4 }}>
+            style={{ width: "100%", padding: "14px 0", background: "transparent", color: "var(--color-inky-moss, #2d3d2b)", border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: canAdvance[step] ? "pointer" : "default", transition: "background 0.2s, color 0.2s", opacity: canAdvance[step] ? 1 : 0.6 }}>
             Continue
           </button>
           {step === 3 || step === 4 ? (
-            <button onClick={() => advance(1)} style={{ width: "100%", marginTop: 10, background: "none", border: "none", fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-stone, #5a5a5a)", cursor: "pointer", padding: "8px 0", letterSpacing: "0.06em" }}>Skip</button>
+            <button onClick={() => advance(1)} style={{ width: "100%", marginTop: 10, background: "none", border: "none", fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer", padding: "8px 0", letterSpacing: "0.06em" }}>Skip</button>
           ) : null}
         </div>
       )}
