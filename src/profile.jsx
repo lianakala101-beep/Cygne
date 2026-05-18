@@ -335,6 +335,189 @@ function IngredientProfile({ user, onUpdateUser }) {
   );
 }
 
+// --- SKIN PROFILE (onboarding answers — climate, goals, philosophy, etc.) ----
+//
+// Same shape as the data captured during onboarding's later steps. Editing here
+// writes back to user.skinProfile, which syncs to Supabase via App.jsx's
+// updateUser → supabase.auth.updateUser pipeline. Downstream consumers
+// (swansense.jsx, intelligence.jsx, engine.applyPhilosophy) read the value
+// inline on every render, so changes take effect immediately for routine
+// recommendations. The swan-sense-daily cache is keyed per (userId, day) — the
+// next day's headline picks up the new profile.
+
+const SKIN_PROFILE_FIELDS = [
+  { key: "skinGoals",          label: "Skin Goals",          options: ["Glassy & Luminous", "Clear & Smooth", "Even-Toned", "Firm & Refined", "Hydrated & Plump"], multi: true },
+  { key: "specialOccasion",    label: "Preparing For",       options: ["Wedding", "Vacation", "Event or Shoot", "Just For Me", "Not Right Now"] },
+  { key: "consistency",        label: "Adherence",           options: ["Daily, Without Fail", "A Few Times a Week", "When I Remember"] },
+  { key: "routinePhilosophy",  label: "Ritual Philosophy",   options: ["Minimalist — 3 to 5 steps", "Multi-Step — full ritual, I enjoy the process", "Somewhere In Between"] },
+  { key: "climate",            label: "Climate",             options: ["Humid", "Dry", "Cold", "Tropical", "Mixed Seasons"] },
+  { key: "environment",        label: "Environment",         options: ["Indoors", "Outdoors", "Hybrid"] },
+  { key: "travel",             label: "Travel",              options: ["Frequently", "Occasionally", "Rarely"] },
+  { key: "fragrance",          label: "Fragrance Sensitivity", options: ["Yes — I avoid it", "Sometimes", "No"] },
+];
+
+function SkinProfileEditor({ user, onUpdateUser }) {
+  const [editing, setEditing] = useState(false);
+  const profile = user?.skinProfile || {};
+  const buildDraft = () => ({
+    skinGoals:         Array.isArray(profile.skinGoals) ? profile.skinGoals : [],
+    specialOccasion:   profile.specialOccasion || "",
+    occasionDate:      profile.occasionDate || "",
+    consistency:       profile.consistency || "",
+    routinePhilosophy: profile.routinePhilosophy || "",
+    climate:           profile.climate || "",
+    environment:       profile.environment || "",
+    travel:            profile.travel || "",
+    fragrance:         profile.fragrance || "",
+    ingredientsToAvoid: profile.ingredientsToAvoid || "",
+  });
+  const [draft, setDraft] = useState(buildDraft());
+
+  const setField = (k, v) => setDraft(d => ({ ...d, [k]: v }));
+  const toggleMulti = (k, v) => setDraft(d => {
+    const cur = Array.isArray(d[k]) ? d[k] : [];
+    return { ...d, [k]: cur.includes(v) ? cur.filter(x => x !== v) : [...cur, v] };
+  });
+  const toggleSingle = (k, v) => setDraft(d => ({ ...d, [k]: d[k] === v ? "" : v }));
+
+  const startEditing = () => { setDraft(buildDraft()); setEditing(true); };
+  const cancel = () => { setDraft(buildDraft()); setEditing(false); };
+  const save = () => {
+    const cleaned = { ...draft, ingredientsToAvoid: (draft.ingredientsToAvoid || "").trim() || null };
+    // If the user moved to a non-event occasion, clear the date so downstream
+    // logic (e.g. SwanSense's countdown gate) doesn't fire on stale data.
+    if (cleaned.specialOccasion === "Just For Me" || cleaned.specialOccasion === "Not Right Now" || !cleaned.specialOccasion) {
+      cleaned.occasionDate = "";
+    }
+    onUpdateUser({ ...user, skinProfile: cleaned });
+    setEditing(false);
+  };
+
+  // Pill button shared with onboarding's PillSelect visual.
+  const Pill = ({ active, children, onClick }) => (
+    <button type="button" onClick={onClick}
+      style={{
+        padding: "8px 14px", borderRadius: 24,
+        border: `1px solid ${active ? "var(--color-inky-moss, #2d3d2b)" : "rgba(45,61,43,0.35)"}`,
+        background: active ? "rgba(45,61,43,0.12)" : "transparent",
+        color: "var(--color-inky-moss, #2d3d2b)",
+        fontFamily: "var(--font-body)", fontSize: 11, fontWeight: active ? 700 : 400,
+        cursor: "pointer", letterSpacing: "0.02em", transition: "all 0.18s",
+        WebkitAppearance: "none", appearance: "none",
+      }}>
+      {children}
+    </button>
+  );
+
+  const summaryRow = (label, value) => (
+    <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 14, paddingBottom: 8, marginBottom: 8, borderBottom: "1px solid rgba(45,61,43,0.08)" }}>
+      <span style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", flexShrink: 0 }}>{label}</span>
+      <span style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-ink, #1c1c1a)", textAlign: "right", lineHeight: 1.5 }}>{value}</span>
+    </div>
+  );
+
+  const fieldLabel = (txt) => (
+    <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: "0 0 8px" }}>{txt}</p>
+  );
+
+  const editInputStyle = {
+    width: "100%", boxSizing: "border-box",
+    background: "var(--color-ivory, #faf9f4)",
+    border: "1px solid rgba(45,61,43,0.18)",
+    borderRadius: 0, padding: "11px 14px",
+    fontFamily: "var(--font-body)", fontSize: 13,
+    color: "var(--color-ink, #1c1c1a)",
+    caretColor: "var(--color-inky-moss, #2d3d2b)",
+    outline: "none",
+    WebkitAppearance: "none", appearance: "none",
+    WebkitTapHighlightColor: "transparent",
+  };
+
+  return (
+    <div style={{ marginBottom: 24 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+        <p style={{ fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 700, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: 0 }}>
+          Your Skin Profile
+        </p>
+        {!editing && (
+          <button onClick={startEditing}
+            style={{ background: "none", border: "none", fontFamily: "var(--font-body)", fontSize: 10, color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer", letterSpacing: "0.14em", textTransform: "uppercase", padding: 0 }}>
+            Edit
+          </button>
+        )}
+      </div>
+
+      {!editing ? (
+        <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "14px 16px" }}>
+          {SKIN_PROFILE_FIELDS.map(f => {
+            const val = draft[f.key];
+            const isEmpty = Array.isArray(val) ? val.length === 0 : !val;
+            const display = isEmpty ? "—" : (Array.isArray(val) ? val.join(", ") : val);
+            return summaryRow(f.label, display);
+          })}
+          {draft.specialOccasion && draft.occasionDate &&
+            draft.specialOccasion !== "Just For Me" && draft.specialOccasion !== "Not Right Now" &&
+            summaryRow("Occasion Date", draft.occasionDate)}
+          <div style={{ display: "flex", flexDirection: "column", gap: 5, paddingTop: 2 }}>
+            <span style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)" }}>Ingredients to Avoid</span>
+            <span style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-ink, #1c1c1a)", lineHeight: 1.55 }}>
+              {draft.ingredientsToAvoid || "—"}
+            </span>
+          </div>
+        </div>
+      ) : (
+        <div style={{ background: "var(--color-ivory-shadow, #f0ebe0)", borderTop: "1px solid rgba(45,61,43,0.18)", padding: "18px 16px", display: "flex", flexDirection: "column", gap: 20 }}>
+          {SKIN_PROFILE_FIELDS.map(f => (
+            <div key={f.key}>
+              {fieldLabel(f.label)}
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {f.options.map(opt => {
+                  const active = f.multi ? (draft[f.key] || []).includes(opt) : draft[f.key] === opt;
+                  return (
+                    <Pill key={opt} active={active}
+                      onClick={() => f.multi ? toggleMulti(f.key, opt) : toggleSingle(f.key, opt)}>
+                      {opt}
+                    </Pill>
+                  );
+                })}
+              </div>
+              {f.key === "specialOccasion" && draft.specialOccasion &&
+                draft.specialOccasion !== "Just For Me" && draft.specialOccasion !== "Not Right Now" && (
+                <div style={{ marginTop: 10 }}>
+                  {fieldLabel("Occasion Date")}
+                  <input type="date" value={draft.occasionDate || ""}
+                    onChange={e => setField("occasionDate", e.target.value)}
+                    min={new Date().toISOString().split("T")[0]}
+                    style={editInputStyle} />
+                </div>
+              )}
+            </div>
+          ))}
+
+          <div>
+            {fieldLabel("Ingredients to Avoid")}
+            <input value={draft.ingredientsToAvoid}
+              onChange={e => setField("ingredientsToAvoid", e.target.value)}
+              placeholder="e.g. retinol, essential oils, alcohol"
+              style={editInputStyle} />
+          </div>
+
+          <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+            <button onClick={save}
+              style={{ flex: 1, padding: "12px 0", background: "transparent", border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 700, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
+              Save
+            </button>
+            <button onClick={cancel}
+              style={{ flex: 1, padding: "12px 0", background: "transparent", border: "1px solid rgba(45,61,43,0.22)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-stone, #5a5a5a)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // --- SKIN HISTORY (medical + clinical context) -------------------------------
 
 const COMMON_SENSITIVITIES = ["Fragrance", "Essential oils", "Alcohol", "Silicones", "Sulfates", "Lanolin", "Latex", "Nut oils", "Parabens"];
@@ -637,6 +820,9 @@ function ProfileSheet({ user, products, locationData, setLocationData, locationD
 
           {/* Your Skin — editable */}
           <SkinEditor user={user} onUpdateUser={onUpdateUser} />
+
+          {/* Your Skin Profile — onboarding answers (goals, philosophy, climate, etc.) */}
+          <SkinProfileEditor user={user} onUpdateUser={onUpdateUser} />
 
           {/* Skin History — medical context */}
           <SkinHistory user={user} onUpdateUser={onUpdateUser} />
