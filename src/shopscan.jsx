@@ -4,6 +4,22 @@ import { analyzeShelf, detectActives } from "./engine.js";
 import { invokeEdgeFunction } from "./supabase.js";
 import { compressImage } from "./utils.jsx";
 
+// Visually hidden but DOM-present input style. iOS Safari silently drops
+// programmatic .click() on display:none / visibility:hidden file inputs (the
+// classic "first tap does nothing, second tap works" symptom). Off-screen
+// + opacity 0 keeps the element interactable to .click() while invisible.
+const HIDDEN_INPUT_STYLE = {
+  position: "absolute",
+  width: 1, height: 1,
+  padding: 0, margin: -1,
+  overflow: "hidden",
+  clip: "rect(0,0,0,0)",
+  whiteSpace: "nowrap",
+  border: 0,
+  opacity: 0,
+  pointerEvents: "none",
+};
+
 function ShopScanModal({ products, user = {}, onClose }) {
   const [phase, setPhase] = useState("prompt"); // prompt | scanning | result
   const [imgPreview, setImgPreview] = useState(null);
@@ -13,7 +29,10 @@ function ShopScanModal({ products, user = {}, onClose }) {
   // iOS Safari treats `capture` as a request to open the camera directly; a
   // bare input without `capture` opens the native sheet (Camera / Photo
   // Library / Browse). Splitting them gives the user a deterministic path
-  // to each on every platform.
+  // to each on every platform. Both are mounted at the top of the modal —
+  // not gated behind {phase === "prompt"} — so the ref is always live when
+  // a button is tapped and the programmatic click never races with React
+  // re-mount.
   const cameraRef = useRef();
   const libraryRef = useRef();
   const { activeMap } = analyzeShelf(products);
@@ -84,7 +103,11 @@ function ShopScanModal({ products, user = {}, onClose }) {
   };
 
   const handleFile = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files && e.target.files[0];
+    // Reset the input so the SAME file can be re-selected later. Without
+    // this iOS won't refire `change` if the user picks the same photo twice
+    // (e.g. after a failed scan).
+    if (e.target) e.target.value = "";
     if (!file) return;
     const reader = new FileReader();
     reader.onload = ev => setImgPreview(ev.target.result);
@@ -113,6 +136,13 @@ function ShopScanModal({ products, user = {}, onClose }) {
           <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: 4, marginTop: 2 }}><Icon name="x" size={17} /></button>
         </div>
 
+        {/* Always-mounted file inputs. They live outside every phase
+            conditional so the refs stay alive across phase transitions and
+            React never re-mounts them between the button onClick and the
+            picker opening. */}
+        <input ref={cameraRef} type="file" accept="image/*" capture="environment" aria-label="Take a photo of the product" style={HIDDEN_INPUT_STYLE} onChange={handleFile} />
+        <input ref={libraryRef} type="file" accept="image/*" aria-label="Choose a photo from your library" style={HIDDEN_INPUT_STYLE} onChange={handleFile} />
+
         <div style={{ padding: "20px 24px 40px" }}>
           {/* Prompt phase */}
           {phase === "prompt" && (
@@ -123,10 +153,6 @@ function ShopScanModal({ products, user = {}, onClose }) {
               {scanError && (
                 <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#8b7355", margin: "0 0 12px", padding: "8px 12px", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.2)", borderRadius: 8 }}>{scanError}</p>
               )}
-              {/* Camera input — capture="environment" tells iOS / Android to open the rear camera */}
-              <input ref={cameraRef} type="file" accept="image/*" capture="environment" style={{ display: "none" }} onChange={handleFile} />
-              {/* Library input — no capture attribute so it opens the OS photo picker */}
-              <input ref={libraryRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleFile} />
 
               <div style={{ width: "100%", padding: "26px 20px 20px", border: "1.5px dashed var(--border)", borderRadius: 16, background: "var(--surface)", textAlign: "center" }}>
                 <div style={{ color: "var(--clay)", marginBottom: 8, display: "flex", justifyContent: "center" }}><Icon name="camera" size={28} /></div>

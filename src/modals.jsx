@@ -5,6 +5,19 @@ import { getSeason } from "./seasonal.jsx";
 import { supabase, invokeEdgeFunction } from "./supabase.js";
 import { compressImage } from "./utils.jsx";
 
+// Visually hidden but DOM-present input style — see shopscan.jsx for the
+// iOS rationale. display:none drops programmatic .click() on iOS Safari.
+const HIDDEN_INPUT_STYLE = {
+  position: "absolute",
+  width: 1, height: 1,
+  padding: 0, margin: -1,
+  overflow: "hidden",
+  clip: "rect(0,0,0,0)",
+  whiteSpace: "nowrap",
+  border: 0,
+  opacity: 0,
+  pointerEvents: "none",
+};
 
 // SCAN MODAL
 function ScanModal({ products, onAddToShelf, onClose }) {
@@ -148,7 +161,9 @@ function ScanModal({ products, onAddToShelf, onClose }) {
   };
 
   const handleFile = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files && e.target.files[0];
+    // Reset so the same photo can be re-selected after an aborted scan.
+    if (e.target) e.target.value = "";
     if (!file) return;
     const reader = new FileReader();
     reader.onload = ev => setImgPreview(ev.target.result);
@@ -159,6 +174,10 @@ function ScanModal({ products, onAddToShelf, onClose }) {
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(8,10,9,0.88)", backdropFilter: "blur(12px)", zIndex: 200, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
       <div style={{ background: "var(--ink)", width: "100%", maxWidth: 520, borderRadius: "20px 20px 0 0", padding: "24px 24px 48px", maxHeight: "92vh", overflowY: "auto", border: "1px solid var(--border)", borderBottom: "none" }}>
+        {/* Always-mounted file input so the ref is live in any mode and the
+            button onClick can call .click() synchronously inside the user
+            gesture. iOS Safari rejects deferred clicks (setTimeout, async). */}
+        <input ref={fileRef} type="file" accept="image/*" capture="environment" aria-label="Scan a product label" style={HIDDEN_INPUT_STYLE} onChange={handleFile} />
 
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
@@ -196,7 +215,7 @@ function ScanModal({ products, onAddToShelf, onClose }) {
                   <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0 }}>Type the product name — fastest in store.</p>
                 </div>
               </button>
-              <button onClick={() => { setMode("scan"); setTimeout(() => fileRef.current && fileRef.current.click(), 100); }}
+              <button onClick={() => { fileRef.current && fileRef.current.click(); setMode("scan"); }}
                 style={{ display: "flex", alignItems: "center", gap: 16, padding: "18px 20px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, cursor: "pointer", textAlign: "left" }}>
                 <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(45,61,43,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                   <Icon name="camera" size={16} color="var(--sage)" />
@@ -250,11 +269,10 @@ function ScanModal({ products, onAddToShelf, onClose }) {
         {/* SCAN MODE */}
         {mode === "scan" && (
           <div>
-            <input ref={fileRef} type="file" accept="image/*" capture="environment" style={{ display: "none" }} onChange={handleFile} />
             {scanError && (
               <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#8b7355", margin: "0 0 10px", padding: "8px 12px", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.2)", borderRadius: 8 }}>{scanError}</p>
             )}
-            <button onClick={() => fileRef.current.click()}
+            <button onClick={() => fileRef.current && fileRef.current.click()}
               style={{ width: "100%", padding: "32px 0", background: "rgba(45,61,43,0.08)", border: "1px dashed rgba(45,61,43,0.35)", borderRadius: 14, cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
               <Icon name="camera" size={28} color="var(--sage)" />
               <span style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", letterSpacing: "0.06em" }}>Tap to open camera</span>
