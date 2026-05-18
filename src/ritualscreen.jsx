@@ -260,45 +260,6 @@ function BreathText({ text, style }) {
   );
 }
 
-// --- RITUAL PROGRESS TRACKER -------------------------------------------------
-// Static shoreline ripple with a swan marker at the completion-percentage
-// position. No motion — the swan re-renders at its new position when ritual
-// steps are checked off.
-function RitualProgressTracker({ completed, total }) {
-  if (total <= 0) return null;
-  const pct = Math.max(0, Math.min(1, completed / total));
-  const allDone = completed === total;
-  return (
-    <div style={{
-      position: "relative", height: 34, marginBottom: 22,
-      padding: "0 10px",
-    }}>
-      {/* Shoreline ripple — warm taupe, visible on cream */}
-      <svg viewBox="0 0 300 12" preserveAspectRatio="none"
-        style={{ position: "absolute", left: 10, right: 10, top: "50%", transform: "translateY(-50%)", width: "calc(100% - 20px)", height: 12, pointerEvents: "none" }}>
-        <path
-          d="M0 6 C 25 2, 50 10, 75 6 C 100 2, 125 10, 150 6 C 175 2, 200 10, 225 6 C 250 2, 275 10, 300 6"
-          stroke="rgba(139,115,85,0.55)" strokeWidth="1.1" fill="none" strokeLinecap="round" />
-      </svg>
-
-      <div style={{
-        position: "absolute", top: "50%",
-        left: `calc(10px + (100% - 30px) * ${pct})`,
-        transform: "translate(-50%, -50%)",
-        pointerEvents: "none",
-      }}>
-        <span style={{
-          display: "inline-block",
-          color: "var(--color-inky-moss)",
-          opacity: 0.35,
-        }}>
-          <SwanIcon size={20} outlineOnly />
-        </span>
-      </div>
-    </div>
-  );
-}
-
 function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false, journals = [], checkIns = [], setCheckIns = () => {}, completedSteps: completedStepsProp, setCompletedSteps: setCompletedStepsProp, onUpdateUser, onAddProduct, onEditProduct, treatments = [] }) {
   // Pause actives that are still under recovery from a logged treatment.
   // These products disappear from today's ritual and surface in Introduce
@@ -434,15 +395,6 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
         />
       </div>
 
-      {/* Decorative wave — between header and steps */}
-      <svg width="100%" height="12" viewBox="0 0 300 12" preserveAspectRatio="none"
-        style={{ display: "block", margin: "2px 0 18px", animation: "ritualWave 5s ease-in-out infinite" }}>
-        <path
-          d="M0 6 C 37.5 2, 75 10, 112.5 6 C 150 2, 187.5 10, 225 6 C 262.5 2, 300 10, 337.5 6"
-          stroke="rgba(192,192,192,0.5)" strokeWidth="1.5" fill="none" strokeLinecap="round"
-        />
-      </svg>
-
       {/* -- Swan guiding line ---------------------------------------------- */}
       {guidingLine && (
         ritualKey === "menstrual" ? (
@@ -512,7 +464,6 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
       {/* Steps */}
       {steps.length > 0
         ? <div style={{ marginBottom: 8 }}>
-            <RitualProgressTracker completed={steps.filter(s => isStepChecked(s.id)).length} total={steps.length} />
             {hintVisible && (
               <button
                 onClick={() => { localStorage.setItem("ritual_hint_dismissed", "1"); setHintVisible(false); }}
