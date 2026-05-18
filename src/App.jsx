@@ -748,27 +748,27 @@ export default function App() {
             }}
           />
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <button onClick={() => setProfileOpen(true)}
-              style={{ width: 34, height: 34, borderRadius: "50%", background: "none", border: "none", cursor: "pointer", padding: 0, WebkitTapHighlightColor: "transparent" }}>
-              <div style={{
-                width: 34, height: 34, borderRadius: "50%",
-                background: "rgba(122,144,112,0.22)",
-                border: "1.5px solid rgba(122,144,112,0.5)",
+            <button
+              onClick={() => setProfileOpen(true)}
+              aria-label="Open profile"
+              style={{
+                width: 44, height: 44,
+                background: "none", border: "none", cursor: "pointer",
+                padding: 0,
                 display: "flex", alignItems: "center", justifyContent: "center",
+                WebkitTapHighlightColor: "transparent",
               }}>
-                <span style={{
-                  fontFamily: "var(--font-display)",
-                  fontWeight: 700,
-                  fontSize: 14,
-                  letterSpacing: "0.02em",
-                  color: "var(--sage)",
-                  lineHeight: 1,
-                  userSelect: "none",
-                  marginTop: 2,
-                }}>
-                  {user?.name ? user.name.trim()[0].toUpperCase() : "?"}
-                </span>
-              </div>
+              <span style={{
+                fontFamily: "var(--font-display)",
+                fontWeight: 700,
+                fontSize: 22,
+                letterSpacing: "0.04em",
+                color: "var(--color-inky-moss, #2d3d2b)",
+                lineHeight: 1,
+                userSelect: "none",
+              }}>
+                {user?.name ? user.name.trim()[0].toUpperCase() : "?"}
+              </span>
             </button>
           </div>
         </div>
