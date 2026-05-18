@@ -201,18 +201,52 @@ function Section({ label, body, rootRef, divider = true }) {
   );
 }
 
+// ─── Calendar + zone helpers ──────────────────────────────────────────────────
+const DOW = ["M", "T", "W", "T", "F", "S", "S"];
+
+const CONDITION_DOT = {
+  glowing: "#2d3d2b",
+  good:    "#2d3d2b",
+  okay:    "#5a5a5a",
+  dull:    "#8b7355",
+  rough:   "#8b7355",
+};
+
+const dayKey = (d) => {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+};
+
+const bestCondition = (journal) => journal?.condition || null;
+
+const zoneLabelDisplay = (zone) => {
+  if (!zone) return "";
+  return String(zone)
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+};
+
 // ─── MonthlyRecap overlay ─────────────────────────────────────────────────────
 //
 // Props:
 //   - offset:  0 = current month, -1 = previous, etc. (default 0)
-//   - journals, checkIns, treatments, products, user — for narrative
+//   - journals, checkIns, treatments, products, reflections, user — for
+//     narrative and stats
 //   - onClose: () => void
 //
+// Every array prop defaults to []. Every derived data field defaults to a
+// sensible empty value (0, [], null) so the recap renders cleanly even on a
+// brand-new account with nothing logged.
 export function MonthlyRecap({
   offset = 0,
   journals = [],
   checkIns = [],
   treatments = [],
+  reflections = [],
   products = [],
   user = {},
   onClose,
@@ -232,14 +266,88 @@ export function MonthlyRecap({
       const t = new Date(iso).getTime();
       return t >= start && t <= end;
     };
-    return { year, month, monthLabel: MONTHS[month], inMonth };
+    return { year, month, daysInMonth, monthLabel: MONTHS[month], inMonth };
   }, [offset]);
 
-  const data = useMemo(() => ({
-    journalsM:    journals.filter(j => view.inMonth(j?.date)),
-    checkInsM:    checkIns.filter(c => view.inMonth(c?.date)),
-    treatmentsM:  treatments.filter(t => view.inMonth(t?.date)),
-  }), [journals, checkIns, treatments, view]);
+  // Defensive coercions — if a prop arrives non-array (legacy storage,
+  // half-loaded state) treat it as empty so we never call .filter on null.
+  const data = useMemo(() => {
+    const journalsArr = Array.isArray(journals) ? journals : [];
+    const checkInsArr = Array.isArray(checkIns) ? checkIns : [];
+    const treatmentsArr = Array.isArray(treatments) ? treatments : [];
+    const reflectionsArr = Array.isArray(reflections) ? reflections : [];
+
+    const journalsM    = journalsArr.filter(j => view.inMonth(j?.date));
+    const checkInsM    = checkInsArr.filter(c => view.inMonth(c?.date));
+    const treatmentsM  = treatmentsArr.filter(t => view.inMonth(t?.date));
+    const reflectionsM = reflectionsArr.filter(r => view.inMonth(r?.date));
+
+    // Day-of-month bucket keyed by local YYYY-MM-DD so the calendar can read
+    // off journal / check-in / treatment markers per cell.
+    const byDay = {};
+    const bump = (date, slot, value) => {
+      if (!date) return;
+      const key = dayKey(new Date(date));
+      if (!byDay[key]) byDay[key] = { journal: null, checkIns: [], treatment: null };
+      if (slot === "journal") byDay[key].journal = value;
+      if (slot === "checkIn") byDay[key].checkIns.push(value);
+      if (slot === "treatment") byDay[key].treatment = value;
+    };
+    journalsM.forEach(j   => bump(j?.date, "journal", j));
+    checkInsM.forEach(c   => bump(c?.date, "checkIn", c));
+    treatmentsM.forEach(t => bump(t?.date, "treatment", t));
+
+    // Aggregate stats
+    const activeDays = Object.keys(byDay).length;
+    const conditions = journalsM.reduce((acc, j) => {
+      if (j?.condition) acc[j.condition] = (acc[j.condition] || 0) + 1;
+      return acc;
+    }, {});
+    const dominantEntry = Object.entries(conditions).sort((a, b) => b[1] - a[1])[0];
+    const dominant = dominantEntry ? [dominantEntry[0].charAt(0).toUpperCase() + dominantEntry[0].slice(1), dominantEntry[1]] : null;
+
+    const irritation = checkInsM.filter(c => c?.irritation && c.irritation !== "none").length;
+    const breakouts  = checkInsM.filter(c => c?.breakout).length;
+
+    const zoneCounts = {};
+    journalsM.forEach(j => (j?.affectedZones || []).forEach(z => {
+      if (!z) return;
+      zoneCounts[z] = (zoneCounts[z] || 0) + 1;
+    }));
+    const topZones = Object.entries(zoneCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+    return {
+      journalsM, checkInsM, treatmentsM,
+      monthJournals: journalsM,
+      monthReflections: reflectionsM,
+      monthTreatments: treatmentsM,
+      byDay,
+      activeDays,
+      dominant,
+      irritation,
+      breakouts,
+      topZones,
+    };
+  }, [journals, checkIns, treatments, reflections, view]);
+
+  // Calendar grid cells: leading blanks so day 1 lines up with its weekday
+  // (Mon-start), then days 1..daysInMonth. Blanks are nulls — render path
+  // skips them as empty <div>s.
+  const cells = useMemo(() => {
+    const firstOfMonth = new Date(view.year, view.month, 1);
+    const dow = firstOfMonth.getDay(); // 0..6, Sun..Sat
+    const leadBlanks = (dow + 6) % 7;  // shift so Monday is column 0
+    const result = new Array(leadBlanks).fill(null);
+    for (let d = 1; d <= view.daysInMonth; d++) result.push(d);
+    return result;
+  }, [view]);
+
+  const isToday = (d) => {
+    const now = new Date();
+    return now.getFullYear() === view.year && now.getMonth() === view.month && now.getDate() === d;
+  };
+
+  const isEmpty = data.activeDays === 0 && data.monthReflections.length === 0 && data.monthTreatments.length === 0;
 
   const sections = useMemo(() => ([
     { label: "Your skin this month",       body: narrateSkin(data) },
