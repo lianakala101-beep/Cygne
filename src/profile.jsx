@@ -147,7 +147,7 @@ function IngredientProfile({ user, onUpdateUser }) {
     <div style={{ marginBottom: 20 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
         <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: 0 }}>Ingredient Profile</p>
-        {!editing && <button onClick={() => setEditing(true)} style={{ background: "none", border: "none", fontFamily: "var(--font-body)", fontSize: 10, color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer", letterSpacing: "0.08em", padding: 0 }}>Edit</button>}
+        {!editing && <button onClick={() => setEditing(true)} style={{ background: "none", border: "none", fontFamily: "var(--font-body)", fontSize: 10, color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer", letterSpacing: "0.14em", textTransform: "uppercase", padding: 0 }}>Edit</button>}
       </div>
 
       {!editing ? (
@@ -157,28 +157,17 @@ function IngredientProfile({ user, onUpdateUser }) {
               No ingredients flagged yet. Tap Edit to mark allergens and loved ingredients — Cygne will cross-reference them on every product.
             </p>
           ) : (
-            <>
-              {allergens.length > 0 && (
-                <div style={{ marginBottom: loved.length > 0 ? 12 : 0 }}>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "#8b7355", margin: "0 0 7px", opacity: 0.8 }}>Avoid</p>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-                    {allergens.map(a => (
-                      <span key={a} style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.22)", fontFamily: "var(--font-body)", fontSize: 10, color: "#8b7355" }}>{a}</span>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {loved.length > 0 && (
-                <div>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "#2d3d2b", margin: "0 0 7px", opacity: 0.8 }}>Love</p>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-                    {loved.map(l => (
-                      <span key={l} style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(45,61,43,0.08)", border: "1px solid rgba(45,61,43,0.22)", fontFamily: "var(--font-body)", fontSize: 10, color: "#2d3d2b" }}>{l}</span>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </>
+            // Unified chip cloud — loved + avoided shown together. Chip color
+            // (clay = avoid, moss = love) is the only visual distinction; the
+            // old subsection eyebrows and gap are gone.
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+              {loved.map(l => (
+                <span key={`l-${l}`} style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(45,61,43,0.08)", border: "1px solid rgba(45,61,43,0.22)", fontFamily: "var(--font-body)", fontSize: 10, color: "#2d3d2b" }}>{l}</span>
+              ))}
+              {allergens.map(a => (
+                <span key={`a-${a}`} style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.22)", fontFamily: "var(--font-body)", fontSize: 10, color: "#8b7355" }}>{a}</span>
+              ))}
+            </div>
           )}
         </div>
       ) : (
@@ -379,18 +368,31 @@ function SkinProfileEditor({ user, onUpdateUser }) {
           {SKIN_PROFILE_FIELDS.map(f => {
             const val = draft[f.key];
             const isEmpty = Array.isArray(val) ? val.length === 0 : !val;
-            const display = isEmpty ? "—" : (Array.isArray(val) ? val.join(", ") : val);
+            // Hide fragrance row entirely when not set — the em-dash placeholder
+            // adds noise without information for users who haven't answered.
+            if (isEmpty && f.key === "fragrance") return null;
+            // Shorten any " — " descriptor values to just the headline part so
+            // long philosophy labels ("Multi-Step — full ritual, I enjoy the
+            // process") don't wrap awkwardly in the summary cell.
+            const shorten = (v) => typeof v === "string" && v.includes(" — ") ? v.split(" — ")[0] : v;
+            const display = isEmpty
+              ? "—"
+              : (Array.isArray(val) ? val.map(shorten).join(", ") : shorten(val));
             return summaryRow(f.label, display);
           })}
           {draft.specialOccasion && draft.occasionDate &&
             draft.specialOccasion !== "Just For Me" && draft.specialOccasion !== "Not Right Now" &&
             summaryRow("Occasion Date", draft.occasionDate)}
-          <div style={{ display: "flex", flexDirection: "column", gap: 5, paddingTop: 2 }}>
-            <span style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)" }}>Ingredients to Avoid</span>
-            <span style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-ink, #1c1c1a)", lineHeight: 1.55 }}>
-              {draft.ingredientsToAvoid || "—"}
-            </span>
-          </div>
+          {/* Ingredients to Avoid only renders when the user has actually
+              entered something — no empty em-dash row. */}
+          {draft.ingredientsToAvoid && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 5, paddingTop: 2 }}>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)" }}>Ingredients to Avoid</span>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-ink, #1c1c1a)", lineHeight: 1.55 }}>
+                {draft.ingredientsToAvoid}
+              </span>
+            </div>
+          )}
         </div>
       ) : (
         <div style={{ background: "var(--color-ivory-shadow, #f0ebe0)", borderTop: "1px solid rgba(45,61,43,0.18)", padding: "18px 16px", display: "flex", flexDirection: "column", gap: 20 }}>
@@ -502,7 +504,7 @@ function SkinHistory({ user, onUpdateUser }) {
     <div style={{ marginBottom: 20 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
         <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: 0 }}>Skin History</p>
-        {!editing && <button onClick={() => setEditing(true)} style={{ background: "none", border: "none", fontFamily: "var(--font-body)", fontSize: 10, color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer", letterSpacing: "0.08em", padding: 0 }}>Edit</button>}
+        {!editing && <button onClick={() => setEditing(true)} style={{ background: "none", border: "none", fontFamily: "var(--font-body)", fontSize: 10, color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer", letterSpacing: "0.14em", textTransform: "uppercase", padding: 0 }}>Edit</button>}
       </div>
 
       {!editing ? (
