@@ -1,10 +1,49 @@
 import { useState, useEffect } from "react";
 import { supabase, invokeEdgeFunction } from "../supabase.js";
 
+// Daily question limit — three per local day. Keyed by date so the count
+// persists across reloads and resets automatically when the date rolls
+// over. Old day-keys age out naturally (they're just orphaned localStorage
+// entries; cleanup pass runs on read to prune them).
+const DAILY_LIMIT = 3;
+
+function todayKey() {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `cygne_ask_count_${y}-${m}-${day}`;
+}
+
+function readDailyCount() {
+  try {
+    // Drop any stale `cygne_ask_count_*` keys from previous days so the
+    // store doesn't grow unbounded.
+    const today = todayKey();
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith("cygne_ask_count_") && k !== today) {
+        try { localStorage.removeItem(k); } catch { /* ignore */ }
+      }
+    }
+    const v = localStorage.getItem(today);
+    const n = v ? parseInt(v, 10) : 0;
+    return Number.isFinite(n) && n >= 0 ? n : 0;
+  } catch { return 0; }
+}
+
+function writeDailyCount(n) {
+  try { localStorage.setItem(todayKey(), String(n)); } catch { /* quota */ }
+}
+
 /**
  * Bottom-sheet Ask Cygne overlay. Posts the question + caller-supplied
  * context (either a pre-built string or raw products/journals/checkIns
  * arrays) to the ask-cygne edge function and renders the response.
+ *
+ * Enforces a three-questions-per-local-day limit client-side: once the
+ * user has hit DAILY_LIMIT, the input + submit are replaced with a quiet
+ * lock-out line and no edge function call is made.
  */
 export function AskCygneModal({
   initialQuestion = "",
@@ -20,9 +59,17 @@ export function AskCygneModal({
   const [loading, setLoading] = useState(false);
   const [answer, setAnswer] = useState("");
   const [error, setError] = useState(null);
+  const [count, setCount] = useState(readDailyCount);
+  const reached = count >= DAILY_LIMIT;
 
   const ask = async (q) => {
     if (!q.trim()) return;
+    // Hard gate — never fire the edge function once the daily limit is hit,
+    // even via the auto-ask path with an initialQuestion seed.
+    if (readDailyCount() >= DAILY_LIMIT) {
+      setCount(DAILY_LIMIT);
+      return;
+    }
     setLoading(true);
     setError(null);
     setAnswer("");
@@ -49,6 +96,9 @@ export function AskCygneModal({
         skinProfile: user?.skinProfile,
       });
       if (data?.error === "limit_reached") {
+        // Server-side limit fired — lock the UI to match.
+        setCount(DAILY_LIMIT);
+        writeDailyCount(DAILY_LIMIT);
         setError(data.message || "You've used your reflections for today. Try again tomorrow.");
         return;
       }
@@ -61,6 +111,10 @@ export function AskCygneModal({
         return;
       }
       setAnswer(data.response);
+      // Successful response — bump the local day counter.
+      const next = readDailyCount() + 1;
+      setCount(next);
+      writeDailyCount(next);
     } catch (e) {
       setError(String(e?.message || e));
     } finally {
@@ -68,9 +122,10 @@ export function AskCygneModal({
     }
   };
 
-  // Auto-ask if we were given a seed question
+  // Auto-ask if we were given a seed question — but never when at the limit.
   useEffect(() => {
-    if (initialQuestion) ask(initialQuestion);
+    if (initialQuestion && !reached) ask(initialQuestion);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -125,49 +180,66 @@ export function AskCygneModal({
           </p>
         </div>
 
-        <textarea
-          value={question}
-          onChange={e => setQuestion(e.target.value)}
-          rows={3}
-          placeholder="What would you like to ask?"
-          style={{
-            width: "100%", boxSizing: "border-box",
-            padding: "14px 16px",
-            background: "var(--color-ivory-shadow, #f0ebe0)",
-            border: "1px solid rgba(45,61,43,0.14)",
-            borderRadius: 0,
-            fontFamily: "var(--font-body, 'Fungis Normal', 'Fungis Normal', sans-serif)",
-            fontSize: 14, lineHeight: 1.55,
-            color: "var(--color-ink, #1c1c1a)",
-            caretColor: "var(--color-inky-moss, #2d3d2b)",
-            resize: "none",
-            outline: "none",
-            WebkitAppearance: "none", appearance: "none",
-            WebkitTapHighlightColor: "transparent",
-          }}
-        />
-
-        <button
-          onClick={() => ask(question)}
-          disabled={loading || !question.trim()}
-          style={{
-            marginTop: 14, width: "100%",
-            padding: "14px 0",
-            background: "transparent",
-            border: "1.5px solid var(--color-inky-moss, #2d3d2b)",
-            color: "var(--color-inky-moss, #2d3d2b)",
-            borderRadius: 0,
+        {reached ? (
+          <p style={{
+            margin: "10px 0 4px",
+            padding: "16px 8px",
+            textAlign: "center",
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
-            fontWeight: 700, fontSize: 11, letterSpacing: "0.24em",
+            fontWeight: 700, fontSize: 11, letterSpacing: "0.22em",
             textTransform: "uppercase",
-            cursor: loading || !question.trim() ? "default" : "pointer",
-            opacity: loading || !question.trim() ? 0.45 : 1,
-            WebkitAppearance: "none", appearance: "none",
-            WebkitTapHighlightColor: "transparent",
-          }}
-        >
-          {loading ? "Thinking" : "Ask"}
-        </button>
+            color: "var(--color-inky-moss, #2d3d2b)",
+            lineHeight: 1.6,
+          }}>
+            You've reached your daily limit — come back tomorrow
+          </p>
+        ) : (
+          <>
+            <textarea
+              value={question}
+              onChange={e => setQuestion(e.target.value)}
+              rows={3}
+              placeholder="What would you like to ask?"
+              style={{
+                width: "100%", boxSizing: "border-box",
+                padding: "14px 16px",
+                background: "var(--color-ivory-shadow, #f0ebe0)",
+                border: "1px solid rgba(45,61,43,0.14)",
+                borderRadius: 0,
+                fontFamily: "var(--font-body, 'Fungis Normal', 'Fungis Normal', sans-serif)",
+                fontSize: 14, lineHeight: 1.55,
+                color: "var(--color-ink, #1c1c1a)",
+                caretColor: "var(--color-inky-moss, #2d3d2b)",
+                resize: "none",
+                outline: "none",
+                WebkitAppearance: "none", appearance: "none",
+                WebkitTapHighlightColor: "transparent",
+              }}
+            />
+
+            <button
+              onClick={() => ask(question)}
+              disabled={loading || !question.trim()}
+              style={{
+                marginTop: 14, width: "100%",
+                padding: "14px 0",
+                background: "transparent",
+                border: "1.5px solid var(--color-inky-moss, #2d3d2b)",
+                color: "var(--color-inky-moss, #2d3d2b)",
+                borderRadius: 0,
+                fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
+                fontWeight: 700, fontSize: 11, letterSpacing: "0.24em",
+                textTransform: "uppercase",
+                cursor: loading || !question.trim() ? "default" : "pointer",
+                opacity: loading || !question.trim() ? 0.45 : 1,
+                WebkitAppearance: "none", appearance: "none",
+                WebkitTapHighlightColor: "transparent",
+              }}
+            >
+              {loading ? "Thinking" : "Ask"}
+            </button>
+          </>
+        )}
 
         {error && (
           <p style={{
