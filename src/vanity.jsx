@@ -81,15 +81,17 @@ function CategoryGlyph({ category }) {
         </svg>
       );
     case "Serum":
-      // Dropper bottle
+      // Dropper bottle — rubber squeeze bulb on top, long thin pipette stem
+      // visible between the bulb and the cap, narrow rectangular vial body
+      // below.
       return (
         <svg {...props}>
-          <line x1="46" y1="10" x2="54" y2="10" />
-          <path d="M 42 14 L 58 14 L 58 26 L 42 26 Z" />
-          <line x1="44" y1="26" x2="44" y2="32" />
-          <line x1="56" y1="26" x2="56" y2="32" />
-          <path d="M 34 32 L 66 32 L 66 86 Q 66 92 60 92 L 40 92 Q 34 92 34 86 Z" />
-          <line x1="40" y1="58" x2="60" y2="58" />
+          <rect x="44" y="8" width="12" height="9" rx="2.5" ry="2.5" />
+          <line x1="48" y1="17" x2="48" y2="32" />
+          <line x1="52" y1="17" x2="52" y2="32" />
+          <rect x="38" y="32" width="24" height="7" rx="1" />
+          <path d="M 40 39 L 60 39 L 60 84 Q 60 90 54 90 L 46 90 Q 40 90 40 84 Z" />
+          <line x1="46" y1="64" x2="54" y2="64" />
         </svg>
       );
     case "Moisturizer":
