@@ -12,6 +12,7 @@ export function AskCygneModal({
   products = [],
   journals = [],
   checkIns = [],
+  triggerLog = [],
   user = null,
   onClose,
 }) {
@@ -42,6 +43,7 @@ export function AskCygneModal({
         products,
         journals,
         checkIns,
+        triggerLog,
         skinType: user?.skinType,
         concerns: user?.concerns,
         skinProfile: user?.skinProfile,

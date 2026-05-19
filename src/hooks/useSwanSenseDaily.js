@@ -38,7 +38,7 @@ function writeLocal(userId, line) {
  * The card consumer uses it to switch to a generic editorial fallback
  * instead of the "no data" hint.
  */
-export function useSwanSenseDaily({ user, products, journals, checkIns, cycleDay }) {
+export function useSwanSenseDaily({ user, products, journals, checkIns, triggerLog, cycleDay }) {
   const [line, setLine] = useState(() => readLocal(user?.id));
   const [loading, setLoading] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -85,6 +85,7 @@ export function useSwanSenseDaily({ user, products, journals, checkIns, cycleDay
           products,
           journals,
           checkIns,
+          triggerLog,
           skinType: user?.skinType,
           concerns: user?.concerns,
           skinProfile: sanitizedSkinProfile,

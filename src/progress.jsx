@@ -1155,6 +1155,11 @@ const BODY_ZONES = [
   },
 ];
 
+const SKIN_SYMPTOMS = [
+  "Whitehead", "Blackhead", "Papule", "Pustule", "Cyst",
+  "Dryness", "Flaking", "Redness", "Irritation", "Congestion",
+];
+
 const BODY_TRIGGERS = [
   { id: "sweat", label: "Gym / Sweat" },
   { id: "detergent", label: "New detergent" },
@@ -1185,12 +1190,12 @@ function buildBodyShelfAdvice(zones, products, activeMap) {
   return { gaps, doubles };
 }
 
-function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => {} }) {
+function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => {}, triggerLog = [], setTriggerLog = () => {} }) {
   const enabled = user.bodyAcneEnabled || false;
   const zones = user.bodyAcneZones || [];
-  const [triggerLog, setTriggerLog] = useState([]);
   const [showTriggerModal, setShowTriggerModal] = useState(false);
   const [selectedTriggers, setSelectedTriggers] = useState([]);
+  const [selectedSymptoms, setSelectedSymptoms] = useState([]);
   const [expandedZone, setExpandedZone] = useState(null);
 
   const { gaps, doubles } = buildBodyShelfAdvice(zones, products, activeMap);
@@ -1403,14 +1408,34 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
                 );
               })}
             </div>
+            {/* What did your skin do? — symptom multi-select. Saved alongside
+                triggers so SwanSense and Ask Cygne can correlate trigger
+                events with the specific symptoms that followed. */}
+            <div style={{ marginBottom: 20 }}>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 4px" }}>Symptoms</p>
+              <h3 style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-ink, #1c1c1a)", margin: "0 0 14px" }}>What did your skin do?</h3>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {SKIN_SYMPTOMS.map(s => {
+                  const active = selectedSymptoms.includes(s);
+                  return (
+                    <button key={s} onClick={() => setSelectedSymptoms(prev => active ? prev.filter(x => x !== s) : [...prev, s])}
+                      style={{ padding: "10px 16px", borderRadius: 22, border: `1px solid ${active ? "rgba(45,61,43,0.5)" : "var(--border)"}`, background: active ? "rgba(45,61,43,0.10)" : "var(--ink)", color: active ? "#2d3d2b" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 12, cursor: "pointer", transition: "all 0.18s" }}>
+                      {s}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
             <button onClick={() => {
-              if (selectedTriggers.length > 0) {
-                setTriggerLog(prev => [...prev, { date: new Date().toISOString(), triggers: selectedTriggers }]);
+              const hasAny = selectedTriggers.length > 0 || selectedSymptoms.length > 0;
+              if (hasAny) {
+                setTriggerLog(prev => [...prev, { date: new Date().toISOString(), triggers: selectedTriggers, symptoms: selectedSymptoms }]);
                 setSelectedTriggers([]);
+                setSelectedSymptoms([]);
                 setShowTriggerModal(false);
               }
             }}
-              style={{ width: "100%", padding: "14px 0", background: selectedTriggers.length > 0 ? "#2d3d2b" : "var(--ink)", color: selectedTriggers.length > 0 ? "#fdfcf9" : "var(--clay)", border: "none", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 400, letterSpacing: "0.14em", textTransform: "uppercase", cursor: selectedTriggers.length > 0 ? "pointer" : "default", opacity: selectedTriggers.length > 0 ? 1 : 0.5 }}>
+              style={{ width: "100%", padding: "14px 0", background: (selectedTriggers.length > 0 || selectedSymptoms.length > 0) ? "#2d3d2b" : "var(--ink)", color: (selectedTriggers.length > 0 || selectedSymptoms.length > 0) ? "#fdfcf9" : "var(--clay)", border: "none", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 400, letterSpacing: "0.14em", textTransform: "uppercase", cursor: (selectedTriggers.length > 0 || selectedSymptoms.length > 0) ? "pointer" : "default", opacity: (selectedTriggers.length > 0 || selectedSymptoms.length > 0) ? 1 : 0.5 }}>
               Save
             </button>
           </div>
@@ -1515,7 +1540,7 @@ function getProductSession(product) {
   return getAutoSession(product).session;
 }
 
-function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatments, saveTreatment, removeTreatment, updateTreatmentDate = () => {}, user = {}, onAdvanceRamp, onHoldRamp, onResetRampStart = () => {}, journals = [], setJournals = () => {}, onUpdateUser = () => {}, reflections = [] }) {
+function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatments, saveTreatment, removeTreatment, updateTreatmentDate = () => {}, user = {}, onAdvanceRamp, onHoldRamp, onResetRampStart = () => {}, journals = [], setJournals = () => {}, onUpdateUser = () => {}, reflections = [], triggerLog = [], setTriggerLog = () => {} }) {
   const [showCheckIn, setShowCheckIn] = useState(false);
   const [showJournal, setShowJournal] = useState(false);
   const [askCygneQuestion, setAskCygneQuestion] = useState(null);
@@ -1749,7 +1774,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
       {/* -- Body Acne --------------------------------------------------------- */}
       {sectionLabel("layers", "Body Acne")}
       <div style={{ marginBottom: 28 }}>
-        <BodyAcneTracker products={products} activeMap={activeMap} user={user} onUpdateUser={onUpdateUser} />
+        <BodyAcneTracker products={products} activeMap={activeMap} user={user} onUpdateUser={onUpdateUser} triggerLog={triggerLog} setTriggerLog={setTriggerLog} />
       </div>
 
       {/* -- Cycle Tracking ---------------------------------------------------- */}

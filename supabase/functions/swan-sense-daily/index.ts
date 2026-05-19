@@ -93,6 +93,21 @@ function buildContext(body: any): string {
     if (brk) bits.push(`${brk} breakout day${brk === 1 ? "" : "s"}`);
     if (bits.length) parts.push(`Recent check-ins — ${bits.join(", ")}.`);
   }
+  if (Array.isArray(body.triggerLog) && body.triggerLog.length) {
+    const recent = body.triggerLog.slice(-7);
+    const triggers: Record<string, number> = {};
+    const symptoms: Record<string, number> = {};
+    recent.forEach((e: any) => {
+      (e?.triggers || []).forEach((t: string) => { triggers[t] = (triggers[t] || 0) + 1; });
+      (e?.symptoms || []).forEach((s: string) => { symptoms[s] = (symptoms[s] || 0) + 1; });
+    });
+    const topTriggers = Object.entries(triggers).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([k]) => k);
+    const topSymptoms = Object.entries(symptoms).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([k]) => k);
+    const bits: string[] = [];
+    if (topTriggers.length) bits.push(`triggers: ${topTriggers.join(", ")}`);
+    if (topSymptoms.length) bits.push(`symptoms: ${topSymptoms.join(", ")}`);
+    if (bits.length) parts.push(`Recent body log — ${bits.join("; ")}.`);
+  }
   return parts.join(" ") || "No context recorded yet.";
 }
 

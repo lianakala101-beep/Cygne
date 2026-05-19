@@ -64,6 +64,11 @@ export default function App() {
   const [waitingRoom, setWaitingRoom] = useLocalStorage("cygne_waitingroom", []);
   const [completedSteps, setCompletedSteps] = useState({ date: null, steps: [] });
   const [rampLog, setRampLog] = useLocalStorage("cygne_ramp_log", []);
+  // Trigger + symptom log captured from the body-acne "What happened today?"
+  // modal. Lifted to App.jsx (was session-only useState in BodyAcneTracker)
+  // so it persists across reloads, syncs to Supabase, and is visible to
+  // SwanSense and Ask Cygne for pattern analysis.
+  const [triggerLog, setTriggerLog] = useLocalStorage("cygne_trigger_log", []);
   const [fitSheet, setFitSheet] = useState(null);
   const [reflections, setReflections] = useLocalStorage("cygne_reflections", []);
 
@@ -98,6 +103,7 @@ export default function App() {
         setWaitingRoom([]);
         setCompletedSteps({ date: null, steps: [] });
         setRampLog([]);
+        setTriggerLog([]);
         setReflections([]);
         setLocationData(null);
         setLocationDenied(false);
@@ -186,6 +192,9 @@ export default function App() {
       }
       if (meta.rampLog && Array.isArray(meta.rampLog)) {
         setRampLog(meta.rampLog);
+      }
+      if (meta.triggerLog && Array.isArray(meta.triggerLog)) {
+        setTriggerLog(meta.triggerLog);
       }
       if (meta.reflections && Array.isArray(meta.reflections)) {
         // Merge cloud + local by id. Cloud is the canonical record but
@@ -329,6 +338,12 @@ export default function App() {
     if (!profileLoaded.current || !authSession) return;
     supabase.auth.updateUser({ data: { rampLog } }).catch(e => console.error("[Cygne] rampLog sync failed:", e));
   }, [rampLog]);
+
+  // -- Sync trigger + symptom log (body-acne "What happened today?") ---------
+  useEffect(() => {
+    if (!profileLoaded.current || !authSession) return;
+    supabase.auth.updateUser({ data: { triggerLog } }).catch(e => console.error("[Cygne] triggerLog sync failed:", e));
+  }, [triggerLog]);
 
   // -- Sync waiting room to Supabase ------------------------------------------
   useEffect(() => {
@@ -775,7 +790,7 @@ export default function App() {
 
       {/* Content */}
       <div style={{ maxWidth: 600, margin: "0 auto", padding: "32px 22px 0", animation: "fadeUp 0.3s ease" }} key={tab}>
-        {tab === "dashboard" && <Dashboard products={products} setTab={setTab} checkIns={checkIns} swanPopupDismissed={swanPopupDismissed} onDismissSwanPopup={dismissSwanPopup} treatments={treatments} locationData={locationData} user={{ ...(user || {}), id: authSession?.user?.id }} notifPermission={notifPermission} onRequestNotif={requestNotifications} notifDismissed={notifDismissed} onDismissNotif={() => setNotifDismissed(true)} journals={journals} setCheckIns={setCheckIns} />}
+        {tab === "dashboard" && <Dashboard products={products} setTab={setTab} checkIns={checkIns} swanPopupDismissed={swanPopupDismissed} onDismissSwanPopup={dismissSwanPopup} treatments={treatments} locationData={locationData} user={{ ...(user || {}), id: authSession?.user?.id }} notifPermission={notifPermission} onRequestNotif={requestNotifications} notifDismissed={notifDismissed} onDismissNotif={() => setNotifDismissed(true)} journals={journals} setCheckIns={setCheckIns} triggerLog={triggerLog} />}
         {tab === "routine"   && <MyRoutine
           products={products}
           user={{ ...(user || {}), id: authSession?.user?.id }}
@@ -828,7 +843,7 @@ export default function App() {
             />
           </Suspense>
         )}
-        {tab === "progress"  && <Progress products={products} checkIns={checkIns} setCheckIns={setCheckIns} treatments={treatments} setTreatments={setTreatments} saveTreatment={saveTreatment} removeTreatment={removeTreatment} updateTreatmentDate={updateTreatmentDate} user={user} onAdvanceRamp={advanceRamp} onHoldRamp={holdRamp} onResetRampStart={resetRampStartDate} journals={journals} setJournals={setJournals} onUpdateUser={updateUser} reflections={reflections} />}
+        {tab === "progress"  && <Progress products={products} checkIns={checkIns} setCheckIns={setCheckIns} treatments={treatments} setTreatments={setTreatments} saveTreatment={saveTreatment} removeTreatment={removeTreatment} updateTreatmentDate={updateTreatmentDate} user={user} onAdvanceRamp={advanceRamp} onHoldRamp={holdRamp} onResetRampStart={resetRampStartDate} journals={journals} setJournals={setJournals} onUpdateUser={updateUser} reflections={reflections} triggerLog={triggerLog} setTriggerLog={setTriggerLog} />}
       </div>
 
       {/* Bottom nav */}

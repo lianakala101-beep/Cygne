@@ -98,6 +98,22 @@ function buildContextFromBody(body: any): string {
     if (checkBits.length) parts.push(`Recent check-ins — ${checkBits.join(", ")}.`);
   }
 
+  if (Array.isArray(body.triggerLog) && body.triggerLog.length) {
+    const recent = body.triggerLog.slice(-7);
+    const triggers: Record<string, number> = {};
+    const symptoms: Record<string, number> = {};
+    recent.forEach((e: any) => {
+      (e?.triggers || []).forEach((t: string) => { triggers[t] = (triggers[t] || 0) + 1; });
+      (e?.symptoms || []).forEach((s: string) => { symptoms[s] = (symptoms[s] || 0) + 1; });
+    });
+    const topTriggers = Object.entries(triggers).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([k]) => k);
+    const topSymptoms = Object.entries(symptoms).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([k]) => k);
+    const bodyBits: string[] = [];
+    if (topTriggers.length) bodyBits.push(`triggers: ${topTriggers.join(", ")}`);
+    if (topSymptoms.length) bodyBits.push(`symptoms: ${topSymptoms.join(", ")}`);
+    if (bodyBits.length) parts.push(`Recent body log — ${bodyBits.join("; ")}.`);
+  }
+
   return parts.join(" ") || "No detailed context provided.";
 }
 

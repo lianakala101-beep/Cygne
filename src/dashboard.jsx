@@ -19,7 +19,7 @@ const MonthlyRecap  = lazy(() => import("./components/MonthlyRecap.jsx").then(m 
 
 const RECAP_MONTH_NAMES = ["january","february","march","april","may","june","july","august","september","october","november","december"];
 
-function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSwanPopup, treatments, locationData, user, notifPermission, onRequestNotif, notifDismissed, onDismissNotif, journals, setCheckIns }) {
+function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSwanPopup, treatments, locationData, user, notifPermission, onRequestNotif, notifDismissed, onDismissNotif, journals, setCheckIns, triggerLog = [] }) {
   const { flags } = analyzeShelf(products);
   const conflicts = detectConflicts(products);
   const { am, pm } = buildRoutine(products);
@@ -62,6 +62,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
     products,
     journals,
     checkIns,
+    triggerLog,
     cycleDay: currentCycleDay,
   });
 
@@ -445,6 +446,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             products={products}
             journals={journals}
             checkIns={checkIns}
+            triggerLog={triggerLog}
             onClose={() => setAskState(null)}
           />
         )}
