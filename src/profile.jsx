@@ -347,7 +347,7 @@ function IngredientProfile({ user, onUpdateUser }) {
 
 const SKIN_PROFILE_FIELDS = [
   { key: "skinGoals",          label: "Skin Goals",          options: ["Glassy & Luminous", "Clear & Smooth", "Even-Toned", "Firm & Refined", "Hydrated & Plump"], multi: true },
-  { key: "specialOccasion",    label: "Preparing For",       options: ["Wedding", "Vacation", "Event or Shoot", "Just For Me", "Not Right Now"] },
+  { key: "specialOccasion",    label: "Preparing For",       options: ["Wedding", "Vacation", "Event or Shoot", "Just For Me"] },
   { key: "consistency",        label: "Adherence",           options: ["Daily, Without Fail", "A Few Times a Week", "When I Remember"] },
   { key: "routinePhilosophy",  label: "Ritual Philosophy",   options: ["Minimalist — 3 to 5 steps", "Multi-Step — full ritual, I enjoy the process", "Somewhere In Between"] },
   { key: "climate",            label: "Climate",             options: ["Humid", "Dry", "Cold", "Tropical", "Mixed Seasons"] },
@@ -735,11 +735,17 @@ function ProfileSheet({ user, products, locationData, setLocationData, locationD
           <div style={{ marginBottom: 24 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: editingAccount ? 16 : 0 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                <div style={{ width: 44, height: 44, borderRadius: "50%", flexShrink: 0, background: "rgba(45,61,43,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <span style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 28, color: "var(--color-inky-moss, #2d3d2b)", lineHeight: 1 }}>
-                    {(accountDraft.name || user?.name || "?").trim()[0].toUpperCase()}
-                  </span>
-                </div>
+                <span style={{
+                  fontFamily: "var(--font-display)",
+                  fontWeight: 700,
+                  fontSize: 32,
+                  letterSpacing: "0.04em",
+                  color: "var(--color-inky-moss, #2d3d2b)",
+                  lineHeight: 1,
+                  userSelect: "none",
+                }}>
+                  {(accountDraft.name || user?.name || "?").trim()[0].toUpperCase()}
+                </span>
                 <div>
                   <p style={{ fontFamily: "var(--font-body)", fontSize: 16, fontWeight: 400, color: "var(--parchment)", margin: "0 0 2px" }}>{user?.name || "—"}</p>
                   <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0 }}>{user?.email || ""}</p>

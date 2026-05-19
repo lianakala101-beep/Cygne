@@ -63,6 +63,23 @@ export function useSwanSenseDaily({ user, products, journals, checkIns, cycleDay
           if (!cancelled) setLoading(false);
           return;
         }
+        // Sanitize the special-occasion field before it reaches the LLM.
+        // "Just For Me" (and legacy "Not Right Now") are explicit non-events
+        // — passing them to the prompt verbatim produces awkward lines like
+        // "Upcoming: Just For Me." Translate to plain context so the model
+        // reads the intent without parroting the option label, and drop any
+        // stale occasionDate that may still be paired with it.
+        const sanitizedSkinProfile = (() => {
+          const sp = user?.skinProfile || null;
+          if (!sp) return sp;
+          const occ = sp.specialOccasion;
+          if (occ === "Just For Me" || occ === "Not Right Now") {
+            const { specialOccasion: _so, occasionDate: _od, ...rest } = sp;
+            return { ...rest, focus: "general skin health" };
+          }
+          return sp;
+        })();
+
         const data = await invokeEdgeFunction("swan-sense-daily", {
           userId: session.user.id,
           products,
@@ -70,7 +87,7 @@ export function useSwanSenseDaily({ user, products, journals, checkIns, cycleDay
           checkIns,
           skinType: user?.skinType,
           concerns: user?.concerns,
-          skinProfile: user?.skinProfile,
+          skinProfile: sanitizedSkinProfile,
           cycleDay,
         });
         if (cancelled) return;

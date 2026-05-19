@@ -287,11 +287,13 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       <p style={obSub}>Cygne can pace your routine toward a specific date.</p>
       <div style={{ marginTop: 32 }}>
         <PillSelect
-          options={["Wedding", "Vacation", "Event or Shoot", "Just For Me", "Not Right Now"]}
+          options={["Wedding", "Vacation", "Event or Shoot", "Just For Me"]}
           selected={specialOccasion}
           onToggle={v => {
             // Clear the date when the user picks a non-event option so the
-            // SwanSense countdown gate doesn't fire on stale data.
+            // SwanSense countdown gate doesn't fire on stale data. The
+            // "Not Right Now" branch is kept defensively for legacy data
+            // even though it's no longer offered as a pill.
             setSpecialOccasion(prev => prev === v ? "" : v);
             if (v === "Just For Me" || v === "Not Right Now") setOccasionDate("");
           }}

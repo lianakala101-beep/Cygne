@@ -52,8 +52,16 @@ function buildContext(body: any): string {
     if (profile.consistency)        parts.push(`Adherence: ${profile.consistency}.`);
     if (profile.climate)            parts.push(`Climate: ${profile.climate}.`);
     if (profile.environment)        parts.push(`Environment: ${profile.environment}.`);
-    if (profile.specialOccasion && profile.occasionDate) {
-      parts.push(`Upcoming: ${profile.specialOccasion} on ${profile.occasionDate}.`);
+    // "Just For Me" and legacy "Not Right Now" are explicit non-events —
+    // never echo them into the prompt verbatim. Render as plain context.
+    const occ = profile.specialOccasion;
+    const isNonEvent = occ === "Just For Me" || occ === "Not Right Now";
+    if (occ && profile.occasionDate && !isNonEvent) {
+      parts.push(`Upcoming: ${occ} on ${profile.occasionDate}.`);
+    } else if (profile.focus) {
+      parts.push(`Focus: ${profile.focus}.`);
+    } else if (isNonEvent) {
+      parts.push(`Focus: general skin health.`);
     }
   }
   if (Array.isArray(body.products) && body.products.length) {
