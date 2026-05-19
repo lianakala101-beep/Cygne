@@ -74,13 +74,17 @@ function AuthScreen({ onAuth }) {
       padding: "0 36px",
     }}>
 
-      {/* Logo */}
+      {/* Logo — width-only constraint so the natural 6710×3407 aspect ratio
+          is preserved. flexShrink: 0 prevents the column flexbox from
+          compressing the image vertically on short viewports. */}
       <img
         src="/cygne-logo.png"
         alt="Cygne"
         style={{
-          width: "48%",
-          maxWidth: 200,
+          width: 180,
+          height: "auto",
+          maxWidth: "70%",
+          flexShrink: 0,
           display: "block",
           margin: "0 auto 52px",
           opacity: 1,
