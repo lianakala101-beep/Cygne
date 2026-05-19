@@ -429,7 +429,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
         <img
           src="/cygne-logo.png"
           alt="Cygne"
-          style={{ height: 170, width: "auto", display: "block", filter: "brightness(1.25) contrast(1.05)", mixBlendMode: "lighten" }}
+          style={{ height: 170, width: "auto", display: "block", opacity: 1, filter: "none" }}
         />
         <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 11, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: "6px 0 0 130px", lineHeight: 1 }}>built around you</p>
       </div>

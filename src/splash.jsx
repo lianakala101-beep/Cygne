@@ -43,6 +43,9 @@ function SplashScreen({ onDone }) {
           margin: "0 auto",
           background: "transparent",
           border: "none",
+          opacity: 1,
+          filter: "none",
+          mixBlendMode: "normal",
         }}
       />
 

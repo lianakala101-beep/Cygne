@@ -83,6 +83,9 @@ function AuthScreen({ onAuth }) {
           maxWidth: 200,
           display: "block",
           margin: "0 auto 52px",
+          opacity: 1,
+          filter: "none",
+          mixBlendMode: "normal",
         }}
       />
 
