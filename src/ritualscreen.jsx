@@ -346,7 +346,6 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
     } catch { setCompletedSteps([]); }
   }, [sessionKey]);
 
-  const [ritualDismissed, setRitualDismissed] = useState(false);
   const [showRitualCheckIn, setShowRitualCheckIn] = useState(false);
   // CheckInModal stores `date` as a full ISO timestamp, so normalize to the
   // YYYY-MM-DD prefix before comparing — without this the "Ritual complete"
@@ -405,12 +404,8 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
       )}
 
       {/* -- Ritual Mode Card ---------------------------------------------- */}
-      {ritualMode.name && !ritualDismissed && (
+      {ritualMode.name && (
         <div style={{ background: ritualMode.bg, border: `1px solid ${ritualMode.border}`, borderRadius: 16, padding: "16px 18px", marginBottom: 22, position: "relative" }}>
-          <button onClick={() => setRitualDismissed(true)}
-            style={{ position: "absolute", top: 12, right: 12, background: "none", border: "none", color: "var(--clay)", cursor: "pointer", opacity: 0.5, padding: 2 }}>
-            <Icon name="x" size={13} />
-          </button>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
             <span style={{ color: "var(--clay)", opacity: 0.6 }}><Icon name={sessionIcon} size={13} /></span>
             <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)" }}>{getRitualTimeLabel().toLowerCase()}</span>
@@ -418,7 +413,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
               <span style={{ marginLeft: "auto", fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: ritualMode.color, opacity: 0.8 }}>{cyclePhase} phase</span>
             )}
           </div>
-          <p style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 400, letterSpacing: "0.08em", color: "var(--parchment)", margin: "0 0 2px" }}>{ritualMode.name}</p>
+          <p style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--parchment)", margin: "0 0 2px" }}>{ritualMode.name}</p>
           <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: "0 0 10px", opacity: 0.7 }}>{ritualMode.tagline}</p>
           <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: 0, lineHeight: 1.65 }}>{ritualMode.guidance}</p>
           {filteredOut.length > 0 && (
