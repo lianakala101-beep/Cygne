@@ -88,15 +88,4 @@ const CONFLICT_RULES = [
   { pair: ["vitamin C", "benzoyl peroxide"],severity: "warning", reason: "Benzoyl peroxide oxidizes Vitamin C and degrades both. Use in separate sessions — Vitamin C AM, BP at a different time." },
 ];
 
-const SAMPLE_PRODUCTS = [
-  { id: "1", brand: "La Roche-Posay", name: "Toleriane Hydrating Gentle Cleanser", category: "Cleanser", price: 15.99, ingredients: ["water", "glycerin", "ceramide np", "ceramide ap", "ceramide elp", "niacinamide", "sodium hyaluronate"], dateAdded: "2024-11-01" },
-  { id: "2", brand: "Paula's Choice", name: "2% BHA Liquid Exfoliant", category: "Exfoliant", price: 34.00, ingredients: ["butylene glycol", "salicylic acid", "methylpropanediol"], dateAdded: "2024-11-10" },
-  { id: "3", brand: "The Ordinary", name: "Niacinamide 10% + Zinc 1%", category: "Serum", price: 6.50, ingredients: ["niacinamide", "zinc pca", "aqua", "glycerin"], dateAdded: "2024-10-15" },
-  { id: "4", brand: "Tatcha", name: "The Dewy Skin Cream", category: "Moisturizer", price: 68.00, ingredients: ["water", "glycerin", "squalane", "niacinamide", "japanese purple rice", "uva ursi leaf extract"], dateAdded: "2024-12-01" },
-  { id: "5", brand: "Supergoop!", name: "Unseen Sunscreen SPF 40", category: "SPF", price: 38.00, ingredients: ["avobenzone", "homosalate", "octisalate", "octocrylene", "glycerin", "squalane"], dateAdded: "2024-11-20" },
-  { id: "6", brand: "COSRX", name: "Snail 96 Mucin Power Essence", category: "Serum", price: 24.00, ingredients: ["snail secretion filtrate", "sodium hyaluronate", "betaine", "glycerin"], dateAdded: "2024-10-01" },
-  { id: "7", brand: "The Ordinary", name: "Retinol 0.5% in Squalane", category: "Serum", price: 11.90, ingredients: ["squalane", "retinol", "solanum lycopersicum"], dateAdded: "2024-12-10" },
-];
-
-
-export { CATEGORIES, FREQUENCIES, LAYER_ORDER, layerIndex, ACTIVE_RULES, ACTIVE_SESSION, CONFLICT_RULES, SAMPLE_PRODUCTS, isScheduledToday, getNextUseLabel };
+export { CATEGORIES, FREQUENCIES, LAYER_ORDER, layerIndex, ACTIVE_RULES, ACTIVE_SESSION, CONFLICT_RULES, isScheduledToday, getNextUseLabel };

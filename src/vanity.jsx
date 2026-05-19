@@ -379,7 +379,7 @@ function ClearAllButton({ onClearAll }) {
   );
 }
 
-function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo, onClearAll, onSession, waitingRoom = [], onAddFromWaiting, onDismissWaiting, checkIns = [], user = {}, journals = [], rampLog = [], onAdvanceRamp, onHoldRamp }) {
+function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearAll, onSession, waitingRoom = [], onAddFromWaiting, onDismissWaiting, checkIns = [], user = {}, journals = [], rampLog = [], onAdvanceRamp, onHoldRamp }) {
   const [view, setView] = useState("shelf");
   const [filter, setFilter] = useState("All");
   const [askState, setAskState] = useState(null); // { question, context } | null
@@ -441,16 +441,6 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo
                 {filtered.length} of {products.length} product{products.length !== 1 ? "s" : ""}
               </p>
 
-              {products.some(p => p.isDemo) && onClearDemo && (
-                <div style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.2)", borderRadius: 12, padding: "12px 14px", marginBottom: 14 }}>
-                  <span style={{ color: "#8b7355", flexShrink: 0, display: "inline-flex" }}><Icon name="sparkle" size={14} /></span>
-                  <div style={{ flex: 1 }}>
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 400, color: "var(--parchment)", margin: "0 0 2px" }}>Sample vanity</p>
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0 }}>These are example products to show you how Cygne works. Scan your own to replace them.</p>
-                  </div>
-                  <button onClick={onClearDemo} style={{ fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, background: "transparent", border: "1px solid rgba(139,115,85,0.3)", borderRadius: 8, color: "var(--clay)", padding: "6px 10px", cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}>Clear demo</button>
-                </div>
-              )}
               {rampCheckIns.length > 0 && (onAdvanceRamp || onHoldRamp) && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 18 }}>
                   {rampCheckIns.map(({ product: p, week }) => (

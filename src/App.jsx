@@ -7,7 +7,7 @@ import { Dashboard } from "./dashboard.jsx";
 import { MyRoutine } from "./ritualscreen.jsx";
 import { Shelf } from "./vanity.jsx";
 import { Progress } from "./progress.jsx";
-import { SwanWelcomeScreen, useLocalStorage, DEMO_PRODUCTS, DEMO_VERSION, getCurrentCycleDay, daysBetweenLocal, toLocalMidnight, isoWeekNumber, isoWeekYear } from "./utils.jsx";
+import { SwanWelcomeScreen, useLocalStorage, getCurrentCycleDay, daysBetweenLocal, toLocalMidnight, isoWeekNumber, isoWeekYear } from "./utils.jsx";
 import { WeekendNudgeCard } from "./weekend.jsx";
 import { SeasonalNudgeCard } from "./seasonal.jsx";
 import { AuthScreen } from "./auth.jsx";
@@ -47,7 +47,6 @@ export default function App() {
   const [notifDismissed, setNotifDismissed] = useLocalStorage("cygne_notifdismissed", false);
   const [tab, setTab] = useState("dashboard");
   const [products, setProducts] = useLocalStorage("cygne_products", []);
-  const [demoVersion, setDemoVersion] = useLocalStorage("cygne_demo_version", null);
   const [modal, setModal] = useState(null);
   const [checkIns, setCheckIns] = useLocalStorage("cygne_checkins", []);
   const [journals, setJournals] = useLocalStorage("cygne_journals", []);
@@ -776,7 +775,7 @@ export default function App() {
 
       {/* Content */}
       <div style={{ maxWidth: 600, margin: "0 auto", padding: "32px 22px 0", animation: "fadeUp 0.3s ease" }} key={tab}>
-        {tab === "dashboard" && <Dashboard products={products} setTab={setTab} checkIns={checkIns} swanPopupDismissed={swanPopupDismissed} onDismissSwanPopup={dismissSwanPopup} treatments={treatments} locationData={locationData} user={{ ...(user || {}), id: authSession?.user?.id }} notifPermission={notifPermission} onRequestNotif={requestNotifications} notifDismissed={notifDismissed} onDismissNotif={() => setNotifDismissed(true)} journals={journals} setCheckIns={setCheckIns} onLoadDemo={() => setProducts(DEMO_PRODUCTS)} />}
+        {tab === "dashboard" && <Dashboard products={products} setTab={setTab} checkIns={checkIns} swanPopupDismissed={swanPopupDismissed} onDismissSwanPopup={dismissSwanPopup} treatments={treatments} locationData={locationData} user={{ ...(user || {}), id: authSession?.user?.id }} notifPermission={notifPermission} onRequestNotif={requestNotifications} notifDismissed={notifDismissed} onDismissNotif={() => setNotifDismissed(true)} journals={journals} setCheckIns={setCheckIns} />}
         {tab === "routine"   && <MyRoutine
           products={products}
           user={{ ...(user || {}), id: authSession?.user?.id }}
@@ -801,7 +800,6 @@ export default function App() {
           onDelete={id => setProducts(prev => prev.filter(x => x.id !== id))}
           onAdd={() => setModal({ brand: "", name: "", category: "Serum", price: "", ingredients: "" })}
           onToggleRoutine={toggleRoutine}
-          onClearDemo={() => setProducts(prev => prev.filter(p => !p.isDemo))}
           onClearAll={() => setProducts([])}
           onSession={(id, session) => setProducts(prev => prev.map(p => p.id === id ? { ...p, session } : p))}
           waitingRoom={waitingRoom}

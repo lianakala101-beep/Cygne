@@ -19,7 +19,7 @@ const MonthlyRecap  = lazy(() => import("./components/MonthlyRecap.jsx").then(m 
 
 const RECAP_MONTH_NAMES = ["january","february","march","april","may","june","july","august","september","october","november","december"];
 
-function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSwanPopup, treatments, locationData, user, notifPermission, onRequestNotif, notifDismissed, onDismissNotif, journals, setCheckIns, onLoadDemo }) {
+function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSwanPopup, treatments, locationData, user, notifPermission, onRequestNotif, notifDismissed, onDismissNotif, journals, setCheckIns }) {
   const { flags } = analyzeShelf(products);
   const conflicts = detectConflicts(products);
   const { am, pm } = buildRoutine(products);
@@ -156,12 +156,6 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
               style={{ width: "100%", padding: "16px 0", background: "var(--cta)", border: "1px solid rgba(122,144,112,0.35)", borderRadius: 14, fontFamily: "var(--font-body), sans-serif", fontSize: 13, fontWeight: 400, color: "var(--parchment)", cursor: "pointer", letterSpacing: "0.04em", marginBottom: 10 }}>
               Add your first product
             </button>
-            {onLoadDemo && (
-              <button onClick={onLoadDemo}
-                style={{ width: "100%", padding: "13px 0", background: "transparent", border: "1px solid var(--border)", borderRadius: 14, fontFamily: "var(--font-body), sans-serif", fontSize: 12, color: "var(--clay)", cursor: "pointer", letterSpacing: "0.04em" }}>
-                Load demo products
-              </button>
-            )}
           </div>
         );
       })()}
@@ -171,7 +165,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         <div>
         {/* Setup strip - shown until user has products + check-in */}
         {products.length > 0 && (() => {
-          const hasProducts = products.filter(p => !p.isDemo).length > 0;
+          const hasProducts = products.length > 0;
           const hasCheckin = checkIns.length > 0;
           const allDone = hasProducts && hasCheckin;
           if (allDone) return null;
@@ -384,12 +378,12 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         })()}
 
         {/* Alerts */}
-        {allAlerts.length > 0 && products.some(p => !p.isDemo) && (
+        {allAlerts.length > 0 && products.length > 0 && (
           <Section title={`${allAlerts.length} alert${allAlerts.length > 1 ? "s" : ""}`} icon="warning">
             {allAlerts.map((f, i) => <FlagCard key={i} f={f} />)}
           </Section>
         )}
-        {allAlerts.length === 0 && products.some(p => !p.isDemo) && (
+        {allAlerts.length === 0 && products.length > 0 && (
           <div style={{ display: "flex", gap: 12, padding: "14px 16px", background: "rgba(122,144,112,0.08)", borderRadius: 12, border: "1px solid rgba(122,144,112,0.2)", marginBottom: 24 }}>
             <span style={{ color: "#6e8a72" }}><Icon name="check" size={15} /></span>
             <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 13, color: "var(--parchment)", margin: 0 }}>No conflicts detected. Your ritual is clean.</p>
