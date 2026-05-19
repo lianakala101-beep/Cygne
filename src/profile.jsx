@@ -86,91 +86,6 @@ function Profile({ user, products, onLogout, locationData, setLocationData, loca
 
 // --- PROFILE SHEET ------------------------------------------------------------
 
-// --- SKIN EDITOR (sub-component for ProfileSheet) ----------------------------
-
-function SkinEditor({ user, onUpdateUser }) {
-  const [editing, setEditing] = useState(false);
-  const [draftType, setDraftType] = useState(user?.skinType || "");
-  const [draftConcerns, setDraftConcerns] = useState(user?.concerns || []);
-
-  const toggleConcern = (c) => setDraftConcerns(prev => prev.includes(c) ? prev.filter(x => x !== c) : [...prev, c]);
-
-  const save = () => {
-    onUpdateUser({ ...user, skinType: draftType, concerns: draftConcerns });
-    setEditing(false);
-  };
-
-  const cancel = () => {
-    setDraftType(user?.skinType || "");
-    setDraftConcerns(user?.concerns || []);
-    setEditing(false);
-  };
-
-  return (
-    <div style={{ marginBottom: 20 }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: 0 }}>Your Skin</p>
-        {!editing && (
-          <button onClick={() => setEditing(true)} style={{ background: "none", border: "none", fontFamily: "var(--font-body)", fontSize: 10, color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer", letterSpacing: "0.14em", textTransform: "uppercase", padding: 0 }}>
-            Edit
-          </button>
-        )}
-      </div>
-
-      {!editing ? (
-        <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "14px 16px" }}>
-          {user?.skinType ? (
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: user?.concerns?.length > 0 ? 10 : 0, paddingBottom: user?.concerns?.length > 0 ? 10 : 0, borderBottom: user?.concerns?.length > 0 ? "1px solid var(--border)" : "none" }}>
-              <span style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", letterSpacing: "0.06em" }}>Skin type</span>
-              <span style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(45,61,43,0.10)", border: "1px solid rgba(45,61,43,0.3)", fontFamily: "var(--font-body)", fontSize: 10, color: "var(--color-inky-moss, #2d3d2b)", fontWeight: 400 }}>{user.skinType}</span>
-            </div>
-          ) : (
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: "0 0 8px", opacity: 0.5 }}>No skin type set.</p>
-          )}
-          {user?.concerns?.length > 0 ? (
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-              {user.concerns.map((c, i) => (
-                <span key={i} style={{ padding: "3px 10px", borderRadius: 20, background: "var(--ink)", border: "1px solid var(--border)", fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)" }}>{c}</span>
-              ))}
-            </div>
-          ) : (
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, opacity: 0.5 }}>No concerns set.</p>
-          )}
-        </div>
-      ) : (
-        <div style={{ background: "var(--surface)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 12, padding: "16px" }}>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 10px", opacity: 0.7 }}>Skin type</p>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 18 }}>
-            {SKIN_TYPES.map(t => {
-              const active = draftType === t;
-              return (
-                <button key={t} onClick={() => setDraftType(active ? "" : t)} style={{ padding: "6px 14px", borderRadius: 20, border: `1px solid ${active ? "rgba(45,61,43,0.55)" : "var(--border)"}`, background: active ? "rgba(45,61,43,0.18)" : "transparent", fontFamily: "var(--font-body)", fontSize: 11, color: active ? "var(--parchment)" : "var(--clay)", fontWeight: 400, cursor: "pointer", transition: "all 0.15s" }}>
-                  {t}
-                </button>
-              );
-            })}
-          </div>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 10px", opacity: 0.7 }}>Concerns</p>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 18 }}>
-            {SKIN_CONCERNS.map(c => {
-              const active = draftConcerns.includes(c);
-              return (
-                <button key={c} onClick={() => toggleConcern(c)} style={{ padding: "6px 14px", borderRadius: 20, border: `1px solid ${active ? "rgba(45,61,43,0.55)" : "var(--border)"}`, background: active ? "rgba(45,61,43,0.18)" : "transparent", fontFamily: "var(--font-body)", fontSize: 11, color: active ? "var(--parchment)" : "var(--clay)", fontWeight: 400, cursor: "pointer", transition: "all 0.15s" }}>
-                  {c}
-                </button>
-              );
-            })}
-          </div>
-          <div style={{ display: "flex", gap: 8 }}>
-            <button onClick={save} style={{ flex: 1, padding: "10px 0", background: "rgba(45,61,43,0.14)", border: "1px solid rgba(45,61,43,0.35)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer" }}>Save</button>
-            <button onClick={cancel} style={{ flex: 1, padding: "10px 0", background: "transparent", border: "1px solid var(--border)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", cursor: "pointer" }}>Cancel</button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
 
 
 // --- INGREDIENT PROFILE -------------------------------------------------------
@@ -345,7 +260,13 @@ function IngredientProfile({ user, onUpdateUser }) {
 // recommendations. The swan-sense-daily cache is keyed per (userId, day) — the
 // next day's headline picks up the new profile.
 
+// Skin Type and Concerns live on the user object's TOP level (user.skinType,
+// user.concerns) — not inside user.skinProfile. They're listed here so the
+// editor renders them in a single unified accordion, but the save handler
+// routes them correctly. `top: true` flags the field as top-level.
 const SKIN_PROFILE_FIELDS = [
+  { key: "skinType",           label: "Skin Type",           options: SKIN_TYPES,    top: true },
+  { key: "concerns",           label: "Concerns",            options: SKIN_CONCERNS, top: true, multi: true },
   { key: "skinGoals",          label: "Skin Goals",          options: ["Glassy & Luminous", "Clear & Smooth", "Even-Toned", "Firm & Refined", "Hydrated & Plump"], multi: true },
   { key: "specialOccasion",    label: "Preparing For",       options: ["Wedding", "Vacation", "Event or Shoot", "Just For Me"] },
   { key: "consistency",        label: "Adherence",           options: ["Daily, Without Fail", "A Few Times a Week", "When I Remember"] },
@@ -359,7 +280,12 @@ const SKIN_PROFILE_FIELDS = [
 function SkinProfileEditor({ user, onUpdateUser }) {
   const [editing, setEditing] = useState(false);
   const profile = user?.skinProfile || {};
+  // Draft holds both top-level fields (skinType, concerns) and nested
+  // skinProfile fields in one flat object — the editor doesn't need to
+  // know the distinction. save() routes each field to its correct home.
   const buildDraft = () => ({
+    skinType:          user?.skinType || "",
+    concerns:          Array.isArray(user?.concerns) ? user.concerns : [],
     skinGoals:         Array.isArray(profile.skinGoals) ? profile.skinGoals : [],
     specialOccasion:   profile.specialOccasion || "",
     occasionDate:      profile.occasionDate || "",
@@ -383,13 +309,14 @@ function SkinProfileEditor({ user, onUpdateUser }) {
   const startEditing = () => { setDraft(buildDraft()); setEditing(true); };
   const cancel = () => { setDraft(buildDraft()); setEditing(false); };
   const save = () => {
-    const cleaned = { ...draft, ingredientsToAvoid: (draft.ingredientsToAvoid || "").trim() || null };
+    const { skinType, concerns, ...profileDraft } = draft;
+    const cleaned = { ...profileDraft, ingredientsToAvoid: (profileDraft.ingredientsToAvoid || "").trim() || null };
     // If the user moved to a non-event occasion, clear the date so downstream
     // logic (e.g. SwanSense's countdown gate) doesn't fire on stale data.
     if (cleaned.specialOccasion === "Just For Me" || cleaned.specialOccasion === "Not Right Now" || !cleaned.specialOccasion) {
       cleaned.occasionDate = "";
     }
-    onUpdateUser({ ...user, skinProfile: cleaned });
+    onUpdateUser({ ...user, skinType, concerns, skinProfile: cleaned });
     setEditing(false);
   };
 
@@ -824,10 +751,8 @@ function ProfileSheet({ user, products, locationData, setLocationData, locationD
             ))}
           </div>
 
-          {/* Your Skin — editable */}
-          <SkinEditor user={user} onUpdateUser={onUpdateUser} />
-
-          {/* Your Skin Profile — onboarding answers (goals, philosophy, climate, etc.) */}
+          {/* Your Skin Profile — unified skin type, concerns, and all
+              onboarding answers (goals, philosophy, climate, etc.) */}
           <SkinProfileEditor user={user} onUpdateUser={onUpdateUser} />
 
           {/* Skin History — medical context */}
