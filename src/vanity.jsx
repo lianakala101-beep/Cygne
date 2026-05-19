@@ -52,6 +52,145 @@ const GLASS_CARD = {
   flexDirection: "column",
 };
 
+// Minimal SVG line illustrations shown when a product has no photo. Single
+// stroke, no fill, stroke inherits currentColor from the wrapper (stone at
+// 0.4 opacity). Rendered at 48px centered in the card image area.
+function CategoryGlyph({ category }) {
+  const props = {
+    viewBox: "0 0 100 100",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.4,
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    style: { width: "100%", height: "100%", display: "block" },
+    "aria-hidden": "true",
+    focusable: "false",
+  };
+  switch (category) {
+    case "Cleanser":
+      // Foam / bubble cluster
+      return (
+        <svg {...props}>
+          <circle cx="34" cy="58" r="14" />
+          <circle cx="56" cy="46" r="18" />
+          <circle cx="74" cy="62" r="10" />
+          <circle cx="46" cy="72" r="7" />
+          <circle cx="64" cy="76" r="5" />
+          <circle cx="26" cy="40" r="4" />
+        </svg>
+      );
+    case "Serum":
+      // Dropper bottle
+      return (
+        <svg {...props}>
+          <line x1="46" y1="10" x2="54" y2="10" />
+          <path d="M 42 14 L 58 14 L 58 26 L 42 26 Z" />
+          <line x1="44" y1="26" x2="44" y2="32" />
+          <line x1="56" y1="26" x2="56" y2="32" />
+          <path d="M 34 32 L 66 32 L 66 86 Q 66 92 60 92 L 40 92 Q 34 92 34 86 Z" />
+          <line x1="40" y1="58" x2="60" y2="58" />
+        </svg>
+      );
+    case "Moisturizer":
+      // Round jar — wide squat lid + body
+      return (
+        <svg {...props}>
+          <ellipse cx="50" cy="28" rx="30" ry="5" />
+          <line x1="20" y1="28" x2="20" y2="38" />
+          <line x1="80" y1="28" x2="80" y2="38" />
+          <ellipse cx="50" cy="38" rx="30" ry="5" />
+          <path d="M 20 38 L 20 80 Q 20 86 26 86 L 74 86 Q 80 86 80 80 L 80 38" />
+        </svg>
+      );
+    case "Oil":
+      // Droplet
+      return (
+        <svg {...props}>
+          <path d="M 50 14 C 30 42, 28 60, 30 70 A 22 22 0 0 0 70 70 C 72 60, 70 42, 50 14 Z" />
+        </svg>
+      );
+    case "Prescription":
+      // Apothecary vial with stopper
+      return (
+        <svg {...props}>
+          <path d="M 42 10 L 58 10 L 58 18 L 42 18 Z" />
+          <line x1="42" y1="18" x2="36" y2="32" />
+          <line x1="58" y1="18" x2="64" y2="32" />
+          <path d="M 36 32 L 36 84 Q 36 92 44 92 L 56 92 Q 64 92 64 84 L 64 32 Z" />
+          <line x1="40" y1="62" x2="60" y2="62" />
+        </svg>
+      );
+    case "SPF":
+    case "SPF Moisturizer":
+      // Sun outline
+      return (
+        <svg {...props}>
+          <circle cx="50" cy="50" r="16" />
+          <line x1="50" y1="20" x2="50" y2="28" />
+          <line x1="50" y1="72" x2="50" y2="80" />
+          <line x1="20" y1="50" x2="28" y2="50" />
+          <line x1="72" y1="50" x2="80" y2="50" />
+          <line x1="29" y1="29" x2="34" y2="34" />
+          <line x1="66" y1="66" x2="71" y2="71" />
+          <line x1="71" y1="29" x2="66" y2="34" />
+          <line x1="34" y1="66" x2="29" y2="71" />
+        </svg>
+      );
+    case "Eye Cream":
+      // Eye outline
+      return (
+        <svg {...props}>
+          <path d="M 14 50 Q 50 22, 86 50 Q 50 78, 14 50 Z" />
+          <circle cx="50" cy="50" r="9" />
+          <circle cx="50" cy="50" r="3" fill="currentColor" stroke="none" />
+        </svg>
+      );
+    case "Toner":
+    case "Toning Pad":
+      // Tall bottle with cap
+      return (
+        <svg {...props}>
+          <path d="M 42 12 L 58 12 L 58 24 L 42 24 Z" />
+          <line x1="42" y1="24" x2="36" y2="34" />
+          <line x1="58" y1="24" x2="64" y2="34" />
+          <path d="M 36 34 L 36 86 Q 36 92 42 92 L 58 92 Q 64 92 64 86 L 64 34" />
+        </svg>
+      );
+    case "Exfoliant":
+      // Textured circle with granules
+      return (
+        <svg {...props}>
+          <circle cx="50" cy="50" r="28" />
+          <circle cx="42" cy="44" r="2" />
+          <circle cx="56" cy="42" r="1.6" />
+          <circle cx="60" cy="56" r="2.2" />
+          <circle cx="44" cy="60" r="1.8" />
+          <circle cx="52" cy="52" r="1.4" />
+          <circle cx="38" cy="52" r="1.4" />
+        </svg>
+      );
+    case "Mask":
+      // Half-moon pouch
+      return (
+        <svg {...props}>
+          <path d="M 22 30 L 78 30 L 70 86 Q 70 90 66 90 L 34 90 Q 30 90 30 86 Z" />
+          <line x1="40" y1="22" x2="60" y2="22" />
+          <line x1="40" y1="22" x2="40" y2="30" />
+          <line x1="60" y1="22" x2="60" y2="30" />
+        </svg>
+      );
+    default:
+      // Leaf — calm, on-brand fallback for anything else
+      return (
+        <svg {...props}>
+          <path d="M 28 80 Q 28 32 72 24 Q 78 64 28 80 Z" />
+          <path d="M 30 78 Q 50 60 70 28" />
+        </svg>
+      );
+  }
+}
+
 function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, user = {}, onAskCygne }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -74,11 +213,11 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
           {product.imageUrl
             ? <img src={product.imageUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
             : (
-              <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6 }}>
-                <span style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 36, color: "rgba(160,160,160,0.45)", lineHeight: 1 }}>
-                  {product.brand?.[0]?.toUpperCase() || "·"}
-                </span>
-                <span style={{ fontFamily: "var(--font-display, 'Fungis', sans-serif)", fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(160,160,160,0.55)" }}>
+              <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10 }}>
+                <div style={{ width: 48, height: 48, color: "var(--color-stone, #5a5a5a)", opacity: 0.4, pointerEvents: "none" }}>
+                  <CategoryGlyph category={product.category} />
+                </div>
+                <span style={{ fontFamily: "var(--font-display, 'Fungis', sans-serif)", fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-stone, #5a5a5a)", opacity: 0.65 }}>
                   {product.category}
                 </span>
               </div>
