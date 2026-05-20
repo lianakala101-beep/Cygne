@@ -396,11 +396,8 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           <AskCygneButton onClick={() => askCygne("", "")} />
         </div>
 
-        {/* 5. Travel Edit + Shop Scan — utility buttons at bottom.
-            Travel Edit is hidden when the user told onboarding they travel
-            rarely — keeps the dashboard quieter for users who don't need it. */}
+        {/* 5. Travel Edit + Shop Scan — utility buttons at bottom. */}
         <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
-          {(user?.skinProfile?.travel || "").toLowerCase() !== "rarely" && (
           <button onClick={() => setFlightOpen(true)}
             style={{ flex: 1, display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", background: "var(--cta)", border: "1px solid rgba(122,144,112,0.25)", borderRadius: 14, cursor: "pointer", transition: "background 0.2s", textAlign: "left" }}
             onMouseEnter={e => e.currentTarget.style.background = "#444d3d"}
@@ -413,7 +410,6 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
               <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 9, color: "rgba(232,227,214,0.45)", margin: 0, letterSpacing: "0.02em" }}>Pack & skip</p>
             </div>
           </button>
-          )}
           <button onClick={() => setShopScanOpen(true)}
             style={{ flex: 1, display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", background: "var(--cta)", border: "1px solid rgba(122,144,112,0.25)", borderRadius: 14, cursor: "pointer", transition: "background 0.2s", textAlign: "left" }}
             onMouseEnter={e => e.currentTarget.style.background = "#444d3d"}
