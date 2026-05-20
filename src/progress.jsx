@@ -963,20 +963,16 @@ function TreatmentSection({ treatments, saveTreatment, removeTreatment, updateTr
 
   return (
     <div style={{ marginBottom: 28 }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)" }}>Treatments</span>
-          {activeTreatments.length > 0 && (
-            <span style={{ fontSize: 9, fontFamily: "var(--font-body)", color: "#2d3d2b", background: "rgba(232,226,217,0.18)", border: "1px solid rgba(45,61,43,0.25)", padding: "2px 8px", borderRadius: 20 }}>{activeTreatments.length} active</span>
-          )}
-        </div>
-        <button onClick={() => setAddOpen(true)}
-          style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 12px", background: "none", border: "1px solid var(--border)", borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 9, color: "var(--clay)", cursor: "pointer", letterSpacing: "0.1em", textTransform: "uppercase", transition: "all 0.2s" }}
-          onMouseEnter={e => { e.currentTarget.style.borderColor = "#2d3d2b"; e.currentTarget.style.color = "#2d3d2b"; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--clay)"; }}>
-          <Icon name="plus" size={11} /> Log
-        </button>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+        <span style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)" }}>Treatments</span>
+        {activeTreatments.length > 0 && (
+          <span style={{ fontSize: 9, fontFamily: "var(--font-body)", color: "#2d3d2b", background: "rgba(232,226,217,0.18)", border: "1px solid rgba(45,61,43,0.25)", padding: "2px 8px", borderRadius: 20 }}>{activeTreatments.length} active</span>
+        )}
       </div>
+      <button onClick={() => setAddOpen(true)}
+        style={{ width: "100%", padding: "13px 0", marginBottom: 16, background: "transparent", color: "var(--color-inky-moss, #2d3d2b)", border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 700, letterSpacing: "0.22em", textTransform: "uppercase", cursor: "pointer", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" }}>
+        Log
+      </button>
 
       {activeTreatments.length === 0 ? (
         <div style={{ padding: "20px 0", textAlign: "center" }}>
@@ -1232,18 +1228,14 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
   return (
     <div style={{ marginBottom: 28 }}>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)" }}>Body Acne</span>
-          {zones.length > 0 && <span style={{ fontSize: 9, fontFamily: "var(--font-body)", color: "#2d3d2b", background: "rgba(232,226,217,0.18)", border: "1px solid rgba(45,61,43,0.25)", padding: "2px 8px", borderRadius: 20 }}>{zones.length} zone{zones.length !== 1 ? "s" : ""}</span>}
-        </div>
-        <button onClick={() => setShowTriggerModal(true)}
-          style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 12px", background: "none", border: "1px solid var(--border)", borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 9, color: "var(--clay)", cursor: "pointer", letterSpacing: "0.1em", textTransform: "uppercase", transition: "all 0.2s" }}
-          onMouseEnter={e => { e.currentTarget.style.borderColor = "#2d3d2b"; e.currentTarget.style.color = "#2d3d2b"; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--clay)"; }}>
-          <Icon name="plus" size={11} /> Log Trigger
-        </button>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+        <span style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)" }}>Body Acne</span>
+        {zones.length > 0 && <span style={{ fontSize: 9, fontFamily: "var(--font-body)", color: "#2d3d2b", background: "rgba(232,226,217,0.18)", border: "1px solid rgba(45,61,43,0.25)", padding: "2px 8px", borderRadius: 20 }}>{zones.length} zone{zones.length !== 1 ? "s" : ""}</span>}
       </div>
+      <button onClick={() => setShowTriggerModal(true)}
+        style={{ width: "100%", padding: "13px 0", marginBottom: 16, background: "transparent", color: "var(--color-inky-moss, #2d3d2b)", border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 700, letterSpacing: "0.22em", textTransform: "uppercase", cursor: "pointer", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" }}>
+        Log
+      </button>
 
       {/* Zone selector */}
       <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: "16px 18px", marginBottom: 12 }}>
