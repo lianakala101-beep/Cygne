@@ -1251,6 +1251,17 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
             );
           })}
         </div>
+
+        {/* Secondary action — opens the "What happened today?" trigger +
+            symptom modal. Sits inside the zone-selector card at the bottom
+            with a hairline divider so it reads as a quiet follow-up to the
+            zone selection, not a primary action. */}
+        <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid rgba(45,61,43,0.10)", display: "flex", justifyContent: "flex-end" }}>
+          <button onClick={() => setShowTriggerModal(true)}
+            style={{ background: "none", border: "none", padding: 0, cursor: "pointer", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" }}>
+            Log Today's Triggers
+          </button>
+        </div>
       </div>
 
       {/* Zone details */}
