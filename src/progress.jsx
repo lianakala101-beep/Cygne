@@ -1221,11 +1221,6 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
 
   return (
     <div style={{ marginBottom: 28 }}>
-      {/* Header */}
-      <button onClick={() => setShowTriggerModal(true)}
-        style={{ width: "100%", padding: "13px 0", marginBottom: 16, background: "transparent", color: "var(--color-inky-moss, #2d3d2b)", border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 700, letterSpacing: "0.22em", textTransform: "uppercase", cursor: "pointer", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" }}>
-        Log
-      </button>
 
       {/* Zone selector */}
       <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: "16px 18px", marginBottom: 12 }}>
