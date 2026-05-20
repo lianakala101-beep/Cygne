@@ -91,14 +91,6 @@ export function FaceHeatMap({ journals = [], products = [], user = {} }) {
       padding: "22px 20px 26px",
       border: "1px solid rgba(45,61,43,0.10)",
     }}>
-      <p style={{
-        fontFamily: "var(--font-display, 'Fungis Heavy', 'Fungis Normal', sans-serif)",
-        fontWeight: 400, fontSize: 11, letterSpacing: "0.2em",
-        color: INKY, margin: "0 0 20px",
-      }}>
-        INFLAMMATION MAP
-      </p>
-
       {/* Time filter */}
       <div style={{ display: "flex", justifyContent: "center", gap: 0, marginBottom: 18 }}>
         {PERIODS.map((p, i) => (
