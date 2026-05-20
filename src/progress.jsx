@@ -1572,10 +1572,10 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
   const rampProducts = [...primaryRamp, ...reintroRamp];
 
   const sectionLabel = (icon, text) => (
-    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18 }}>
-      <span style={{ color: "var(--color-inky-moss, #2d3d2b)", display: "inline-flex" }}><Icon name={icon} size={17} /></span>
-      <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 18, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", lineHeight: 1.1 }}>{text}</span>
-      <div style={{ flex: 1, height: 1, background: "rgba(45,61,43,0.18)", marginLeft: 10 }} />
+    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+      <span style={{ color: "var(--color-inky-moss, #2d3d2b)", display: "inline-flex" }}><Icon name={icon} size={13} /></span>
+      <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 14, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", lineHeight: 1.1 }}>{text}</span>
+      <div style={{ flex: 1, height: 1, background: "rgba(45,61,43,0.18)", marginLeft: 8 }} />
     </div>
   );
 
