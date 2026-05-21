@@ -74,21 +74,111 @@ function Section({ title, icon, children }) {
   );
 }
 
+// Collapsed by default — just severity label + title in one row, with a
+// subtle chevron when there's detail or product context to expand into.
+// Tap to expand reveals f.detail and any conflict-side product pills.
 function FlagCard({ f }) {
-  const variants = {
-    warning: { border: "var(--border)", bg: "var(--surface)", dot: "var(--parchment)", text: "var(--parchment)" },
-    caution: { border: "var(--border)", bg: "var(--surface)", dot: "var(--sage)",      text: "var(--parchment)" },
-    missing: { border: "var(--border)", bg: "var(--surface)", dot: "var(--sage)",      text: "var(--parchment)" },
+  const [open, setOpen] = useState(false);
+  const SEVERITY_LABEL = {
+    warning: "Warning",
+    high:    "Warning",
+    caution: "Caution",
+    medium:  "Caution",
+    missing: "Note",
   };
-  const v = variants[f.severity] || variants.caution;
+  const SEVERITY_TONE = {
+    warning: { color: "#8b7355", bg: "rgba(139,115,85,0.12)" },
+    high:    { color: "#8b7355", bg: "rgba(139,115,85,0.12)" },
+    caution: { color: "#8b7355", bg: "rgba(139,115,85,0.08)" },
+    medium:  { color: "#8b7355", bg: "rgba(139,115,85,0.08)" },
+    missing: { color: "var(--color-inky-moss, #2d3d2b)", bg: "rgba(45,61,43,0.08)" },
+  };
+  const label = SEVERITY_LABEL[f.severity] || "Note";
+  const tone = SEVERITY_TONE[f.severity] || SEVERITY_TONE.caution;
+
+  const pillProducts = [...(f.productsA || []), ...(f.productsB || []), ...(f.products || [])];
+  // De-duplicate by id so a product appearing on both sides of a conflict
+  // doesn't render twice.
+  const uniqueProducts = [];
+  const seen = new Set();
+  for (const p of pillProducts) {
+    const id = p?.id || p?.name || (typeof p === "string" ? p : null);
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+    uniqueProducts.push(p);
+  }
+  const hasDetail = !!f.detail || uniqueProducts.length > 0;
+
   return (
-    <div style={{ display: "flex", gap: 14, padding: "14px 16px", background: v.bg, borderRadius: 12, border: `1px solid ${v.border}`, marginBottom: 8 }}>
-      <div style={{ width: 6, height: 6, borderRadius: "50%", background: v.dot, flexShrink: 0, marginTop: 6 }} />
-      <div>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: v.text, margin: "0 0 3px", fontWeight: 400 }}>{f.label}</p>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: 0, lineHeight: 1.5 }}>{f.detail}</p>
+    <button
+      type="button"
+      onClick={() => hasDetail && setOpen(o => !o)}
+      aria-expanded={hasDetail ? open : undefined}
+      style={{
+        display: "block", width: "100%", textAlign: "left",
+        padding: "12px 14px",
+        background: "var(--surface)",
+        border: "1px solid var(--border)",
+        borderRadius: 12,
+        marginBottom: 8,
+        cursor: hasDetail ? "pointer" : "default",
+        WebkitAppearance: "none", appearance: "none",
+        WebkitTapHighlightColor: "transparent",
+      }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <span style={{
+          fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 9,
+          letterSpacing: "0.18em", textTransform: "uppercase",
+          color: tone.color, background: tone.bg,
+          padding: "3px 8px", borderRadius: 2,
+          flexShrink: 0, whiteSpace: "nowrap",
+        }}>{label}</span>
+        <span style={{
+          flex: 1, minWidth: 0,
+          fontFamily: "var(--font-body)", fontSize: 13,
+          color: "var(--parchment)", fontWeight: 400,
+          overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+        }}>{f.label}</span>
+        {hasDetail && (
+          <span style={{
+            color: "var(--color-stone, #5a5a5a)", opacity: 0.5,
+            transform: open ? "rotate(90deg)" : "none",
+            transition: "transform 0.2s",
+            display: "inline-flex", flexShrink: 0,
+          }}><Icon name="chevron" size={11} /></span>
+        )}
       </div>
-    </div>
+      {open && hasDetail && (
+        <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid rgba(45,61,43,0.08)" }}>
+          {f.detail && (
+            <p style={{
+              fontFamily: "var(--font-body)", fontSize: 12,
+              color: "var(--color-inky-moss, #2d3d2b)",
+              margin: 0, lineHeight: 1.55,
+              whiteSpace: "normal",
+            }}>{f.detail}</p>
+          )}
+          {uniqueProducts.length > 0 && (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: f.detail ? 10 : 0 }}>
+              {uniqueProducts.map((p, i) => {
+                const name = p?.name || (typeof p === "string" ? p : "");
+                if (!name) return null;
+                return (
+                  <span key={p?.id || name + i} style={{
+                    padding: "3px 9px", borderRadius: 20,
+                    background: "var(--color-ivory-shadow, #f0ebe0)",
+                    border: "1px solid rgba(45,61,43,0.14)",
+                    fontFamily: "var(--font-body)", fontSize: 10,
+                    color: "var(--color-ink, #1c1c1a)",
+                    whiteSpace: "nowrap",
+                  }}>{name}</span>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+    </button>
   );
 }
 

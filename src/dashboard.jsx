@@ -67,22 +67,30 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
   });
 
   const allAlerts = [
-    ...conflicts.map(c => ({ severity: c.severity, label: `${c.pair[0]} + ${c.pair[1]}`, detail: c.reason })),
+    // Conflicts carry both sides of the pair as productsA / productsB so the
+    // expanded FlagCard can render product pills for what's actually clashing.
+    ...conflicts.map(c => ({
+      severity: c.severity,
+      label: `${c.pair[0]} + ${c.pair[1]}`,
+      detail: c.reason,
+      productsA: c.productsA || [],
+      productsB: c.productsB || [],
+    })),
     ...flags,
     ...products.flatMap(p => {
       const now = Date.now();
       const alerts = [];
       if (p.expiryDate) {
         const days = Math.ceil((new Date(p.expiryDate) - now) / 86400000);
-        if (days <= 0) alerts.push({ severity: "high", label: `${p.name} - expired`, detail: `Expiry date was ${Math.abs(days)} day${Math.abs(days) === 1 ? "" : "s"} ago. Discard or replace.` });
-        else if (days <= 30) alerts.push({ severity: "medium", label: `${p.name} - expiring soon`, detail: `Expires in ${days} day${days === 1 ? "" : "s"}.` });
+        if (days <= 0) alerts.push({ severity: "high", label: `${p.name} - expired`, detail: `Expiry date was ${Math.abs(days)} day${Math.abs(days) === 1 ? "" : "s"} ago. Discard or replace.`, products: [p] });
+        else if (days <= 30) alerts.push({ severity: "medium", label: `${p.name} - expiring soon`, detail: `Expires in ${days} day${days === 1 ? "" : "s"}.`, products: [p] });
       }
       if (p.paoMonths && p.openedDate) {
         const paoExp = new Date(p.openedDate);
         paoExp.setMonth(paoExp.getMonth() + p.paoMonths);
         const days = Math.ceil((paoExp - now) / 86400000);
-        if (days <= 0) alerts.push({ severity: "high", label: `${p.name} - PAO exceeded`, detail: `This product was opened ${p.paoMonths}M ago and is past its period after opening. Its efficacy and safety may be compromised.` });
-        else if (days <= 30) alerts.push({ severity: "medium", label: `${p.name} - PAO ending soon`, detail: `${days} day${days === 1 ? "" : "s"} left within its ${p.paoMonths}M period after opening.` });
+        if (days <= 0) alerts.push({ severity: "high", label: `${p.name} - PAO exceeded`, detail: `This product was opened ${p.paoMonths}M ago and is past its period after opening. Its efficacy and safety may be compromised.`, products: [p] });
+        else if (days <= 30) alerts.push({ severity: "medium", label: `${p.name} - PAO ending soon`, detail: `${days} day${days === 1 ? "" : "s"} left within its ${p.paoMonths}M period after opening.`, products: [p] });
       }
       return alerts;
     }),
