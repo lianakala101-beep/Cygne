@@ -152,55 +152,65 @@ function getProfileNudge(season, products, activeMap, user) {
 function SeasonalNudgeCard({ products, activeMap, user }) {
   const season = getSeason();
   const cfg = SEASON_CONFIG[season];
-  const [dismissed, setDismissed] = useState(false);
-  const [fading, setFading] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const profileNudge = getProfileNudge(season, products, activeMap, user);
   const nudge = profileNudge || cfg.shelfNudge(products, activeMap);
 
-  const handleDismiss = () => {
-    setFading(true);
-    setTimeout(() => setDismissed(true), 360);
-  };
-
-  if (dismissed) return null;
-
   return (
     <div style={{
-      opacity: fading ? 0 : 1,
-      transform: fading ? "translateY(-4px)" : "none",
-      transition: "opacity 0.36s ease, transform 0.36s ease",
+      background: "radial-gradient(circle at 85% 15%, rgba(45,61,43,0.06) 0%, rgba(45,61,43,0.02) 35%, transparent 65%), var(--color-ivory-shadow)",
+      border: "1px solid rgba(192,192,192,0.25)",
+      borderRadius: 12,
+      boxShadow: "0 4px 24px rgba(0,0,0,0.05)",
+      padding: "14px 16px",
       marginBottom: 20,
+      position: "relative",
+      overflow: "hidden",
     }}>
-      <div style={{
-        background: "radial-gradient(circle at 85% 15%, rgba(45,61,43,0.06) 0%, rgba(45,61,43,0.02) 35%, transparent 65%), var(--color-ivory-shadow)",
-        border: "1px solid rgba(192,192,192,0.25)",
-        borderRadius: 12,
-        boxShadow: "0 4px 24px rgba(0,0,0,0.05)",
-        padding: 20,
-        position: "relative",
-        overflow: "hidden",
-      }}>
-        {/* Header */}
-        <div style={{ display: "flex", alignItems: "center", marginBottom: 10 }}>
-          <span style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 11, letterSpacing: "4px", textTransform: "uppercase", color: "var(--color-inky-moss)" }}>{cfg.label}</span>
-          <div style={{ flex: 1 }} />
-          <button onClick={handleDismiss} style={{ background: "none", border: "none", color: "var(--clay)", opacity: 0.35, cursor: "pointer", padding: "2px 4px", transition: "opacity 0.2s", display: "inline-flex" }}
-            onMouseEnter={e => e.currentTarget.style.opacity = "0.7"}
-            onMouseLeave={e => e.currentTarget.style.opacity = "0.35"}><Icon name="x" size={12} /></button>
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        aria-expanded={open}
+        style={{
+          display: "flex", width: "100%", textAlign: "left",
+          alignItems: "center", gap: 12,
+          background: "none", border: "none", padding: 0,
+          cursor: "pointer",
+          WebkitAppearance: "none", appearance: "none",
+          WebkitTapHighlightColor: "transparent",
+        }}>
+        <span style={{
+          fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 9,
+          letterSpacing: "0.22em", textTransform: "uppercase",
+          color: "var(--color-inky-moss)",
+          background: "rgba(45,61,43,0.10)",
+          padding: "3px 8px", borderRadius: 2,
+          flexShrink: 0, whiteSpace: "nowrap",
+        }}>{cfg.label}</span>
+        <span style={{
+          flex: 1, minWidth: 0,
+          fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 400,
+          letterSpacing: "0.02em",
+          color: "var(--color-inky-moss)",
+          lineHeight: 1.4,
+          overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+        }}>{cfg.headline}</span>
+        <span style={{
+          color: "var(--color-stone, #5a5a5a)", opacity: 0.5,
+          transform: open ? "rotate(90deg)" : "none",
+          transition: "transform 0.2s",
+          display: "inline-flex", flexShrink: 0,
+        }}><Icon name="chevron" size={11} /></span>
+      </button>
+      {open && (
+        <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid rgba(45,61,43,0.10)" }}>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-inky-moss)", margin: "0 0 12px", lineHeight: 1.65 }}>{cfg.body}</p>
+          <div style={{ padding: "11px 14px", background: "rgba(45,61,43,0.06)", borderRadius: 4, borderLeft: "2px solid " + cfg.accent }}>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-ink, #1c1c1a)", margin: 0, lineHeight: 1.65 }}>{nudge}</p>
+          </div>
         </div>
-
-        {/* Headline */}
-        <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 16, letterSpacing: "0.03em", color: "var(--color-inky-moss)", margin: "0 0 6px", lineHeight: 1.5 }}>{cfg.headline}</p>
-
-        {/* Body */}
-        <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: "0 0 12px", lineHeight: 1.65 }}>{cfg.body}</p>
-
-        {/* Shelf-specific nudge */}
-        <div style={{ padding: "11px 14px", background: "rgba(0,0,0,0.12)", borderRadius: 4, borderLeft: "2px solid " + cfg.accent }}>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--parchment)", margin: 0, lineHeight: 1.65 }}>{nudge}</p>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
