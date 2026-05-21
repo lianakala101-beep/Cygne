@@ -84,7 +84,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
                 <h1 style={{ fontFamily: "var(--font-display)", fontSize: 30, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: "0 0 2px", lineHeight: 1 }}>
                   {greeting},
                 </h1>
-                <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 14, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: 0, lineHeight: 1.1 }}>
+                <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 14, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: 0, lineHeight: 1.1 }}>
                   {firstName}
                 </p>
               </>
