@@ -167,74 +167,6 @@ function getRitualMode(products, checkIns = [], user = {}, cycleDay = null, isFl
   return { mode: RITUAL_MODES.standard, key: "standard", cyclePhase: cyclePhaseName };
 }
 
-function getSwanGuidingLine(products, checkIns = [], user = {}, cycleDay = null, ritualKey = "standard", session = "pm", journals = []) {
-  const recent = checkIns.slice(-3);
-  const hasModerateIrritation = recent.some(c => c.irritation === "moderate");
-  const hasMildIrritation = recent.some(c => c.irritation === "mild");
-  const hasBreakout = recent.some(c => c.breakout);
-  const hasTight = recent.some(c => c.tight);
-  const lastClear = recent.length > 0 && recent.every(c => c.irritation === "none" && !c.breakout && !c.tight);
-  const activeMap = analyzeShelf(products).activeMap;
-  const hasRetinol = !!(activeMap["retinol"]?.length);
-  const hasAHA = !!(activeMap["AHA"]?.length);
-  const onTretinoin = user?.medicalHistory?.prescriptions?.some(p => /tretinoin|retin-a/i.test(p.name));
-  const season = getSeason();
-
-  // Journal context — last entry
-  const lastJournal = journals[journals.length - 1];
-  const today = new Date().toISOString().split("T")[0];
-  const isToday = lastJournal?.date === today;
-  const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
-  const isRecent = lastJournal && (lastJournal.date === today || lastJournal.date === yesterday);
-  const poorSleepRecent = isRecent && lastJournal.sleep === "poor";
-  const highStressRecent = isRecent && lastJournal.stress === "high";
-  const recentJournals = journals.slice(-5);
-  const poorSleepStreak = recentJournals.filter(j => j.sleep === "poor").length >= 3;
-
-  // Ritual-mode-specific lines take priority
-  if (ritualKey === "travel")        return "Essentials only tonight. Your skin travels better light.";
-  if (ritualKey === "recovery")      return "Step back tonight. Calm, cleanse, seal — let the barrier recover.";
-  if (ritualKey === "barrier_repair") return "Rebuild before you push. Your barrier comes first.";
-  if (ritualKey === "menstrual")     return "Your skin is asking for softness tonight.";
-  if (ritualKey === "luteal")        return "Sebum is peaking this week. Stay consistent with your BHA.";
-  if (ritualKey === "follicular")    return session === "pm"
-    ? (hasRetinol || onTretinoin ? "Good window for actives. Your skin is at its most resilient right now." : "Follicular phase — your skin is ready if you want to push.")
-    : "Your skin is resilient this morning. Make the most of it.";
-  if (ritualKey === "winter")        return "Cold air is working against you. Lock moisture in tonight.";
-  if (ritualKey === "summer")        return "Light layers tonight. Let your skin breathe.";
-
-  // Journal-informed lines — sleep and stress context
-  if (poorSleepStreak)              return "Three nights of poor sleep in a row. Gentle ritual only — your barrier needs recovery more than actives right now.";
-  if (poorSleepRecent && highStressRecent) return "Poor sleep and high stress take a toll on the barrier. Keep it simple tonight.";
-  if (poorSleepRecent && (hasRetinol || hasAHA)) return "You logged poor sleep recently. Consider resting your actives tonight — barrier recovery slows when sleep does.";
-  if (poorSleepRecent)              return "Sleep affects your skin more than most products. A simple ritual and an early night will do more than anything on the shelf.";
-  if (highStressRecent && (hasRetinol || hasAHA)) return "High stress elevates cortisol and sensitizes skin. A gentle night is worth more than pushing actives.";
-  if (highStressRecent)             return "Stress shows up on skin before anywhere else. Be easy with yourself tonight.";
-
-  // Skin-state lines from check-ins
-  if (hasModerateIrritation)  return "Your skin is telling you something. Keep it simple and listen.";
-  if (hasMildIrritation && hasBreakout) return "A little reactive right now. Gentle tonight, actives can wait.";
-  if (hasMildIrritation)      return "Mild irritation noted recently. Stay consistent, hold the actives.";
-  if (hasBreakout)            return "Breakout flagged. BHA tonight if you have it, nothing heavy.";
-  if (hasTight)               return "Tightness in your last check-in. Lean into hydration tonight.";
-
-  // Positive momentum
-  if (lastClear && (hasRetinol || hasAHA || onTretinoin)) {
-    return session === "pm"
-      ? "Skin is clear. Good night for actives — stay consistent."
-      : "Clear skin, morning momentum. SPF is your most important step today.";
-  }
-  if (lastClear) return "Your skin is settled. Keep doing what you're doing.";
-
-  // Session defaults
-  if (session === "am") return "Start with a clean face. SPF is the step that earns everything else.";
-
-  // Seasonal PM defaults
-  if (season === "winter") return "Cold night. Don't skip the last occlusive step.";
-  if (season === "summer") return "Warm night. Lighter layers will serve you better than heavy ones.";
-
-  return "Your ritual is ready. Take your time with it.";
-}
 
 // --- BREATH TEXT ------------------------------------------------------------
 // Splits a heading into words and fades each one in, staggered, on mount.
@@ -381,7 +313,6 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
   const simplifications = recs.filter(r => r.type === "simplify");
   const totalRecs = recs.length + refinements.length;
 
-  const guidingLine = getSwanGuidingLine(products, [], user, cycleDay, ritualKey, session, journals);
 
   return (
     <div>
@@ -393,15 +324,6 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
           style={{ fontFamily: "var(--font-display)", fontSize: 30, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-inky-moss)", margin: 0, lineHeight: 1.15 }}
         />
       </div>
-
-      {/* -- Swan guiding line ---------------------------------------------- */}
-      {guidingLine && (
-        ritualKey === "menstrual" ? (
-          <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 13, letterSpacing: "0.04em", color: "var(--color-inky-moss)", opacity: 0.8, textTransform: "none", lineHeight: 1.6, textAlign: "left", margin: "0 0 16px" }}>{guidingLine}</p>
-        ) : (
-          <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 13, letterSpacing: "0.02em", color: "var(--color-inky-moss)", margin: "0 0 22px", lineHeight: 1.6 }}>{guidingLine}</p>
-        )
-      )}
 
       {/* -- Ritual Mode Card ---------------------------------------------- */}
       {ritualMode.name && (
