@@ -184,6 +184,11 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           );
         })()}
 
+        {/* Section order: action over context. Swan Sense → routine → Ask
+            Cygne → utility tiles → seasonal/weekend/recovery context →
+            cycle pill → check-in pill → weather. Contextual data lives at
+            the bottom so the primary action flow isn't interrupted. */}
+
         {/* 1. Swan Song card (intelligence) — always fully visible */}
         <div style={{ marginBottom: 8 }}>
           <SwanSongCard currentSession={currentSession} asPopup={false} user={user} predictions={swanSensePredictions} dailyLine={swanDailyLine} dailyLoading={swanLoading} dailyFailed={swanFailed} />
@@ -203,120 +208,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           </button>
         </div>
 
-        {/* 2. Cycle phase — ambient pill, tap to expand */}
-        {user?.cycleTrackingEnabled && currentCycleDay && (() => {
-          const phase = getCyclePhase(currentCycleDay);
-          return (
-            <button
-              onClick={() => setCycleExpanded(true)}
-              style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "7px 13px", background: phase.bg, border: `1px solid ${phase.border}`, borderRadius: 999, marginBottom: 20, cursor: "pointer", fontFamily: "inherit" }}>
-              <div style={{ width: 5, height: 5, borderRadius: "50%", background: phase.dot, flexShrink: 0 }} />
-              <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, fontWeight: 400, color: "var(--parchment)", letterSpacing: "0.02em" }}>{phase.name} Phase · Day {currentCycleDay}</span>
-              <span style={{ color: "var(--clay)", opacity: 0.6, marginLeft: 2, display: "inline-flex" }}><Icon name="chevron" size={10} /></span>
-            </button>
-          );
-        })()}
-
-        {/* Cycle phase expanded modal */}
-        {cycleExpanded && user?.cycleTrackingEnabled && currentCycleDay && (() => {
-          const phase = getCyclePhase(currentCycleDay);
-          return (
-            <div onClick={() => setCycleExpanded(false)}
-              style={{ position: "fixed", inset: 0, background: "var(--overlay)", backdropFilter: "blur(6px)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 22 }}>
-              <div onClick={e => e.stopPropagation()}
-                style={{ background: "var(--ink)", border: `1px solid ${phase.border}`, borderRadius: 18, padding: "24px 22px", maxWidth: 440, width: "100%" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: phase.dot }} />
-                  <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 14, fontWeight: 400, color: "var(--parchment)" }}>{phase.name} Phase</span>
-                  <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--clay)", opacity: 0.7, marginLeft: "auto" }}>Day {currentCycleDay}</span>
-                  <button onClick={() => setCycleExpanded(false)} aria-label="Close cycle detail" style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", marginLeft: 6, display: "inline-flex", padding: 2 }}><Icon name="x" size={14} /></button>
-                </div>
-                <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 12, color: "var(--clay)", margin: "0 0 14px", lineHeight: 1.65 }}>{phase.description}</p>
-                <div style={{ padding: "12px 14px", background: "rgba(0,0,0,0.2)", borderRadius: 10 }}>
-                  <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--parchment)", margin: 0, lineHeight: 1.6 }}>{phase.nudge}</p>
-                </div>
-              </div>
-            </div>
-          );
-        })()}
-
-        {/* 3. Check-in signal — pill styled to match the cycle phase pill */}
-        {(() => {
-          const last = checkIns.length ? checkIns.reduce((a, b) => new Date(a.date) > new Date(b.date) ? a : b) : null;
-          const daysSince = last ? daysBetweenLocal(last.date) : null;
-          const due = daysSince === null || daysSince >= 7;
-          const msg = daysSince === null
-            ? "No check-ins yet"
-            : daysSince === 0 ? "Check-in logged today"
-            : daysSince < 7 ? `Last check-in ${daysSince}d ago`
-            : "Check-in overdue";
-          // Tone tracks the dot color so the pill, dot, and text all live in
-          // the same hue family — same visual structure as the cycle pill.
-          const tone = !due
-            ? { dot: "rgba(122,144,112,0.85)", bg: "rgba(122,144,112,0.10)", border: "rgba(122,144,112,0.30)" }
-            : daysSince === null
-              ? { dot: "rgba(139,115,85,0.7)",  bg: "rgba(139,115,85,0.06)", border: "rgba(139,115,85,0.22)" }
-              : { dot: "rgba(139,115,85,0.85)", bg: "rgba(139,115,85,0.10)", border: "rgba(139,115,85,0.30)" };
-          return (
-            <button onClick={() => setTab("progress")}
-              style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "7px 13px", background: tone.bg, border: `1px solid ${tone.border}`, borderRadius: 999, marginBottom: 20, cursor: "pointer", fontFamily: "inherit" }}>
-              <div style={{ width: 5, height: 5, borderRadius: "50%", background: tone.dot, flexShrink: 0 }} />
-              <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, fontWeight: 400, color: "var(--parchment)", letterSpacing: "0.02em" }}>{msg}</span>
-              <span style={{ color: "var(--clay)", opacity: 0.6, marginLeft: 2, display: "inline-flex" }}><Icon name="chevron" size={10} /></span>
-            </button>
-          );
-        })()}
-
-        {/* Notification nudge banner */}
-        {!notifDismissed && notifPermission === "default" && (
-          <div style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.25)", borderRadius: 12, padding: "12px 14px", marginBottom: 20 }}>
-            <span style={{ color: "#6e8a72", flexShrink: 0, display: "inline-flex" }}><Icon name="bell" size={16} /></span>
-            <div style={{ flex: 1 }}>
-              <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 12, fontWeight: 400, color: "var(--parchment)", margin: "0 0 2px" }}>Stay on ritual</p>
-              <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>Get AM & PM reminders so your ritual stays consistent.</p>
-            </div>
-            <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-              <button onClick={onRequestNotif} style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, fontWeight: 400, background: "rgba(122,144,112,0.25)", border: "1px solid rgba(122,144,112,0.4)", borderRadius: 8, color: "var(--parchment)", padding: "6px 12px", cursor: "pointer" }}>Enable</button>
-              <button onClick={onDismissNotif} aria-label="Dismiss notification prompt" style={{ background: "transparent", border: "none", color: "var(--clay)", cursor: "pointer", padding: "6px 4px", display: "inline-flex" }}><Icon name="x" size={12} /></button>
-            </div>
-          </div>
-        )}
-        {notifPermission === "granted" && !notifDismissed && (() => {
-          const amTime = user?.amReminderTime || "7:30";
-          const pmTime = user?.pmReminderTime || "9:00";
-          const amOn = user?.amReminderEnabled !== false;
-          const pmOn = user?.pmReminderEnabled !== false;
-          const parts = [amOn && `${amTime}am`, pmOn && `${pmTime}pm`].filter(Boolean);
-          const label = parts.length > 0 ? `Reminders on — ${parts.join(" & ")} daily.` : "Reminders enabled.";
-          return (
-            <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.2)", borderRadius: 12, padding: "10px 14px", marginBottom: 20 }}>
-              <span style={{ color: "#6e8a72", display: "inline-flex" }}><Icon name="sparkle" size={12} /></span>
-              <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>{label}</p>
-              <button onClick={onDismissNotif} aria-label="Dismiss" style={{ marginLeft: "auto", background: "transparent", border: "none", color: "var(--clay)", cursor: "pointer", display: "inline-flex", padding: 4 }}><Icon name="x" size={12} /></button>
-            </div>
-          );
-        })()}
-
-        {/* 4. Recovery / daily tips / environment */}
-        <div style={{ marginBottom: 20 }}>
-          <EnvironmentStrip products={products} activeMap={activeMap} locationData={locationData} tempUnit={user?.tempUnit || "C"} />
-        </div>
-
-        <div style={{ marginBottom: 20 }}>
-          <WeekendNudgeCard products={products} activeMap={activeMap} />
-        </div>
-
-        {treatments.filter(t => { const r = getTreatmentPhase(t); return r && r.phase && r.phase.label !== "Cleared"; }).map(t => (
-          <div key={t.id} style={{ marginBottom: 20 }}>
-            <TreatmentRecoveryCard treatment={t} products={products} activeMap={activeMap} onDismiss={() => {}} />
-          </div>
-        ))}
-
-        <div style={{ marginBottom: 20 }}>
-          <SeasonalNudgeCard products={products} activeMap={activeMap} locationData={locationData} user={user} />
-        </div>
-
-        {/* Current session routine card — quiet summary, tap to open ritual page. */}
+        {/* 2. Current session routine card — quiet summary, tap to open ritual page. */}
         {(() => {
           const isAM = currentSession === "am";
           const steps = isAM ? am : pm;
@@ -407,6 +299,121 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
               <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--color-stone, #5a5a5a)", margin: 0, letterSpacing: "0.02em" }}>Would my skin like this?</p>
             </div>
           </button>
+        </div>
+
+        {/* 6. Notification nudge — actionable prompt, transitional between
+            top-of-page actions and bottom-of-page context. */}
+        {!notifDismissed && notifPermission === "default" && (
+          <div style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.25)", borderRadius: 12, padding: "12px 14px", marginBottom: 20 }}>
+            <span style={{ color: "#6e8a72", flexShrink: 0, display: "inline-flex" }}><Icon name="bell" size={16} /></span>
+            <div style={{ flex: 1 }}>
+              <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 12, fontWeight: 400, color: "var(--parchment)", margin: "0 0 2px" }}>Stay on ritual</p>
+              <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>Get AM & PM reminders so your ritual stays consistent.</p>
+            </div>
+            <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+              <button onClick={onRequestNotif} style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, fontWeight: 400, background: "rgba(122,144,112,0.25)", border: "1px solid rgba(122,144,112,0.4)", borderRadius: 8, color: "var(--parchment)", padding: "6px 12px", cursor: "pointer" }}>Enable</button>
+              <button onClick={onDismissNotif} aria-label="Dismiss notification prompt" style={{ background: "transparent", border: "none", color: "var(--clay)", cursor: "pointer", padding: "6px 4px", display: "inline-flex" }}><Icon name="x" size={12} /></button>
+            </div>
+          </div>
+        )}
+        {notifPermission === "granted" && !notifDismissed && (() => {
+          const amTime = user?.amReminderTime || "7:30";
+          const pmTime = user?.pmReminderTime || "9:00";
+          const amOn = user?.amReminderEnabled !== false;
+          const pmOn = user?.pmReminderEnabled !== false;
+          const parts = [amOn && `${amTime}am`, pmOn && `${pmTime}pm`].filter(Boolean);
+          const label = parts.length > 0 ? `Reminders on — ${parts.join(" & ")} daily.` : "Reminders enabled.";
+          return (
+            <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.2)", borderRadius: 12, padding: "10px 14px", marginBottom: 20 }}>
+              <span style={{ color: "#6e8a72", display: "inline-flex" }}><Icon name="sparkle" size={12} /></span>
+              <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>{label}</p>
+              <button onClick={onDismissNotif} aria-label="Dismiss" style={{ marginLeft: "auto", background: "transparent", border: "none", color: "var(--clay)", cursor: "pointer", display: "inline-flex", padding: 4 }}><Icon name="x" size={12} /></button>
+            </div>
+          );
+        })()}
+
+        {/* 7. Seasonal card */}
+        <div style={{ marginBottom: 20 }}>
+          <SeasonalNudgeCard products={products} activeMap={activeMap} locationData={locationData} user={user} />
+        </div>
+
+        {/* 8. Weekend nudge — supplementary seasonal-adjacent context */}
+        <div style={{ marginBottom: 20 }}>
+          <WeekendNudgeCard products={products} activeMap={activeMap} />
+        </div>
+
+        {/* 9. Treatment recovery — only when a recovery window is active */}
+        {treatments.filter(t => { const r = getTreatmentPhase(t); return r && r.phase && r.phase.label !== "Cleared"; }).map(t => (
+          <div key={t.id} style={{ marginBottom: 20 }}>
+            <TreatmentRecoveryCard treatment={t} products={products} activeMap={activeMap} onDismiss={() => {}} />
+          </div>
+        ))}
+
+        {/* 10. Cycle phase pill — bottom-of-page context */}
+        {user?.cycleTrackingEnabled && currentCycleDay && (() => {
+          const phase = getCyclePhase(currentCycleDay);
+          return (
+            <button
+              onClick={() => setCycleExpanded(true)}
+              style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "7px 13px", background: phase.bg, border: `1px solid ${phase.border}`, borderRadius: 999, marginBottom: 12, cursor: "pointer", fontFamily: "inherit" }}>
+              <div style={{ width: 5, height: 5, borderRadius: "50%", background: phase.dot, flexShrink: 0 }} />
+              <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, fontWeight: 400, color: "var(--parchment)", letterSpacing: "0.02em" }}>{phase.name} Phase · Day {currentCycleDay}</span>
+              <span style={{ color: "var(--clay)", opacity: 0.6, marginLeft: 2, display: "inline-flex" }}><Icon name="chevron" size={10} /></span>
+            </button>
+          );
+        })()}
+
+        {/* Cycle phase expanded modal — fixed overlay, position-independent */}
+        {cycleExpanded && user?.cycleTrackingEnabled && currentCycleDay && (() => {
+          const phase = getCyclePhase(currentCycleDay);
+          return (
+            <div onClick={() => setCycleExpanded(false)}
+              style={{ position: "fixed", inset: 0, background: "var(--overlay)", backdropFilter: "blur(6px)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 22 }}>
+              <div onClick={e => e.stopPropagation()}
+                style={{ background: "var(--ink)", border: `1px solid ${phase.border}`, borderRadius: 18, padding: "24px 22px", maxWidth: 440, width: "100%" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: phase.dot }} />
+                  <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 14, fontWeight: 400, color: "var(--parchment)" }}>{phase.name} Phase</span>
+                  <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--clay)", opacity: 0.7, marginLeft: "auto" }}>Day {currentCycleDay}</span>
+                  <button onClick={() => setCycleExpanded(false)} aria-label="Close cycle detail" style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", marginLeft: 6, display: "inline-flex", padding: 2 }}><Icon name="x" size={14} /></button>
+                </div>
+                <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 12, color: "var(--clay)", margin: "0 0 14px", lineHeight: 1.65 }}>{phase.description}</p>
+                <div style={{ padding: "12px 14px", background: "rgba(0,0,0,0.2)", borderRadius: 10 }}>
+                  <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--parchment)", margin: 0, lineHeight: 1.6 }}>{phase.nudge}</p>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* 11. Check-in status pill */}
+        {(() => {
+          const last = checkIns.length ? checkIns.reduce((a, b) => new Date(a.date) > new Date(b.date) ? a : b) : null;
+          const daysSince = last ? daysBetweenLocal(last.date) : null;
+          const due = daysSince === null || daysSince >= 7;
+          const msg = daysSince === null
+            ? "No check-ins yet"
+            : daysSince === 0 ? "Check-in logged today"
+            : daysSince < 7 ? `Last check-in ${daysSince}d ago`
+            : "Check-in overdue";
+          const tone = !due
+            ? { dot: "rgba(122,144,112,0.85)", bg: "rgba(122,144,112,0.10)", border: "rgba(122,144,112,0.30)" }
+            : daysSince === null
+              ? { dot: "rgba(139,115,85,0.7)",  bg: "rgba(139,115,85,0.06)", border: "rgba(139,115,85,0.22)" }
+              : { dot: "rgba(139,115,85,0.85)", bg: "rgba(139,115,85,0.10)", border: "rgba(139,115,85,0.30)" };
+          return (
+            <button onClick={() => setTab("progress")}
+              style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "7px 13px", background: tone.bg, border: `1px solid ${tone.border}`, borderRadius: 999, marginLeft: 8, marginBottom: 20, cursor: "pointer", fontFamily: "inherit" }}>
+              <div style={{ width: 5, height: 5, borderRadius: "50%", background: tone.dot, flexShrink: 0 }} />
+              <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, fontWeight: 400, color: "var(--parchment)", letterSpacing: "0.02em" }}>{msg}</span>
+              <span style={{ color: "var(--clay)", opacity: 0.6, marginLeft: 2, display: "inline-flex" }}><Icon name="chevron" size={10} /></span>
+            </button>
+          );
+        })()}
+
+        {/* 12. Weather / location — environment strip at the very bottom */}
+        <div style={{ marginBottom: 20 }}>
+          <EnvironmentStrip products={products} activeMap={activeMap} locationData={locationData} tempUnit={user?.tempUnit || "C"} />
         </div>
 
         </div>
