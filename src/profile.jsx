@@ -196,7 +196,7 @@ function IngredientProfile({ user, onUpdateUser }) {
       </div>
 
       {!editing ? (
-        <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "14px 16px" }}>
+        <div style={{ background: "var(--color-ivory-shadow, #f0ebe0)", borderTop: "1px solid rgba(45,61,43,0.18)", padding: "18px 16px" }}>
           {!hasAny ? (
             <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-stone, #5a5a5a)", margin: 0 }}>
               No ingredients flagged yet. Tap Edit to mark allergens and loved ingredients — Cygne will cross-reference them on every product.
@@ -403,7 +403,7 @@ function SkinProfileEditor({ user, onUpdateUser }) {
       </div>
 
       {!editing ? (
-        <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "14px 16px" }}>
+        <div style={{ background: "var(--color-ivory-shadow, #f0ebe0)", borderTop: "1px solid rgba(45,61,43,0.18)", padding: "18px 16px" }}>
           {SKIN_PROFILE_FIELDS.map(f => {
             const val = draft[f.key];
             const isEmpty = Array.isArray(val) ? val.length === 0 : !val;
@@ -597,7 +597,7 @@ function SkinHistory({ user, onUpdateUser }) {
       </div>
 
       {!editing ? (
-        <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "14px 16px" }}>
+        <div style={{ background: "var(--color-ivory-shadow, #f0ebe0)", borderTop: "1px solid rgba(45,61,43,0.18)", padding: "18px 16px" }}>
           {!hasSomeHistory ? (
             <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-stone, #5a5a5a)", margin: 0 }}>
               No history logged. Tap Edit to add prescriptions, sensitivities, or dermatologist visits.
