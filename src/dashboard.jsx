@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState, useEffect } from "react";
-import { Icon, Section, FlagCard, SwanIcon } from "./components.jsx";
+import { Icon, Section, SwanIcon } from "./components.jsx";
 import { analyzeShelf, detectConflicts, buildRoutine, calcSpending, getCurrentSession } from "./engine.js";
 import { getSwanSensePredictions } from "./swansense.jsx";
 import { SwanSongCard, FlightModeModal } from "./ritual.jsx";
@@ -20,8 +20,11 @@ const MonthlyRecap  = lazy(() => import("./components/MonthlyRecap.jsx").then(m 
 const RECAP_MONTH_NAMES = ["january","february","march","april","may","june","july","august","september","october","november","december"];
 
 function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSwanPopup, treatments, locationData, user, notifPermission, onRequestNotif, notifDismissed, onDismissNotif, journals, setCheckIns, triggerLog = [] }) {
-  const { flags } = analyzeShelf(products);
   const conflicts = detectConflicts(products);
+  // Surface only irreconcilable conflicts (the molecule-level deactivation
+  // pairs flagged in constants.js). Everything else is handled silently
+  // by the routine engine via AM/PM split + alternating-night sequencing.
+  const irreconcilable = conflicts.filter(c => c.irreconcilable);
   const { am, pm } = buildRoutine(products);
   const spending = calcSpending(products);
   const currentSession = getCurrentSession();
@@ -65,36 +68,6 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
     triggerLog,
     cycleDay: currentCycleDay,
   });
-
-  const allAlerts = [
-    // Conflicts carry both sides of the pair as productsA / productsB so the
-    // expanded FlagCard can render product pills for what's actually clashing.
-    ...conflicts.map(c => ({
-      severity: c.severity,
-      label: `${c.pair[0]} + ${c.pair[1]}`,
-      detail: c.reason,
-      productsA: c.productsA || [],
-      productsB: c.productsB || [],
-    })),
-    ...flags,
-    ...products.flatMap(p => {
-      const now = Date.now();
-      const alerts = [];
-      if (p.expiryDate) {
-        const days = Math.ceil((new Date(p.expiryDate) - now) / 86400000);
-        if (days <= 0) alerts.push({ severity: "high", label: `${p.name} - expired`, detail: `Expiry date was ${Math.abs(days)} day${Math.abs(days) === 1 ? "" : "s"} ago. Discard or replace.`, products: [p] });
-        else if (days <= 30) alerts.push({ severity: "medium", label: `${p.name} - expiring soon`, detail: `Expires in ${days} day${days === 1 ? "" : "s"}.`, products: [p] });
-      }
-      if (p.paoMonths && p.openedDate) {
-        const paoExp = new Date(p.openedDate);
-        paoExp.setMonth(paoExp.getMonth() + p.paoMonths);
-        const days = Math.ceil((paoExp - now) / 86400000);
-        if (days <= 0) alerts.push({ severity: "high", label: `${p.name} - PAO exceeded`, detail: `This product was opened ${p.paoMonths}M ago and is past its period after opening. Its efficacy and safety may be compromised.`, products: [p] });
-        else if (days <= 30) alerts.push({ severity: "medium", label: `${p.name} - PAO ending soon`, detail: `${days} day${days === 1 ? "" : "s"} left within its ${p.paoMonths}M period after opening.`, products: [p] });
-      }
-      return alerts;
-    }),
-  ];
 
   return (
     <div>
@@ -386,16 +359,19 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           );
         })()}
 
-        {/* Alerts */}
-        {allAlerts.length > 0 && products.length > 0 && (
-          <Section title={`${allAlerts.length} alert${allAlerts.length > 1 ? "s" : ""}`} icon="warning">
-            {allAlerts.map((f, i) => <FlagCard key={i} f={f} />)}
-          </Section>
-        )}
-        {allAlerts.length === 0 && products.length > 0 && (
-          <div style={{ display: "flex", gap: 12, padding: "14px 16px", background: "rgba(122,144,112,0.08)", borderRadius: 12, border: "1px solid rgba(122,144,112,0.2)", marginBottom: 24 }}>
-            <span style={{ color: "#6e8a72" }}><Icon name="check" size={15} /></span>
-            <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 13, color: "var(--parchment)", margin: 0 }}>No conflicts detected. Your ritual is clean.</p>
+        {/* Irreconcilable conflicts only — quiet one-liner, no card, no label,
+            no header. The routine engine handles every schedulable conflict
+            silently via AM/PM split or alternating nights. */}
+        {irreconcilable.length > 0 && products.length > 0 && (
+          <div style={{ marginBottom: 24 }}>
+            {irreconcilable.map((c, i) => (
+              <p key={i} style={{
+                fontFamily: "var(--font-body)", fontSize: 12,
+                color: "var(--color-inky-moss, #2d3d2b)",
+                lineHeight: 1.6,
+                margin: i === 0 ? 0 : "6px 0 0",
+              }}>{c.reason}</p>
+            ))}
           </div>
         )}
 

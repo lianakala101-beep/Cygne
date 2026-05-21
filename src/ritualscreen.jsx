@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Icon, Section, FlagCard, SwanIcon } from "./components.jsx";
+import { Icon, Section, SwanIcon } from "./components.jsx";
 import { detectActives, analyzeShelf, buildRoutine, detectConflicts, isScheduledToday, applyPhilosophy } from "./engine.js";
 import { FREQUENCIES } from "./constants.js";
 import { buildRecommendations, buildRefinements } from "./intelligence.jsx";
@@ -274,7 +274,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
     : [];
   const { am, pm, periodic } = buildRoutine(products, { pausedActives });
   const conflicts = detectConflicts(products);
-  const { flags, activeMap } = analyzeShelf(products);
+  const { activeMap } = analyzeShelf(products);
   const [recTab, setRecTab] = useState("additions");
   const now = new Date();
   const today = now.toISOString().split("T")[0];
@@ -563,33 +563,26 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
       )}
 
 
-      {/* Conflicts */}
-      {conflicts.length > 0 && (
-        <Section title={`${conflicts.length} conflict${conflicts.length > 1 ? "s" : ""} detected`} icon="warning">
-          {conflicts.map((c, i) => (
-            <div key={i} style={{ padding: "15px 17px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 13, marginBottom: 10 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 7 }}>
-                <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--parchment)", flexShrink: 0, boxShadow: "0 0 6px rgba(232,227,214,0.4)" }} />
-                <span style={{ fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400, color: "var(--parchment)", letterSpacing: "0.13em", textTransform: "uppercase" }}>{c.pair.join(" + ")}</span>
-                <span style={{ marginLeft: "auto", fontSize: 9, fontFamily: "var(--font-body)", letterSpacing: "0.11em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.65 }}>{c.severity}</span>
-              </div>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: "0 0 9px", lineHeight: 1.6 }}>{c.reason}</p>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-                {[...c.productsA, ...c.productsB].filter((p, i, arr) => arr.findIndex(x => x.id === p.id) === i).map(p => (
-                  <span key={p.id} style={{ fontSize: 10, fontFamily: "var(--font-body)", color: "var(--clay)", background: "var(--surface)", padding: "3px 8px", borderRadius: 20, border: "1px solid var(--border)" }}>{p.name}</span>
-                ))}
-              </div>
-            </div>
-          ))}
-        </Section>
-      )}
-
-      {/* Shelf flags */}
-      {flags.length > 0 && (
-        <Section title="Observations" icon="info">
-          {flags.map((f, i) => <FlagCard key={i} f={f} />)}
-        </Section>
-      )}
+      {/* Irreconcilable conflicts only — quiet one-liner, no card, no label,
+          no header. Schedulable conflicts (retinol+AHA, AHA+BHA, etc.) are
+          handled silently by buildRoutine's AM/PM split + alternating-night
+          sequencing. */}
+      {(() => {
+        const irreconcilable = conflicts.filter(c => c.irreconcilable);
+        if (irreconcilable.length === 0) return null;
+        return (
+          <div style={{ marginBottom: 18 }}>
+            {irreconcilable.map((c, i) => (
+              <p key={i} style={{
+                fontFamily: "var(--font-body)", fontSize: 12,
+                color: "var(--color-inky-moss, #2d3d2b)",
+                lineHeight: 1.6,
+                margin: i === 0 ? 0 : "6px 0 0",
+              }}>{c.reason}</p>
+            ))}
+          </div>
+        );
+      })()}
 
       {/* -- CYGNE INTELLIGENCE ----------------------------------------------- */}
       {totalRecs > 0 && (
@@ -661,13 +654,6 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
             })}
           </div>
 
-        </div>
-      )}
-
-      {conflicts.length === 0 && flags.length === 0 && totalRecs === 0 && products.length > 0 && (
-        <div style={{ display: "flex", gap: 11, padding: "13px 16px", background: "rgba(45,61,43,0.07)", borderRadius: 12, border: "1px solid rgba(45,61,43,0.18)" }}>
-          <span style={{ color: "#2d3d2b" }}><Icon name="check" size={14} /></span>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "var(--parchment)", margin: 0 }}>No conflicts. Your ritual is well-balanced.</p>
         </div>
       )}
 

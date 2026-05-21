@@ -75,6 +75,11 @@ const ACTIVE_SESSION = {
   niacinamide: "both", "hyaluronic acid": "both", peptides: "pm", ceramides: "both",
 };
 
+// `irreconcilable: true` flags pairs that can't be safely scheduled around —
+// the molecules deactivate each other on contact, so even alternating nights
+// leaves residue that affects the other product. These are the only pairs
+// the UI surfaces as a one-line note; everything else is handled silently
+// by the routine engine via AM/PM splits and alternating-night sequencing.
 const CONFLICT_RULES = [
   { pair: ["retinol", "vitamin C"],         severity: "warning", reason: "These degrade each other and heighten irritation. Use Vitamin C in the morning, retinol at night." },
   { pair: ["retinol", "AHA"],               severity: "warning", reason: "Retinol + AHA together risks barrier damage. Alternate on separate evenings." },
@@ -84,8 +89,8 @@ const CONFLICT_RULES = [
   { pair: ["AHA", "BHA"],                   severity: "caution", reason: "Daily AHA + BHA risks chronic over-exfoliation. Alternate days or use one per session." },
   { pair: ["AHA", "PHA"],                   severity: "caution", reason: "Layering PHA on top of AHA compounds exfoliation. Use one per session." },
   { pair: ["BHA", "PHA"],                   severity: "caution", reason: "Layering PHA on top of BHA compounds exfoliation. Use one per session." },
-  { pair: ["retinol", "benzoyl peroxide"],  severity: "warning", reason: "Benzoyl peroxide oxidizes and deactivates retinol. Keep these in entirely separate rituals." },
-  { pair: ["vitamin C", "benzoyl peroxide"],severity: "warning", reason: "Benzoyl peroxide oxidizes Vitamin C and degrades both. Use in separate sessions — Vitamin C AM, BP at a different time." },
+  { pair: ["retinol", "benzoyl peroxide"],  severity: "warning", irreconcilable: true, reason: "Benzoyl peroxide oxidizes and deactivates retinol. Keep these in entirely separate rituals." },
+  { pair: ["vitamin C", "benzoyl peroxide"],severity: "warning", irreconcilable: true, reason: "Benzoyl peroxide oxidizes Vitamin C and degrades both. Use in separate sessions — Vitamin C AM, BP at a different time." },
 ];
 
 export { CATEGORIES, FREQUENCIES, LAYER_ORDER, layerIndex, ACTIVE_RULES, ACTIVE_SESSION, CONFLICT_RULES, isScheduledToday, getNextUseLabel };
