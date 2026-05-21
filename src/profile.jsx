@@ -141,25 +141,69 @@ function IngredientProfile({ user, onUpdateUser }) {
   };
 
   const hasAny = allergens.length > 0 || loved.length > 0;
-  const inputStyle = { background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 8, padding: "8px 12px", fontFamily: "var(--font-body)", fontSize: 11, color: "var(--parchment)", outline: "none" };
+
+  // Shared visual language with SkinProfileEditor — same card chrome,
+  // header treatment, edit chrome, field labels, Save/Cancel buttons.
+  const fieldLabel = (txt) => (
+    <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: "0 0 8px" }}>{txt}</p>
+  );
+  const editInputStyle = {
+    width: "100%", boxSizing: "border-box",
+    background: "var(--color-ivory, #faf9f4)",
+    border: "1px solid rgba(45,61,43,0.18)",
+    borderRadius: 0, padding: "11px 14px",
+    fontFamily: "var(--font-body)", fontSize: 13,
+    color: "var(--color-ink, #1c1c1a)",
+    caretColor: "var(--color-inky-moss, #2d3d2b)",
+    outline: "none",
+    WebkitAppearance: "none", appearance: "none",
+    WebkitTapHighlightColor: "transparent",
+  };
+  // Loved (moss) and avoided (clay) keep their tonal distinction via
+  // background + text color when active; inactive is the neutral outline.
+  const tagButton = ({ on, tone, onClick, children }) => {
+    const palettes = {
+      love:  { active: { color: "#2d3d2b", bg: "rgba(45,61,43,0.12)", border: "var(--color-inky-moss, #2d3d2b)" } },
+      avoid: { active: { color: "#8b7355", bg: "rgba(139,115,85,0.10)", border: "rgba(139,115,85,0.5)" } },
+    };
+    const p = palettes[tone].active;
+    return (
+      <button type="button" onClick={onClick}
+        style={{
+          padding: "6px 12px", borderRadius: 24,
+          border: `1px solid ${on ? p.border : "rgba(45,61,43,0.35)"}`,
+          background: on ? p.bg : "transparent",
+          color: on ? p.color : "var(--color-inky-moss, #2d3d2b)",
+          fontFamily: "var(--font-body)", fontSize: 11, fontWeight: on ? 700 : 400,
+          cursor: "pointer", letterSpacing: "0.02em", transition: "all 0.18s",
+          WebkitAppearance: "none", appearance: "none",
+        }}>{children}</button>
+    );
+  };
 
   return (
-    <div style={{ marginBottom: 20 }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: 0 }}>Ingredient Profile</p>
-        {!editing && <button onClick={() => setEditing(true)} style={{ background: "none", border: "none", fontFamily: "var(--font-body)", fontSize: 10, color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer", letterSpacing: "0.14em", textTransform: "uppercase", padding: 0 }}>Edit</button>}
+    <div style={{ marginBottom: 24 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+        <p style={{ fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 700, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: 0 }}>
+          Ingredient Profile
+        </p>
+        {!editing && (
+          <button onClick={() => setEditing(true)}
+            style={{ background: "none", border: "none", fontFamily: "var(--font-body)", fontSize: 10, color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer", letterSpacing: "0.14em", textTransform: "uppercase", padding: 0 }}>
+            Edit
+          </button>
+        )}
       </div>
 
       {!editing ? (
-        <div style={{ background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 12, padding: "14px 16px" }}>
+        <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "14px 16px" }}>
           {!hasAny ? (
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, opacity: 0.5 }}>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-stone, #5a5a5a)", margin: 0 }}>
               No ingredients flagged yet. Tap Edit to mark allergens and loved ingredients — Cygne will cross-reference them on every product.
             </p>
           ) : (
             // Unified chip cloud — loved + avoided shown together. Chip color
-            // (clay = avoid, moss = love) is the only visual distinction; the
-            // old subsection eyebrows and gap are gone.
+            // (clay = avoid, moss = love) is the only visual distinction.
             <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
               {loved.map(l => (
                 <span key={`l-${l}`} style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(45,61,43,0.08)", border: "1px solid rgba(45,61,43,0.22)", fontFamily: "var(--font-body)", fontSize: 10, color: "#2d3d2b" }}>{l}</span>
@@ -171,67 +215,62 @@ function IngredientProfile({ user, onUpdateUser }) {
           )}
         </div>
       ) : (
-        <div style={{ background: "var(--surface)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 12, padding: "16px" }}>
-
-          {/* Allergens */}
-          <div style={{ marginBottom: 18 }}>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "#8b7355", margin: "0 0 10px", opacity: 0.9 }}>Avoid / Allergic to</p>
+        <div style={{ background: "var(--color-ivory-shadow, #f0ebe0)", borderTop: "1px solid rgba(45,61,43,0.18)", padding: "18px 16px", display: "flex", flexDirection: "column", gap: 20 }}>
+          {/* Avoid / Allergic to */}
+          <div>
+            {fieldLabel("Avoid / Allergic to")}
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }}>
-              {COMMON_ALLERGENS.map(s => {
-                const on = draftAllergens.includes(s);
-                return (
-                  <button key={s} onClick={() => toggleAllergen(s)}
-                    style={{ padding: "5px 12px", borderRadius: 20, border: `1px solid ${on ? "rgba(139,115,85,0.5)" : "var(--border)"}`, background: on ? "rgba(139,115,85,0.10)" : "transparent", fontFamily: "var(--font-body)", fontSize: 10, color: on ? "#8b7355" : "var(--clay)", fontWeight: 400, cursor: "pointer", transition: "all 0.15s" }}>
-                    {s}
-                  </button>
-                );
-              })}
+              {COMMON_ALLERGENS.map(s => tagButton({ on: draftAllergens.includes(s), tone: "avoid", onClick: () => toggleAllergen(s), children: s }))}
               {draftAllergens.filter(a => !COMMON_ALLERGENS.includes(a)).map(a => (
                 <button key={a} onClick={() => toggleAllergen(a)}
-                  style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "5px 12px", borderRadius: 20, border: "1px solid rgba(139,115,85,0.5)", background: "rgba(139,115,85,0.10)", fontFamily: "var(--font-body)", fontSize: 10, color: "#8b7355", fontWeight: 400, cursor: "pointer" }}>
+                  style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "6px 12px", borderRadius: 24, border: "1px solid rgba(139,115,85,0.5)", background: "rgba(139,115,85,0.10)", fontFamily: "var(--font-body)", fontSize: 11, color: "#8b7355", fontWeight: 700, cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
                   {a} <Icon name="x" size={9} />
                 </button>
               ))}
             </div>
             <div style={{ display: "flex", gap: 8 }}>
-              <input style={{ ...inputStyle, flex: 1 }} placeholder="Add custom e.g. Benzophenone"
+              <input style={editInputStyle} placeholder="Add custom e.g. Benzophenone"
                 value={customAllergen} onChange={e => setCustomAllergen(e.target.value)}
                 onKeyDown={e => e.key === "Enter" && addCustomAllergen()} />
-              <button onClick={addCustomAllergen} style={{ padding: "8px 14px", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.25)", borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 10, color: "#8b7355", cursor: "pointer" }}>Add</button>
+              <button onClick={addCustomAllergen}
+                style={{ padding: "0 18px", background: "transparent", border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 10, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
+                Add
+              </button>
             </div>
           </div>
 
-          {/* Loved */}
-          <div style={{ marginBottom: 18 }}>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "#2d3d2b", margin: "0 0 10px", opacity: 0.9 }}>Love</p>
+          {/* Love */}
+          <div>
+            {fieldLabel("Love")}
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }}>
-              {COMMON_LOVED.map(s => {
-                const on = draftLoved.includes(s);
-                return (
-                  <button key={s} onClick={() => toggleLoved(s)}
-                    style={{ padding: "5px 12px", borderRadius: 20, border: `1px solid ${on ? "rgba(45,61,43,0.5)" : "var(--border)"}`, background: on ? "rgba(45,61,43,0.10)" : "transparent", fontFamily: "var(--font-body)", fontSize: 10, color: on ? "#2d3d2b" : "var(--clay)", fontWeight: 400, cursor: "pointer", transition: "all 0.15s" }}>
-                    {s}
-                  </button>
-                );
-              })}
+              {COMMON_LOVED.map(s => tagButton({ on: draftLoved.includes(s), tone: "love", onClick: () => toggleLoved(s), children: s }))}
               {draftLoved.filter(l => !COMMON_LOVED.includes(l)).map(l => (
                 <button key={l} onClick={() => toggleLoved(l)}
-                  style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "5px 12px", borderRadius: 20, border: "1px solid rgba(45,61,43,0.5)", background: "rgba(45,61,43,0.10)", fontFamily: "var(--font-body)", fontSize: 10, color: "#2d3d2b", fontWeight: 400, cursor: "pointer" }}>
+                  style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "6px 12px", borderRadius: 24, border: "1px solid var(--color-inky-moss, #2d3d2b)", background: "rgba(45,61,43,0.12)", fontFamily: "var(--font-body)", fontSize: 11, color: "#2d3d2b", fontWeight: 700, cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
                   {l} <Icon name="x" size={9} />
                 </button>
               ))}
             </div>
             <div style={{ display: "flex", gap: 8 }}>
-              <input style={{ ...inputStyle, flex: 1 }} placeholder="Add custom e.g. Tranexamic acid"
+              <input style={editInputStyle} placeholder="Add custom e.g. Tranexamic acid"
                 value={customLoved} onChange={e => setCustomLoved(e.target.value)}
                 onKeyDown={e => e.key === "Enter" && addCustomLoved()} />
-              <button onClick={addCustomLoved} style={{ padding: "8px 14px", background: "rgba(45,61,43,0.08)", border: "1px solid rgba(45,61,43,0.25)", borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 10, color: "#2d3d2b", cursor: "pointer" }}>Add</button>
+              <button onClick={addCustomLoved}
+                style={{ padding: "0 18px", background: "transparent", border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 10, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
+                Add
+              </button>
             </div>
           </div>
 
-          <div style={{ display: "flex", gap: 8 }}>
-            <button onClick={save} style={{ flex: 1, padding: "10px 0", background: "rgba(45,61,43,0.14)", border: "1px solid rgba(45,61,43,0.35)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer" }}>Save</button>
-            <button onClick={cancel} style={{ flex: 1, padding: "10px 0", background: "transparent", border: "1px solid var(--border)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", cursor: "pointer" }}>Cancel</button>
+          <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+            <button onClick={save}
+              style={{ flex: 1, padding: "12px 0", background: "transparent", border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 700, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
+              Save
+            </button>
+            <button onClick={cancel}
+              style={{ flex: 1, padding: "12px 0", background: "transparent", border: "1px solid rgba(45,61,43,0.22)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-stone, #5a5a5a)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
+              Cancel
+            </button>
           </div>
         </div>
       )}
@@ -494,140 +533,189 @@ function SkinHistory({ user, onUpdateUser }) {
   };
 
   const hasSomeHistory = history.onTretinoin || history.accutaneHistory || (history.prescriptions||[]).length || (history.sensitivities||[]).length || (history.dermaVisits||[]).length;
-  const rowStyle = { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 0", borderBottom: "1px solid var(--border)" };
-  const labelStyle = { fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)" };
-  const valStyle = { fontFamily: "var(--font-body)", fontSize: 11, color: "var(--parchment)", fontWeight: 400 };
-  const inputStyle = { background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 8, padding: "8px 12px", fontFamily: "var(--font-body)", fontSize: 11, color: "var(--parchment)", width: "100%", outline: "none" };
-  const toggleBtnStyle = (on) => ({ padding: "5px 14px", borderRadius: 20, border: `1px solid ${on ? "rgba(45,61,43,0.5)" : "var(--border)"}`, background: on ? "rgba(45,61,43,0.14)" : "transparent", fontFamily: "var(--font-body)", fontSize: 10, color: on ? "var(--color-inky-moss, #2d3d2b)" : "var(--clay)", fontWeight: 400, cursor: "pointer", transition: "all 0.15s" });
+
+  // Shared visual language with SkinProfileEditor.
+  const summaryRow = (label, value) => (
+    <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 14, paddingBottom: 8, marginBottom: 8, borderBottom: "1px solid rgba(45,61,43,0.08)" }}>
+      <span style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", flexShrink: 0 }}>{label}</span>
+      <span style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-ink, #1c1c1a)", textAlign: "right", lineHeight: 1.5 }}>{value}</span>
+    </div>
+  );
+  const fieldLabel = (txt) => (
+    <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: "0 0 8px" }}>{txt}</p>
+  );
+  const editInputStyle = {
+    width: "100%", boxSizing: "border-box",
+    background: "var(--color-ivory, #faf9f4)",
+    border: "1px solid rgba(45,61,43,0.18)",
+    borderRadius: 0, padding: "11px 14px",
+    fontFamily: "var(--font-body)", fontSize: 13,
+    color: "var(--color-ink, #1c1c1a)",
+    caretColor: "var(--color-inky-moss, #2d3d2b)",
+    outline: "none",
+    WebkitAppearance: "none", appearance: "none",
+    WebkitTapHighlightColor: "transparent",
+  };
+  const Pill = ({ on, tone, onClick, children }) => {
+    const active = tone === "avoid"
+      ? { color: "#8b7355", bg: "rgba(139,115,85,0.10)", border: "rgba(139,115,85,0.5)" }
+      : { color: "#2d3d2b", bg: "rgba(45,61,43,0.12)", border: "var(--color-inky-moss, #2d3d2b)" };
+    return (
+      <button type="button" onClick={onClick}
+        style={{
+          padding: "6px 12px", borderRadius: 24,
+          border: `1px solid ${on ? active.border : "rgba(45,61,43,0.35)"}`,
+          background: on ? active.bg : "transparent",
+          color: on ? active.color : "var(--color-inky-moss, #2d3d2b)",
+          fontFamily: "var(--font-body)", fontSize: 11, fontWeight: on ? 700 : 400,
+          cursor: "pointer", letterSpacing: "0.02em", transition: "all 0.18s",
+          WebkitAppearance: "none", appearance: "none",
+        }}>{children}</button>
+    );
+  };
+  const smallAddButton = {
+    padding: "0 18px", background: "transparent",
+    border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 0,
+    fontFamily: "var(--font-display)", fontSize: 10, fontWeight: 700,
+    letterSpacing: "0.18em", textTransform: "uppercase",
+    color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer",
+    WebkitAppearance: "none", appearance: "none",
+  };
 
   return (
-    <div style={{ marginBottom: 20 }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: 0 }}>Skin History</p>
-        {!editing && <button onClick={() => setEditing(true)} style={{ background: "none", border: "none", fontFamily: "var(--font-body)", fontSize: 10, color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer", letterSpacing: "0.14em", textTransform: "uppercase", padding: 0 }}>Edit</button>}
+    <div style={{ marginBottom: 24 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+        <p style={{ fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 700, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: 0 }}>
+          Skin History
+        </p>
+        {!editing && (
+          <button onClick={() => setEditing(true)}
+            style={{ background: "none", border: "none", fontFamily: "var(--font-body)", fontSize: 10, color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer", letterSpacing: "0.14em", textTransform: "uppercase", padding: 0 }}>
+            Edit
+          </button>
+        )}
       </div>
 
       {!editing ? (
-        <div style={{ background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 12, padding: "14px 16px" }}>
+        <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "14px 16px" }}>
           {!hasSomeHistory ? (
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, opacity: 0.5 }}>No history logged. Tap Edit to add prescriptions, sensitivities, or dermatologist visits.</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-stone, #5a5a5a)", margin: 0 }}>
+              No history logged. Tap Edit to add prescriptions, sensitivities, or dermatologist visits.
+            </p>
           ) : (
             <>
-              {history.onTretinoin && (
-                <div style={rowStyle}>
-                  <span style={labelStyle}>Tretinoin</span>
-                  <span style={valStyle}>{history.tretinoinStrength ? `${history.tretinoinStrength}%` : "Active"}</span>
+              {history.onTretinoin && summaryRow("Tretinoin", history.tretinoinStrength ? `${history.tretinoinStrength}%` : "Active")}
+              {history.accutaneHistory && summaryRow("Accutane", history.accutaneEndYear ? `Ended ${history.accutaneEndYear}` : "On record")}
+              {(history.prescriptions || []).map((rx, i) => summaryRow(i === 0 ? "Rx" : " ", rx.name))}
+              {(history.sensitivities || []).length > 0 && (
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 14, paddingBottom: 8, marginBottom: 8, borderBottom: "1px solid rgba(45,61,43,0.08)" }}>
+                  <span style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", flexShrink: 0, paddingTop: 3 }}>Sensitivities</span>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 5, justifyContent: "flex-end" }}>
+                    {history.sensitivities.map(s => (
+                      <span key={s} style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.22)", fontFamily: "var(--font-body)", fontSize: 10, color: "#8b7355" }}>{s}</span>
+                    ))}
+                  </div>
                 </div>
               )}
-              {history.accutaneHistory && (
-                <div style={rowStyle}>
-                  <span style={labelStyle}>Accutane history</span>
-                  <span style={valStyle}>{history.accutaneEndYear ? `Ended ${history.accutaneEndYear}` : "On record"}</span>
-                </div>
-              )}
-              {(history.prescriptions||[]).map((rx, i) => (
-                <div key={i} style={rowStyle}>
-                  <span style={labelStyle}>Rx</span>
-                  <span style={valStyle}>{rx.name}</span>
-                </div>
-              ))}
-              {(history.sensitivities||[]).length > 0 && (
-                <div style={{ ...rowStyle, flexWrap: "wrap", gap: 6, alignItems: "flex-start", paddingTop: 10 }}>
-                  <span style={{ ...labelStyle, width: "100%", marginBottom: 6 }}>Sensitivities</span>
-                  {history.sensitivities.map(s => <span key={s} style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.2)", fontFamily: "var(--font-body)", fontSize: 10, color: "#8b7355" }}>{s}</span>)}
-                </div>
-              )}
-              {(history.dermaVisits||[]).slice(0,2).map((v, i) => (
-                <div key={i} style={rowStyle}>
-                  <span style={labelStyle}>Derm visit</span>
-                  <span style={valStyle}>{v.date}{v.note ? ` — ${v.note}` : ""}</span>
-                </div>
-              ))}
+              {(history.dermaVisits || []).slice(0, 2).map((v, i) => summaryRow(i === 0 ? "Derm Visit" : " ", `${v.date}${v.note ? ` — ${v.note}` : ""}`))}
             </>
           )}
         </div>
       ) : (
-        <div style={{ background: "var(--surface)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 12, padding: "16px" }}>
-
+        <div style={{ background: "var(--color-ivory-shadow, #f0ebe0)", borderTop: "1px solid rgba(45,61,43,0.18)", padding: "18px 16px", display: "flex", flexDirection: "column", gap: 20 }}>
           {/* Tretinoin */}
-          <div style={{ marginBottom: 16 }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-              <span style={labelStyle}>Currently on tretinoin?</span>
-              <div style={{ display: "flex", gap: 6 }}>
-                <button style={toggleBtnStyle(!draft.onTretinoin)} onClick={() => setDraft(d => ({ ...d, onTretinoin: false }))}>No</button>
-                <button style={toggleBtnStyle(draft.onTretinoin)} onClick={() => setDraft(d => ({ ...d, onTretinoin: true }))}>Yes</button>
-              </div>
+          <div>
+            {fieldLabel("Currently On Tretinoin")}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              <Pill on={!draft.onTretinoin} tone="love" onClick={() => setDraft(d => ({ ...d, onTretinoin: false }))}>No</Pill>
+              <Pill on={draft.onTretinoin} tone="love" onClick={() => setDraft(d => ({ ...d, onTretinoin: true }))}>Yes</Pill>
             </div>
             {draft.onTretinoin && (
-              <input style={inputStyle} placeholder="Strength e.g. 0.025, 0.05, 0.1" value={draft.tretinoinStrength}
+              <input style={{ ...editInputStyle, marginTop: 10 }} placeholder="Strength e.g. 0.025, 0.05, 0.1"
+                value={draft.tretinoinStrength}
                 onChange={e => setDraft(d => ({ ...d, tretinoinStrength: e.target.value }))} />
             )}
           </div>
 
           {/* Accutane */}
-          <div style={{ marginBottom: 16 }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-              <span style={labelStyle}>Accutane history?</span>
-              <div style={{ display: "flex", gap: 6 }}>
-                <button style={toggleBtnStyle(!draft.accutaneHistory)} onClick={() => setDraft(d => ({ ...d, accutaneHistory: false }))}>No</button>
-                <button style={toggleBtnStyle(draft.accutaneHistory)} onClick={() => setDraft(d => ({ ...d, accutaneHistory: true }))}>Yes</button>
-              </div>
+          <div>
+            {fieldLabel("Accutane History")}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              <Pill on={!draft.accutaneHistory} tone="love" onClick={() => setDraft(d => ({ ...d, accutaneHistory: false }))}>No</Pill>
+              <Pill on={draft.accutaneHistory} tone="love" onClick={() => setDraft(d => ({ ...d, accutaneHistory: true }))}>Yes</Pill>
             </div>
             {draft.accutaneHistory && (
-              <input style={inputStyle} placeholder="Year course ended e.g. 2021" value={draft.accutaneEndYear}
+              <input style={{ ...editInputStyle, marginTop: 10 }} placeholder="Year course ended e.g. 2021"
+                value={draft.accutaneEndYear}
                 onChange={e => setDraft(d => ({ ...d, accutaneEndYear: e.target.value }))} />
             )}
           </div>
 
           {/* Other prescriptions */}
-          <div style={{ marginBottom: 16 }}>
-            <p style={{ ...labelStyle, marginBottom: 8 }}>Other prescriptions</p>
+          <div>
+            {fieldLabel("Other Prescriptions")}
             {draft.prescriptions.map((rx, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "6px 0" }}>
-                <span style={valStyle}>{rx.name}</span>
-                <button onClick={() => setDraft(d => ({ ...d, prescriptions: d.prescriptions.filter((_, j) => j !== i) }))} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: "0 4px", display: "inline-flex", alignItems: "center" }}><Icon name="x" size={11} /></button>
+                <span style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-ink, #1c1c1a)" }}>{rx.name}</span>
+                <button onClick={() => setDraft(d => ({ ...d, prescriptions: d.prescriptions.filter((_, j) => j !== i) }))}
+                  aria-label="Remove prescription"
+                  style={{ background: "none", border: "none", color: "var(--color-stone, #5a5a5a)", cursor: "pointer", padding: "0 4px", display: "inline-flex", alignItems: "center" }}>
+                  <Icon name="x" size={11} />
+                </button>
               </div>
             ))}
-            <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
-              <input style={{ ...inputStyle, flex: 1 }} placeholder="e.g. Clindamycin, Spironolactone" value={draft.newRx}
+            <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+              <input style={editInputStyle} placeholder="e.g. Clindamycin, Spironolactone"
+                value={draft.newRx}
                 onChange={e => setDraft(d => ({ ...d, newRx: e.target.value }))}
                 onKeyDown={e => e.key === "Enter" && addRx()} />
-              <button onClick={addRx} style={{ padding: "8px 14px", background: "rgba(45,61,43,0.12)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 10, color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer" }}>Add</button>
+              <button onClick={addRx} style={smallAddButton}>Add</button>
             </div>
           </div>
 
           {/* Sensitivities */}
-          <div style={{ marginBottom: 16 }}>
-            <p style={{ ...labelStyle, marginBottom: 8 }}>Known sensitivities</p>
+          <div>
+            {fieldLabel("Known Sensitivities")}
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-              {COMMON_SENSITIVITIES.map(s => {
-                const on = draft.sensitivities.includes(s);
-                return <button key={s} onClick={() => toggleSensitivity(s)} style={{ padding: "5px 12px", borderRadius: 20, border: `1px solid ${on ? "rgba(139,115,85,0.5)" : "var(--border)"}`, background: on ? "rgba(139,115,85,0.10)" : "transparent", fontFamily: "var(--font-body)", fontSize: 10, color: on ? "#8b7355" : "var(--clay)", fontWeight: 400, cursor: "pointer", transition: "all 0.15s" }}>{s}</button>;
-              })}
+              {COMMON_SENSITIVITIES.map(s => (
+                <Pill key={s} on={draft.sensitivities.includes(s)} tone="avoid" onClick={() => toggleSensitivity(s)}>{s}</Pill>
+              ))}
             </div>
           </div>
 
           {/* Dermatologist visits */}
-          <div style={{ marginBottom: 18 }}>
-            <p style={{ ...labelStyle, marginBottom: 8 }}>Dermatologist visits</p>
-            {draft.dermaVisits.slice(0,3).map((v, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "5px 0", borderBottom: "1px solid var(--border)" }}>
-                <span style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)" }}>{v.date}{v.note ? ` — ${v.note}` : ""}</span>
-                <button onClick={() => setDraft(d => ({ ...d, dermaVisits: d.dermaVisits.filter((_, j) => j !== i) }))} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: "0 4px", display: "inline-flex", alignItems: "center" }}><Icon name="x" size={11} /></button>
+          <div>
+            {fieldLabel("Dermatologist Visits")}
+            {draft.dermaVisits.slice(0, 3).map((v, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "5px 0", borderBottom: "1px solid rgba(45,61,43,0.08)" }}>
+                <span style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-ink, #1c1c1a)" }}>{v.date}{v.note ? ` — ${v.note}` : ""}</span>
+                <button onClick={() => setDraft(d => ({ ...d, dermaVisits: d.dermaVisits.filter((_, j) => j !== i) }))}
+                  aria-label="Remove visit"
+                  style={{ background: "none", border: "none", color: "var(--color-stone, #5a5a5a)", cursor: "pointer", padding: "0 4px", display: "inline-flex", alignItems: "center" }}>
+                  <Icon name="x" size={11} />
+                </button>
               </div>
             ))}
             <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-              <input type="date" style={{ ...inputStyle, flex: "0 0 auto", width: 140 }} value={draft.newVisitDate}
+              <input type="date" style={{ ...editInputStyle, flex: "0 0 auto", width: 150 }}
+                value={draft.newVisitDate}
                 onChange={e => setDraft(d => ({ ...d, newVisitDate: e.target.value }))} />
-              <input style={{ ...inputStyle, flex: 1 }} placeholder="Note e.g. prescribed adapalene" value={draft.newVisitNote}
+              <input style={editInputStyle} placeholder="Note e.g. prescribed adapalene"
+                value={draft.newVisitNote}
                 onChange={e => setDraft(d => ({ ...d, newVisitNote: e.target.value }))} />
-              <button onClick={addVisit} style={{ padding: "8px 14px", background: "rgba(45,61,43,0.12)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 10, color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer" }}>Log</button>
+              <button onClick={addVisit} style={smallAddButton}>Log</button>
             </div>
           </div>
 
-          <div style={{ display: "flex", gap: 8 }}>
-            <button onClick={save} style={{ flex: 1, padding: "10px 0", background: "rgba(45,61,43,0.14)", border: "1px solid rgba(45,61,43,0.35)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer" }}>Save</button>
-            <button onClick={cancel} style={{ flex: 1, padding: "10px 0", background: "transparent", border: "1px solid var(--border)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", cursor: "pointer" }}>Cancel</button>
+          <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+            <button onClick={save}
+              style={{ flex: 1, padding: "12px 0", background: "transparent", border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 700, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
+              Save
+            </button>
+            <button onClick={cancel}
+              style={{ flex: 1, padding: "12px 0", background: "transparent", border: "1px solid rgba(45,61,43,0.22)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-stone, #5a5a5a)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
+              Cancel
+            </button>
           </div>
         </div>
       )}
