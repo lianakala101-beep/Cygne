@@ -316,7 +316,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           <SeasonalNudgeCard products={products} activeMap={activeMap} locationData={locationData} user={user} />
         </div>
 
-        {/* Current session routine card */}
+        {/* Current session routine card — quiet summary, tap to open ritual page. */}
         {(() => {
           const isAM = currentSession === "am";
           const steps = isAM ? am : pm;
@@ -325,34 +325,34 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           return (
             <div onClick={() => setTab("routine")} style={{ marginBottom: 36 }}>
               <div
-                style={{ background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.45)", borderRadius: 18, padding: "28px 26px", cursor: "pointer", transition: "border-color 0.2s" }}
+                style={{ background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.45)", borderRadius: 14, padding: "18px 20px", cursor: "pointer", transition: "border-color 0.2s" }}
                 onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(122,144,112,0.75)"}
                 onMouseLeave={e => e.currentTarget.style.borderColor = "rgba(122,144,112,0.45)"}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 22 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
                   <span style={{ color: "#6e8a72", opacity: 0.8 }}><Icon name={icon} size={15} /></span>
-                  <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)" }}>{label} Routine</span>
-                  <span style={{ marginLeft: "auto", fontSize: 9, fontFamily: "var(--font-body), sans-serif", fontWeight: 400, letterSpacing: "0.14em", textTransform: "uppercase", color: "#6e8a72", background: "rgba(232,226,217,0.25)", padding: "3px 9px", borderRadius: 20 }}>Now</span>
+                  <span style={{ fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 700, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)" }}>{label} Routine</span>
+                  <span style={{ marginLeft: "auto", fontSize: 9, fontFamily: "var(--font-body)", fontWeight: 400, letterSpacing: "0.14em", textTransform: "uppercase", color: "#6e8a72", background: "rgba(232,226,217,0.45)", padding: "3px 9px", borderRadius: 20 }}>Now</span>
                 </div>
-                <div style={{ display: "flex", alignItems: "flex-end", gap: 10, marginBottom: 8 }}>
-                  <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 64, fontWeight: 200, color: "var(--parchment)", lineHeight: 0.9, letterSpacing: "-0.03em" }}>{steps.length}</span>
-                  <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 14, color: "var(--clay)", paddingBottom: 8, letterSpacing: "0.04em" }}>step{steps.length !== 1 ? "s" : ""} in order</span>
-                </div>
-                {steps.length > 0 && (
-                  <p style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "#6e8a72", margin: "0 0 18px", letterSpacing: "0.06em" }}>
-                    {steps[0].category} <Icon name="arrow-right" size={11} /> {steps[steps.length - 1].category}
-                  </p>
-                )}
-                {steps.length > 0 && (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-                    {steps.map((s, i) => (
-                      <span key={s.id} style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--clay)", background: "var(--surface)", border: "1px solid rgba(255,255,255,0.07)", padding: "3px 9px", borderRadius: 20 }}>
-                        {i + 1}. {s.category}
-                      </span>
-                    ))}
-                  </div>
-                )}
-                {steps.length === 0 && (
-                  <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 12, color: "var(--clay)", margin: 0, opacity: 0.6 }}>Add products to build your ritual.</p>
+                {steps.length > 0 ? (
+                  <>
+                    <p style={{
+                      display: "inline-flex", alignItems: "center", gap: 8,
+                      fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 400,
+                      letterSpacing: "0.04em", color: "var(--color-inky-moss, #2d3d2b)",
+                      margin: "0 0 4px", lineHeight: 1.4,
+                    }}>
+                      {steps[0].category} <Icon name="arrow-right" size={12} /> {steps[steps.length - 1].category}
+                    </p>
+                    <p style={{
+                      fontFamily: "var(--font-body)", fontSize: 11,
+                      color: "var(--color-stone, #5a5a5a)",
+                      margin: 0, letterSpacing: "0.04em",
+                    }}>
+                      {steps.length} step{steps.length !== 1 ? "s" : ""}
+                    </p>
+                  </>
+                ) : (
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-stone, #5a5a5a)", margin: 0 }}>Add products to build your ritual.</p>
                 )}
               </div>
             </div>
