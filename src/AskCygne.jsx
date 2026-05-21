@@ -7,12 +7,13 @@ export function AskCygneButton({ onClick }) {
     <button
       onClick={onClick}
       style={{
-        display: "inline-flex", alignItems: "center", gap: 8,
-        padding: "10px 24px", background: "transparent",
-        border: "1px solid rgba(45,61,43,0.3)", borderRadius: 0,
-        cursor: "pointer", fontFamily: "var(--font-display)", fontWeight: 400,
-        fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase",
+        display: "flex", width: "100%", alignItems: "center", justifyContent: "center", gap: 8,
+        padding: "14px 16px", background: "transparent",
+        border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 0,
+        cursor: "pointer", fontFamily: "var(--font-display)", fontWeight: 700,
+        fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase",
         color: "var(--color-inky-moss)", transition: "all 0.2s",
+        WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
       }}
       onMouseEnter={e => { e.currentTarget.style.background = "var(--color-inky-moss)"; e.currentTarget.style.color = "var(--color-ivory)"; }}
       onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--color-inky-moss)"; }}>

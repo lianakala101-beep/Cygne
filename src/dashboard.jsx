@@ -268,7 +268,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         )}
 
         {/* Ask Cygne — standalone entry point above the utility buttons */}
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}>
+        <div style={{ marginBottom: 16 }}>
           <AskCygneButton onClick={() => askCygne("", "")} />
         </div>
 
