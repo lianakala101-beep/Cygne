@@ -1187,9 +1187,10 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
   const [selectedTriggers, setSelectedTriggers] = useState([]);
   const [selectedSymptoms, setSelectedSymptoms] = useState([]);
   const [expandedZone, setExpandedZone] = useState(null);
-  // First tap on "Log today's triggers" expands the section to reveal the
-  // zone selector; second tap opens the trigger/symptom modal.
-  const [collapsed, setCollapsed] = useState(true);
+  // Body Acne section owns two independent collapsible rows on the dark
+  // canvas: Log Today's Triggers (opens the modal sheet) and Body Acne
+  // (expands the zone selector). Both default closed.
+  const [zonesExpanded, setZonesExpanded] = useState(false);
 
   const { gaps, doubles } = buildBodyShelfAdvice(zones, products, activeMap);
 
@@ -1222,29 +1223,59 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
     );
   }
 
-  const handleLogClick = () => {
-    if (collapsed) setCollapsed(false);
-    else setShowTriggerModal(true);
-  };
-
   return (
     <div style={{ marginBottom: 28 }}>
 
-      {/* Always-visible trigger — expands the section on first tap, opens the
-          trigger/symptom modal on subsequent taps. The chevron is only
-          shown while collapsed to signal the expand affordance. */}
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: collapsed ? 0 : 12 }}>
-        <button onClick={handleLogClick}
-          style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "none", border: "none", padding: 0, cursor: "pointer", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" }}>
+      {/* Row 1 — LOG TODAY'S TRIGGERS. Tap opens the trigger/symptom sheet. */}
+      <button onClick={() => setShowTriggerModal(true)}
+        style={{
+          display: "flex", width: "100%", alignItems: "center", justifyContent: "space-between",
+          padding: "18px 0",
+          background: "transparent", border: "none",
+          borderTop: "1px solid rgba(250,249,244,0.25)",
+          borderBottom: "1px solid rgba(250,249,244,0.25)",
+          cursor: "pointer",
+          WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
+        }}>
+        <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 13, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)" }}>
           Log Today's Triggers
-          {collapsed && <Icon name="chevron" size={10} />}
-        </button>
-      </div>
+        </span>
+        <span style={{ color: "var(--color-ivory, #faf9f4)", opacity: 0.7, display: "inline-flex" }}>
+          <Icon name="arrow-right" size={14} />
+        </span>
+      </button>
 
-      {!collapsed && (
-      <>
+      {/* Row 2 — BODY ACNE. Tap toggles the zone selector and the rest of
+          the section. Shares its top hairline with Row 1 above via
+          marginTop: -1. */}
+      <button onClick={() => setZonesExpanded(o => !o)}
+        aria-expanded={zonesExpanded}
+        style={{
+          display: "flex", width: "100%", alignItems: "center", justifyContent: "space-between",
+          padding: "18px 0", marginTop: -1,
+          background: "transparent", border: "none",
+          borderTop: "1px solid rgba(250,249,244,0.25)",
+          borderBottom: "1px solid rgba(250,249,244,0.25)",
+          cursor: "pointer",
+          WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
+        }}>
+        <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 13, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)" }}>
+          Body Acne
+        </span>
+        <span style={{
+          color: "var(--color-ivory, #faf9f4)", opacity: 0.7,
+          transform: zonesExpanded ? "rotate(90deg)" : "none",
+          transition: "transform 0.2s",
+          display: "inline-flex",
+        }}>
+          <Icon name="chevron" size={13} />
+        </span>
+      </button>
+
+      {zonesExpanded && (
+      <div style={{ paddingTop: 16 }}>
       {/* Zone selector */}
-      <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "16px 18px", marginBottom: 12 }}>
+      <div style={{ marginBottom: 16 }}>
         <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 12px" }}>Where do you experience it?</p>
 
         <p style={{ fontFamily: "var(--font-body)", fontSize: 9, color: "var(--clay)", margin: "0 0 8px", letterSpacing: "0.2em", textTransform: "uppercase", opacity: 0.55 }}>Face</p>
@@ -1253,7 +1284,7 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
             const active = zones.includes(zone.id);
             return (
               <button key={zone.id} onClick={() => { toggleZone(zone.id); setExpandedZone(active ? null : zone.id); }}
-                style={{ padding: "9px 16px", borderRadius: 22, border: `1px solid ${active ? "rgba(45,61,43,0.5)" : "var(--border)"}`, background: active ? "rgba(250,249,244,0.10)" : "transparent", color: active ? "#2d3d2b" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, cursor: "pointer", transition: "all 0.18s" }}>
+                style={{ padding: "9px 16px", borderRadius: 22, border: `1px solid ${active ? "rgba(250,249,244,0.6)" : "var(--border)"}`, background: active ? "rgba(250,249,244,0.10)" : "transparent", color: active ? "var(--color-ivory, #faf9f4)" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, cursor: "pointer", transition: "all 0.18s" }}>
                 {zone.label}
               </button>
             );
@@ -1266,7 +1297,7 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
             const active = zones.includes(zone.id);
             return (
               <button key={zone.id} onClick={() => { toggleZone(zone.id); setExpandedZone(active ? null : zone.id); }}
-                style={{ padding: "9px 16px", borderRadius: 22, border: `1px solid ${active ? "rgba(45,61,43,0.5)" : "var(--border)"}`, background: active ? "rgba(250,249,244,0.10)" : "transparent", color: active ? "#2d3d2b" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, cursor: "pointer", transition: "all 0.18s" }}>
+                style={{ padding: "9px 16px", borderRadius: 22, border: `1px solid ${active ? "rgba(250,249,244,0.6)" : "var(--border)"}`, background: active ? "rgba(250,249,244,0.10)" : "transparent", color: active ? "var(--color-ivory, #faf9f4)" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, cursor: "pointer", transition: "all 0.18s" }}>
                 {zone.label}
               </button>
             );
@@ -1382,7 +1413,7 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
         onMouseLeave={e => e.currentTarget.style.opacity = "0.35"}>
         Disable tracking
       </button>
-      </>
+      </div>
       )}
 
       {/* Trigger log modal */}
@@ -1771,8 +1802,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
         <TreatmentSection treatments={treatments} saveTreatment={saveTreatment} removeTreatment={removeTreatment} updateTreatmentDate={updateTreatmentDate} products={products} activeMap={activeMap} />
       </div>
 
-      {/* -- Body Acne --------------------------------------------------------- */}
-      {sectionLabel("layers", "Body Acne")}
+      {/* -- Body Acne — owns its own collapsible header inside the tracker */}
       <div style={{ marginBottom: 28 }}>
         <BodyAcneTracker products={products} activeMap={activeMap} user={user} onUpdateUser={onUpdateUser} triggerLog={triggerLog} setTriggerLog={setTriggerLog} />
       </div>
