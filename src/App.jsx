@@ -2,7 +2,7 @@ import { lazy, Suspense, useState, useRef, useEffect } from "react";
 import { Icon } from "./components.jsx";
 import { analyzeShelf, detectConflicts, buildRoutine, detectActives } from "./engine.js";
 import { RAMP_SCHEDULES, RAMP_ACTIVES } from "./ramp.jsx";
-import { SplashScreen } from "./splash.jsx";
+import { PreAuthScreen } from "./splash.jsx";
 import { Dashboard } from "./dashboard.jsx";
 import { MyRoutine } from "./ritualscreen.jsx";
 import { Shelf } from "./vanity.jsx";
@@ -10,7 +10,6 @@ import { Progress } from "./progress.jsx";
 import { SwanWelcomeScreen, useLocalStorage, getCurrentCycleDay, daysBetweenLocal, toLocalMidnight, isoWeekNumber, isoWeekYear } from "./utils.jsx";
 import { WeekendNudgeCard } from "./weekend.jsx";
 import { SeasonalNudgeCard } from "./seasonal.jsx";
-import { AuthScreen } from "./auth.jsx";
 import { supabase } from "./supabase.js";
 
 // Code-split: gated by user action or onboarding state, so their chunks load
@@ -41,7 +40,6 @@ export default function App() {
   };
 
   const [user, setUser] = useLocalStorage("cygne_user", null);
-  const [splashDone, setSplashDone] = useState(false);
   const [firstRun, setFirstRun] = useLocalStorage("cygne_firstrun", false);
   const [notifPermission, setNotifPermission] = useState("default");
   const [notifDismissed, setNotifDismissed] = useLocalStorage("cygne_notifdismissed", false);
@@ -634,9 +632,9 @@ export default function App() {
     );
   }
 
-  // -- No session → Auth screen -----------------------------------------------
+  // -- No session → Pre-auth (swan-video splash + frosted-glass auth form) ---
   if (!authSession) {
-    return <AuthScreen onAuth={handleAuth} />;
+    return <PreAuthScreen onAuth={handleAuth} />;
   }
 
   // -- Needs onboarding (new signup) ------------------------------------------
@@ -649,7 +647,6 @@ export default function App() {
   }
 
   // -- First run welcome (just completed onboarding) --------------------------
-  if (!splashDone) return <SplashScreen onDone={() => setSplashDone(true)} />;
   if (firstRun) return <SwanWelcomeScreen user={user} onDone={() => { setFirstRun(false); setTab("dashboard"); }} />;
 
   // -- Main app ---------------------------------------------------------------
