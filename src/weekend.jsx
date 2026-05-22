@@ -1,5 +1,3 @@
-import { useState } from "react";
-import { Icon } from "./components.jsx";
 import { hasSPFCoverage } from "./engine.js";
 
 function getWeekendPhase() {
@@ -60,30 +58,9 @@ function buildWeekendAdvice(phase, products, activeMap) {
 }
 
 const WEEKEND_PHASE_CONFIG = {
-  before: {
-    label: "The Weekend Is Near",
-    sublabel: "Thursday · Friday",
-    headline: "Prep your skin before the night.",
-    accent: "#8b7355",
-    bg: "rgba(139,115,85,0.07)",
-    border: "rgba(139,115,85,0.2)",
-  },
-  during: {
-    label: "Weekend",
-    sublabel: "Saturday",
-    headline: "A few things worth remembering.",
-    accent: "#8b7355",
-    bg: "rgba(139,115,85,0.07)",
-    border: "rgba(139,115,85,0.2)",
-  },
-  after: {
-    label: "Recovery Day",
-    sublabel: "Sunday",
-    headline: "Your skin needs a quiet day.",
-    accent: "#6e8a72",
-    bg: "rgba(122,144,112,0.07)",
-    border: "rgba(122,144,112,0.2)",
-  },
+  before: { label: "The Weekend Is Near", headline: "Prep your skin before the night." },
+  during: { label: "Weekend",             headline: "A few things worth remembering." },
+  after:  { label: "Recovery Day",        headline: "Your skin needs a quiet day." },
 };
 
 function WeekendNudgeCard({ products, activeMap }) {
@@ -92,33 +69,49 @@ function WeekendNudgeCard({ products, activeMap }) {
 
   const cfg = WEEKEND_PHASE_CONFIG[phase];
   const advice = buildWeekendAdvice(phase, products, activeMap);
-  const [dismissed, setDismissed] = useState(false);
-  if (dismissed) return null;
 
   return (
-    <div style={{ marginBottom: 20, background: cfg.bg, border: `1px solid ${cfg.border}`, borderRadius: 16, padding: "18px 20px 16px", position: "relative" }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-        <div>
-          <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: cfg.accent }}>{cfg.label}</span>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 18, fontWeight: 400, color: "var(--parchment)", margin: "2px 0 0", lineHeight: 1.3, letterSpacing: "0.005em" }}>{cfg.headline}</p>
-        </div>
-        <button onClick={() => setDismissed(true)} aria-label="Dismiss" style={{ background: "none", border: "none", color: "var(--clay)", opacity: 0.35, cursor: "pointer", padding: "2px 4px", display: "inline-flex" }}><Icon name="x" size={12} /></button>
+    <div style={{
+      background: "radial-gradient(circle at 85% 15%, rgba(45,61,43,0.06) 0%, rgba(45,61,43,0.02) 35%, transparent 65%), var(--color-ivory-shadow)",
+      border: "1px solid rgba(192,192,192,0.25)",
+      borderRadius: 12,
+      boxShadow: "0 4px 24px rgba(0,0,0,0.05)",
+      padding: "14px 16px",
+      marginBottom: 20,
+      position: "relative",
+      overflow: "hidden",
+    }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
+        <span style={{
+          fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 9,
+          letterSpacing: "0.22em", textTransform: "uppercase",
+          color: "var(--color-inky-moss)",
+          background: "rgba(45,61,43,0.10)",
+          padding: "3px 8px", borderRadius: 2,
+          flexShrink: 0, whiteSpace: "nowrap",
+        }}>{cfg.label}</span>
+        <span style={{
+          flex: 1, minWidth: 0,
+          fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 400,
+          letterSpacing: "0.02em",
+          color: "var(--color-inky-moss)",
+          lineHeight: 1.4,
+        }}>{cfg.headline}</span>
       </div>
-      {advice.skip.length > 0 && (
-        <div style={{ marginBottom: 10 }}>
-          {advice.skip.map((s, i) => (
-            <div key={i} style={{ display: "flex", gap: 8, marginBottom: 6 }}>
-              <span style={{ color: "#8b7355", fontSize: 10, flexShrink: 0, marginTop: 1 }}>—</span>
-              <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{s}</p>
-            </div>
-          ))}
-        </div>
-      )}
+      {advice.skip.map((s, i) => (
+        <p key={"s" + i} style={{
+          fontFamily: "var(--font-body)", fontSize: 12,
+          color: "var(--color-inky-moss)", margin: i === 0 ? "0 0 8px" : "0 0 8px",
+          lineHeight: 1.65,
+        }}>{s}</p>
+      ))}
       {advice.do.map((s, i) => (
-        <div key={i} style={{ display: "flex", gap: 8, marginBottom: 6 }}>
-          <span style={{ color: cfg.accent, fontSize: 10, flexShrink: 0, marginTop: 1 }}>+</span>
-          <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{s}</p>
-        </div>
+        <p key={"d" + i} style={{
+          fontFamily: "var(--font-body)", fontSize: 12,
+          color: "var(--color-inky-moss)",
+          margin: i === advice.do.length - 1 ? 0 : "0 0 8px",
+          lineHeight: 1.65,
+        }}>{s}</p>
       ))}
     </div>
   );

@@ -205,10 +205,8 @@ function SeasonalNudgeCard({ products, activeMap, user }) {
       </button>
       {open && (
         <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid rgba(45,61,43,0.10)" }}>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-inky-moss)", margin: "0 0 12px", lineHeight: 1.65 }}>{cfg.body}</p>
-          <div style={{ padding: "11px 14px", background: "rgba(45,61,43,0.06)", borderRadius: 4, borderLeft: "2px solid " + cfg.accent }}>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-ink, #1c1c1a)", margin: 0, lineHeight: 1.65 }}>{nudge}</p>
-          </div>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-inky-moss)", margin: "0 0 8px", lineHeight: 1.65 }}>{cfg.body}</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-inky-moss)", margin: 0, lineHeight: 1.65 }}>{nudge}</p>
         </div>
       )}
     </div>
