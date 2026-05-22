@@ -4,7 +4,7 @@ import { analyzeShelf, detectConflicts, buildRoutine, calcSpending, getCurrentSe
 import { getSwanSensePredictions } from "./swansense.jsx";
 import { SwanSongCard, FlightModeModal } from "./ritual.jsx";
 import { ShopScanModal } from "./shopscan.jsx";
-import { EnvironmentStrip } from "./environment.jsx";
+import { useWeather } from "./environment.jsx";
 import { WeekendNudgeCard } from "./weekend.jsx";
 import { SeasonalNudgeCard } from "./seasonal.jsx";
 import { getTreatmentPhase, TreatmentRecoveryCard, getCyclePhase } from "./progress.jsx";
@@ -56,6 +56,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
   const currentCycleDay = getCurrentCycleDay(user);
   const { activeMap } = analyzeShelf(products);
   const swanSensePredictions = getSwanSensePredictions(products, checkIns, user, locationData, journals);
+  const { env: weather } = useWeather(locationData, user?.tempUnit || "C");
 
   // LLM-generated daily Swan Sense line — fetched once per (user, day), cached
   // in localStorage + the server-side ask_cygne_cache table. Falls back to the
@@ -325,17 +326,57 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           </div>
         ))}
 
-        {/* 10. Cycle phase pill — bottom-of-page context */}
-        {user?.cycleTrackingEnabled && currentCycleDay && (() => {
-          const phase = getCyclePhase(currentCycleDay);
+        {/* 10. Unified context footer — cycle phase, last check-in and
+            local weather sit in a single ivory-shadow strip so they read
+            as a quiet data footer instead of three competing pills. */}
+        {(() => {
+          const phase = user?.cycleTrackingEnabled && currentCycleDay ? getCyclePhase(currentCycleDay) : null;
+          const last = checkIns.length ? checkIns.reduce((a, b) => new Date(a.date) > new Date(b.date) ? a : b) : null;
+          const daysSince = last ? daysBetweenLocal(last.date) : null;
+          const checkInMsg = daysSince === null
+            ? "No check-ins"
+            : daysSince === 0 ? "Checked in today"
+            : daysSince < 7 ? `Checked in ${daysSince}d ago`
+            : "Check-in overdue";
+          const tempUnit = user?.tempUnit || "C";
+          const hasWeather = weather && (weather.temp !== null || weather.uvIndex !== null || weather.humidity !== null);
+
+          if (!phase && !hasWeather && daysSince === null) return null;
+
+          const txtSt = { fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, letterSpacing: "0.02em", color: "var(--color-inky-moss)", whiteSpace: "nowrap" };
+          const btnSt = { display: "inline-flex", alignItems: "center", gap: 6, padding: 0, background: "none", border: "none", cursor: "pointer", fontFamily: "var(--font-body)", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" };
+
           return (
-            <button
-              onClick={() => setCycleExpanded(true)}
-              style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "7px 13px", background: phase.bg, border: `1px solid ${phase.border}`, borderRadius: 999, marginBottom: 12, cursor: "pointer", fontFamily: "inherit" }}>
-              <div style={{ width: 5, height: 5, borderRadius: "50%", background: phase.dot, flexShrink: 0 }} />
-              <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, fontWeight: 400, color: "var(--parchment)", letterSpacing: "0.02em" }}>{phase.name} Phase · Day {currentCycleDay}</span>
-              <span style={{ color: "var(--clay)", opacity: 0.6, marginLeft: 2, display: "inline-flex" }}><Icon name="chevron" size={10} /></span>
-            </button>
+            <div style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              rowGap: 8,
+              columnGap: 16,
+              padding: "11px 14px",
+              background: "var(--color-ivory-shadow)",
+              marginBottom: 20,
+              fontFamily: "var(--font-body)",
+            }}>
+              {phase && (
+                <button onClick={() => setCycleExpanded(true)} style={btnSt}>
+                  <span style={{ width: 5, height: 5, borderRadius: "50%", background: phase.dot, display: "inline-block", flexShrink: 0 }} />
+                  <span style={txtSt}>{phase.name} · Day {currentCycleDay}</span>
+                </button>
+              )}
+              <button onClick={() => setTab("progress")} style={btnSt}>
+                <span style={{ width: 5, height: 5, borderRadius: "50%", background: "var(--color-inky-moss)", opacity: 0.45, display: "inline-block", flexShrink: 0 }} />
+                <span style={txtSt}>{checkInMsg}</span>
+              </button>
+              {hasWeather && (
+                <div style={{ display: "inline-flex", alignItems: "center", gap: 10, marginLeft: "auto" }}>
+                  {weather.temp !== null && <span style={txtSt}>{Math.round(tempUnit === "F" ? (weather.temp * 9 / 5 + 32) : weather.temp)}°{tempUnit}</span>}
+                  {weather.uvIndex !== null && <span style={txtSt}>UV {weather.uvIndex}</span>}
+                  {weather.humidity !== null && <span style={txtSt}>{weather.humidity}%</span>}
+                  {locationData?.city && <span style={{ ...txtSt, opacity: 0.65 }}>{locationData.city}</span>}
+                </div>
+              )}
+            </div>
           );
         })()}
 
@@ -361,36 +402,6 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             </div>
           );
         })()}
-
-        {/* 11. Check-in status pill */}
-        {(() => {
-          const last = checkIns.length ? checkIns.reduce((a, b) => new Date(a.date) > new Date(b.date) ? a : b) : null;
-          const daysSince = last ? daysBetweenLocal(last.date) : null;
-          const due = daysSince === null || daysSince >= 7;
-          const msg = daysSince === null
-            ? "No check-ins yet"
-            : daysSince === 0 ? "Check-in logged today"
-            : daysSince < 7 ? `Last check-in ${daysSince}d ago`
-            : "Check-in overdue";
-          const tone = !due
-            ? { dot: "rgba(122,144,112,0.85)", bg: "rgba(122,144,112,0.10)", border: "rgba(122,144,112,0.30)" }
-            : daysSince === null
-              ? { dot: "rgba(139,115,85,0.7)",  bg: "rgba(139,115,85,0.06)", border: "rgba(139,115,85,0.22)" }
-              : { dot: "rgba(139,115,85,0.85)", bg: "rgba(139,115,85,0.10)", border: "rgba(139,115,85,0.30)" };
-          return (
-            <button onClick={() => setTab("progress")}
-              style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "7px 13px", background: tone.bg, border: `1px solid ${tone.border}`, borderRadius: 999, marginLeft: 8, marginBottom: 20, cursor: "pointer", fontFamily: "inherit" }}>
-              <div style={{ width: 5, height: 5, borderRadius: "50%", background: tone.dot, flexShrink: 0 }} />
-              <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, fontWeight: 400, color: "var(--parchment)", letterSpacing: "0.02em" }}>{msg}</span>
-              <span style={{ color: "var(--clay)", opacity: 0.6, marginLeft: 2, display: "inline-flex" }}><Icon name="chevron" size={10} /></span>
-            </button>
-          );
-        })()}
-
-        {/* 12. Weather / location — environment strip at the very bottom */}
-        <div style={{ marginBottom: 20 }}>
-          <EnvironmentStrip products={products} activeMap={activeMap} locationData={locationData} tempUnit={user?.tempUnit || "C"} />
-        </div>
 
         </div>
       )}

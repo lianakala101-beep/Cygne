@@ -76,10 +76,9 @@ function WeekendNudgeCard({ products, activeMap }) {
 
   return (
     <div style={{
-      background: "radial-gradient(circle at 85% 15%, rgba(45,61,43,0.06) 0%, rgba(45,61,43,0.02) 35%, transparent 65%), var(--color-ivory-shadow)",
-      border: "1px solid rgba(192,192,192,0.25)",
-      borderRadius: 12,
-      boxShadow: "0 4px 24px rgba(0,0,0,0.05)",
+      background: "transparent",
+      border: "1.5px solid var(--color-inky-moss, #2d3d2b)",
+      borderRadius: 0,
       padding: "14px 16px",
       marginBottom: 20,
       position: "relative",
