@@ -451,6 +451,7 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
           boxShadow: "0 24px 60px rgba(0,0,0,0.7), 0 1px 0 rgba(232,220,180,0.06) inset",
           border: "1px solid rgba(139,115,85,0.22)",
         }}>
+<<<<<<< HEAD
           <img
             src="/cygne-logo.png"
             alt=""
@@ -462,6 +463,18 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
               pointerEvents: "none", userSelect: "none",
             }}
           />
+=======
+          <span aria-hidden="true" style={{
+            position: "absolute", top: "50%", left: "50%",
+            transform: "translate(-50%, -50%)",
+            fontFamily: "var(--script)",
+            fontSize: 160, lineHeight: 1,
+            color: "#f5f0e8", opacity: 0.07,
+            pointerEvents: "none", userSelect: "none",
+            whiteSpace: "nowrap",
+            zIndex: -1,
+          }}>Cygne</span>
+>>>>>>> 7d9bb5c (feat(swansense): ivory card, /cygne-logo.png watermark, rename Swan Song → Swan Sense)
           <div style={{ position: "absolute", inset: 0, borderRadius: 22, pointerEvents: "none", backgroundImage: grain, backgroundSize: "180px 180px", opacity: 0.7 }} />
           <div style={{ position: "absolute", inset: 0, borderRadius: 22, pointerEvents: "none", background: "radial-gradient(ellipse at 85% 15%, rgba(139,115,85,0.12) 0%, transparent 65%)" }} />
 
@@ -495,7 +508,11 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
     );
   }
 
+<<<<<<< HEAD
   // -- INLINE (settled) version — note-card on home dashboard -----------------
+=======
+  // -- INLINE (settled) version — ivory SwanSense card ----------------------
+>>>>>>> 7d9bb5c (feat(swansense): ivory card, /cygne-logo.png watermark, rename Swan Song → Swan Sense)
   return (
     <div style={{ position: "relative", marginTop: 8 }}>
       <div style={{
@@ -505,6 +522,7 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
         padding: "20px 22px 22px",
         overflow: "hidden",
         isolation: "isolate",
+<<<<<<< HEAD
         boxShadow: "0 1px 3px rgba(28,28,26,0.05), 0 8px 24px rgba(28,28,26,0.06)",
         border: "1px solid rgba(45,61,43,0.14)",
       }}>
@@ -553,6 +571,27 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
         }}>
           {renderInsightLines(line)}
         </p>
+=======
+        border: "1px solid var(--color-ivory-shadow, #f0ebe0)",
+        boxShadow: "0 2px 12px rgba(28,28,26,0.06)",
+      }}>
+        <div style={{ position: "absolute", inset: 0, borderRadius: 14, pointerEvents: "none", backgroundImage: grain, backgroundSize: "180px 180px", opacity: 0.4 }} />
+        <img src="/cygne-logo.png" alt="" style={{
+          position: "absolute", bottom: 10, right: 14,
+          height: 48, width: "auto", opacity: 0.06,
+          pointerEvents: "none", userSelect: "none",
+        }} />
+
+        <div style={{ marginBottom: 10 }}>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 8, letterSpacing: "0.28em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: 0 }}>Swan Sense</p>
+        </div>
+
+        <p style={{ fontFamily: "var(--script)", fontSize: 26, fontWeight: 400, lineHeight: 1.35, color: "var(--color-ink, #1c1c1a)", letterSpacing: "0.01em", margin: "0 0 8px" }}>{renderInsightLines(line)}</p>
+
+        {hasMeaningful && meaningfulPredictions[0].detail && (
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-stone, #5a5a5a)", margin: 0, lineHeight: 1.65 }}>{meaningfulPredictions[0].detail}</p>
+        )}
+>>>>>>> 7d9bb5c (feat(swansense): ivory card, /cygne-logo.png watermark, rename Swan Song → Swan Sense)
       </div>
     </div>
   );
