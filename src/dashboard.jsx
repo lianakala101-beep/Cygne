@@ -209,22 +209,25 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           </button>
         </div>
 
-        {/* 2. Begin Your Ritual — primary daily action. */}
+        {/* 2. Begin Your Ritual — primary daily action. Typographic presence
+            matches the step headers on the ritual page (CLEANSE, SEAL,
+            TREAT) so it reads as an editorial statement, not a chip. */}
         <button
           onClick={() => setTab("routine")}
           style={{
-            display: "flex", width: "100%", alignItems: "center", justifyContent: "center", gap: 10,
-            padding: "18px 16px", marginBottom: 16,
+            display: "flex", width: "100%", alignItems: "center", justifyContent: "center", gap: 12,
+            padding: "26px 18px", marginBottom: 16,
             background: "transparent",
             border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 8,
             cursor: "pointer", fontFamily: "var(--font-display)", fontWeight: 700,
-            fontSize: 12, letterSpacing: "0.24em", textTransform: "uppercase",
-            color: "var(--color-inky-moss, #2d3d2b)", transition: "background 0.2s",
+            fontSize: 24, letterSpacing: "0.04em", textTransform: "uppercase",
+            color: "var(--color-inky-moss, #2d3d2b)", lineHeight: 1.05,
+            transition: "background 0.2s",
             WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
           }}
           onMouseEnter={e => e.currentTarget.style.background = "rgba(45,61,43,0.08)"}
           onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-          <Icon name={currentSession === "am" ? "sun" : "moon"} size={14} />
+          <Icon name={currentSession === "am" ? "sun" : "moon"} size={20} />
           Begin Your Ritual
         </button>
 
