@@ -99,18 +99,62 @@ export function detectActivesFromProduct(product) {
   return actives;
 }
 
+// Returns the sessions a product is scheduled into. Mirrors buildRoutine's
+// daily auto-assignment so periodic products (exfoliants/masks) and shelf
+// products without an explicit session still resolve to the slot they'd
+// land in if used. Used by detectConflicts so we only flag pairs that
+// actually share a session.
+export function getProductSessions(product) {
+  if (!product) return new Set();
+  if (product.session === "am")   return new Set(["am"]);
+  if (product.session === "pm")   return new Set(["pm"]);
+  if (product.session === "both") return new Set(["am", "pm"]);
+  if (product.category === "SPF")          return new Set(["am"]);
+  if (product.category === "Prescription") return new Set(["pm"]);
+  const actives = detectActives(product.ingredients || []);
+  if (product.category === "Toning Pad") {
+    if (actives.AHA && !actives.BHA) return new Set(["pm"]);
+    return new Set(["am", "pm"]);
+  }
+  const hasPMOnly = Object.keys(actives).some(a => ACTIVE_RULES[a]?.pmOnly);
+  const hasAMPref = Object.keys(actives).some(a => ACTIVE_SESSION[a] === "am");
+  if (hasPMOnly) return new Set(["pm"]);
+  if (hasAMPref) {
+    if (["Cleanser", "Moisturizer", "Toner", "Essence", "Mist"].includes(product.category)) return new Set(["am", "pm"]);
+    return new Set(["am"]);
+  }
+  return new Set(["am", "pm"]);
+}
+
 function detectConflicts(products) {
   const pam = products.map(p => ({ product: p, actives: Object.keys(detectActivesFromProduct(p)) }));
   return CONFLICT_RULES.reduce((acc, rule) => {
     const [a, b] = rule.pair;
     const pA = pam.filter(p => p.actives.includes(a)).map(p => p.product);
     const pB = pam.filter(p => p.actives.includes(b)).map(p => p.product);
-    if (pA.length && pB.length) {
-      // Suppress conflict if all products on both sides are intentionally alternating —
-      // they never share a night so the conflict doesn't apply
-      const allAlternating = [...pA, ...pB].every(p => p.frequency === "alternating");
-      if (!allAlternating) acc.push({ ...rule, productsA: pA, productsB: pB });
-    }
+    if (!pA.length || !pB.length) return acc;
+
+    // Only flag the pair when at least one product on each side lands in
+    // the same session. If retinol is auto-scheduled to PM and vitamin C
+    // to AM, the routine engine has already resolved the incompatibility
+    // by splitting them — surfacing a warning would be a false positive.
+    const sharesSession = pA.some(prodA => {
+      const aSes = getProductSessions(prodA);
+      return pB.some(prodB => {
+        if (prodA.id === prodB.id) return false;
+        const bSes = getProductSessions(prodB);
+        for (const s of aSes) if (bSes.has(s)) return true;
+        return false;
+      });
+    });
+    if (!sharesSession) return acc;
+
+    // Suppress when all products in the conflict alternate nights —
+    // alternating products skip evenings rather than stacking.
+    const allAlternating = [...pA, ...pB].every(p => p.frequency === "alternating");
+    if (allAlternating) return acc;
+
+    acc.push({ ...rule, productsA: pA, productsB: pB });
     return acc;
   }, []);
 }

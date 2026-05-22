@@ -227,13 +227,33 @@ describe("buildRoutine", () => {
 });
 
 describe("detectConflicts", () => {
-  it("flags retinol + vitamin C", () => {
+  it("flags retinol + vitamin C when scheduled in the same session", () => {
+    const products = [
+      p({ id: "r", ingredients: ["retinol"], session: "pm" }),
+      p({ id: "c", ingredients: ["ascorbic acid"], session: "pm" }),
+    ];
+    const out = detectConflicts(products);
+    expect(out.some(c => c.pair.includes("retinol") && c.pair.includes("vitamin C"))).toBe(true);
+  });
+
+  it("does not flag retinol + vitamin C when the user split them across sessions", () => {
+    const products = [
+      p({ id: "r", ingredients: ["retinol"], session: "pm" }),
+      p({ id: "c", ingredients: ["ascorbic acid"], session: "am" }),
+    ];
+    const out = detectConflicts(products);
+    expect(out.length).toBe(0);
+  });
+
+  it("does not flag when auto-detection already places the pair in different sessions", () => {
+    // retinol auto-lands in PM (pmOnly), vitamin C auto-lands in AM (AM-pref
+    // serum) — the routine engine has already separated them.
     const products = [
       p({ id: "r", ingredients: ["retinol"] }),
       p({ id: "c", ingredients: ["ascorbic acid"] }),
     ];
     const out = detectConflicts(products);
-    expect(out.some(c => c.pair.includes("retinol") && c.pair.includes("vitamin C"))).toBe(true);
+    expect(out.length).toBe(0);
   });
 
   it("returns no conflict when only one side of a pair is present", () => {
@@ -292,8 +312,8 @@ describe("analyzeShelf", () => {
 
 describe("getProductConflicts", () => {
   it("returns conflicts the specific product participates in", () => {
-    const r = p({ id: "ret", ingredients: ["retinol"] });
-    const c = p({ id: "vc", ingredients: ["ascorbic acid"] });
+    const r = p({ id: "ret", ingredients: ["retinol"], session: "pm" });
+    const c = p({ id: "vc", ingredients: ["ascorbic acid"], session: "pm" });
     const conflicts = getProductConflicts(r, [r, c]);
     expect(conflicts.length).toBeGreaterThan(0);
     expect(
