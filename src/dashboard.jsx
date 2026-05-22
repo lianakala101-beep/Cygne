@@ -120,7 +120,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
               {emptySteps.map((s, i) => (
-                <div key={i} style={{ display: "flex", gap: 14, padding: "16px 18px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8 }}>
+                <div key={i} style={{ display: "flex", gap: 14, padding: "16px 18px", background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8 }}>
                   <span style={{ color: "var(--clay)", flexShrink: 0, marginTop: 2, display: "inline-flex" }}><Icon name={s.icon} size={18} /></span>
                   <div style={{ flex: 1 }}>
                     <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.5 }}>Step {i + 1}</span>
@@ -158,7 +158,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             { label: "Swan Sense activates", done: hasProducts && hasCheckin, action: null, cta: null },
           ];
           return (
-            <div style={{ marginBottom: 24, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "16px 18px" }}>
+            <div style={{ marginBottom: 24, background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "16px 18px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
                 <span style={{ color: "var(--clay)", display: "inline-flex" }}><SwanIcon size={14} /></span>
                 <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)", margin: 0 }}>Getting started</p>

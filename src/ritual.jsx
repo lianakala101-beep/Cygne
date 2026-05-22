@@ -654,7 +654,7 @@ function FlightModeModal({ products, activeMap, onClose }) {
         </p>
 
         {/* Tab toggle */}
-        <div style={{ display: "flex", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: 3, marginBottom: 24 }}>
+        <div style={{ display: "flex", background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: 3, marginBottom: 24 }}>
           {[{ id: "edit", label: "Your Edit" }, { id: "tips", label: "Flight Tips" }].map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
               style={{ flex: 1, padding: "8px 0", borderRadius: 8, border: "none", background: tab === t.id ? "#6e8a72" : "transparent", color: tab === t.id ? "#0d0f0d" : "var(--clay)", fontFamily: "var(--font-body), sans-serif", fontSize: 10, fontWeight: 400, cursor: "pointer", letterSpacing: "0.12em", textTransform: "uppercase", transition: "all 0.18s" }}>
@@ -736,7 +736,7 @@ function FlightModeModal({ products, activeMap, onClose }) {
         {tab === "tips" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {tips.map((tip, i) => (
-              <div key={i} style={{ display: "flex", gap: 12, padding: "14px 16px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8 }}>
+              <div key={i} style={{ display: "flex", gap: 12, padding: "14px 16px", background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8 }}>
                 <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 13, color: "var(--clay)", flexShrink: 0, marginTop: 1 }}>{i + 1}.</span>
                 <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 12, color: "var(--parchment)", margin: 0, lineHeight: 1.65 }}>{tip}</p>
               </div>

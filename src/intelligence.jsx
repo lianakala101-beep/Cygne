@@ -332,7 +332,7 @@ function RecommendationCard({ rec, onAdd, onDismiss }) {
 
   return (
     <div onClick={() => setExpanded(e => !e)}
-      style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: "15px 17px", marginBottom: 8, cursor: "pointer", transition: "border-color 0.2s" }}
+      style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 14, padding: "15px 17px", marginBottom: 8, cursor: "pointer", transition: "border-color 0.2s" }}
       onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(122,144,112,0.4)"}
       onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}>
       <div style={{ display: "flex", alignItems: "flex-start", gap: 11 }}>
@@ -627,7 +627,7 @@ function RefinementsCard({ products, activeMap, conflicts }) {
       </button>
 
       {open && (
-        <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderTop: "none", borderRadius: "0 0 14px 14px", padding: "16px 16px 18px" }}>
+        <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderTop: "none", borderRadius: "0 0 14px 14px", padding: "16px 16px 18px" }}>
 
           {/* Verb filter pills */}
           <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>

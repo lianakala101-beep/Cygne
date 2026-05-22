@@ -20,7 +20,7 @@ function Profile({ user, products, onLogout, locationData, setLocationData, loca
       {(user.skinType || (user.concerns && user.concerns.length > 0) || user.skinAgeBracket) && (
         <div style={{ marginBottom: 24 }}>
           <p style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", marginBottom: 12 }}>Your Skin</p>
-          <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "16px 18px" }}>
+          <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "16px 18px" }}>
             {user.skinAgeBracket && (
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, paddingBottom: 12, borderBottom: "1px solid var(--border)" }}>
                 <span style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)" }}>Age Bracket</span>
@@ -49,7 +49,7 @@ function Profile({ user, products, onLogout, locationData, setLocationData, loca
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 32 }}>
         {[["Products", products.length], ["Categories", new Set(products.map(p => p.category)).size], ["Value", `$${spending.total.toFixed(0)}`]].map(([l, v]) => (
-          <div key={l} style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "18px 12px", textAlign: "center" }}>
+          <div key={l} style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "18px 12px", textAlign: "center" }}>
             <p style={{ fontFamily: "var(--font-body)", fontSize: 24, fontWeight: 200, color: "var(--parchment)", margin: "0 0 4px", letterSpacing: "-0.02em" }}>{v}</p>
             <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", margin: 0 }}>{l}</p>
           </div>
@@ -63,7 +63,7 @@ function Profile({ user, products, onLogout, locationData, setLocationData, loca
       </div>
 
       <Section title="About Cygne" icon="leaf">
-        <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "20px 20px" }}>
+        <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "20px 20px" }}>
           <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "var(--clay)", margin: "0 0 14px", lineHeight: 1.7 }}>
             Cygne transforms your product collection into a properly sequenced, conflict-free routine. Correct layering. Ingredient compatibility. Reduced redundancy.
           </p>

@@ -346,7 +346,7 @@ function SkinJournalModal({ onSubmit, onClose, existing = null }) {
             value={notes}
             onChange={e => setNotes(e.target.value)}
             placeholder="Anything worth noting today..."
-            style={{ width: "100%", minHeight: 72, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "12px 14px", fontFamily: "var(--font-body)", fontSize: 12, color: "var(--parchment)", resize: "none", outline: "none", boxSizing: "border-box", lineHeight: 1.6 }}
+            style={{ width: "100%", minHeight: 72, background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "12px 14px", fontFamily: "var(--font-body)", fontSize: 12, color: "var(--parchment)", resize: "none", outline: "none", boxSizing: "border-box", lineHeight: 1.6 }}
           />
         </div>
 
@@ -453,11 +453,11 @@ function CycleTracker({ products, activeMap, cycleDay: cycledayProp = 14, onSetC
 
   if (!enabled) {
     return (
-      <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "20px 20px", marginBottom: 28 }}>
+      <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "20px 20px", marginBottom: 28 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
           <span style={{ color: "var(--clay)", display: "inline-flex" }}><Icon name="moon" size={14} /></span>
           <span style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)" }}>Sync Your Ritual With Your Rhythm</span>
-          <span style={{ fontSize: 9, fontFamily: "var(--font-body)", color: "var(--clay)", background: "var(--surface)", border: "1px solid var(--border)", padding: "2px 8px", borderRadius: 20, letterSpacing: "0.06em" }}>Optional</span>
+          <span style={{ fontSize: 9, fontFamily: "var(--font-body)", color: "var(--clay)", background: "var(--color-ivory-shadow)", border: "none", padding: "2px 8px", borderRadius: 20, letterSpacing: "0.06em" }}>Optional</span>
         </div>
         <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: "0 0 16px", lineHeight: 1.65 }}>
           Your hormones shift every week. Your ritual should too. Enable this to receive phase-aware nudges drawn from what's already on your vanity.
@@ -507,7 +507,7 @@ function CycleTracker({ products, activeMap, cycleDay: cycledayProp = 14, onSetC
               </div>
             ) : (
               <button onClick={() => { setInputVal(String(cycleDay)); setEditing(true); }}
-                style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "5px 10px", cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
+                style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "5px 10px", cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
                 <span style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 13, letterSpacing: "0.08em", color: "var(--color-pebble)", lineHeight: 1.6 }}>Day {cycleDay}</span>
               </button>
             )}
@@ -525,7 +525,7 @@ function CycleTracker({ products, activeMap, cycleDay: cycledayProp = 14, onSetC
       </div>
 
       {/* Shelf-specific advice */}
-      <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "14px 16px" }}>
+      <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "14px 16px" }}>
         <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 8px" }}>Your Vanity This Week</p>
         <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 13, letterSpacing: "0.02em", color: "var(--color-inky-moss, #2d3d2b)", margin: "0 0 12px", lineHeight: 1.6 }}>{advice}</p>
         <button onClick={() => setEnabled(false)}
@@ -774,7 +774,7 @@ function buildTreatmentRoutineAdvice(phase, products, activeMap) {
   return { paused, cleared };
 }
 
-const inputSt = { width: "100%", padding: "12px 16px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 14, color: "var(--parchment)", outline: "none" };
+const inputSt = { width: "100%", padding: "12px 16px", background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 14, color: "var(--parchment)", outline: "none" };
 const labelSt = { fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", display: "block", marginBottom: 6 };
 
 function AddTreatmentModal({ onSave, onClose }) {
@@ -1204,10 +1204,10 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
 
   if (!enabled) {
     return (
-      <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "20px 20px", marginBottom: 28 }}>
+      <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "20px 20px", marginBottom: 28 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
           <span style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)" }}>Body Acne</span>
-          <span style={{ fontSize: 9, fontFamily: "var(--font-body)", color: "var(--clay)", background: "var(--surface)", border: "1px solid var(--border)", padding: "2px 8px", borderRadius: 20, letterSpacing: "0.06em" }}>Optional</span>
+          <span style={{ fontSize: 9, fontFamily: "var(--font-body)", color: "var(--clay)", background: "var(--color-ivory-shadow)", border: "none", padding: "2px 8px", borderRadius: 20, letterSpacing: "0.06em" }}>Optional</span>
         </div>
         <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: "0 0 16px", lineHeight: 1.65 }}>
           Track body acne zones, identify triggers, and get advice drawn from what's already on your vanity.
@@ -1244,7 +1244,7 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
       {!collapsed && (
       <>
       {/* Zone selector */}
-      <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "16px 18px", marginBottom: 12 }}>
+      <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "16px 18px", marginBottom: 12 }}>
         <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 12px" }}>Where do you experience it?</p>
 
         <p style={{ fontFamily: "var(--font-body)", fontSize: 9, color: "var(--clay)", margin: "0 0 8px", letterSpacing: "0.2em", textTransform: "uppercase", opacity: 0.55 }}>Face</p>
@@ -1280,7 +1280,7 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
           {[...FACE_TRACKER_ZONES, ...BODY_ZONES].filter(z => zones.includes(z.id)).map(zone => {
             const open = expandedZone === zone.id;
             return (
-              <div key={zone.id} style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, overflow: "hidden", transition: "all 0.2s" }}>
+              <div key={zone.id} style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, overflow: "hidden", transition: "all 0.2s" }}>
                 <button onClick={() => setExpandedZone(open ? null : zone.id)}
                   style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 18px", background: "none", border: "none", cursor: "pointer", textAlign: "left" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -1321,7 +1321,7 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
 
       {/* Shelf integration */}
       {zones.length > 0 && (gaps.length > 0 || doubles.length > 0) && (
-        <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "16px 18px", marginBottom: 12 }}>
+        <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "16px 18px", marginBottom: 12 }}>
           <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 12px" }}>Your Vanity</p>
 
           {doubles.length > 0 && (
@@ -1358,7 +1358,7 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
 
       {/* Trigger log */}
       {triggerLog.length > 0 && (
-        <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "16px 18px" }}>
+        <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "16px 18px" }}>
           <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 12px" }}>Recent Triggers</p>
           {triggerLog.slice(-5).reverse().map((entry, i) => (
             <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: i < triggerLog.slice(-5).length - 1 ? 10 : 0, paddingBottom: i < triggerLog.slice(-5).length - 1 ? 10 : 0, borderBottom: i < triggerLog.slice(-5).length - 1 ? "1px solid var(--border)" : "none" }}>
@@ -1487,7 +1487,7 @@ function JournalFullView({ journals, onClose, onEditToday }) {
               const isToday = j.date === today;
               const dateLabel = isToday ? "Today" : d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
               return (
-                <div key={j.date} style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "14px 16px", marginBottom: 8 }}>
+                <div key={j.date} style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "14px 16px", marginBottom: 8 }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: j.notes ? 8 : 0 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                       <div style={{ width: 8, height: 8, borderRadius: "50%", background: c ? c.color : "var(--clay)", flexShrink: 0 }} />
@@ -1621,7 +1621,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
               </button>
             ) : (
               <div onClick={() => setShowJournal(true)}
-                style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "13px 18px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, cursor: "pointer" }}>
+                style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "13px 18px", background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, cursor: "pointer" }}>
                 <div>
                   <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 3px" }}>Today</p>
                   <p style={{ fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 400, letterSpacing: "0.08em", color: cond ? cond.color : "var(--parchment)", margin: 0 }}>{cond ? cond.label : todayEntry.condition}</p>
@@ -1642,7 +1642,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
               const d = new Date(j.date + "T12:00:00");
               const label = d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
               return (
-                <div key={j.date} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 18px", background: "var(--surface)", border: "1px solid var(--border)", marginTop: -1, borderRadius: 0 }}>
+                <div key={j.date} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 18px", background: "var(--color-ivory-shadow)", border: "none", marginTop: -1, borderRadius: 0 }}>
                   <div style={{ width: 7, height: 7, borderRadius: "50%", background: c ? c.color : "var(--clay)", flexShrink: 0 }} />
                   <span style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", flex: 1 }}>{label}</span>
                   <span style={{ fontFamily: "var(--font-body)", fontSize: 11, color: c ? c.color : "var(--parchment)", fontWeight: 400 }}>{c ? c.label : j.condition}</span>
@@ -1654,7 +1654,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
             {/* View all link */}
             {pastEntries.length > 0 && (
               <button onClick={() => setJournalFullView(true)}
-                style={{ width: "100%", padding: "9px 0", background: "var(--surface)", border: "1px solid var(--border)", borderTop: "none", marginTop: -1, borderRadius: "0 0 10px 10px", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.08em", color: "#2d3d2b" }}>
+                style={{ width: "100%", padding: "9px 0", background: "var(--color-ivory-shadow)", border: "none", borderTop: "none", marginTop: -1, borderRadius: "0 0 10px 10px", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.08em", color: "#2d3d2b" }}>
                 View all {journals.length} entries <Icon name="arrow-right" size={10} />
               </button>
             )}
@@ -1677,7 +1677,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
           <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, color: "#2d3d2b", flexShrink: 0, marginLeft: 12 }}>Check in <Icon name="arrow-right" size={11} /></span>
         </button>
       ) : (
-        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "14px 18px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, marginBottom: 24 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "14px 18px", background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, marginBottom: 24 }}>
           <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#2d3d2b", flexShrink: 0 }} />
           <div style={{ flex: 1 }}>
             <span style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--parchment)" }}>
@@ -1699,7 +1699,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
 
       {/* -- Consistency score — only when there are check-ins ------------------ */}
       {consistencyPct !== null && (
-        <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "20px 20px", marginBottom: 24 }}>
+        <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "20px 20px", marginBottom: 24 }}>
           <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 10 }}>
             <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
               <span style={{ fontFamily: "var(--font-body)", fontSize: 48, fontWeight: 200, color: "var(--parchment)", lineHeight: 1 }}>{consistencyPct}</span>
@@ -1755,7 +1755,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
                 );
               })
             ) : (
-              <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "18px 18px 16px" }}>
+              <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "18px 18px 16px" }}>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: 0, lineHeight: 1.6, opacity: 0.75 }}>
                   No actives in ramp-up right now.
                 </p>
@@ -1850,7 +1850,7 @@ function LocationManager({ locationData, setLocationData, locationDenied, setLoc
 
   if (locationData) {
     return (
-      <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "16px 18px" }}>
+      <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "16px 18px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <span style={{ color: "var(--clay)", opacity: 0.6, display: "inline-flex" }}><Icon name="target" size={14} /></span>
@@ -1872,7 +1872,7 @@ function LocationManager({ locationData, setLocationData, locationDenied, setLoc
   }
 
   return (
-    <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "16px 18px" }}>
+    <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "16px 18px" }}>
       <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: "0 0 14px", lineHeight: 1.65 }}>
         {locationDenied
           ? "Location was previously denied. You can grant access in your browser settings, then try again."

@@ -674,7 +674,7 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearAll,
                   { label: "Categories", value: new Set(products.map(p => p.category)).size },
                   { label: "Value", value: `$${(spending.total || 0).toFixed(0)}` },
                 ].map(({ label, value }) => (
-                  <div key={label} style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "16px 14px", textAlign: "center" }}>
+                  <div key={label} style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "16px 14px", textAlign: "center" }}>
                     <p style={{ fontFamily: "var(--font-body)", fontSize: 22, fontWeight: 200, color: "var(--parchment)", margin: "0 0 3px", letterSpacing: "-0.02em" }}>{value}</p>
                     <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", margin: 0 }}>{label}</p>
                   </div>

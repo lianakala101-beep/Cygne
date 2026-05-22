@@ -478,7 +478,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
             const nextLabel = getNextUseLabel(p);
             const freqLabel = FREQUENCIES.find(f => f.id === (p.frequency || (["Exfoliant","Mask"].includes(p.category) ? "2-3x" : "as-needed")))?.label || "Periodic";
             return (
-              <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, marginBottom: 8 }}>
+              <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, marginBottom: 8 }}>
                 <div>
                   <p style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 400, letterSpacing: "0.08em", color: "var(--parchment)", margin: "0 0 1px" }}>{p.name}</p>
                   <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0 }}>{p.brand} · {freqLabel}</p>
@@ -547,7 +547,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
                 .map(id => products.find(p => p.id === id))
                 .filter(Boolean);
               return (
-                <div key={i} style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "13px 15px", marginBottom: 8 }}>
+                <div key={i} style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "13px 15px", marginBottom: 8 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
                     <span style={{ fontSize: 9, fontFamily: "var(--font-body)", fontWeight: 400, letterSpacing: "0.13em", textTransform: "uppercase", color: "var(--parchment)", opacity: 0.7 }}>{r.verb}</span>
                     <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--parchment)", margin: 0, flex: 1, fontWeight: 400, lineHeight: 1.3 }}>{r.title}</p>
