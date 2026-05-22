@@ -270,10 +270,21 @@ describe("detectConflicts", () => {
     expect(out.length).toBe(0);
   });
 
-  it("does not suppress when a non-alternating product is involved", () => {
+  it("suppresses a conflict when even one product is on a non-daily schedule", () => {
+    // Retinol daily + glycolic weekly: the weekly product is intentionally
+    // spaced by the user, so the routine is already handling it.
     const products = [
-      p({ id: "r", ingredients: ["retinol"], frequency: "alternating" }),
-      p({ id: "a", ingredients: ["glycolic acid"], frequency: "daily" }),
+      p({ id: "r", ingredients: ["retinol"], frequency: "daily", session: "pm" }),
+      p({ id: "a", ingredients: ["glycolic acid"], frequency: "weekly", session: "pm" }),
+    ];
+    const out = detectConflicts(products);
+    expect(out.length).toBe(0);
+  });
+
+  it("flags a same-session conflict when both products are daily", () => {
+    const products = [
+      p({ id: "r", ingredients: ["retinol"], frequency: "daily", session: "pm" }),
+      p({ id: "a", ingredients: ["glycolic acid"], frequency: "daily", session: "pm" }),
     ];
     const out = detectConflicts(products);
     expect(out.length).toBeGreaterThan(0);

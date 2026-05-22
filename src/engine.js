@@ -149,10 +149,12 @@ function detectConflicts(products) {
     });
     if (!sharesSession) return acc;
 
-    // Suppress when all products in the conflict alternate nights —
-    // alternating products skip evenings rather than stacking.
-    const allAlternating = [...pA, ...pB].every(p => p.frequency === "alternating");
-    if (allAlternating) return acc;
+    // Suppress when any involved product is on a non-daily schedule.
+    // Alternating, 2-3x, weekly and as-needed all signal that the user
+    // is intentionally spacing the product — the routine is already
+    // handling the conflict and no further nudge is needed.
+    const anyNonDaily = [...pA, ...pB].some(p => p.frequency && p.frequency !== "daily");
+    if (anyNonDaily) return acc;
 
     acc.push({ ...rule, productsA: pA, productsB: pB });
     return acc;

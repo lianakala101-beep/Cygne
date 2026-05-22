@@ -389,6 +389,11 @@ function RecommendationCard({ rec, onAdd, onDismiss }) {
 }
 
 // -- Refinements Engine ------------------------------------------------------
+// A product on alternating/2-3x/weekly/as-needed is "already handled" — the
+// user has set an intentional spacing. Refinements that nag about stacking
+// or frequency should skip products in this state.
+const isDailyOrUnset = (p) => !p?.frequency || p.frequency === "daily";
+
 function buildRefinements(products, activeMap, conflicts) {
   const cats = products.reduce((acc, p) => { acc[p.category] = (acc[p.category] || []); acc[p.category].push(p); return acc; }, {});
   const refinements = [];
@@ -428,16 +433,21 @@ function buildRefinements(products, activeMap, conflicts) {
   });
 
   if (activeCount >= 3) {
-    const activeSummary = overloadActiveKeys
-      .map(a => { const p = (activeMap[a] || [])[0]; return pName(p) ? `${pName(p)} (${a})` : a; })
-      .join(", ");
-    refinements.push({
-      verb: "Remove", verbColor: "#c06060", icon: "trash",
-      title: `${activeCount} potent actives running simultaneously`,
-      body: `You're running ${activeSummary}. That's more than most barriers can recover from between sessions — even without obvious day-to-day reactions.`,
-      action: "Run 1–2 actives per session. Rotate the others on separate days or evenings.",
-      trigger: "overload",
-    });
+    // Only flag overload when every active is genuinely running daily —
+    // a user who's already spaced one or more actives doesn't need this.
+    const overloadProducts = overloadActiveKeys.flatMap(a => activeMap[a] || []);
+    if (overloadProducts.length > 0 && overloadProducts.every(isDailyOrUnset)) {
+      const activeSummary = overloadActiveKeys
+        .map(a => { const p = (activeMap[a] || [])[0]; return pName(p) ? `${pName(p)} (${a})` : a; })
+        .join(", ");
+      refinements.push({
+        verb: "Remove", verbColor: "#c06060", icon: "trash",
+        title: `${activeCount} potent actives running simultaneously`,
+        body: `You're running ${activeSummary}. That's more than most barriers can recover from between sessions — even without obvious day-to-day reactions.`,
+        action: "Run 1–2 actives per session. Rotate the others on separate days or evenings.",
+        trigger: "overload",
+      });
+    }
   }
 
   // -- 2. REDUCE FREQUENCY ---------------------------------------------------
@@ -449,34 +459,40 @@ function buildRefinements(products, activeMap, conflicts) {
     const retinolProduct = (activeMap["retinol"] || [])[0];
     const exfoliantKey = hasBHA ? "BHA" : "AHA";
     const exfoliantProduct = (activeMap[exfoliantKey] || [])[0];
-    const retinolName = pName(retinolProduct) || "your retinoid";
-    const exfoliantName = pName(exfoliantProduct) || `your ${exfoliantKey}`;
-    refinements.push({
-      verb: "Reduce Frequency", verbColor: "#c49040", icon: "clock",
-      title: `${retinolName} and ${exfoliantName} are both PM`,
-      body: `Using a retinoid and an exfoliant in the same session — or on back-to-back nights — is the most common cause of barrier compromise. Each needs recovery time before the next use.`,
-      action: `${retinolName}: Mon / Wed / Fri. ${exfoliantName}: Tue / Thu. Weekends: cleanser and moisturizer only.`,
-      trigger: "stacking",
-      product: retinolProduct || null,
-    });
+    // Only flag stacking if both products are running daily. Either one
+    // on a non-daily schedule means the user has already created spacing.
+    if (isDailyOrUnset(retinolProduct) && isDailyOrUnset(exfoliantProduct)) {
+      const retinolName = pName(retinolProduct) || "your retinoid";
+      const exfoliantName = pName(exfoliantProduct) || `your ${exfoliantKey}`;
+      refinements.push({
+        verb: "Reduce Frequency", verbColor: "#c49040", icon: "clock",
+        title: `${retinolName} and ${exfoliantName} are both PM`,
+        body: `Using a retinoid and an exfoliant in the same session — or on back-to-back nights — is the most common cause of barrier compromise. Each needs recovery time before the next use.`,
+        action: `${retinolName}: Mon / Wed / Fri. ${exfoliantName}: Tue / Thu. Weekends: cleanser and moisturizer only.`,
+        trigger: "stacking",
+        product: retinolProduct || null,
+      });
+    }
   }
 
   if (hasAHA && hasBHA) {
     const ahaProduct = (activeMap["AHA"] || [])[0];
     const bhaProduct = (activeMap["BHA"] || [])[0];
-    const ahaName = pName(ahaProduct) || "your AHA";
-    const bhaName = pName(bhaProduct) || "your BHA";
-    refinements.push({
-      verb: "Reduce Frequency", verbColor: "#c49040", icon: "clock",
-      title: `${ahaName} (AHA) and ${bhaName} (BHA) — pick one`,
-      body: `AHA resurfaces the top layer of skin. BHA penetrates pores. Using both routinely is excessive for most skin types and causes chronic low-grade barrier disruption.`,
-      action: `Oily or acne-prone: lean on ${bhaName}. Texture or dullness: lean on ${ahaName}. Use the other max 1× per week.`,
-      trigger: "exfoliant-stack",
-      product: ahaProduct || null,
-    });
+    if (isDailyOrUnset(ahaProduct) && isDailyOrUnset(bhaProduct)) {
+      const ahaName = pName(ahaProduct) || "your AHA";
+      const bhaName = pName(bhaProduct) || "your BHA";
+      refinements.push({
+        verb: "Reduce Frequency", verbColor: "#c49040", icon: "clock",
+        title: `${ahaName} (AHA) and ${bhaName} (BHA) — pick one`,
+        body: `AHA resurfaces the top layer of skin. BHA penetrates pores. Using both routinely is excessive for most skin types and causes chronic low-grade barrier disruption.`,
+        action: `Oily or acne-prone: lean on ${bhaName}. Texture or dullness: lean on ${ahaName}. Use the other max 1× per week.`,
+        trigger: "exfoliant-stack",
+        product: ahaProduct || null,
+      });
+    }
   } else {
     const exfoliantProds = products.filter(p => p.category === "Exfoliant");
-    if (exfoliantProds.length > 1) {
+    if (exfoliantProds.length > 1 && exfoliantProds.every(isDailyOrUnset)) {
       const names = exfoliantProds.map(p => pName(p)).filter(Boolean);
       refinements.push({
         verb: "Reduce Frequency", verbColor: "#c49040", icon: "clock",
@@ -490,16 +506,21 @@ function buildRefinements(products, activeMap, conflicts) {
   }
 
   if (activeCount >= 2 && hasRetinol) {
-    const intensityNames = overloadActiveKeys
-      .map(a => { const p = (activeMap[a] || [])[0]; return pName(p) || a; })
-      .join(", ");
-    refinements.push({
-      verb: "Reduce Frequency", verbColor: "#c49040", icon: "clock",
-      title: `${activeCount} actives in rotation — schedule rest nights`,
-      body: `Between ${intensityNames}, your skin is processing something potent most evenings. Chronic over-activing accumulates slowly — no dramatic reaction needed for the barrier to degrade.`,
-      action: "Pick 2 nights per week to go barrier-only: cleanser, moisturizer, SPF — nothing potent. Your actives will absorb better on the days you use them.",
-      trigger: "intensity",
-    });
+    // Only nag about rest nights when every active is running daily.
+    const allActives = overloadActiveKeys
+      .flatMap(a => activeMap[a] || []);
+    if (allActives.length > 0 && allActives.every(isDailyOrUnset)) {
+      const intensityNames = overloadActiveKeys
+        .map(a => { const p = (activeMap[a] || [])[0]; return pName(p) || a; })
+        .join(", ");
+      refinements.push({
+        verb: "Reduce Frequency", verbColor: "#c49040", icon: "clock",
+        title: `${activeCount} actives in rotation — schedule rest nights`,
+        body: `Between ${intensityNames}, your skin is processing something potent most evenings. Chronic over-activing accumulates slowly — no dramatic reaction needed for the barrier to degrade.`,
+        action: "Pick 2 nights per week to go barrier-only: cleanser, moisturizer, SPF — nothing potent. Your actives will absorb better on the days you use them.",
+        trigger: "intensity",
+      });
+    }
   }
 
   // -- 3. REPLACE ------------------------------------------------------------
