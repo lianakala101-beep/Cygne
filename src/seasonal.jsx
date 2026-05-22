@@ -159,7 +159,7 @@ function SeasonalNudgeCard({ products, activeMap, user }) {
 
   return (
     <div style={{
-      background: "transparent",
+      background: "var(--color-inky-moss, #2d3d2b)",
       border: "1.5px solid var(--color-inky-moss, #2d3d2b)",
       borderRadius: 0,
       padding: "14px 16px",
@@ -182,8 +182,8 @@ function SeasonalNudgeCard({ products, activeMap, user }) {
         <span style={{
           fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 9,
           letterSpacing: "0.22em", textTransform: "uppercase",
-          color: "var(--color-inky-moss)",
-          background: "rgba(45,61,43,0.10)",
+          color: "var(--color-ivory, #faf9f4)",
+          background: "rgba(250,249,244,0.15)",
           padding: "3px 8px", borderRadius: 2,
           flexShrink: 0, whiteSpace: "nowrap",
         }}>{cfg.label}</span>
@@ -191,21 +191,21 @@ function SeasonalNudgeCard({ products, activeMap, user }) {
           flex: 1, minWidth: 0,
           fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 400,
           letterSpacing: "0.02em",
-          color: "var(--color-inky-moss)",
+          color: "var(--color-ivory, #faf9f4)",
           lineHeight: 1.4,
           overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
         }}>{cfg.headline}</span>
         <span style={{
-          color: "var(--color-stone, #5a5a5a)", opacity: 0.5,
+          color: "var(--color-ivory, #faf9f4)", opacity: 0.7,
           transform: open ? "rotate(90deg)" : "none",
           transition: "transform 0.2s",
           display: "inline-flex", flexShrink: 0,
         }}><Icon name="chevron" size={11} /></span>
       </button>
       {open && (
-        <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid rgba(45,61,43,0.10)" }}>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-inky-moss)", margin: "0 0 8px", lineHeight: 1.65 }}>{cfg.body}</p>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-inky-moss)", margin: 0, lineHeight: 1.65 }}>{nudge}</p>
+        <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid rgba(250,249,244,0.18)" }}>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-ivory, #faf9f4)", margin: "0 0 8px", lineHeight: 1.65 }}>{cfg.body}</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-ivory, #faf9f4)", margin: 0, lineHeight: 1.65 }}>{nudge}</p>
         </div>
       )}
     </div>
