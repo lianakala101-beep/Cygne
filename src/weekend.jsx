@@ -98,7 +98,7 @@ function WeekendNudgeCard({ products, activeMap }) {
           WebkitTapHighlightColor: "transparent",
         }}>
         <span style={{
-          fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 9,
+          fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 11,
           letterSpacing: "0.22em", textTransform: "uppercase",
           color: "var(--color-ivory, #faf9f4)",
           background: "rgba(250,249,244,0.15)",
