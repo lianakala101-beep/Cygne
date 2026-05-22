@@ -333,23 +333,23 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
 
       {/* -- Ritual Mode Card ---------------------------------------------- */}
       {ritualMode.name && (
-        <div style={{ background: "var(--color-ivory, #faf9f4)", border: "none", borderRadius: 8, padding: "16px", marginBottom: 24, position: "relative" }}>
+        <div style={{ background: "rgba(250, 249, 244, 0.92)", border: "1px solid rgba(250, 249, 244, 0.25)", borderRadius: 8, padding: "16px", marginBottom: 24, position: "relative" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-            <span style={{ color: "var(--color-inky-moss, #2d3d2b)", opacity: 0.7 }}><Icon name={timeOfDayIcon} size={13} /></span>
-            <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)" }}>{timeOfDayLabel.toLowerCase()}</span>
+            <span style={{ color: "#5a5a5a" }}><Icon name={timeOfDayIcon} size={13} /></span>
+            <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#5a5a5a" }}>{timeOfDayLabel.toLowerCase()}</span>
             {cyclePhase && (
-              <span style={{ marginLeft: "auto", fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", opacity: 0.8 }}>{cyclePhase} phase</span>
+              <span style={{ marginLeft: "auto", fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "#5a5a5a" }}>{cyclePhase} phase</span>
             )}
           </div>
-          <p style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 700, letterSpacing: "0.08em", color: "var(--color-ink, #1c1c1a)", margin: "0 0 2px" }}>{ritualMode.name}</p>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-inky-moss, #2d3d2b)", opacity: 0.8, margin: "0 0 10px" }}>{ritualMode.tagline}</p>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-ink, #1c1c1a)", opacity: 0.85, margin: 0, lineHeight: 1.65 }}>{ritualMode.guidance}</p>
+          <p style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 700, letterSpacing: "0.08em", color: "#1c1c1a", margin: "0 0 2px" }}>{ritualMode.name}</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#5a5a5a", margin: "0 0 10px" }}>{ritualMode.tagline}</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "#1c1c1a", margin: 0, lineHeight: 1.65 }}>{ritualMode.guidance}</p>
           {filteredOut.length > 0 && (
-            <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid rgba(45,61,43,0.18)" }}>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--color-inky-moss, #2d3d2b)", margin: "0 0 6px", letterSpacing: "0.06em", opacity: 0.85 }}>{"Paused " + getRitualTimeLabel().toLowerCase()}</p>
+            <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid rgba(28,28,26,0.12)" }}>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "#5a5a5a", margin: "0 0 6px", letterSpacing: "0.06em" }}>{"Paused " + getRitualTimeLabel().toLowerCase()}</p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                 {filteredOut.map(p => (
-                  <span key={p.id} style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(45,61,43,0.06)", border: "1px solid rgba(45,61,43,0.18)", fontFamily: "var(--font-body)", fontSize: 10, color: "var(--color-inky-moss, #2d3d2b)" }}>{p.name}</span>
+                  <span key={p.id} style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(28,28,26,0.04)", border: "1px solid rgba(28,28,26,0.12)", fontFamily: "var(--font-body)", fontSize: 10, color: "#5a5a5a" }}>{p.name}</span>
                 ))}
               </div>
             </div>
