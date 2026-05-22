@@ -40,8 +40,10 @@ const CARD_IMG_BG = {
   Mask:        "linear-gradient(145deg, #edeae2 0%, #ddd5c7 100%)",
 };
 
+// Ivory product card sitting on the dark inky-moss canvas — the bright
+// surface is intentional editorial contrast against the dark page chrome.
 const GLASS_CARD = {
-  background: "var(--color-ivory-shadow)",
+  background: "var(--color-ivory, #faf9f4)",
   border: "none",
   borderRadius: 8,
   overflow: "hidden",
@@ -202,9 +204,9 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
   }, [menuOpen]);
 
   const inRoutine = product.inRoutine !== false;
-  // Dark editorial canvas — placeholder image area uses a faint ivory wash
-  // instead of the original light-paper gradients.
-  const imgBg = "rgba(255,255,255,0.04)";
+  // Soft ink wash inside the ivory card when there's no product photo —
+  // keeps the placeholder tile readable without competing with the card.
+  const imgBg = "rgba(28,28,26,0.04)";
 
   return (
     <>
@@ -215,10 +217,10 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
             ? <img src={product.imageUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
             : (
               <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10 }}>
-                <div style={{ width: 48, height: 48, color: "var(--color-ivory, #faf9f4)", opacity: 0.4, pointerEvents: "none" }}>
+                <div style={{ width: 48, height: 48, color: "#5a5a5a", pointerEvents: "none" }}>
                   <CategoryGlyph category={product.category} />
                 </div>
-                <span style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(250,249,244,0.6)", opacity: 0.65 }}>
+                <span style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: "#5a5a5a", opacity: 0.75 }}>
                   {product.category}
                 </span>
               </div>
@@ -228,15 +230,15 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
           {/* ⋯ menu */}
           <div ref={menuRef} style={{ position: "absolute", top: 6, right: 6 }}>
             <button onClick={() => setMenuOpen(o => !o)} aria-label="Options"
-              style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(250,249,244,0.75)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", border: "1px solid rgba(192,192,192,0.35)", color: "var(--color-ivory, #faf9f4)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, lineHeight: 1, fontFamily: "sans-serif" }}>
+              style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(250,249,244,0.75)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", border: "1px solid rgba(192,192,192,0.35)", color: "#1c1c1a", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, lineHeight: 1, fontFamily: "sans-serif" }}>
               ⋯
             </button>
             {menuOpen && (
               <div style={{ position: "absolute", right: 0, top: "110%", zIndex: 50, minWidth: 170, background: "rgba(250,249,244,0.96)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", border: "1px solid rgba(192,192,192,0.3)", borderRadius: 8, padding: "6px 0", boxShadow: "0 8px 28px rgba(0,0,0,0.10)" }}>
-                <button onClick={() => { setMenuOpen(false); onEdit(product); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "var(--color-ivory, #faf9f4)", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "left" }}>
+                <button onClick={() => { setMenuOpen(false); onEdit(product); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#1c1c1a", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "left" }}>
                   <Icon name="edit" size={12} /><span>Edit product</span>
                 </button>
-                <button onClick={() => { setMenuOpen(false); onToggleRoutine(product.id); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "var(--color-ivory, #faf9f4)", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "left" }}>
+                <button onClick={() => { setMenuOpen(false); onToggleRoutine(product.id); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#1c1c1a", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "left" }}>
                   <Icon name="sparkle" size={12} /><span>{inRoutine ? "Remove from ritual" : "Add to ritual"}</span>
                 </button>
                 {onAskCygne && (
@@ -257,7 +259,7 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
                         ctxLines.join(" "),
                       );
                     }}
-                    style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "var(--color-ivory, #faf9f4)", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "left" }}>
+                    style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#1c1c1a", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "left" }}>
                     <Icon name="swan" size={12} /><span>Ask Cygne</span>
                   </button>
                 )}
@@ -272,10 +274,10 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
 
         {/* Text content — 0 top padding (image bleeds to edge), 12px sides + bottom */}
         <div style={{ padding: "10px 12px 12px" }}>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 13, fontWeight: 400, letterSpacing: "0.04em", color: "var(--color-ivory, #faf9f4)", margin: "0 0 3px", lineHeight: 1.3 }}>{product.name}</p>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "rgba(250,249,244,0.6)", margin: 0, letterSpacing: "0.03em" }}>{product.brand}</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 13, fontWeight: 400, letterSpacing: "0.04em", color: "#1c1c1a", margin: "0 0 3px", lineHeight: 1.3 }}>{product.name}</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "#5a5a5a", margin: 0, letterSpacing: "0.03em" }}>{product.brand}</p>
           {product.price > 0 && (
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-ivory, #faf9f4)", margin: "5px 0 0", fontWeight: 300, letterSpacing: "0.01em" }}>${(product.price || 0).toFixed(0)}</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#1c1c1a", margin: "5px 0 0", fontWeight: 300, letterSpacing: "0.01em" }}>${(product.price || 0).toFixed(0)}</p>
           )}
         </div>
       </div>
@@ -284,10 +286,10 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
       {confirmDelete && (
         <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(250,249,244,0.8)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", padding: "0 28px" }} onClick={() => setConfirmDelete(false)}>
           <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 320, background: "rgba(250,249,244,0.97)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", border: "1px solid rgba(192,192,192,0.3)", borderRadius: 8, padding: "26px 24px 22px", boxShadow: "0 16px 48px rgba(0,0,0,0.10)" }}>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(250,249,244,0.6)", margin: "0 0 12px" }}>Confirm</p>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "var(--color-ivory, #faf9f4)", margin: "0 0 22px", lineHeight: 1.65 }}>Remove <strong>{product.name}</strong> from your vanity? This cannot be undone.</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#5a5a5a", margin: "0 0 12px" }}>Confirm</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "#1c1c1a", margin: "0 0 22px", lineHeight: 1.65 }}>Remove <strong>{product.name}</strong> from your vanity? This cannot be undone.</p>
             <div style={{ display: "flex", gap: 10 }}>
-              <button onClick={() => setConfirmDelete(false)} style={{ flex: 1, padding: "12px 0", borderRadius: 0, border: "1px solid rgba(192,192,192,0.35)", background: "transparent", color: "var(--color-ivory, #faf9f4)", fontFamily: "var(--font-body)", fontSize: 12, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => setConfirmDelete(false)} style={{ flex: 1, padding: "12px 0", borderRadius: 0, border: "1px solid rgba(192,192,192,0.35)", background: "transparent", color: "#1c1c1a", fontFamily: "var(--font-body)", fontSize: 12, cursor: "pointer" }}>Cancel</button>
               <button onClick={() => { setConfirmDelete(false); onDelete(product.id); }} style={{ flex: 1, padding: "12px 0", borderRadius: 0, border: "1px solid rgba(139,115,85,0.3)", background: "rgba(139,115,85,0.07)", color: "#8b7355", fontFamily: "var(--font-body)", fontSize: 12, cursor: "pointer" }}>Remove</button>
             </div>
           </div>
