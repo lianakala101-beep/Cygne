@@ -65,7 +65,7 @@ const WEEKEND_PHASE_CONFIG = {
   after:  { label: "Recovery Day",        headline: "Your skin needs a quiet day." },
 };
 
-function WeekendNudgeCard({ products, activeMap }) {
+function WeekendNudgeCard({ products, activeMap, lineMode = false }) {
   const phase = getWeekendPhase();
   const [open, setOpen] = useState(false);
   if (!phase) return null;
@@ -73,6 +73,58 @@ function WeekendNudgeCard({ products, activeMap }) {
   const cfg = WEEKEND_PHASE_CONFIG[phase];
   const advice = buildWeekendAdvice(phase, products, activeMap);
   const lines = [...advice.skip, ...advice.do];
+
+  // Editorial line treatment for the dark homepage canvas.
+  if (lineMode) {
+    return (
+      <div style={{ borderTop: "1px solid rgba(250,249,244,0.25)", borderBottom: "1px solid rgba(250,249,244,0.25)", marginTop: -1, padding: "18px 0" }}>
+        <button
+          type="button"
+          onClick={() => setOpen(o => !o)}
+          aria-expanded={open}
+          style={{
+            display: "flex", width: "100%", textAlign: "left", alignItems: "center", gap: 14,
+            background: "none", border: "none", padding: 0, cursor: "pointer",
+            fontFamily: "var(--font-body)",
+            WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
+          }}>
+          <span style={{
+            fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 11,
+            letterSpacing: "0.22em", textTransform: "uppercase",
+            color: "var(--color-ivory, #faf9f4)",
+            flexShrink: 0, whiteSpace: "nowrap",
+          }}>{cfg.label}</span>
+          <span style={{
+            flex: 1, minWidth: 0,
+            fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 400,
+            letterSpacing: "0.04em",
+            color: "var(--color-ivory, #faf9f4)",
+            opacity: 0.85,
+            lineHeight: 1.4,
+            overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+          }}>{cfg.headline}</span>
+          <span style={{
+            color: "var(--color-ivory, #faf9f4)", opacity: 0.7,
+            transform: open ? "rotate(90deg)" : "none",
+            transition: "transform 0.2s",
+            display: "inline-flex", flexShrink: 0,
+          }}><Icon name="chevron" size={11} /></span>
+        </button>
+        {open && lines.length > 0 && (
+          <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid rgba(250,249,244,0.18)" }}>
+            {lines.map((s, i) => (
+              <p key={i} style={{
+                fontFamily: "var(--font-body)", fontSize: 12,
+                color: "var(--color-ivory, #faf9f4)", opacity: 0.85,
+                margin: i === lines.length - 1 ? 0 : "0 0 8px",
+                lineHeight: 1.65,
+              }}>{s}</p>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div style={{

@@ -651,7 +651,7 @@ export default function App() {
 
   // -- Main app ---------------------------------------------------------------
   return (
-    <div style={{ minHeight: "100vh", background: "var(--deep)", paddingBottom: 88 }}>
+    <div style={{ minHeight: "100vh", background: tab === "dashboard" ? "var(--color-inky-moss, #2d3d2b)" : "var(--deep)", paddingBottom: 88, transition: "background 0.4s ease" }}>
       <style>{`
         /* Fonts are declared once in src/index.css. Everything below is
            the runtime token sheet — colors and aliases the legacy inline

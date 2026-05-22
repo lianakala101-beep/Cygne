@@ -72,30 +72,24 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
 
   return (
     <div>
-      {/* Hero */}
+      {/* Hero — editorial greeting in ivory + Fungis Normal wide tracking */}
       {(() => {
         const h = new Date().getHours();
         const slot = h >= 5 && h < 12 ? "morning" : h >= 12 && h < 17 ? "afternoon" : "evening";
         const greeting = slot === "morning" ? "Good Morning" : slot === "afternoon" ? "Good Afternoon" : "Good Evening";
         const firstName = user?.name?.split(" ")[0] || "";
         return (
-          <div style={{ marginBottom: products.length === 0 ? 20 : 16 }}>
-            {firstName ? (
-              <>
-                <h1 style={{ fontFamily: "var(--font-display)", fontSize: 32, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: "0 0 2px", lineHeight: 1 }}>
-                  {greeting},
-                </h1>
-                <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 14, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: 0, lineHeight: 1.1 }}>
-                  {firstName}
-                </p>
-              </>
-            ) : (
-              <h1 style={{ fontFamily: "var(--font-display)", fontSize: 32, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: 0, lineHeight: 1.05 }}>
-                {greeting}.
-              </h1>
+          <div style={{ marginBottom: products.length === 0 ? 20 : 24 }}>
+            <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 14, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 8px", lineHeight: 1, opacity: 0.75 }}>
+              {greeting}{firstName ? "," : "."}
+            </p>
+            {firstName && (
+              <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 28, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: 0, lineHeight: 1.05 }}>
+                {firstName}
+              </p>
             )}
             {products.length === 0 && (
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 14, color: "var(--clay)", margin: "10px 0 0", lineHeight: 1.5 }}>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 14, letterSpacing: "0.04em", color: "var(--color-ivory, #faf9f4)", opacity: 0.7, margin: "10px 0 0", lineHeight: 1.5 }}>
                 Welcome.
               </p>
             )}
@@ -185,23 +179,25 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           );
         })()}
 
-        {/* Section order: action over context. Swan Sense → routine → Ask
-            Cygne → utility tiles → seasonal/weekend/recovery context →
-            cycle pill → check-in pill → weather. Contextual data lives at
-            the bottom so the primary action flow isn't interrupted. */}
+        {/* Editorial canvas — sections separated by thin ivory rules rather
+            than card containers. Action items use Fungis Heavy uppercase
+            with an arrow; the swan video bg + dark canvas make this read
+            like the interior of a magazine. */}
 
-        {/* 1. Swan Song card (intelligence) — always fully visible */}
-        <div style={{ marginBottom: 8 }}>
-          <SwanSongCard currentSession={currentSession} asPopup={false} user={user} predictions={swanSensePredictions} dailyLine={swanDailyLine} dailyLoading={swanLoading} dailyFailed={swanFailed} />
+        {/* Swan Sense — fully transparent, divides greeting from action list */}
+        <div style={{ height: 1, background: "rgba(250,249,244,0.18)", marginBottom: 18 }} />
+        <div style={{ marginBottom: 20 }}>
+          <SwanSongCard currentSession={currentSession} asPopup={false} user={user} predictions={swanSensePredictions} dailyLine={swanDailyLine} dailyLoading={swanLoading} dailyFailed={swanFailed} variant="ivory-flat" />
         </div>
-        <div style={{ textAlign: "right", marginBottom: 18 }}>
+        <div style={{ textAlign: "right", marginBottom: 24 }}>
           <button
             onClick={() => { setRecapOffset(0); setRecapOpen(true); }}
             style={{
               background: "none", border: "none", padding: 0, cursor: "pointer",
               fontFamily: "var(--font-body)",
-              fontSize: 10, letterSpacing: "0.04em",
-              color: "var(--color-pebble, #7a7a7a)",
+              fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase",
+              color: "var(--color-ivory, #faf9f4)",
+              opacity: 0.65,
               fontWeight: 400,
             }}
           >
@@ -209,37 +205,58 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           </button>
         </div>
 
-        {/* 2. Begin Your Ritual — primary daily action. Typographic presence
-            matches the step headers on the ritual page (CLEANSE, SEAL,
-            TREAT) so it reads as an editorial statement, not a chip. */}
+        {/* Begin Your Ritual — editorial line item: rules top + bottom, label
+            left, arrow right. No box. */}
         <button
           onClick={() => setTab("routine")}
           style={{
-            display: "flex", width: "100%", alignItems: "center", justifyContent: "center", gap: 12,
-            padding: "26px 18px", marginBottom: 16,
-            background: "transparent",
-            border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 6,
-            cursor: "pointer", fontFamily: "var(--font-display)", fontWeight: 700,
-            fontSize: 18, letterSpacing: "0.04em", textTransform: "uppercase",
-            color: "var(--color-inky-moss, #2d3d2b)", lineHeight: 1.05,
-            transition: "background 0.2s",
+            display: "flex", width: "100%", alignItems: "center", justifyContent: "space-between",
+            padding: "18px 0", marginBottom: 0,
+            background: "transparent", border: "none",
+            borderTop: "1px solid rgba(250,249,244,0.25)",
+            borderBottom: "1px solid rgba(250,249,244,0.25)",
+            cursor: "pointer",
             WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
-          }}
-          onMouseEnter={e => e.currentTarget.style.background = "rgba(45,61,43,0.08)"}
-          onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-          <Icon name={currentSession === "am" ? "sun" : "moon"} size={16} />
-          Begin Your Ritual
+          }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 12, fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 16, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)" }}>
+            <Icon name={currentSession === "am" ? "sun" : "moon"} size={14} />
+            Begin Your Ritual
+          </span>
+          <span style={{ color: "var(--color-ivory, #faf9f4)", display: "inline-flex" }}>
+            <Icon name="arrow-right" size={16} />
+          </span>
         </button>
 
-        {/* Irreconcilable conflicts only — quiet one-liner, no card, no label,
-            no header. The routine engine handles every schedulable conflict
-            silently via AM/PM split or alternating nights. */}
+        {/* Ask Cygne — second editorial line item, stacks directly under
+            Begin Your Ritual sharing its bottom rule. */}
+        <button
+          onClick={() => askCygne("", "")}
+          style={{
+            display: "flex", width: "100%", alignItems: "center", justifyContent: "space-between",
+            padding: "18px 0", marginTop: -1, marginBottom: 16,
+            background: "transparent", border: "none",
+            borderTop: "1px solid rgba(250,249,244,0.25)",
+            borderBottom: "1px solid rgba(250,249,244,0.25)",
+            cursor: "pointer",
+            WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
+          }}>
+          <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 16, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)" }}>
+            Ask Cygne
+          </span>
+          <span style={{ color: "var(--color-ivory, #faf9f4)", display: "inline-flex" }}>
+            <Icon name="arrow-right" size={16} />
+          </span>
+        </button>
+
+        {/* Irreconcilable conflicts — quiet ivory one-liner */}
         {irreconcilable.length > 0 && products.length > 0 && (
-          <div style={{ marginBottom: 24 }}>
+          <div style={{ marginBottom: 20 }}>
             {irreconcilable.map((c, i) => (
               <p key={i} style={{
                 fontFamily: "var(--font-body)", fontSize: 12,
-                color: "var(--color-inky-moss, #2d3d2b)",
+                letterSpacing: "0.02em",
+                color: "var(--color-ivory, #faf9f4)",
+                opacity: 0.7,
                 lineHeight: 1.6,
                 margin: i === 0 ? 0 : "6px 0 0",
               }}>{c.reason}</p>
@@ -247,37 +264,18 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           </div>
         )}
 
-        {/* Ask Cygne — standalone entry point above the utility buttons */}
-        <div style={{ marginBottom: 16 }}>
-          <AskCygneButton onClick={() => askCygne("", "")} />
-        </div>
-
-        {/* 5. Travel Edit + Shop Scan — utility buttons at bottom. */}
-        <div style={{ display: "flex", gap: 10, marginBottom: 40 }}>
-          <button onClick={() => setFlightOpen(true)}
-            style={{ flex: 1, display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", background: "transparent", border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 6, cursor: "pointer", textAlign: "left", transition: "background 0.2s", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" }}
-            onMouseEnter={e => e.currentTarget.style.background = "rgba(45,61,43,0.08)"}
-            onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-inky-moss, #2d3d2b)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/>
-            </svg>
-            <div>
-              <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: "0 0 2px" }}>Travel Edit</p>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--color-pebble, #7a7a7a)", margin: 0, letterSpacing: "0.02em" }}>Pack & skip</p>
-            </div>
+        {/* Travel Edit | Shop Scan — text links separated by a vertical rule. */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 18, marginBottom: 36 }}>
+          <button
+            onClick={() => setFlightOpen(true)}
+            style={{ background: "none", border: "none", padding: "6px 0", cursor: "pointer", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", opacity: 0.85, WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" }}>
+            Travel Edit
           </button>
-          <button onClick={() => setShopScanOpen(true)}
-            style={{ flex: 1, display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", background: "transparent", border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 6, cursor: "pointer", textAlign: "left", transition: "background 0.2s", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" }}
-            onMouseEnter={e => e.currentTarget.style.background = "rgba(45,61,43,0.08)"}
-            onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-inky-moss, #2d3d2b)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-            </svg>
-            <div>
-              <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: "0 0 2px" }}>Shop Scan</p>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--color-pebble, #7a7a7a)", margin: 0, letterSpacing: "0.02em" }}>Would my skin like this?</p>
-            </div>
+          <span style={{ width: 1, height: 14, background: "rgba(250,249,244,0.3)", display: "inline-block" }} />
+          <button
+            onClick={() => setShopScanOpen(true)}
+            style={{ background: "none", border: "none", padding: "6px 0", cursor: "pointer", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", opacity: 0.85, WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" }}>
+            Shop Scan
           </button>
         </div>
 
@@ -312,14 +310,10 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           );
         })()}
 
-        {/* 7. Seasonal card */}
-        <div style={{ marginBottom: 20 }}>
-          <SeasonalNudgeCard products={products} activeMap={activeMap} locationData={locationData} user={user} />
-        </div>
-
-        {/* 8. Weekend nudge — supplementary seasonal-adjacent context */}
-        <div style={{ marginBottom: 40 }}>
-          <WeekendNudgeCard products={products} activeMap={activeMap} />
+        {/* Seasonal + Weekend — editorial line items, stacked sharing rules */}
+        <div style={{ marginBottom: 28 }}>
+          <SeasonalNudgeCard products={products} activeMap={activeMap} locationData={locationData} user={user} lineMode />
+          <WeekendNudgeCard products={products} activeMap={activeMap} lineMode />
         </div>
 
         {/* 9. Treatment recovery — only when a recovery window is active */}
@@ -346,7 +340,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
 
           if (!phase && !hasWeather && daysSince === null) return null;
 
-          const txtSt = { fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, letterSpacing: "0.02em", color: "var(--color-inky-moss)", whiteSpace: "nowrap" };
+          const txtSt = { fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", opacity: 0.75, whiteSpace: "nowrap" };
           const btnSt = { display: "inline-flex", alignItems: "center", gap: 6, padding: 0, background: "none", border: "none", cursor: "pointer", fontFamily: "var(--font-body)", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" };
 
           return (
@@ -356,20 +350,19 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
               alignItems: "center",
               rowGap: 8,
               columnGap: 16,
-              padding: "11px 14px",
-              background: "var(--color-ivory-shadow)",
-              borderRadius: 8,
+              padding: "16px 0 0",
+              borderTop: "1px solid rgba(250,249,244,0.18)",
               marginBottom: 20,
               fontFamily: "var(--font-body)",
             }}>
               {phase && (
                 <button onClick={() => setCycleExpanded(true)} style={btnSt}>
-                  <span style={{ width: 5, height: 5, borderRadius: "50%", background: phase.dot, display: "inline-block", flexShrink: 0 }} />
+                  <span style={{ width: 5, height: 5, borderRadius: "50%", background: "var(--color-ivory, #faf9f4)", opacity: 0.7, display: "inline-block", flexShrink: 0 }} />
                   <span style={txtSt}>{phase.name} · Day {currentCycleDay}</span>
                 </button>
               )}
               <button onClick={() => setTab("progress")} style={btnSt}>
-                <span style={{ width: 5, height: 5, borderRadius: "50%", background: "var(--color-inky-moss)", opacity: 0.45, display: "inline-block", flexShrink: 0 }} />
+                <span style={{ width: 5, height: 5, borderRadius: "50%", background: "var(--color-ivory, #faf9f4)", opacity: 0.45, display: "inline-block", flexShrink: 0 }} />
                 <span style={txtSt}>{checkInMsg}</span>
               </button>
               {hasWeather && (
@@ -377,7 +370,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
                   {weather.temp !== null && <span style={txtSt}>{Math.round(tempUnit === "F" ? (weather.temp * 9 / 5 + 32) : weather.temp)}°{tempUnit}</span>}
                   {weather.uvIndex !== null && <span style={txtSt}>UV {weather.uvIndex}</span>}
                   {weather.humidity !== null && <span style={txtSt}>{weather.humidity}%</span>}
-                  {locationData?.city && <span style={{ ...txtSt, opacity: 0.65 }}>{locationData.city}</span>}
+                  {locationData?.city && <span style={{ ...txtSt, opacity: 0.5 }}>{locationData.city}</span>}
                 </div>
               )}
             </div>

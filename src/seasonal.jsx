@@ -149,13 +149,60 @@ function getProfileNudge(season, products, activeMap, user) {
   return null;
 }
 
-function SeasonalNudgeCard({ products, activeMap, user }) {
+function SeasonalNudgeCard({ products, activeMap, user, lineMode = false }) {
   const season = getSeason();
   const cfg = SEASON_CONFIG[season];
   const [open, setOpen] = useState(false);
 
   const profileNudge = getProfileNudge(season, products, activeMap, user);
   const nudge = profileNudge || cfg.shelfNudge(products, activeMap);
+
+  // Editorial line treatment for the dark homepage canvas — no card chrome,
+  // just label + headline + thin ivory rule, with the body content
+  // revealing inline on tap.
+  if (lineMode) {
+    return (
+      <div style={{ borderTop: "1px solid rgba(250,249,244,0.25)", borderBottom: "1px solid rgba(250,249,244,0.25)", marginTop: -1, padding: "18px 0" }}>
+        <button
+          type="button"
+          onClick={() => setOpen(o => !o)}
+          aria-expanded={open}
+          style={{
+            display: "flex", width: "100%", textAlign: "left", alignItems: "center", gap: 14,
+            background: "none", border: "none", padding: 0, cursor: "pointer",
+            WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
+          }}>
+          <span style={{
+            fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 11,
+            letterSpacing: "0.22em", textTransform: "uppercase",
+            color: "var(--color-ivory, #faf9f4)",
+            flexShrink: 0, whiteSpace: "nowrap",
+          }}>{cfg.label}</span>
+          <span style={{
+            flex: 1, minWidth: 0,
+            fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 400,
+            letterSpacing: "0.04em",
+            color: "var(--color-ivory, #faf9f4)",
+            opacity: 0.85,
+            lineHeight: 1.4,
+            overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+          }}>{cfg.headline}</span>
+          <span style={{
+            color: "var(--color-ivory, #faf9f4)", opacity: 0.7,
+            transform: open ? "rotate(90deg)" : "none",
+            transition: "transform 0.2s",
+            display: "inline-flex", flexShrink: 0,
+          }}><Icon name="chevron" size={11} /></span>
+        </button>
+        {open && (
+          <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid rgba(250,249,244,0.18)" }}>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-ivory, #faf9f4)", opacity: 0.85, margin: "0 0 8px", lineHeight: 1.65 }}>{cfg.body}</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-ivory, #faf9f4)", opacity: 0.85, margin: 0, lineHeight: 1.65 }}>{nudge}</p>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div style={{

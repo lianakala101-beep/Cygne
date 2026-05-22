@@ -433,7 +433,7 @@ function genericFallbackLine() {
   return GENERIC_FALLBACK_LINES[doy % GENERIC_FALLBACK_LINES.length];
 }
 
-function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = {}, predictions = [], dailyLine = null, dailyLoading = false, dailyFailed = false }) {
+function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = {}, predictions = [], dailyLine = null, dailyLoading = false, dailyFailed = false, variant = "default" }) {
   const now = new Date();
   const isBirthday = user.birthMonth && user.birthDay &&
     (now.getMonth() + 1) === parseInt(user.birthMonth) &&
@@ -540,6 +540,35 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
   }
 
   // -- INLINE (settled) version — note-card on home dashboard -----------------
+  // ivory-flat variant: fully transparent surface, ivory text only. Used on
+  // the dark homepage canvas where the card chrome would clash with the
+  // editorial line treatment.
+  if (variant === "ivory-flat") {
+    return (
+      <div style={{ position: "relative" }}>
+        <p style={{
+          fontFamily: "var(--font-display)",
+          fontSize: 10, fontWeight: 700,
+          letterSpacing: "0.28em", textTransform: "uppercase",
+          color: "var(--color-ivory, #faf9f4)",
+          opacity: 0.75,
+          margin: "0 0 10px",
+        }}>
+          Swan Sense
+        </p>
+        <p style={{
+          fontFamily: "var(--font-body)",
+          fontSize: 16, fontWeight: 400,
+          lineHeight: 1.5, letterSpacing: "0.01em",
+          color: "var(--color-ivory, #faf9f4)",
+          margin: 0,
+        }}>
+          {renderInsightLines(line)}
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div style={{ position: "relative", marginTop: 8 }}>
       <div style={{
