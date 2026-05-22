@@ -168,18 +168,27 @@ function SeasonalNudgeCard({ products, activeMap, user, lineMode = false }) {
           onClick={() => setOpen(o => !o)}
           aria-expanded={open}
           style={{
-            display: "flex", width: "100%", textAlign: "left", alignItems: "center", gap: 14,
+            display: "flex", width: "100%", textAlign: "left",
+            flexDirection: "column", gap: 8,
             background: "none", border: "none", padding: 0, cursor: "pointer",
             WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
           }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
+            <span style={{
+              fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 11,
+              letterSpacing: "0.22em", textTransform: "uppercase",
+              color: "var(--color-ivory, #faf9f4)",
+              whiteSpace: "nowrap",
+            }}>{cfg.label}</span>
+            <span style={{
+              color: "var(--color-ivory, #faf9f4)", opacity: 0.7,
+              transform: open ? "rotate(90deg)" : "none",
+              transition: "transform 0.2s",
+              display: "inline-flex", flexShrink: 0,
+            }}><Icon name="chevron" size={11} /></span>
+          </div>
           <span style={{
-            fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 11,
-            letterSpacing: "0.22em", textTransform: "uppercase",
-            color: "var(--color-ivory, #faf9f4)",
-            flexShrink: 0, whiteSpace: "nowrap",
-          }}>{cfg.label}</span>
-          <span style={{
-            flex: 1, minWidth: 0,
+            width: "100%",
             fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 400,
             letterSpacing: "0.04em",
             color: "var(--color-ivory, #faf9f4)",
@@ -187,12 +196,6 @@ function SeasonalNudgeCard({ products, activeMap, user, lineMode = false }) {
             lineHeight: 1.4,
             overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
           }}>{cfg.headline}</span>
-          <span style={{
-            color: "var(--color-ivory, #faf9f4)", opacity: 0.7,
-            transform: open ? "rotate(90deg)" : "none",
-            transition: "transform 0.2s",
-            display: "inline-flex", flexShrink: 0,
-          }}><Icon name="chevron" size={11} /></span>
         </button>
         {open && (
           <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid rgba(250,249,244,0.18)" }}>

@@ -264,8 +264,10 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           </div>
         )}
 
-        {/* Travel Edit | Shop Scan — text links separated by a vertical rule. */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 18, marginBottom: 36 }}>
+        {/* Travel Edit | Shop Scan — text links separated by a vertical rule.
+            marginBottom is intentionally generous so the action group reads
+            as visually complete before the seasonal context rows begin. */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 18, marginBottom: 60 }}>
           <button
             onClick={() => setFlightOpen(true)}
             style={{ background: "none", border: "none", padding: "6px 0", cursor: "pointer", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", opacity: 0.85, WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" }}>
@@ -310,8 +312,10 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           );
         })()}
 
-        {/* Seasonal + Weekend — editorial line items, stacked sharing rules */}
-        <div style={{ marginBottom: 28 }}>
+        {/* Seasonal + Weekend — editorial line items, stacked sharing rules.
+            marginBottom adds clear breathing room before the bottom context
+            strip so it doesn't feel pinched against the last seasonal row. */}
+        <div style={{ marginBottom: 52 }}>
           <SeasonalNudgeCard products={products} activeMap={activeMap} locationData={locationData} user={user} lineMode />
           <WeekendNudgeCard products={products} activeMap={activeMap} lineMode />
         </div>
