@@ -393,11 +393,13 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
                 style={{
                   display: "block", width: "100%", margin: "0 0 14px",
                   padding: "10px 16px", textAlign: "center",
-                  background: "rgba(240,235,224,0.8)", border: "1px solid rgba(192,192,192,0.25)",
-                  borderRadius: 2, cursor: "pointer",
+                  background: "transparent", border: "none",
+                  borderRadius: 0, cursor: "pointer",
                   fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 10,
                   letterSpacing: "0.15em", textTransform: "uppercase",
-                  color: "var(--color-ivory)",
+                  color: "var(--color-ivory, #faf9f4)",
+                  opacity: 0.45,
+                  WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
                 }}>
                 Tap each step to mark it complete
               </button>
