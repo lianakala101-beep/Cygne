@@ -741,7 +741,14 @@ export default function App() {
       `}</style>
 
       {/* Header */}
-      <div style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(250,249,244,0.94)", backdropFilter: "blur(16px)", borderBottom: "1px solid var(--border)", padding: "0 22px" }}>
+      <div style={{
+        position: "sticky", top: 0, zIndex: 50,
+        background: tab === "dashboard" ? "rgba(45,61,43,0.94)" : "rgba(250,249,244,0.94)",
+        backdropFilter: "blur(16px)",
+        borderBottom: tab === "dashboard" ? "1px solid rgba(250,249,244,0.12)" : "1px solid var(--border)",
+        padding: "0 22px",
+        transition: "background 0.4s ease, border-bottom-color 0.4s ease",
+      }}>
         <div style={{ position: "relative", maxWidth: 600, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "flex-end", height: 76 }}>
           <img
             src="/cygne-logo.png"
@@ -755,7 +762,11 @@ export default function App() {
               width: "auto",
               pointerEvents: "none",
               userSelect: "none",
-              filter: "brightness(0.45) contrast(1.35) saturate(0.6)",
+              filter: tab === "dashboard"
+                ? "brightness(0) invert(1)"
+                : "brightness(0.45) contrast(1.35) saturate(0.6)",
+              opacity: tab === "dashboard" ? 0.95 : 1,
+              transition: "filter 0.4s ease, opacity 0.4s ease",
             }}
           />
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -774,9 +785,10 @@ export default function App() {
                 fontWeight: 700,
                 fontSize: 22,
                 letterSpacing: "0.04em",
-                color: "var(--color-inky-moss, #2d3d2b)",
+                color: tab === "dashboard" ? "var(--color-ivory, #faf9f4)" : "var(--color-inky-moss, #2d3d2b)",
                 lineHeight: 1,
                 userSelect: "none",
+                transition: "color 0.4s ease",
               }}>
                 {user?.name ? user.name.trim()[0].toUpperCase() : "?"}
               </span>
