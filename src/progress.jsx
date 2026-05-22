@@ -1187,6 +1187,9 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
   const [selectedTriggers, setSelectedTriggers] = useState([]);
   const [selectedSymptoms, setSelectedSymptoms] = useState([]);
   const [expandedZone, setExpandedZone] = useState(null);
+  // First tap on "Log today's triggers" expands the section to reveal the
+  // zone selector; second tap opens the trigger/symptom modal.
+  const [collapsed, setCollapsed] = useState(true);
 
   const { gaps, doubles } = buildBodyShelfAdvice(zones, products, activeMap);
 
@@ -1219,9 +1222,27 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
     );
   }
 
+  const handleLogClick = () => {
+    if (collapsed) setCollapsed(false);
+    else setShowTriggerModal(true);
+  };
+
   return (
     <div style={{ marginBottom: 28 }}>
 
+      {/* Always-visible trigger — expands the section on first tap, opens the
+          trigger/symptom modal on subsequent taps. The chevron is only
+          shown while collapsed to signal the expand affordance. */}
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: collapsed ? 0 : 12 }}>
+        <button onClick={handleLogClick}
+          style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "none", border: "none", padding: 0, cursor: "pointer", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" }}>
+          Log Today's Triggers
+          {collapsed && <Icon name="chevron" size={10} />}
+        </button>
+      </div>
+
+      {!collapsed && (
+      <>
       {/* Zone selector */}
       <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: "16px 18px", marginBottom: 12 }}>
         <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 12px" }}>Where do you experience it?</p>
@@ -1250,17 +1271,6 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
               </button>
             );
           })}
-        </div>
-
-        {/* Secondary action — opens the "What happened today?" trigger +
-            symptom modal. Sits inside the zone-selector card at the bottom
-            with a hairline divider so it reads as a quiet follow-up to the
-            zone selection, not a primary action. */}
-        <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid rgba(45,61,43,0.10)", display: "flex", justifyContent: "flex-end" }}>
-          <button onClick={() => setShowTriggerModal(true)}
-            style={{ background: "none", border: "none", padding: 0, cursor: "pointer", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" }}>
-            Log Today's Triggers
-          </button>
         </div>
       </div>
 
@@ -1372,6 +1382,8 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
         onMouseLeave={e => e.currentTarget.style.opacity = "0.35"}>
         Disable tracking
       </button>
+      </>
+      )}
 
       {/* Trigger log modal */}
       {showTriggerModal && (

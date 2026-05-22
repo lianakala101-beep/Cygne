@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { Icon } from "./components.jsx";
 import { hasSPFCoverage } from "./engine.js";
 
 function getWeekendPhase() {
@@ -65,10 +67,12 @@ const WEEKEND_PHASE_CONFIG = {
 
 function WeekendNudgeCard({ products, activeMap }) {
   const phase = getWeekendPhase();
+  const [open, setOpen] = useState(false);
   if (!phase) return null;
 
   const cfg = WEEKEND_PHASE_CONFIG[phase];
   const advice = buildWeekendAdvice(phase, products, activeMap);
+  const lines = [...advice.skip, ...advice.do];
 
   return (
     <div style={{
@@ -81,7 +85,19 @@ function WeekendNudgeCard({ products, activeMap }) {
       position: "relative",
       overflow: "hidden",
     }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        aria-expanded={open}
+        style={{
+          display: "flex", width: "100%", textAlign: "left",
+          alignItems: "center", gap: 12,
+          background: "none", border: "none", padding: 0,
+          cursor: "pointer",
+          fontFamily: "var(--font-body)",
+          WebkitAppearance: "none", appearance: "none",
+          WebkitTapHighlightColor: "transparent",
+        }}>
         <span style={{
           fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 9,
           letterSpacing: "0.22em", textTransform: "uppercase",
@@ -96,23 +112,27 @@ function WeekendNudgeCard({ products, activeMap }) {
           letterSpacing: "0.02em",
           color: "var(--color-inky-moss)",
           lineHeight: 1.4,
+          overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
         }}>{cfg.headline}</span>
-      </div>
-      {advice.skip.map((s, i) => (
-        <p key={"s" + i} style={{
-          fontFamily: "var(--font-body)", fontSize: 12,
-          color: "var(--color-inky-moss)", margin: i === 0 ? "0 0 8px" : "0 0 8px",
-          lineHeight: 1.65,
-        }}>{s}</p>
-      ))}
-      {advice.do.map((s, i) => (
-        <p key={"d" + i} style={{
-          fontFamily: "var(--font-body)", fontSize: 12,
-          color: "var(--color-inky-moss)",
-          margin: i === advice.do.length - 1 ? 0 : "0 0 8px",
-          lineHeight: 1.65,
-        }}>{s}</p>
-      ))}
+        <span style={{
+          color: "var(--color-stone, #5a5a5a)", opacity: 0.5,
+          transform: open ? "rotate(90deg)" : "none",
+          transition: "transform 0.2s",
+          display: "inline-flex", flexShrink: 0,
+        }}><Icon name="chevron" size={11} /></span>
+      </button>
+      {open && lines.length > 0 && (
+        <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid rgba(45,61,43,0.10)" }}>
+          {lines.map((s, i) => (
+            <p key={i} style={{
+              fontFamily: "var(--font-body)", fontSize: 12,
+              color: "var(--color-inky-moss)",
+              margin: i === lines.length - 1 ? 0 : "0 0 8px",
+              lineHeight: 1.65,
+            }}>{s}</p>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
