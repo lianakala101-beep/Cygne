@@ -220,14 +220,14 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             background: "transparent",
             border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 8,
             cursor: "pointer", fontFamily: "var(--font-display)", fontWeight: 700,
-            fontSize: 21, letterSpacing: "0.04em", textTransform: "uppercase",
+            fontSize: 18, letterSpacing: "0.04em", textTransform: "uppercase",
             color: "var(--color-inky-moss, #2d3d2b)", lineHeight: 1.05,
             transition: "background 0.2s",
             WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
           }}
           onMouseEnter={e => e.currentTarget.style.background = "rgba(45,61,43,0.08)"}
           onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-          <Icon name={currentSession === "am" ? "sun" : "moon"} size={18} />
+          <Icon name={currentSession === "am" ? "sun" : "moon"} size={16} />
           Begin Your Ritual
         </button>
 
