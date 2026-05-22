@@ -13,7 +13,7 @@ import { getRitualPeriod, getRitualTimeLabel } from "./utils/ritualPeriod.js";
 
 const RITUAL_MODES = {
   travel: {
-    name: "travel ritual",
+    name: "Travel Ritual",
     tagline: "Simplified for the road.",
     color: "#8b7355",
     bg: "rgba(139,115,85,0.08)",
@@ -24,7 +24,7 @@ const RITUAL_MODES = {
     guidance: "Strip back to the essentials. Travel stress, recycled air, and different water are enough for your skin to manage — no need to push actives.",
   },
   recovery: {
-    name: "recovery ritual",
+    name: "Recovery Ritual",
     tagline: "Let your barrier breathe.",
     color: "#8b7355",
     bg: "rgba(139,115,85,0.08)",
@@ -38,7 +38,7 @@ const RITUAL_MODES = {
     guidance: "Your skin is reacting. Pause actives and exfoliants tonight — focus on cleanse, hydrate, seal. Let recovery do the work.",
   },
   barrier_repair: {
-    name: "barrier repair ritual",
+    name: "Barrier Repair Ritual",
     tagline: "Rebuild, don't strip.",
     color: "#8b7355",
     bg: "rgba(139,115,85,0.08)",
@@ -50,7 +50,7 @@ const RITUAL_MODES = {
     guidance: "Cold, dry air depletes the barrier faster than any active can repair it. Lean into occlusion and ceramides tonight.",
   },
   menstrual: {
-    name: "gentle ritual",
+    name: "Gentle Ritual",
     tagline: "Your skin is more sensitive right now.",
     color: "#8b7355",
     bg: "rgba(139,115,85,0.07)",
@@ -62,7 +62,7 @@ const RITUAL_MODES = {
     guidance: "Progesterone is low, barrier permeability is up. Skip exfoliants and actives — your skin absorbs and reacts to everything more intensely right now.",
   },
   luteal: {
-    name: "oil control ritual",
+    name: "Oil Control Ritual",
     tagline: "Sebum is peaking. Get ahead of it.",
     color: "#8b7355",
     bg: "rgba(139,115,85,0.08)",
@@ -71,7 +71,7 @@ const RITUAL_MODES = {
     guidance: "Progesterone is driving up sebum production this week. Prioritise your BHA if you have one, keep moisturiser lighter, and watch for congestion.",
   },
   follicular: {
-    name: "actives ritual",
+    name: "Actives Ritual",
     tagline: "Your skin is resilient right now.",
     color: "#2d3d2b",
     bg: "rgba(45,61,43,0.08)",
@@ -80,7 +80,7 @@ const RITUAL_MODES = {
     guidance: "Rising estrogen means higher resilience and better absorption. This is your best window for retinol and AHA — your skin can handle it.",
   },
   winter: {
-    name: "winter ritual",
+    name: "Winter Ritual",
     tagline: "Moisture in, barrier up.",
     color: "#8b7355",
     bg: "rgba(139,115,85,0.08)",
@@ -89,7 +89,7 @@ const RITUAL_MODES = {
     guidance: "Cold strips moisture and weakens the barrier. Swap any foaming cleansers for cream formulas tonight if you can, and lock everything in with an occlusive.",
   },
   summer: {
-    name: "minimal ritual",
+    name: "Minimal Ritual",
     tagline: "Light layers, consistent SPF.",
     color: "#8b7355",
     bg: "rgba(139,115,85,0.07)",
@@ -98,7 +98,7 @@ const RITUAL_MODES = {
     guidance: "Heat and humidity mean your skin retains more moisture naturally. Oils and heavy occlusives can congest — keep it light and make SPF the hero.",
   },
   reset: {
-    name: "reset ritual",
+    name: "Reset Ritual",
     tagline: "Back to basics.",
     color: "#8b7355",
     bg: "rgba(139,115,85,0.08)",
@@ -341,7 +341,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
               <span style={{ marginLeft: "auto", fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: ritualMode.color, opacity: 0.8 }}>{cyclePhase} phase</span>
             )}
           </div>
-          <p style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--parchment)", margin: "0 0 2px" }}>{ritualMode.name}</p>
+          <p style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 700, letterSpacing: "0.08em", color: "var(--parchment)", margin: "0 0 2px" }}>{ritualMode.name}</p>
           <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: "0 0 10px", opacity: 0.7 }}>{ritualMode.tagline}</p>
           <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: 0, lineHeight: 1.65 }}>{ritualMode.guidance}</p>
           {filteredOut.length > 0 && (
