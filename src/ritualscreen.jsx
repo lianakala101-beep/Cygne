@@ -305,6 +305,12 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
   const allDone = steps.length > 0 && steps.every(s => isStepChecked(s.id));
   const sessionLabel = session === "am" ? "Morning" : "Evening";
   const sessionIcon  = session === "am" ? "sun" : "moon";
+  // The context card pairs its icon with getRitualTimeLabel() (clock-
+  // based), so it must track that label rather than `session` — otherwise
+  // a manually-selected AM ritual in the evening renders a sun next to
+  // "tonight".
+  const timeOfDayLabel = getRitualTimeLabel();
+  const timeOfDayIcon  = timeOfDayLabel === "TONIGHT" ? "moon" : "sun";
 
   const recs = buildRecommendations(products, activeMap, conflicts, user);
   const refinements = buildRefinements(products, activeMap, conflicts);
@@ -329,8 +335,8 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
       {ritualMode.name && (
         <div style={{ background: ritualMode.bg, border: `1px solid ${ritualMode.border}`, borderRadius: 16, padding: "16px 18px", marginBottom: 22, position: "relative" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-            <span style={{ color: "var(--clay)", opacity: 0.6 }}><Icon name={sessionIcon} size={13} /></span>
-            <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)" }}>{getRitualTimeLabel().toLowerCase()}</span>
+            <span style={{ color: "var(--clay)", opacity: 0.6 }}><Icon name={timeOfDayIcon} size={13} /></span>
+            <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)" }}>{timeOfDayLabel.toLowerCase()}</span>
             {cyclePhase && (
               <span style={{ marginLeft: "auto", fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: ritualMode.color, opacity: 0.8 }}>{cyclePhase} phase</span>
             )}
