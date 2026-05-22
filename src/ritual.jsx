@@ -546,15 +546,14 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
     <div style={{ position: "relative", marginTop: 8 }}>
       <div style={{
         position: "relative",
-        background: "var(--color-ivory, #faf9f4)",
+        background: "var(--color-inky-moss, #2d3d2b)",
         borderRadius: 8,
         padding: "20px 22px 22px",
         overflow: "hidden",
         isolation: "isolate",
-        boxShadow: "0 1px 2px rgba(45,61,43,0.04), 0 4px 12px rgba(45,61,43,0.05)",
-        border: "1px solid rgba(45,61,43,0.18)",
+        border: "none",
       }}>
-        {/* Faint logo watermark */}
+        {/* Faint logo watermark — inverted to read as ivory on the dark base. */}
         <img
           src="/cygne-logo.png"
           alt=""
@@ -562,27 +561,18 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
           style={{
             position: "absolute", bottom: 10, right: 14,
             height: 48, width: "auto",
-            opacity: 0.06,
-            filter: "brightness(0.3) saturate(0.5)",
+            opacity: 0.10,
+            filter: "brightness(0) invert(1)",
             pointerEvents: "none", userSelect: "none",
           }}
         />
-        {/* Paper / linen texture — multiplies the noise into the ivory base */}
-        <div style={{
-          position: "absolute", inset: 0,
-          pointerEvents: "none",
-          backgroundImage: grain,
-          backgroundSize: "220px 220px",
-          opacity: 0.55,
-          mixBlendMode: "multiply",
-        }} />
 
         <div style={{ position: "relative", marginBottom: 12 }}>
           <p style={{
             fontFamily: "var(--font-body)",
             fontSize: 9, fontWeight: 400,
             letterSpacing: "0.28em", textTransform: "uppercase",
-            color: "var(--color-inky-moss, #2d3d2b)",
+            color: "var(--color-ivory, #faf9f4)",
             margin: 0,
           }}>
             Swan Sense
@@ -594,7 +584,7 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
           fontFamily: "var(--font-body)",
           fontSize: 15, fontWeight: 400,
           lineHeight: 1.55, letterSpacing: "0.01em",
-          color: "var(--color-ink, #1c1c1a)",
+          color: "var(--color-ivory, #faf9f4)",
           margin: 0,
         }}>
           {renderInsightLines(line)}
