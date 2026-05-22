@@ -281,10 +281,10 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, on
       <div onClick={() => setExpanded(e => !e)} style={{ padding: "16px 18px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ flex: 1 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5, flexWrap: "wrap" }}>
-            <span style={{ fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: schedule.color, background: `${schedule.color}18`, padding: "2px 8px", borderRadius: 20 }}>{schedule.label}</span>
+            <span style={{ fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 400, letterSpacing: "0.14em", textTransform: "uppercase", color: schedule.color, background: `${schedule.color}18`, padding: "2px 8px", borderRadius: 20 }}>{schedule.label}</span>
             <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", color: isHeld ? "#8b7355" : "var(--clay)", opacity: 0.7 }}>Week {weekNumber} · {isHeld ? "Holding" : phase.name}</span>
           </div>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 13, fontWeight: 500, color: "var(--parchment)", margin: "0 0 2px" }}>{product.name}</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 13, fontWeight: 400, color: "var(--parchment)", margin: "0 0 2px" }}>{product.name}</p>
           <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: schedule.color, margin: 0, letterSpacing: "0.04em" }}>{phase.frequency}</p>
           {startedLabel && (
             <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", margin: "4px 0 0", opacity: 0.6, letterSpacing: "0.04em" }}>{startedLabel}</p>
@@ -310,11 +310,11 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, on
           {/* On track / Back off */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 16 }}>
             <div style={{ padding: "10px 12px", background: "rgba(45,61,43,0.08)", border: "1px solid rgba(45,61,43,0.2)", borderRadius: 10 }}>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--sage)", margin: "0 0 4px" }}>On track</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--sage)", margin: "0 0 4px" }}>On track</p>
               <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>{phase.onTrack}</p>
             </div>
             <div style={{ padding: "10px 12px", background: "rgba(139,115,85,0.06)", border: "1px solid rgba(139,115,85,0.18)", borderRadius: 10 }}>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#8b7355", margin: "0 0 4px" }}>Back off</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "#8b7355", margin: "0 0 4px" }}>Back off</p>
               <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>{phase.backOff}</p>
             </div>
           </div>
@@ -323,11 +323,11 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, on
           {isHeld ? (
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               <div style={{ padding: "12px 16px", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.22)", borderRadius: 10, textAlign: "center" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 600, color: "#8b7355", margin: "0 0 2px" }}>Paused — repeat this week</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, color: "#8b7355", margin: "0 0 2px" }}>Paused — repeat this week</p>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", margin: 0, opacity: 0.7 }}>When you're ready, mark as handled to advance.</p>
               </div>
               <button onClick={handleAdvanceClick}
-                style={{ width: "100%", padding: "10px 0", background: "rgba(45,61,43,0.12)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 10, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer", transition: "all 0.18s" }}
+                style={{ width: "100%", padding: "10px 0", background: "rgba(45,61,43,0.12)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 10, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer", transition: "all 0.18s" }}
                 onMouseEnter={e => e.currentTarget.style.background = "rgba(45,61,43,0.2)"}
                 onMouseLeave={e => e.currentTarget.style.background = "rgba(45,61,43,0.12)"}>
                 Skin handled it — advance <Icon name="check" size={10} />
@@ -336,13 +336,13 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, on
           ) : (
             <div style={{ display: "flex", gap: 8 }}>
               <button onClick={handleAdvanceClick}
-                style={{ flex: 1, padding: "10px 0", background: "rgba(45,61,43,0.12)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 10, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer", transition: "all 0.18s" }}
+                style={{ flex: 1, padding: "10px 0", background: "rgba(45,61,43,0.12)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 10, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer", transition: "all 0.18s" }}
                 onMouseEnter={e => e.currentTarget.style.background = "rgba(45,61,43,0.2)"}
                 onMouseLeave={e => e.currentTarget.style.background = "rgba(45,61,43,0.12)"}>
                 Skin handled it <Icon name="check" size={10} />
               </button>
               <button onClick={() => { onHold(product.id); setJustActioned("hold"); }}
-                style={{ flex: 1, padding: "10px 0", background: "rgba(139,115,85,0.06)", border: "1px solid rgba(139,115,85,0.18)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#8b7355", cursor: "pointer", transition: "all 0.18s" }}
+                style={{ flex: 1, padding: "10px 0", background: "rgba(139,115,85,0.06)", border: "1px solid rgba(139,115,85,0.18)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400, letterSpacing: "0.1em", textTransform: "uppercase", color: "#8b7355", cursor: "pointer", transition: "all 0.18s" }}
                 onMouseEnter={e => e.currentTarget.style.background = "rgba(139,115,85,0.12)"}
                 onMouseLeave={e => e.currentTarget.style.background = "rgba(139,115,85,0.06)"}>
                 Backing off
@@ -374,7 +374,7 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, on
                   <button
                     disabled={!pickedDate}
                     onClick={(e) => { e.stopPropagation(); if (!pickedDate) return; onResetStart?.(product.id, pickedDate); setConfirmReset(false); setPickedDate(""); }}
-                    style={{ padding: "6px 12px", background: pickedDate ? "rgba(139,115,85,0.12)" : "transparent", border: `1px solid ${pickedDate ? "rgba(139,115,85,0.35)" : "var(--border)"}`, borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: pickedDate ? "#8b7355" : "var(--clay)", cursor: pickedDate ? "pointer" : "not-allowed", opacity: pickedDate ? 1 : 0.5 }}>
+                    style={{ padding: "6px 12px", background: pickedDate ? "rgba(139,115,85,0.12)" : "transparent", border: `1px solid ${pickedDate ? "rgba(139,115,85,0.35)" : "var(--border)"}`, borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 400, letterSpacing: "0.1em", textTransform: "uppercase", color: pickedDate ? "#8b7355" : "var(--clay)", cursor: pickedDate ? "pointer" : "not-allowed", opacity: pickedDate ? 1 : 0.5 }}>
                     Save
                   </button>
                   <button onClick={(e) => { e.stopPropagation(); setConfirmReset(false); setPickedDate(""); }}
@@ -428,7 +428,7 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, on
                 border: "1px solid rgba(232,224,200,0.28)",
                 borderRadius: 10,
                 fontFamily: "var(--font-body)",
-                fontSize: 11, fontWeight: 600,
+                fontSize: 11, fontWeight: 400,
                 letterSpacing: "0.18em", textTransform: "uppercase",
                 cursor: "pointer",
                 transition: "background 0.18s",
@@ -578,7 +578,7 @@ function WeeklyRitualCalendar({ rampProducts, products }) {
               <span style={{
                 fontFamily: "var(--font-body)",
                 fontSize: 10,
-                fontWeight: active ? 700 : 500,
+                fontWeight: 400,
                 letterSpacing: "0.08em",
                 color: active ? "var(--parchment)" : "var(--clay)",
               }}>{day.label}</span>
@@ -665,7 +665,7 @@ function WeeklyRitualCalendar({ rampProducts, products }) {
                 if (slotProducts.length === 0) return null;
                 return (
                   <div key={slot} style={{ padding: "12px 16px", borderBottom: "1px solid var(--border)" }}>
-                    <p style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 10px", opacity: 0.55 }}>
+                    <p style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 400, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 10px", opacity: 0.55 }}>
                       <Icon name={slot === "am" ? "sun" : "moon"} size={10} /> {slot === "am" ? "Morning" : "Evening"}
                     </p>
                     {slotProducts.map((p, i) => {
@@ -679,7 +679,7 @@ function WeeklyRitualCalendar({ rampProducts, products }) {
                         <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: i < slotProducts.length - 1 ? 10 : 0 }}>
                           <div style={{ width: 8, height: 8, borderRadius: "50%", background: color, flexShrink: 0 }} />
                           <div style={{ flex: 1 }}>
-                            <p style={{ fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 500, color: "var(--parchment)", margin: "0 0 1px" }}>{p.name}</p>
+                            <p style={{ fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 400, color: "var(--parchment)", margin: "0 0 1px" }}>{p.name}</p>
                             {phase && (
                               <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color, margin: 0, letterSpacing: "0.04em" }}>
                                 Week {getRampWeek(p)} · {phase.frequency}

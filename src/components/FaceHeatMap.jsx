@@ -17,7 +17,7 @@ const CYCLE_PHASES = [
 ];
 
 const PEBBLE = "var(--color-pebble, #7a7a7a)";
-const STONE = "var(--color-stone, #5a5a5a)";
+const STONE = "var(--color-pebble, #7a7a7a)";
 const INKY = "var(--color-inky-moss, #2d3d2b)";
 const IVORY = "var(--color-ivory, #faf9f4)";
 const STROKE_DEFAULT = INKY;
@@ -91,14 +91,6 @@ export function FaceHeatMap({ journals = [], products = [], user = {} }) {
       padding: "22px 20px 26px",
       border: "1px solid rgba(45,61,43,0.10)",
     }}>
-      <p style={{
-        fontFamily: "var(--font-display, 'Fungis Heavy', 'Space Grotesk', sans-serif)",
-        fontWeight: 700, fontSize: 11, letterSpacing: "0.2em",
-        color: INKY, margin: "0 0 20px",
-      }}>
-        INFLAMMATION MAP
-      </p>
-
       {/* Time filter */}
       <div style={{ display: "flex", justifyContent: "center", gap: 0, marginBottom: 18 }}>
         {PERIODS.map((p, i) => (
@@ -163,8 +155,8 @@ export function FaceHeatMap({ journals = [], products = [], user = {} }) {
         <>
           <p style={{
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
-            fontWeight: 400, fontStyle: "italic",
-            fontSize: 13, color: PEBBLE,
+            fontWeight: 400,
+            fontSize: 13, color: "var(--color-inky-moss, #2d3d2b)",
             textAlign: "center", marginTop: 16,
           }}>
             your map is taking shape
@@ -172,7 +164,7 @@ export function FaceHeatMap({ journals = [], products = [], user = {} }) {
           <p style={{
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
             fontSize: 10, letterSpacing: "0.1em",
-            color: PEBBLE, opacity: 0.6,
+            color: "var(--color-inky-moss, #2d3d2b)", opacity: 0.7,
             textAlign: "center", marginTop: 6, textTransform: "uppercase",
           }}>
             log skin observations to reveal your patterns
@@ -278,13 +270,14 @@ function ZoneInsightDrawer({ zoneId, journals, products, user, onClose, onAskCyg
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
           <h3 style={{
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
-            fontWeight: 700, fontSize: 14, letterSpacing: "0.18em",
+            fontWeight: 400, fontSize: 14, letterSpacing: "0.18em",
             color: INKY, margin: 0,
           }}>
             {zoneLabelDisplay(zoneId)}
           </h3>
           <button
             onClick={onClose}
+            aria-label="Close"
             style={{ background: "none", border: "none", cursor: "pointer", color: STONE, fontSize: 18, lineHeight: 1 }}
           >×</button>
         </div>
@@ -292,7 +285,7 @@ function ZoneInsightDrawer({ zoneId, journals, products, user, onClose, onAskCyg
         {/* Stats */}
         <p style={{
           fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
-          fontWeight: 400, fontSize: 13, color: STONE,
+          fontWeight: 400, fontSize: 13, color: "var(--color-inky-moss, #2d3d2b)",
           margin: "0 0 12px",
         }}>
           Logged {flareCount} time{flareCount === 1 ? "" : "s"} this month
@@ -302,7 +295,7 @@ function ZoneInsightDrawer({ zoneId, journals, products, user, onClose, onAskCyg
         {dominantPhase && (
           <p style={{
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
-            fontStyle: "italic", fontSize: 12,
+            fontSize: 12,
             color: INKY,
             margin: "0 0 18px",
           }}>
@@ -315,15 +308,15 @@ function ZoneInsightDrawer({ zoneId, journals, products, user, onClose, onAskCyg
           <p style={{
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
             fontWeight: 400, fontSize: 10, letterSpacing: "0.15em",
-            color: PEBBLE, textTransform: "uppercase",
+            color: "var(--color-inky-moss, #2d3d2b)", textTransform: "uppercase",
             margin: "0 0 8px",
           }}>
             Products present during flare-ups
           </p>
           {topProducts.length === 0 ? (
             <p style={{
-              fontFamily: "var(--font-body, 'Fungis Normal', 'Space Grotesk', sans-serif)",
-              fontSize: 12, color: STONE, opacity: 0.7, margin: 0,
+              fontFamily: "var(--font-body, 'Fungis Normal', 'Fungis Normal', sans-serif)",
+              fontSize: 12, color: "var(--color-inky-moss, #2d3d2b)", opacity: 0.75, margin: 0,
             }}>
               Not enough data yet.
             </p>
@@ -333,13 +326,13 @@ function ZoneInsightDrawer({ zoneId, journals, products, user, onClose, onAskCyg
                 <li
                   key={p.id}
                   style={{
-                    fontFamily: "var(--font-body, 'Fungis Normal', 'Space Grotesk', sans-serif)",
+                    fontFamily: "var(--font-body, 'Fungis Normal', 'Fungis Normal', sans-serif)",
                     fontSize: 13, color: "var(--color-ink, #1c1c1a)",
                     padding: "6px 0",
                     borderBottom: "1px solid rgba(45,61,43,0.08)",
                   }}
                 >
-                  {p.name || "(unnamed)"}{p.brand ? <span style={{ color: STONE }}> · {p.brand}</span> : null}
+                  {p.name || "(unnamed)"}{p.brand ? <span style={{ color: "var(--color-inky-moss, #2d3d2b)" }}> · {p.brand}</span> : null}
                 </li>
               ))}
             </ul>
@@ -355,7 +348,7 @@ function ZoneInsightDrawer({ zoneId, journals, products, user, onClose, onAskCyg
             color: INKY,
             borderRadius: 12,
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
-            fontWeight: 700, fontSize: 11, letterSpacing: "0.18em",
+            fontWeight: 400, fontSize: 11, letterSpacing: "0.18em",
             cursor: "pointer",
           }}
         >

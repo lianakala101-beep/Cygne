@@ -1,8 +1,33 @@
 import { useState, useRef, useEffect } from "react";
 import { Icon, Section, Pill } from "./components.jsx";
 import { detectActives, analyzeShelf, calcSpending } from "./engine.js";
+import { AskCygneModal } from "./components/AskCygneModal.jsx";
 import { assessRoutineFit, DEFER_TAG_CONFIG } from "./modals.jsx";
 import { ProductModal } from "./productmodal.jsx";
+import { RAMP_SCHEDULES, RAMP_ACTIVES, getRampWeek } from "./ramp.jsx";
+import { daysBetweenLocal } from "./utils.jsx";
+
+// A product is owed a check-in when:
+//   1. It's in an Introduce Slowly schedule (rampWeek + a matching active),
+//   2. The user is at least 3 days into the current week (so we have real
+//      observation data to ask about, and don't nag on the day they added it),
+//   3. rampLog has no entry for (productId, currentWeek). A "backing_off"
+//      action counts as a check-in too, since both statuses write entries.
+function getRampCheckInDue(product, rampLog = []) {
+  if (!product?.rampWeek || !product?.routineStartDate) return null;
+  const activeKey = product.category === "Toning Pad"
+    ? "toning pad"
+    : RAMP_ACTIVES.find(a => detectActives(product.ingredients || [])[a]);
+  if (!activeKey || !RAMP_SCHEDULES[activeKey]) return null;
+  const days = daysBetweenLocal(product.routineStartDate);
+  if (days < 3) return null;
+  const currentWeek = getRampWeek(product);
+  const dayInWeek = days % 7;
+  if (dayInWeek < 3) return null;
+  const checkedIn = rampLog.some(e => e?.productId === product.id && e?.week === currentWeek);
+  if (checkedIn) return null;
+  return { week: currentWeek };
+}
 
 
 const CARD_IMG_BG = {
@@ -14,19 +39,158 @@ const CARD_IMG_BG = {
   Exfoliant:   "linear-gradient(145deg, #e8e2d8 0%, #d8d0c3 100%)",
   Mask:        "linear-gradient(145deg, #edeae2 0%, #ddd5c7 100%)",
 };
+
 const GLASS_CARD = {
-  backdropFilter: "blur(12px)",
-  WebkitBackdropFilter: "blur(12px)",
-  background: "rgba(250,249,244,0.45)",
-  border: "1px solid rgba(192,192,192,0.3)",
-  borderRadius: 16,
-  boxShadow: "0 4px 24px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.8)",
+  background: "var(--color-ivory-shadow)",
+  border: "none",
+  borderRadius: 8,
   overflow: "hidden",
   display: "flex",
   flexDirection: "column",
 };
 
-function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, user = {} }) {
+// Minimal SVG line illustrations shown when a product has no photo. Single
+// stroke, no fill, stroke inherits currentColor from the wrapper (stone at
+// 0.4 opacity). Rendered at 48px centered in the card image area.
+function CategoryGlyph({ category }) {
+  const props = {
+    viewBox: "0 0 100 100",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.5,
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    style: { width: "100%", height: "100%", display: "block" },
+    "aria-hidden": "true",
+    focusable: "false",
+  };
+  switch (category) {
+    case "Cleanser":
+      // Foam / bubble cluster
+      return (
+        <svg {...props}>
+          <circle cx="34" cy="58" r="14" />
+          <circle cx="56" cy="46" r="18" />
+          <circle cx="74" cy="62" r="10" />
+          <circle cx="46" cy="72" r="7" />
+          <circle cx="64" cy="76" r="5" />
+          <circle cx="26" cy="40" r="4" />
+        </svg>
+      );
+    case "Serum":
+      // Classic serum dropper vial — oval rubber bulb at the very top, a
+      // narrow neck collar below it, and a thin pipette tube descending
+      // visibly through a wider squat bottle body to a tapered tip.
+      return (
+        <svg {...props}>
+          <ellipse cx="50" cy="13" rx="10" ry="7" />
+          <rect x="44" y="20" width="12" height="9" />
+          <path d="M 26 36 Q 26 30 32 30 L 68 30 Q 74 30 74 36 L 74 84 Q 74 92 66 92 L 34 92 Q 26 92 26 84 Z" />
+          <line x1="48" y1="20" x2="48" y2="72" />
+          <line x1="52" y1="20" x2="52" y2="72" />
+          <path d="M 48 72 L 50 78 L 52 72" />
+        </svg>
+      );
+    case "Moisturizer":
+      // Round jar — wide squat lid + body
+      return (
+        <svg {...props}>
+          <ellipse cx="50" cy="28" rx="30" ry="5" />
+          <line x1="20" y1="28" x2="20" y2="38" />
+          <line x1="80" y1="28" x2="80" y2="38" />
+          <ellipse cx="50" cy="38" rx="30" ry="5" />
+          <path d="M 20 38 L 20 80 Q 20 86 26 86 L 74 86 Q 80 86 80 80 L 80 38" />
+        </svg>
+      );
+    case "Oil":
+      // Droplet
+      return (
+        <svg {...props}>
+          <path d="M 50 14 C 30 42, 28 60, 30 70 A 22 22 0 0 0 70 70 C 72 60, 70 42, 50 14 Z" />
+        </svg>
+      );
+    case "Prescription":
+      // Apothecary vial with stopper
+      return (
+        <svg {...props}>
+          <path d="M 42 10 L 58 10 L 58 18 L 42 18 Z" />
+          <line x1="42" y1="18" x2="36" y2="32" />
+          <line x1="58" y1="18" x2="64" y2="32" />
+          <path d="M 36 32 L 36 84 Q 36 92 44 92 L 56 92 Q 64 92 64 84 L 64 32 Z" />
+          <line x1="40" y1="62" x2="60" y2="62" />
+        </svg>
+      );
+    case "SPF":
+    case "SPF Moisturizer":
+      // Sun outline
+      return (
+        <svg {...props}>
+          <circle cx="50" cy="50" r="16" />
+          <line x1="50" y1="20" x2="50" y2="28" />
+          <line x1="50" y1="72" x2="50" y2="80" />
+          <line x1="20" y1="50" x2="28" y2="50" />
+          <line x1="72" y1="50" x2="80" y2="50" />
+          <line x1="29" y1="29" x2="34" y2="34" />
+          <line x1="66" y1="66" x2="71" y2="71" />
+          <line x1="71" y1="29" x2="66" y2="34" />
+          <line x1="34" y1="66" x2="29" y2="71" />
+        </svg>
+      );
+    case "Eye Cream":
+      // Eye outline
+      return (
+        <svg {...props}>
+          <path d="M 14 50 Q 50 22, 86 50 Q 50 78, 14 50 Z" />
+          <circle cx="50" cy="50" r="9" />
+          <circle cx="50" cy="50" r="3" fill="currentColor" stroke="none" />
+        </svg>
+      );
+    case "Toner":
+    case "Toning Pad":
+      // Tall bottle with cap
+      return (
+        <svg {...props}>
+          <path d="M 42 12 L 58 12 L 58 24 L 42 24 Z" />
+          <line x1="42" y1="24" x2="36" y2="34" />
+          <line x1="58" y1="24" x2="64" y2="34" />
+          <path d="M 36 34 L 36 86 Q 36 92 42 92 L 58 92 Q 64 92 64 86 L 64 34" />
+        </svg>
+      );
+    case "Exfoliant":
+      // Textured circle with granules
+      return (
+        <svg {...props}>
+          <circle cx="50" cy="50" r="28" />
+          <circle cx="42" cy="44" r="2" />
+          <circle cx="56" cy="42" r="1.6" />
+          <circle cx="60" cy="56" r="2.2" />
+          <circle cx="44" cy="60" r="1.8" />
+          <circle cx="52" cy="52" r="1.4" />
+          <circle cx="38" cy="52" r="1.4" />
+        </svg>
+      );
+    case "Mask":
+      // Half-moon pouch
+      return (
+        <svg {...props}>
+          <path d="M 22 30 L 78 30 L 70 86 Q 70 90 66 90 L 34 90 Q 30 90 30 86 Z" />
+          <line x1="40" y1="22" x2="60" y2="22" />
+          <line x1="40" y1="22" x2="40" y2="30" />
+          <line x1="60" y1="22" x2="60" y2="30" />
+        </svg>
+      );
+    default:
+      // Leaf — calm, on-brand fallback for anything else
+      return (
+        <svg {...props}>
+          <path d="M 28 80 Q 28 32 72 24 Q 78 64 28 80 Z" />
+          <path d="M 30 78 Q 50 60 70 28" />
+        </svg>
+      );
+  }
+}
+
+function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, user = {}, onAskCygne }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const menuRef = useRef(null);
@@ -48,21 +212,16 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
           {product.imageUrl
             ? <img src={product.imageUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
             : (
-              <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6 }}>
-                <span style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontStyle: "italic", fontSize: 36, color: "rgba(160,160,160,0.45)", lineHeight: 1 }}>
-                  {product.brand?.[0]?.toUpperCase() || "·"}
-                </span>
-                <span style={{ fontFamily: "var(--font-display, 'Fungis', sans-serif)", fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(160,160,160,0.55)" }}>
+              <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10 }}>
+                <div style={{ width: 48, height: 48, color: "var(--color-pebble, #7a7a7a)", opacity: 0.4, pointerEvents: "none" }}>
+                  <CategoryGlyph category={product.category} />
+                </div>
+                <span style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-pebble, #7a7a7a)", opacity: 0.65 }}>
                   {product.category}
                 </span>
               </div>
             )
           }
-
-          {/* In-ritual indicator dot */}
-          {inRoutine && (
-            <div style={{ position: "absolute", top: 10, left: 10, width: 7, height: 7, borderRadius: "50%", background: "#c0c0c0", boxShadow: "0 0 0 2px rgba(255,255,255,0.85)" }} />
-          )}
 
           {/* ⋯ menu */}
           <div ref={menuRef} style={{ position: "absolute", top: 6, right: 6 }}>
@@ -71,13 +230,35 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
               ⋯
             </button>
             {menuOpen && (
-              <div style={{ position: "absolute", right: 0, top: "110%", zIndex: 50, minWidth: 170, background: "rgba(250,249,244,0.96)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", border: "1px solid rgba(192,192,192,0.3)", borderRadius: 12, padding: "6px 0", boxShadow: "0 8px 28px rgba(0,0,0,0.10)" }}>
+              <div style={{ position: "absolute", right: 0, top: "110%", zIndex: 50, minWidth: 170, background: "rgba(250,249,244,0.96)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", border: "1px solid rgba(192,192,192,0.3)", borderRadius: 8, padding: "6px 0", boxShadow: "0 8px 28px rgba(0,0,0,0.10)" }}>
                 <button onClick={() => { setMenuOpen(false); onEdit(product); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#1c1c1a", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "left" }}>
                   <Icon name="edit" size={12} /><span>Edit product</span>
                 </button>
                 <button onClick={() => { setMenuOpen(false); onToggleRoutine(product.id); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#1c1c1a", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "left" }}>
                   <Icon name="sparkle" size={12} /><span>{inRoutine ? "Remove from ritual" : "Add to ritual"}</span>
                 </button>
+                {onAskCygne && (
+                  <button
+                    onClick={() => {
+                      setMenuOpen(false);
+                      const productName = product.name || "this product";
+                      const ingredients = (product.ingredients || []).slice(0, 12).join(", ");
+                      const ctxLines = [
+                        `Product: ${productName}${product.brand ? ` by ${product.brand}` : ""}.`,
+                        `Category: ${product.category || "uncategorized"}.`,
+                        ingredients ? `Ingredients: ${ingredients}.` : null,
+                        product.session ? `Session: ${product.session}.` : null,
+                        product.frequency && product.frequency !== "daily" ? `Frequency: ${product.frequency}.` : null,
+                      ].filter(Boolean);
+                      onAskCygne(
+                        `Tell me about ${productName} and how it works with my other products.`,
+                        ctxLines.join(" "),
+                      );
+                    }}
+                    style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#1c1c1a", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "left" }}>
+                    <Icon name="swan" size={12} /><span>Ask Cygne</span>
+                  </button>
+                )}
                 <div style={{ height: 1, background: "rgba(192,192,192,0.25)", margin: "4px 12px" }} />
                 <button onClick={() => { setMenuOpen(false); setConfirmDelete(true); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#8b7355", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "left" }}>
                   <Icon name="trash" size={12} /><span>Remove</span>
@@ -89,7 +270,7 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
 
         {/* Text content — 0 top padding (image bleeds to edge), 12px sides + bottom */}
         <div style={{ padding: "10px 12px 12px" }}>
-          <p style={{ fontFamily: "var(--font-display, 'Fungis', sans-serif)", fontSize: 13, fontWeight: 400, letterSpacing: "0.1em", color: "#1c1c1a", margin: "0 0 3px", lineHeight: 1.3 }}>{product.name}</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 13, fontWeight: 400, letterSpacing: "0.04em", color: "#1c1c1a", margin: "0 0 3px", lineHeight: 1.3 }}>{product.name}</p>
           <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "#7a7a7a", margin: 0, letterSpacing: "0.03em" }}>{product.brand}</p>
           {product.price > 0 && (
             <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#1c1c1a", margin: "5px 0 0", fontWeight: 300, letterSpacing: "0.01em" }}>${(product.price || 0).toFixed(0)}</p>
@@ -100,7 +281,7 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
       {/* Delete confirmation */}
       {confirmDelete && (
         <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(250,249,244,0.8)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", padding: "0 28px" }} onClick={() => setConfirmDelete(false)}>
-          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 320, background: "rgba(250,249,244,0.97)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", border: "1px solid rgba(192,192,192,0.3)", borderRadius: 18, padding: "26px 24px 22px", boxShadow: "0 16px 48px rgba(0,0,0,0.10)" }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 320, background: "rgba(250,249,244,0.97)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", border: "1px solid rgba(192,192,192,0.3)", borderRadius: 8, padding: "26px 24px 22px", boxShadow: "0 16px 48px rgba(0,0,0,0.10)" }}>
             <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#7a7a7a", margin: "0 0 12px" }}>Confirm</p>
             <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "#1c1c1a", margin: "0 0 22px", lineHeight: 1.65 }}>Remove <strong>{product.name}</strong> from your vanity? This cannot be undone.</p>
             <div style={{ display: "flex", gap: 10 }}>
@@ -336,21 +517,28 @@ function ClearAllButton({ onClearAll }) {
   );
 }
 
-function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo, onClearAll, onSession, waitingRoom = [], onAddFromWaiting, onDismissWaiting, checkIns = [], user = {} }) {
+function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearAll, onSession, waitingRoom = [], onAddFromWaiting, onDismissWaiting, checkIns = [], user = {}, journals = [], rampLog = [], onAdvanceRamp, onHoldRamp }) {
   const [view, setView] = useState("shelf");
   const [filter, setFilter] = useState("All");
+  const [askState, setAskState] = useState(null); // { question, context } | null
   const { activeMap } = analyzeShelf(products);
   const spending = calcSpending(products);
   const cats = ["All", ...new Set(products.map(p => p.category))];
   const filtered = filter === "All" ? products : products.filter(p => p.category === filter);
   const insights = buildInsights(products, activeMap);
+  const rampCheckIns = products
+    .map(p => {
+      const due = getRampCheckInDue(p, rampLog);
+      return due ? { product: p, week: due.week } : null;
+    })
+    .filter(Boolean);
 
   return (
     <div>
       {/* -- Header ----------------------------------------------------------- */}
       <div style={{ marginBottom: 24, paddingTop: 44 }}>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-          <h1 style={{ fontFamily: "var(--font-display)", fontSize: 38, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-inky-moss)", margin: "0 0 4px", lineHeight: 1.15 }}>Your Vanity</h1>
+          <h1 style={{ fontFamily: "var(--font-display)", fontSize: 32, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-inky-moss)", margin: "0 0 4px", lineHeight: 1.15 }}>Your Vanity</h1>
           {false && <ClearAllButton onClearAll={onClearAll} />}  {/* hidden — dev only */}
         </div>
         <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: 0 }}>
@@ -376,7 +564,7 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo
               <p style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 400, letterSpacing: "0.08em", color: "var(--clay)", margin: "0 0 8px" }}>Your vanity is empty.</p>
               <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", opacity: 0.6, margin: "0 0 28px", lineHeight: 1.6 }}>Scan a product to add it, or add one manually.</p>
               <button onClick={onAdd}
-                style={{ padding: "12px 28px", background: "rgba(45,61,43,0.10)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer" }}>
+                style={{ padding: "12px 28px", background: "rgba(45,61,43,0.10)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer" }}>
                 + Add Product
               </button>
             </div>
@@ -391,21 +579,79 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo
                 {filtered.length} of {products.length} product{products.length !== 1 ? "s" : ""}
               </p>
 
-              {products.some(p => p.isDemo) && onClearDemo && (
-                <div style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.2)", borderRadius: 12, padding: "12px 14px", marginBottom: 14 }}>
-                  <span style={{ color: "#8b7355", flexShrink: 0, display: "inline-flex" }}><Icon name="sparkle" size={14} /></span>
-                  <div style={{ flex: 1 }}>
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 600, color: "var(--parchment)", margin: "0 0 2px" }}>Sample vanity</p>
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0 }}>These are example products to show you how Cygne works. Scan your own to replace them.</p>
-                  </div>
-                  <button onClick={onClearDemo} style={{ fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 600, background: "transparent", border: "1px solid rgba(139,115,85,0.3)", borderRadius: 8, color: "var(--clay)", padding: "6px 10px", cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}>Clear demo</button>
+              {rampCheckIns.length > 0 && (onAdvanceRamp || onHoldRamp) && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 18 }}>
+                  {rampCheckIns.map(({ product: p, week }) => (
+                    <div key={p.id} style={{
+                      background: "var(--color-ivory)",
+                      border: "1px solid rgba(45,61,43,0.22)",
+                      borderRadius: 8,
+                      padding: "16px 18px",
+                    }}>
+                      <p style={{
+                        fontFamily: "var(--font-body)",
+                        fontSize: 9, fontWeight: 400, letterSpacing: "0.18em", textTransform: "uppercase",
+                        color: "var(--color-inky-moss)",
+                        margin: "0 0 8px",
+                        opacity: 0.75,
+                      }}>
+                        Introduce slowly · week {week}
+                      </p>
+                      <p style={{
+                        fontFamily: "var(--font-body)",
+                        fontSize: 15, fontWeight: 400, letterSpacing: "0.02em",
+                        color: "var(--color-ink)",
+                        margin: "0 0 4px",
+                      }}>
+                        {p.name}
+                      </p>
+                      <p style={{
+                        fontFamily: "var(--font-body)",
+                        fontSize: 12, color: "var(--color-pebble)",
+                        margin: "0 0 14px", lineHeight: 1.65,
+                      }}>
+                        How has your skin been responding this week?
+                      </p>
+                      <div style={{ display: "flex", gap: 8 }}>
+                        <button
+                          onClick={() => onAdvanceRamp?.(p.id)}
+                          style={{
+                            flex: 1, padding: "10px 0",
+                            background: "transparent",
+                            border: "1px solid rgba(45,61,43,0.45)",
+                            borderRadius: 8,
+                            fontFamily: "var(--font-display)",
+                            fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase",
+                            color: "var(--color-inky-moss)",
+                            cursor: "pointer",
+                          }}>
+                          Skin handled it
+                        </button>
+                        <button
+                          onClick={() => onHoldRamp?.(p.id)}
+                          style={{
+                            flex: 1, padding: "10px 0",
+                            background: "transparent",
+                            border: "1px solid rgba(45,61,43,0.25)",
+                            borderRadius: 8,
+                            fontFamily: "var(--font-display)",
+                            fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase",
+                            color: "var(--color-inky-moss)",
+                            opacity: 0.8,
+                            cursor: "pointer",
+                          }}>
+                          Backing off
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
-                {filtered.map(p => <GlassProductCard key={p.id} product={p} onEdit={onEdit} onDelete={onDelete} onToggleRoutine={onToggleRoutine} onSession={onSession} user={user} />)}
+                {filtered.map(p => <GlassProductCard key={p.id} product={p} onEdit={onEdit} onDelete={onDelete} onToggleRoutine={onToggleRoutine} onSession={onSession} user={user} onAskCygne={(q, ctx) => setAskState({ question: q, context: ctx })} />)}
                 <button onClick={onAdd} style={{ ...GLASS_CARD, background: "rgba(250,249,244,0.25)", border: "1px dashed rgba(192,192,192,0.4)", cursor: "pointer", aspectRatio: "1 / 1", alignItems: "center", justifyContent: "center", gap: 8 }}>
-                  <span style={{ fontSize: 20, color: "#7a7a7a", lineHeight: 1 }}>+</span>
-                  <span style={{ fontFamily: "var(--font-display, 'Fungis', sans-serif)", fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: "#7a7a7a" }}>Add Product</span>
+                  <span style={{ fontSize: 20, color: "var(--color-inky-moss, #2d3d2b)", opacity: 0.6, lineHeight: 1 }}>+</span>
+                  <span style={{ fontFamily: "var(--font-display, 'Fungis', sans-serif)", fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", opacity: 0.6 }}>Add Product</span>
                 </button>
               </div>
             </>
@@ -428,7 +674,7 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo
                   { label: "Categories", value: new Set(products.map(p => p.category)).size },
                   { label: "Value", value: `$${(spending.total || 0).toFixed(0)}` },
                 ].map(({ label, value }) => (
-                  <div key={label} style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "16px 14px", textAlign: "center" }}>
+                  <div key={label} style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "16px 14px", textAlign: "center" }}>
                     <p style={{ fontFamily: "var(--font-body)", fontSize: 22, fontWeight: 200, color: "var(--parchment)", margin: "0 0 3px", letterSpacing: "-0.02em" }}>{value}</p>
                     <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", margin: 0 }}>{label}</p>
                   </div>
@@ -445,7 +691,7 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo
         <div style={{ marginTop: 32 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
             <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--clay)", margin: 0 }}>Waiting Room</p>
-            <span style={{ padding: "1px 8px", borderRadius: 10, background: "rgba(45,61,43,0.10)", border: "1px solid rgba(45,61,43,0.2)", fontFamily: "var(--font-body)", fontSize: 9, color: "var(--sage)" }}>{waitingRoom.length}</span>
+            <span style={{ padding: "1px 8px", borderRadius: 8, background: "rgba(45,61,43,0.10)", border: "1px solid rgba(45,61,43,0.2)", fontFamily: "var(--font-body)", fontSize: 9, color: "var(--sage)" }}>{waitingRoom.length}</span>
           </div>
           <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: "0 0 16px", lineHeight: 1.6, opacity: 0.7 }}>Products Cygne suggested holding for now. You'll get a nudge when the timing shifts.</p>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -454,7 +700,7 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo
               const assessment = assessRoutineFit(item.product, products, checkIns, user);
               const nowReady = assessment.verdict === "add";
               return (
-                <div key={idx} style={{ background: "var(--surface)", border: `1px solid ${nowReady ? "rgba(45,61,43,0.4)" : "var(--border)"}`, borderRadius: 14, padding: "16px", transition: "border-color 0.3s" }}>
+                <div key={idx} style={{ background: "var(--surface)", border: `1px solid ${nowReady ? "rgba(45,61,43,0.4)" : "var(--border)"}`, borderRadius: 8, padding: "16px", transition: "border-color 0.3s" }}>
                   {nowReady && (
                     <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
                       <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#2d3d2b" }} />
@@ -463,7 +709,7 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo
                   )}
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
                     <div>
-                      <p style={{ fontFamily: "var(--font-body)", fontSize: 13, fontWeight: 600, color: "var(--parchment)", margin: "0 0 2px" }}>{item.product.name}</p>
+                      <p style={{ fontFamily: "var(--font-body)", fontSize: 13, fontWeight: 400, color: "var(--parchment)", margin: "0 0 2px" }}>{item.product.name}</p>
                       <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0 }}>{item.product.brand} · {item.product.category}</p>
                     </div>
                     <span style={{ padding: "2px 9px", borderRadius: 20, background: tagCfg.bg, border: `1px solid ${tagCfg.color}40`, fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: tagCfg.color, flexShrink: 0, marginLeft: 10 }}>
@@ -473,7 +719,7 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo
                   <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: "0 0 14px", lineHeight: 1.6, opacity: 0.8 }}>{item.reason}</p>
                   <div style={{ display: "flex", gap: 8 }}>
                     <button onClick={() => onAddFromWaiting(item)}
-                      style={{ flex: 1, padding: "9px 0", background: nowReady ? "#2d3d2b" : "rgba(45,61,43,0.10)", color: nowReady ? "#fdfcf9" : "var(--sage)", border: `1px solid ${nowReady ? "#2d3d2b" : "rgba(45,61,43,0.3)"}`, borderRadius: 9, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s" }}>
+                      style={{ flex: 1, padding: "9px 0", background: nowReady ? "#2d3d2b" : "rgba(45,61,43,0.10)", color: nowReady ? "#fdfcf9" : "var(--sage)", border: `1px solid ${nowReady ? "#2d3d2b" : "rgba(45,61,43,0.3)"}`, borderRadius: 9, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s" }}>
                       Add to Ritual
                     </button>
                     <button onClick={() => onDismissWaiting(item)}
@@ -486,6 +732,18 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearDemo
             })}
           </div>
         </div>
+      )}
+
+      {askState && (
+        <AskCygneModal
+          initialQuestion={askState.question}
+          context={askState.context}
+          user={user}
+          products={products}
+          journals={journals}
+          checkIns={checkIns}
+          onClose={() => setAskState(null)}
+        />
       )}
     </div>
   );

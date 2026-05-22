@@ -110,6 +110,23 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
   // -- SKIN TYPE & CONCERN RULES --------------------------------------------
   const skinType = user.skinType || "";
   const concerns = user.concerns || [];
+  const knownActives = (user.knownActives || []).map(a => a.toLowerCase());
+  const skinAgeBracket = user.skinAgeBracket || "";
+  const skinProfile = user.skinProfile || {};
+  const skinGoals = skinProfile.skinGoals || [];
+  const fragrancePref = (skinProfile.fragrance || "").toLowerCase();
+  const avoidsFragrance = fragrancePref.startsWith("yes") || fragrancePref.startsWith("sometimes");
+  const ingredientsToAvoid = (skinProfile.ingredientsToAvoid || "")
+    .split(/[,\n;]+/).map(s => s.trim().toLowerCase()).filter(Boolean);
+
+  // Suppress an "introduce active X" recommendation if the user already
+  // flagged X in onboarding's knownActives — they have history with it.
+  // We check by lowercased substring across the rec's title/trigger.
+  const suppressKnown = (rec) => {
+    if (rec.type !== "addition") return false;
+    const haystack = `${rec.title} ${rec.trigger}`.toLowerCase();
+    return knownActives.some(a => a && haystack.includes(a));
+  };
 
   if (skinType === "Dry" || concerns.includes("Dehydration")) {
     if (!hasCeramides) recs.push({
@@ -215,7 +232,92 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
     cygne: false,
   });
 
-  return recs.sort((a, b) => {
+  // -- SKIN GOALS (from onboarding) -----------------------------------------
+  if (skinGoals.includes("Glassy & Luminous") && !hasVitC) recs.push({
+    type: "addition", priority: 4,
+    title: "Vitamin C supports your luminosity goal",
+    body: "You said you'd love glassy, luminous skin in 3 months. Vitamin C is the most evidence-backed brightening active — paired with daily SPF, it builds visible radiance over 8–12 weeks.",
+    tag: "Goal: Luminous", tagColor: "#c4a060", category: "Serum", trigger: "goal-luminous-vitc", cygne: true,
+    note: "10–15% L-ascorbic acid in the AM, layered before SPF.",
+  });
+  if (skinGoals.includes("Clear & Smooth") && !hasBHA && !hasAHA) recs.push({
+    type: "addition", priority: 4,
+    title: "An exfoliant supports your clarity goal",
+    body: "You're working toward clear, smooth skin. A weekly BHA (oily/congested) or AHA (texture) is the most direct path — physical scrubs don't reach pore-level congestion.",
+    tag: "Goal: Clear", tagColor: "#c49040", category: "Exfoliant", trigger: "goal-clear-exfoliant", cygne: true,
+    note: "BHA 2× per week PM. Build up tolerance before layering with retinol.",
+  });
+  if (skinGoals.includes("Firm & Refined") && !hasPeptides && !hasRetinol) recs.push({
+    type: "addition", priority: 4,
+    title: "Retinol or peptides support your firmness goal",
+    body: "Firm, refined skin comes from collagen support. Retinol is the strongest evidence; peptides are the gentlest entry. Either belongs in a long-term firmness ritual.",
+    tag: "Goal: Firm", tagColor: "#9a8070", category: "Serum", trigger: "goal-firm-retinoid-or-peptide", cygne: true,
+    note: "Start with peptides if retinol feels intimidating — they layer well with most other actives.",
+  });
+  if (skinGoals.includes("Hydrated & Plump") && !hasHA && !hasCeramides) recs.push({
+    type: "addition", priority: 4,
+    title: "Hydration stack for plump skin",
+    body: "Plump skin is well-hydrated skin. A hyaluronic-acid serum draws water in; a ceramide moisturizer seals it. They work together — neither is sufficient alone.",
+    tag: "Goal: Plump", tagColor: "#8aa8c4", category: "Serum", trigger: "goal-plump-ha-ceramide", cygne: true,
+    note: "HA serum on damp skin → ceramide cream on top.",
+  });
+
+  // -- SKIN AGE BRACKET ------------------------------------------------------
+  // 35+ benefits from a peptide layer if not already present and not on retinol.
+  if (/35|40|45|50|55|60/.test(skinAgeBracket) && !hasPeptides && !hasRetinol) {
+    recs.push({
+      type: "addition", priority: 5,
+      title: "Peptides for sustained collagen support",
+      body: "From the mid-30s onward, collagen production declines about 1% per year. Peptides signal the skin to rebuild — gentler than retinoids and additive to any ritual.",
+      tag: "Age Support", tagColor: "#9a8070", category: "Serum", trigger: "age-peptides", cygne: true,
+      note: "Look for matrixyl, copper peptides, or palmitoyl tripeptide. Layers AM or PM.",
+    });
+  }
+
+  // -- FRAGRANCE PREFERENCE --------------------------------------------------
+  if (avoidsFragrance) {
+    const fragranced = products.filter(p => {
+      const ings = (p.ingredients || []).map(i => i.toLowerCase());
+      return ings.some(i => /fragrance|parfum|perfume|essential oil/.test(i));
+    });
+    if (fragranced.length) {
+      recs.push({
+        type: "swap", priority: 2,
+        title: `${fragranced.length} fragranced product${fragranced.length === 1 ? "" : "s"} in your vanity`,
+        body: `You said you avoid fragrance. ${fragranced.map(p => p.name).join(", ")} list${fragranced.length === 1 ? "s" : ""} fragrance, parfum, or essential oil. These are the most common irritation triggers for sensitive skin.`,
+        tag: "Fragrance Watch", tagColor: "#9a8070", trigger: "fragrance-products",
+        action: "Swap for fragrance-free alternatives in the same category, or hold these for occasional use only.",
+        cygne: false,
+      });
+    }
+  }
+
+  // -- INGREDIENTS-TO-AVOID --------------------------------------------------
+  if (ingredientsToAvoid.length) {
+    const matches = [];
+    products.forEach(p => {
+      const ings = (p.ingredients || []).map(i => i.toLowerCase());
+      const hits = ingredientsToAvoid.filter(avoid => ings.some(i => i.includes(avoid)));
+      if (hits.length) matches.push({ product: p, hits });
+    });
+    if (matches.length) {
+      recs.push({
+        type: "swap", priority: 1,
+        title: `${matches.length} product${matches.length === 1 ? "" : "s"} contain${matches.length === 1 ? "s" : ""} ingredients you wanted to avoid`,
+        body: matches.map(m => `${m.product.name}: ${m.hits.join(", ")}`).join(" · "),
+        tag: "Avoid List", tagColor: "#8a3a2a", trigger: "ingredients-to-avoid",
+        action: "Replace with formulations that omit these ingredients, or move them out of your daily ritual.",
+        cygne: false,
+      });
+    }
+  }
+
+  // Apply known-active suppression to additions only (don't suppress
+  // conflict fixes or simplifications even if user said they "know" the
+  // active — the conflict exists regardless of familiarity).
+  const filtered = recs.filter(r => !suppressKnown(r));
+
+  return filtered.sort((a, b) => {
     const typeOrder = { addition: 0, swap: 1, simplify: 2 };
     return (typeOrder[a.type] - typeOrder[b.type]) || (a.priority - b.priority);
   });
@@ -230,7 +332,7 @@ function RecommendationCard({ rec, onAdd, onDismiss }) {
 
   return (
     <div onClick={() => setExpanded(e => !e)}
-      style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: "15px 17px", marginBottom: 8, cursor: "pointer", transition: "border-color 0.2s" }}
+      style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 14, padding: "15px 17px", marginBottom: 8, cursor: "pointer", transition: "border-color 0.2s" }}
       onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(122,144,112,0.4)"}
       onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}>
       <div style={{ display: "flex", alignItems: "flex-start", gap: 11 }}>
@@ -239,10 +341,10 @@ function RecommendationCard({ rec, onAdd, onDismiss }) {
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 4, flexWrap: "wrap" }}>
-            <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", fontWeight: 700, letterSpacing: "0.13em", textTransform: "uppercase", color: rec.tagColor, background: `${rec.tagColor}18`, padding: "2px 7px", borderRadius: 20 }}>{rec.tag}</span>
-            <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.11em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.55 }}>{typeLabelMap[rec.type]}</span>
+            <span style={{ fontSize: 9, fontFamily: "var(--font-body), sans-serif", fontWeight: 400, letterSpacing: "0.13em", textTransform: "uppercase", color: rec.tagColor, background: `${rec.tagColor}18`, padding: "2px 7px", borderRadius: 20 }}>{rec.tag}</span>
+            <span style={{ fontSize: 9, fontFamily: "var(--font-body), sans-serif", letterSpacing: "0.11em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.55 }}>{typeLabelMap[rec.type]}</span>
           </div>
-          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, color: "var(--parchment)", margin: 0, fontWeight: 500, lineHeight: 1.35 }}>{rec.title}</p>
+          <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 13, color: "var(--parchment)", margin: 0, fontWeight: 400, lineHeight: 1.35 }}>{rec.title}</p>
         </div>
         <span style={{ color: "var(--clay)", opacity: 0.35, flexShrink: 0, marginTop: 5, display: "inline-block", transform: expanded ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>
           <Icon name="chevron" size={13} />
@@ -252,22 +354,22 @@ function RecommendationCard({ rec, onAdd, onDismiss }) {
             style={{ background: "none", border: "none", cursor: "pointer", color: "var(--clay)", opacity: 0.3, padding: "0 0 0 2px", flexShrink: 0, marginTop: 3, fontSize: 15, lineHeight: 1 }}
             onMouseEnter={e => e.currentTarget.style.opacity = "0.65"}
             onMouseLeave={e => e.currentTarget.style.opacity = "0.3"}
-            title="Dismiss">×</button>
+            aria-label="Dismiss" title="Dismiss">×</button>
         )}
       </div>
       {expanded && (
         <div style={{ marginTop: 13, paddingTop: 13, borderTop: "1px solid var(--border)" }}>
-          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", margin: "0 0 10px", lineHeight: 1.65 }}>{rec.body}</p>
+          <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 12, color: "var(--clay)", margin: "0 0 10px", lineHeight: 1.65 }}>{rec.body}</p>
           {rec.action && (
             <div style={{ display: "flex", gap: 8, padding: "9px 12px", background: "rgba(122,144,112,0.06)", borderRadius: 9, border: "1px solid rgba(122,144,112,0.14)", marginBottom: 8 }}>
               <span style={{ color: "#7a9070", flexShrink: 0, marginTop: 1 }}><Icon name="check" size={11} /></span>
-              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--parchment)", margin: 0, lineHeight: 1.6 }}>{rec.action}</p>
+              <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--parchment)", margin: 0, lineHeight: 1.6 }}>{rec.action}</p>
             </div>
           )}
           {rec.note && (
             <div style={{ display: "flex", gap: 8, padding: "9px 12px", background: "var(--surface)", borderRadius: 9, border: "1px solid var(--border)", marginBottom: 8 }}>
               <span style={{ color: "var(--clay)", opacity: 0.45, flexShrink: 0, marginTop: 1 }}><Icon name="info" size={11} /></span>
-              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{rec.note}</p>
+              <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{rec.note}</p>
             </div>
           )}
           {rec.type === "addition" && rec.category && onAdd && (
@@ -277,7 +379,7 @@ function RecommendationCard({ rec, onAdd, onDismiss }) {
               onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.18)"}
               onMouseLeave={e => e.currentTarget.style.background = "rgba(122,144,112,0.10)"}>
               <Icon name="plus" size={11} color="#7a9070" />
-              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 600, color: "#7a9070", letterSpacing: "0.08em", textTransform: "uppercase" }}>Add {rec.category} to vanity</span>
+              <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 10, fontWeight: 400, color: "#7a9070", letterSpacing: "0.08em", textTransform: "uppercase" }}>Add {rec.category} to vanity</span>
             </button>
           )}
         </div>
@@ -287,6 +389,11 @@ function RecommendationCard({ rec, onAdd, onDismiss }) {
 }
 
 // -- Refinements Engine ------------------------------------------------------
+// A product on alternating/2-3x/weekly/as-needed is "already handled" — the
+// user has set an intentional spacing. Refinements that nag about stacking
+// or frequency should skip products in this state.
+const isDailyOrUnset = (p) => !p?.frequency || p.frequency === "daily";
+
 function buildRefinements(products, activeMap, conflicts) {
   const cats = products.reduce((acc, p) => { acc[p.category] = (acc[p.category] || []); acc[p.category].push(p); return acc; }, {});
   const refinements = [];
@@ -326,16 +433,21 @@ function buildRefinements(products, activeMap, conflicts) {
   });
 
   if (activeCount >= 3) {
-    const activeSummary = overloadActiveKeys
-      .map(a => { const p = (activeMap[a] || [])[0]; return pName(p) ? `${pName(p)} (${a})` : a; })
-      .join(", ");
-    refinements.push({
-      verb: "Remove", verbColor: "#c06060", icon: "trash",
-      title: `${activeCount} potent actives running simultaneously`,
-      body: `You're running ${activeSummary}. That's more than most barriers can recover from between sessions — even without obvious day-to-day reactions.`,
-      action: "Run 1–2 actives per session. Rotate the others on separate days or evenings.",
-      trigger: "overload",
-    });
+    // Only flag overload when every active is genuinely running daily —
+    // a user who's already spaced one or more actives doesn't need this.
+    const overloadProducts = overloadActiveKeys.flatMap(a => activeMap[a] || []);
+    if (overloadProducts.length > 0 && overloadProducts.every(isDailyOrUnset)) {
+      const activeSummary = overloadActiveKeys
+        .map(a => { const p = (activeMap[a] || [])[0]; return pName(p) ? `${pName(p)} (${a})` : a; })
+        .join(", ");
+      refinements.push({
+        verb: "Remove", verbColor: "#c06060", icon: "trash",
+        title: `${activeCount} potent actives running simultaneously`,
+        body: `You're running ${activeSummary}. That's more than most barriers can recover from between sessions — even without obvious day-to-day reactions.`,
+        action: "Run 1–2 actives per session. Rotate the others on separate days or evenings.",
+        trigger: "overload",
+      });
+    }
   }
 
   // -- 2. REDUCE FREQUENCY ---------------------------------------------------
@@ -347,34 +459,40 @@ function buildRefinements(products, activeMap, conflicts) {
     const retinolProduct = (activeMap["retinol"] || [])[0];
     const exfoliantKey = hasBHA ? "BHA" : "AHA";
     const exfoliantProduct = (activeMap[exfoliantKey] || [])[0];
-    const retinolName = pName(retinolProduct) || "your retinoid";
-    const exfoliantName = pName(exfoliantProduct) || `your ${exfoliantKey}`;
-    refinements.push({
-      verb: "Reduce Frequency", verbColor: "#c49040", icon: "clock",
-      title: `${retinolName} and ${exfoliantName} are both PM`,
-      body: `Using a retinoid and an exfoliant in the same session — or on back-to-back nights — is the most common cause of barrier compromise. Each needs recovery time before the next use.`,
-      action: `${retinolName}: Mon / Wed / Fri. ${exfoliantName}: Tue / Thu. Weekends: cleanser and moisturizer only.`,
-      trigger: "stacking",
-      product: retinolProduct || null,
-    });
+    // Only flag stacking if both products are running daily. Either one
+    // on a non-daily schedule means the user has already created spacing.
+    if (isDailyOrUnset(retinolProduct) && isDailyOrUnset(exfoliantProduct)) {
+      const retinolName = pName(retinolProduct) || "your retinoid";
+      const exfoliantName = pName(exfoliantProduct) || `your ${exfoliantKey}`;
+      refinements.push({
+        verb: "Reduce Frequency", verbColor: "#c49040", icon: "clock",
+        title: `${retinolName} and ${exfoliantName} are both PM`,
+        body: `Using a retinoid and an exfoliant in the same session — or on back-to-back nights — is the most common cause of barrier compromise. Each needs recovery time before the next use.`,
+        action: `${retinolName}: Mon / Wed / Fri. ${exfoliantName}: Tue / Thu. Weekends: cleanser and moisturizer only.`,
+        trigger: "stacking",
+        product: retinolProduct || null,
+      });
+    }
   }
 
   if (hasAHA && hasBHA) {
     const ahaProduct = (activeMap["AHA"] || [])[0];
     const bhaProduct = (activeMap["BHA"] || [])[0];
-    const ahaName = pName(ahaProduct) || "your AHA";
-    const bhaName = pName(bhaProduct) || "your BHA";
-    refinements.push({
-      verb: "Reduce Frequency", verbColor: "#c49040", icon: "clock",
-      title: `${ahaName} (AHA) and ${bhaName} (BHA) — pick one`,
-      body: `AHA resurfaces the top layer of skin. BHA penetrates pores. Using both routinely is excessive for most skin types and causes chronic low-grade barrier disruption.`,
-      action: `Oily or acne-prone: lean on ${bhaName}. Texture or dullness: lean on ${ahaName}. Use the other max 1× per week.`,
-      trigger: "exfoliant-stack",
-      product: ahaProduct || null,
-    });
+    if (isDailyOrUnset(ahaProduct) && isDailyOrUnset(bhaProduct)) {
+      const ahaName = pName(ahaProduct) || "your AHA";
+      const bhaName = pName(bhaProduct) || "your BHA";
+      refinements.push({
+        verb: "Reduce Frequency", verbColor: "#c49040", icon: "clock",
+        title: `${ahaName} (AHA) and ${bhaName} (BHA) — pick one`,
+        body: `AHA resurfaces the top layer of skin. BHA penetrates pores. Using both routinely is excessive for most skin types and causes chronic low-grade barrier disruption.`,
+        action: `Oily or acne-prone: lean on ${bhaName}. Texture or dullness: lean on ${ahaName}. Use the other max 1× per week.`,
+        trigger: "exfoliant-stack",
+        product: ahaProduct || null,
+      });
+    }
   } else {
     const exfoliantProds = products.filter(p => p.category === "Exfoliant");
-    if (exfoliantProds.length > 1) {
+    if (exfoliantProds.length > 1 && exfoliantProds.every(isDailyOrUnset)) {
       const names = exfoliantProds.map(p => pName(p)).filter(Boolean);
       refinements.push({
         verb: "Reduce Frequency", verbColor: "#c49040", icon: "clock",
@@ -388,16 +506,21 @@ function buildRefinements(products, activeMap, conflicts) {
   }
 
   if (activeCount >= 2 && hasRetinol) {
-    const intensityNames = overloadActiveKeys
-      .map(a => { const p = (activeMap[a] || [])[0]; return pName(p) || a; })
-      .join(", ");
-    refinements.push({
-      verb: "Reduce Frequency", verbColor: "#c49040", icon: "clock",
-      title: `${activeCount} actives in rotation — schedule rest nights`,
-      body: `Between ${intensityNames}, your skin is processing something potent most evenings. Chronic over-activing accumulates slowly — no dramatic reaction needed for the barrier to degrade.`,
-      action: "Pick 2 nights per week to go barrier-only: cleanser, moisturizer, SPF — nothing potent. Your actives will absorb better on the days you use them.",
-      trigger: "intensity",
-    });
+    // Only nag about rest nights when every active is running daily.
+    const allActives = overloadActiveKeys
+      .flatMap(a => activeMap[a] || []);
+    if (allActives.length > 0 && allActives.every(isDailyOrUnset)) {
+      const intensityNames = overloadActiveKeys
+        .map(a => { const p = (activeMap[a] || [])[0]; return pName(p) || a; })
+        .join(", ");
+      refinements.push({
+        verb: "Reduce Frequency", verbColor: "#c49040", icon: "clock",
+        title: `${activeCount} actives in rotation — schedule rest nights`,
+        body: `Between ${intensityNames}, your skin is processing something potent most evenings. Chronic over-activing accumulates slowly — no dramatic reaction needed for the barrier to degrade.`,
+        action: "Pick 2 nights per week to go barrier-only: cleanser, moisturizer, SPF — nothing potent. Your actives will absorb better on the days you use them.",
+        trigger: "intensity",
+      });
+    }
   }
 
   // -- 3. REPLACE ------------------------------------------------------------
@@ -495,8 +618,8 @@ function RefinementsCard({ products, activeMap, conflicts }) {
         onMouseLeave={e => { if (!open) e.currentTarget.style.borderColor = "var(--border)"; }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#c49040", flexShrink: 0 }} />
-          <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 600, color: "var(--parchment)", letterSpacing: "0.02em" }}>Refine Your Ritual</span>
-          <span style={{ fontSize: 10, fontFamily: "Space Grotesk, sans-serif", background: "rgba(196,144,64,0.14)", color: "#c49040", padding: "2px 8px", borderRadius: 20, letterSpacing: "0.06em" }}>{refinements.length}</span>
+          <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 12, fontWeight: 400, color: "var(--parchment)", letterSpacing: "0.02em" }}>Refine Your Ritual</span>
+          <span style={{ fontSize: 10, fontFamily: "var(--font-body), sans-serif", background: "rgba(196,144,64,0.14)", color: "#c49040", padding: "2px 8px", borderRadius: 20, letterSpacing: "0.06em" }}>{refinements.length}</span>
         </div>
         <span style={{ color: "var(--clay)", opacity: 0.6, display: "inline-block", transform: open ? "rotate(90deg)" : "none", transition: "transform 0.22s" }}>
           <Icon name="chevron" size={14} />
@@ -504,12 +627,12 @@ function RefinementsCard({ products, activeMap, conflicts }) {
       </button>
 
       {open && (
-        <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderTop: "none", borderRadius: "0 0 14px 14px", padding: "16px 16px 18px" }}>
+        <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderTop: "none", borderRadius: "0 0 14px 14px", padding: "16px 16px 18px" }}>
 
           {/* Verb filter pills */}
           <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
             <button onClick={() => setActiveVerb(null)}
-              style={{ padding: "5px 12px", borderRadius: 20, border: `1px solid ${activeVerb === null ? "var(--sage)" : "var(--border)"}`, background: activeVerb === null ? "rgba(122,144,112,0.10)" : "transparent", color: activeVerb === null ? "var(--parchment)" : "var(--clay)", fontFamily: "Space Grotesk, sans-serif", fontSize: 9, fontWeight: activeVerb === null ? 700 : 400, cursor: "pointer", letterSpacing: "0.1em", textTransform: "uppercase", transition: "all 0.15s" }}>
+              style={{ padding: "5px 12px", borderRadius: 20, border: `1px solid ${activeVerb === null ? "var(--sage)" : "var(--border)"}`, background: activeVerb === null ? "rgba(122,144,112,0.10)" : "transparent", color: activeVerb === null ? "var(--parchment)" : "var(--clay)", fontFamily: "var(--font-body), sans-serif", fontSize: 9, fontWeight: 400, cursor: "pointer", letterSpacing: "0.1em", textTransform: "uppercase", transition: "all 0.15s" }}>
               All
             </button>
             {verbs.map(v => {
@@ -517,7 +640,7 @@ function RefinementsCard({ products, activeMap, conflicts }) {
               const isActive = activeVerb === v;
               return (
                 <button key={v} onClick={() => setActiveVerb(isActive ? null : v)}
-                  style={{ padding: "5px 12px", borderRadius: 20, border: `1px solid ${isActive ? vs.border : "var(--border)"}`, background: isActive ? vs.bg : "transparent", color: isActive ? vs.color : "var(--clay)", fontFamily: "Space Grotesk, sans-serif", fontSize: 9, fontWeight: isActive ? 700 : 400, cursor: "pointer", letterSpacing: "0.1em", textTransform: "uppercase", transition: "all 0.15s" }}>
+                  style={{ padding: "5px 12px", borderRadius: 20, border: `1px solid ${isActive ? vs.border : "var(--border)"}`, background: isActive ? vs.bg : "transparent", color: isActive ? vs.color : "var(--clay)", fontFamily: "var(--font-body), sans-serif", fontSize: 9, fontWeight: 400, cursor: "pointer", letterSpacing: "0.1em", textTransform: "uppercase", transition: "all 0.15s" }}>
                   {v}
                 </button>
               );
@@ -545,8 +668,8 @@ function RefinementItem({ r, vs, onEdit, onDismiss }) {
       onMouseEnter={e => e.currentTarget.style.borderColor = vs.border}
       onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}>
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", fontWeight: 700, letterSpacing: "0.13em", textTransform: "uppercase", color: vs.color, background: `${vs.color}18`, padding: "3px 8px", borderRadius: 20, flexShrink: 0 }}>{r.verb}</span>
-        <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--parchment)", margin: 0, flex: 1, fontWeight: 500, lineHeight: 1.3 }}>{r.title}</p>
+        <span style={{ fontSize: 9, fontFamily: "var(--font-body), sans-serif", fontWeight: 400, letterSpacing: "0.13em", textTransform: "uppercase", color: vs.color, background: `${vs.color}18`, padding: "3px 8px", borderRadius: 20, flexShrink: 0 }}>{r.verb}</span>
+        <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 12, color: "var(--parchment)", margin: 0, flex: 1, fontWeight: 400, lineHeight: 1.3 }}>{r.title}</p>
         <span style={{ color: "var(--clay)", opacity: 0.5, flexShrink: 0, display: "inline-block", transform: open ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>
           <Icon name="chevron" size={12} />
         </span>
@@ -555,16 +678,16 @@ function RefinementItem({ r, vs, onEdit, onDismiss }) {
             style={{ background: "none", border: "none", cursor: "pointer", color: "var(--clay)", opacity: 0.3, padding: "0 0 0 2px", flexShrink: 0, fontSize: 15, lineHeight: 1 }}
             onMouseEnter={e => e.currentTarget.style.opacity = "0.65"}
             onMouseLeave={e => e.currentTarget.style.opacity = "0.3"}
-            title="Dismiss">×</button>
+            aria-label="Dismiss" title="Dismiss">×</button>
         )}
       </div>
       {open && (
         <div style={{ marginTop: 11, paddingTop: 11, borderTop: "1px solid var(--border)" }}>
-          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: "0 0 9px", lineHeight: 1.65 }}>{r.body}</p>
+          <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--clay)", margin: "0 0 9px", lineHeight: 1.65 }}>{r.body}</p>
           {r.action && (
             <div style={{ display: "flex", gap: 8, padding: "9px 11px", background: `${vs.color}0d`, borderRadius: 8, border: `1px solid ${vs.color}28`, marginBottom: r.product && onEdit ? 8 : 0 }}>
               <span style={{ color: vs.color, flexShrink: 0, marginTop: 1 }}><Icon name="check" size={11} /></span>
-              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--parchment)", margin: 0, lineHeight: 1.55 }}>{r.action}</p>
+              <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--parchment)", margin: 0, lineHeight: 1.55 }}>{r.action}</p>
             </div>
           )}
           {r.product && onEdit && (
@@ -573,7 +696,7 @@ function RefinementItem({ r, vs, onEdit, onDismiss }) {
               style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4, padding: "8px 14px", background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.30)", borderRadius: 9, cursor: "pointer", transition: "background 0.15s" }}
               onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.18)"}
               onMouseLeave={e => e.currentTarget.style.background = "rgba(122,144,112,0.10)"}>
-              <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 600, color: "#7a9070", letterSpacing: "0.08em", textTransform: "uppercase" }}>Edit {r.product.brand ? `${r.product.brand} ${r.product.name}` : r.product.name}</span>
+              <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 10, fontWeight: 400, color: "#7a9070", letterSpacing: "0.08em", textTransform: "uppercase" }}>Edit {r.product.brand ? `${r.product.brand} ${r.product.name}` : r.product.name}</span>
               <Icon name="chevron" size={11} color="#7a9070" />
             </button>
           )}

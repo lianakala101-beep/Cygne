@@ -1,50 +1,32 @@
-import { useState, useRef, useEffect } from "react";
-import { Icon, Wordmark, LOGO_SRC } from "./components.jsx";
+import { lazy, Suspense, useState, useRef, useEffect } from "react";
+import { Icon } from "./components.jsx";
 import { analyzeShelf, detectConflicts, buildRoutine, detectActives } from "./engine.js";
 import { RAMP_SCHEDULES, RAMP_ACTIVES } from "./ramp.jsx";
 import { SplashScreen } from "./splash.jsx";
-import { OnboardingScreen } from "./onboarding.jsx";
 import { Dashboard } from "./dashboard.jsx";
 import { MyRoutine } from "./ritualscreen.jsx";
 import { Shelf } from "./vanity.jsx";
 import { Progress } from "./progress.jsx";
-import { ProfileSheet } from "./profile.jsx";
-import { ScanModal } from "./modals.jsx";
-import { ProductModal, RoutineFitSheet } from "./productmodal.jsx";
-import { SwanWelcomeScreen, useLocalStorage, DEMO_PRODUCTS, DEMO_VERSION, getCurrentCycleDay, daysBetweenLocal, toLocalMidnight } from "./utils.jsx";
+import { SwanWelcomeScreen, useLocalStorage, getCurrentCycleDay, daysBetweenLocal, toLocalMidnight, isoWeekNumber, isoWeekYear } from "./utils.jsx";
 import { WeekendNudgeCard } from "./weekend.jsx";
 import { SeasonalNudgeCard } from "./seasonal.jsx";
 import { AuthScreen } from "./auth.jsx";
-import { Reflection, isoWeekNumber } from "./reflection.jsx";
 import { supabase } from "./supabase.js";
+
+// Code-split: gated by user action or onboarding state, so their chunks load
+// on demand rather than blocking initial paint.
+const OnboardingScreen = lazy(() => import("./onboarding.jsx").then(m => ({ default: m.OnboardingScreen })));
+const Reflection       = lazy(() => import("./reflection.jsx").then(m => ({ default: m.Reflection })));
+const ProfileSheet     = lazy(() => import("./profile.jsx").then(m => ({ default: m.ProfileSheet })));
+const ScanModal        = lazy(() => import("./modals.jsx").then(m => ({ default: m.ScanModal })));
+const ProductModal     = lazy(() => import("./productmodal.jsx").then(m => ({ default: m.ProductModal })));
+const RoutineFitSheet  = lazy(() => import("./productmodal.jsx").then(m => ({ default: m.RoutineFitSheet })));
 
 export default function App() {
   // -- Auth state --------------------------------------------------------------
   const [authSession, setAuthSession] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
-
-  // -- Theme: auto by time, manual override ----------------------------------
-  const getAutoTheme = () => {
-    const h = new Date().getHours();
-    return (h >= 7 && h < 19) ? "light" : "dark";
-  };
-  const [themeOverride, setThemeOverride] = useLocalStorage("cygne_theme", null);
-  const theme = themeOverride || getAutoTheme();
-  const toggleTheme = () => setThemeOverride(t => {
-    if (t === null) return getAutoTheme() === "dark" ? "light" : "dark";
-    if (t === "light") return "dark";
-    return "light";
-  });
-  const isAuto = themeOverride === null;
-
-  // Ensure fonts load
-  useEffect(() => {
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Pinyon+Script&display=swap";
-    document.head.appendChild(link);
-  }, []);
 
   const requestNotifications = () => {
     setNotifPermission("granted");
@@ -65,7 +47,6 @@ export default function App() {
   const [notifDismissed, setNotifDismissed] = useLocalStorage("cygne_notifdismissed", false);
   const [tab, setTab] = useState("dashboard");
   const [products, setProducts] = useLocalStorage("cygne_products", []);
-  const [demoVersion, setDemoVersion] = useLocalStorage("cygne_demo_version", null);
   const [modal, setModal] = useState(null);
   const [checkIns, setCheckIns] = useLocalStorage("cygne_checkins", []);
   const [journals, setJournals] = useLocalStorage("cygne_journals", []);
@@ -83,6 +64,11 @@ export default function App() {
   const [waitingRoom, setWaitingRoom] = useLocalStorage("cygne_waitingroom", []);
   const [completedSteps, setCompletedSteps] = useState({ date: null, steps: [] });
   const [rampLog, setRampLog] = useLocalStorage("cygne_ramp_log", []);
+  // Trigger + symptom log captured from the body-acne "What happened today?"
+  // modal. Lifted to App.jsx (was session-only useState in BodyAcneTracker)
+  // so it persists across reloads, syncs to Supabase, and is visible to
+  // SwanSense and Ask Cygne for pattern analysis.
+  const [triggerLog, setTriggerLog] = useLocalStorage("cygne_trigger_log", []);
   const [fitSheet, setFitSheet] = useState(null);
   const [reflections, setReflections] = useLocalStorage("cygne_reflections", []);
 
@@ -117,6 +103,7 @@ export default function App() {
         setWaitingRoom([]);
         setCompletedSteps({ date: null, steps: [] });
         setRampLog([]);
+        setTriggerLog([]);
         setReflections([]);
         setLocationData(null);
         setLocationDenied(false);
@@ -160,6 +147,10 @@ export default function App() {
         // Profile data
         ingredientProfile: meta.ingredientProfile || null,
         medicalHistory: meta.medicalHistory || null,
+        // Onboarding-captured preferences (skin goals, special occasion,
+        // consistency, routine philosophy, climate, environment, travel,
+        // fragrance sensitivity, ingredients to avoid)
+        skinProfile: meta.skinProfile || null,
       });
       // Restore notification state
       if (meta.notifEnabled || meta.amReminderEnabled || meta.pmReminderEnabled) {
@@ -202,8 +193,29 @@ export default function App() {
       if (meta.rampLog && Array.isArray(meta.rampLog)) {
         setRampLog(meta.rampLog);
       }
+      if (meta.triggerLog && Array.isArray(meta.triggerLog)) {
+        setTriggerLog(meta.triggerLog);
+      }
       if (meta.reflections && Array.isArray(meta.reflections)) {
-        setReflections(meta.reflections);
+        // Merge cloud + local by id. Cloud is the canonical record but
+        // local-only entries (cloud write failed mid-flight) must survive
+        // reload — and local copies preserve `inline` data URLs that may
+        // have been stripped from the cloud payload, so prefer them when
+        // the cloud version is missing one.
+        setReflections(prev => {
+          const byId = new Map();
+          for (const r of meta.reflections) if (r?.id) byId.set(r.id, r);
+          for (const r of prev) {
+            if (!r?.id) continue;
+            const cloud = byId.get(r.id);
+            if (!cloud) {
+              byId.set(r.id, r);
+            } else if (!cloud.url && !cloud.path && r.inline) {
+              byId.set(r.id, { ...cloud, inline: r.inline });
+            }
+          }
+          return Array.from(byId.values());
+        });
       }
       if (meta.waitingRoom && Array.isArray(meta.waitingRoom)) {
         setWaitingRoom(meta.waitingRoom);
@@ -327,6 +339,12 @@ export default function App() {
     supabase.auth.updateUser({ data: { rampLog } }).catch(e => console.error("[Cygne] rampLog sync failed:", e));
   }, [rampLog]);
 
+  // -- Sync trigger + symptom log (body-acne "What happened today?") ---------
+  useEffect(() => {
+    if (!profileLoaded.current || !authSession) return;
+    supabase.auth.updateUser({ data: { triggerLog } }).catch(e => console.error("[Cygne] triggerLog sync failed:", e));
+  }, [triggerLog]);
+
   // -- Sync waiting room to Supabase ------------------------------------------
   useEffect(() => {
     if (!profileLoaded.current || !authSession) return;
@@ -342,28 +360,49 @@ export default function App() {
   // -- Reflection entries ------------------------------------------------------
   // Persist immediately on save so a disconnect right after capture doesn't
   // lose the week's triptych + insight snapshot.
+  //
+  // Inline data URLs (entry.inline) can be 300–500KB each. When Supabase
+  // Storage upload succeeds, the entry has a `path` and we drop `inline` —
+  // the signed URL refreshes on load and we keep user_metadata small.
+  // When the storage upload FAILS (no bucket, RLS, network), inline is the
+  // only copy of the photo we have, so we must let it through to
+  // user_metadata or the entry won't round-trip on reload.
+  const stripInlineForCloud = (rs) => rs.map(r => {
+    if (!r) return r;
+    if (!r.path) return r;          // no storage — keep inline as the carrier
+    const { inline: _drop, ...rest } = r;
+    return rest;
+  });
+
   const addReflection = async (entry) => {
     if (!profileLoaded.current && authSession) {
       console.warn("[Cygne] reflection save blocked — profile not loaded yet");
       return;
     }
-    // Replace any existing entry for the same ISO week so re-captures overwrite.
-    const next = [...reflections.filter(r => r.weekNumber !== entry.weekNumber || new Date(r.date).getFullYear() !== new Date(entry.date).getFullYear()), entry];
+    // Replace any existing entry for the same ISO (week, week-year) so a
+    // re-capture overwrites cleanly. ISO week-year is used here (not the
+    // calendar year) so a year boundary doesn't misclassify the match.
+    const entryISOYear = isoWeekYear(new Date(entry.date));
+    const next = [
+      ...reflections.filter(r => r.weekNumber !== entry.weekNumber || isoWeekYear(new Date(r.date)) !== entryISOYear),
+      entry,
+    ];
     setReflections(next);
     if (authSession) {
       try {
-        await supabase.auth.updateUser({ data: { reflections: next } });
-        console.log("[Cygne] reflection saved to Supabase — total:", next.length);
+        await supabase.auth.updateUser({ data: { reflections: stripInlineForCloud(next) } });
+        console.log("[Cygne] reflection saved to Supabase — total:", next.length, "(inline stripped)");
       } catch (e) {
         console.error("[Cygne] reflection save failed:", e);
       }
     }
   };
 
-  // Belt-and-suspenders sync for reflections.
+  // Belt-and-suspenders sync for reflections — same inline-stripping
+  // applies so we don't blow the user_metadata size limit.
   useEffect(() => {
     if (!profileLoaded.current || !authSession) return;
-    supabase.auth.updateUser({ data: { reflections } }).catch(() => {});
+    supabase.auth.updateUser({ data: { reflections: stripInlineForCloud(reflections) } }).catch(() => {});
   }, [reflections]);
 
   // -- Weekly reflection reminder --------------------------------------------
@@ -602,7 +641,11 @@ export default function App() {
 
   // -- Needs onboarding (new signup) ------------------------------------------
   if (needsOnboarding || (!user && authSession)) {
-    return <OnboardingScreen onComplete={handleOnboardingComplete} setLocationData={setLocationData} />;
+    return (
+      <Suspense fallback={<div style={{ minHeight: "100vh", background: "var(--color-ivory)" }} />}>
+        <OnboardingScreen onComplete={handleOnboardingComplete} setLocationData={setLocationData} />
+      </Suspense>
+    );
   }
 
   // -- First run welcome (just completed onboarding) --------------------------
@@ -611,37 +654,16 @@ export default function App() {
 
   // -- Main app ---------------------------------------------------------------
   return (
-    <div className={`theme-${theme}`} style={{ minHeight: "100vh", background: "var(--deep)", paddingBottom: 88, transition: "background 0.4s ease, color 0.4s ease" }}>
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-      <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Pinyon+Script&display=swap" rel="stylesheet" />
+    <div style={{ minHeight: "100vh", background: "var(--deep)", paddingBottom: 88 }}>
       <style>{`
-        @font-face {
-          font-family: 'Fungis Heavy';
-          src: url('/fonts/FUNGIS%20Heavy.otf') format('opentype');
-          font-weight: 700;
-          font-style: normal;
-          font-display: swap;
-        }
-        @font-face {
-          font-family: 'Fungis Normal';
-          src: url('/fonts/FUNGIS%20Regular.otf') format('opentype');
-          font-weight: 400;
-          font-style: normal;
-          font-display: swap;
-        }
-        @font-face {
-          font-family: 'Hellasta Signature';
-          src: url('/fonts/hellastasignature.ttf') format('truetype');
-          font-weight: 400;
-          font-style: normal;
-          font-display: swap;
-        }
+        /* Fonts are declared once in src/index.css. Everything below is
+           the runtime token sheet — colors and aliases the legacy inline
+           styles reference. --sans now resolves to Fungis Normal so any
+           stale "var(--font-body)" callsite ends up in the same family as the
+           rest of the app. */
         :root {
           --sage:      #6e8a72;
-          --script:    'Pinyon Script', cursive;
-          --cursive:   'Pinyon Script', cursive;
-          --sans:      'Space Grotesk', sans-serif;
+          --sans:      'Fungis Normal', 'Fungis', sans-serif;
           /* Cygne design system tokens */
           --color-ivory:        #faf9f4;
           --color-ivory-shadow: #f0ebe0;
@@ -649,52 +671,53 @@ export default function App() {
           --color-inky-moss:    #2d3d2b;
           --color-stone:        #5a5a5a;
           --color-pebble:       #7a7a7a;
-          --font-display:  'Fungis Heavy', 'Space Grotesk', sans-serif;
-          --font-body:     'Fungis Normal', 'Space Grotesk', sans-serif;
-          --font-signature:'Hellasta Signature', 'Pinyon Script', cursive;
-        }
-        .theme-dark {
-          --deep:      #0e100d;
-          --ink:       #151813;
-          --surface:   #1c201a;
-          --border:    rgba(200,215,190,0.09);
-          --parchment: #e8e2d9;
-          --clay:      #8b7355;
-          --muted:     #6b5a43;
-          --taupe:     #8b7355;
-          --overlay:   rgba(8,12,8,0.72);
-          --cta:       #323d30;
-        }
-        .theme-light {
-          --deep:      #f0ece6;
+          --font-display:  'Fungis Heavy', 'Fungis', sans-serif;
+          --font-body:     'Fungis Normal', 'Fungis', sans-serif;
+          /* Surfaces (single light theme) */
+          --deep:      #faf9f4;
           --ink:       #f7f4f0;
           --surface:   #ffffff;
           --border:    rgba(0,0,0,0.10);
-          --parchment: #1a1612;
-          --clay:      #6b5338;
-          --muted:     #a8906c;
+          --parchment: #1c1c1a;
+          --clay:      #5a5a5a;
+          --muted:     #7a7a7a;
           --taupe:     #6b5338;
           --overlay:   rgba(30,25,20,0.5);
           --sage:      #526859;
-          --cta:       #3d5240;
+          --cta:       #2d3d2b;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         input, select, textarea { outline: none; }
         input:focus, select:focus, textarea:focus { border-color: var(--sage) !important; }
         input::placeholder, textarea::placeholder { color: var(--muted); opacity: 0.7; }
         ::-webkit-scrollbar { display: none; }
-        .theme-light ::-webkit-scrollbar { display: none; }
-        .theme-light button:focus { outline: none; }
+        /* Keyboard focus: visible inky-moss ring for :focus-visible only, so
+           mouse/touch interactions stay clean but keyboard navigation is
+           always discoverable. */
+        button:focus { outline: none; }
+        button:focus-visible,
+        a:focus-visible,
+        [role="button"]:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        textarea:focus-visible {
+          outline: 2px solid var(--color-inky-moss, #2d3d2b);
+          outline-offset: 2px;
+          border-radius: 2px;
+        }
+        /* Respect prefers-reduced-motion — disable non-essential transitions
+           and keyframes for users who opt out of animation. */
+        @media (prefers-reduced-motion: reduce) {
+          *, *::before, *::after {
+            animation-duration: 0.001ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.001ms !important;
+            scroll-behavior: auto !important;
+          }
+        }
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
         @keyframes cygneCheckDraw { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
-        @keyframes etherealGlide {
-          0%   { transform: translateY(0px) rotate(0deg); }
-          25%  { transform: translateY(-3px) rotate(-1deg); }
-          50%  { transform: translateY(0px) rotate(0deg); }
-          75%  { transform: translateY(3px) rotate(1deg); }
-          100% { transform: translateY(0px) rotate(0deg); }
-        }
         @keyframes softPulse {
           0%   { transform: scale(1); opacity: 1; }
           50%  { transform: scale(1.06); opacity: 0.7; }
@@ -712,59 +735,54 @@ export default function App() {
           from { opacity: 0; }
           to   { opacity: 1; }
         }
-        @keyframes cygneSwanSongIntro {
-          from { opacity: 0; transform: translateY(12px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        .cygne-swansong-intro { animation: cygneSwanSongIntro 500ms 200ms ease-out both; }
-        .theme-dark option { background: #1a1c1a; color: #e8e2d9; }
-        .theme-light option { background: #f7f4f0; color: #1a1612; }
-        .theme-light input,
-        .theme-light select,
-        .theme-light textarea {
-          background: #f7f4f0 !important;
-          color: #1a1612 !important;
-        }
-        .theme-light .modal-bg {
-          background: rgba(232,226,217,0.55) !important;
-        }
-        .theme-light option {
+        option { background: #f7f4f0; color: #1c1c1a; }
+        input, select, textarea {
           background: #f7f4f0;
-          color: #1a1612;
+          color: #1c1c1a;
         }
-        .theme-light .modal-bg { background: rgba(232,226,217,0.5) !important; }
+        .modal-bg { background: rgba(232,226,217,0.55); }
       `}</style>
 
       {/* Header */}
-      <div style={{ position: "sticky", top: 0, zIndex: 50, background: theme === "dark" ? "rgba(13,15,13,0.94)" : "rgba(240,236,230,0.94)", backdropFilter: "blur(16px)", borderBottom: "1px solid var(--border)", padding: "0 22px" }}>
-        <div style={{ maxWidth: 600, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: 54 }}>
-          <Wordmark size={42} theme={theme} />
+      <div style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(250,249,244,0.94)", backdropFilter: "blur(16px)", borderBottom: "1px solid var(--border)", padding: "0 22px" }}>
+        <div style={{ position: "relative", maxWidth: 600, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "flex-end", height: 76 }}>
+          <img
+            src="/cygne-logo.png"
+            alt="Cygne"
+            style={{
+              position: "absolute",
+              left: "50%",
+              top: "50%",
+              transform: "translate(-50%, -50%)",
+              height: 56,
+              width: "auto",
+              pointerEvents: "none",
+              userSelect: "none",
+              filter: "brightness(0.45) contrast(1.35) saturate(0.6)",
+            }}
+          />
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <button onClick={toggleTheme} title={isAuto ? "Auto theme" : theme === "dark" ? "Dark mode" : "Light mode"}
-              style={{ width: 32, height: 32, borderRadius: "50%", background: "var(--surface)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "border-color 0.2s", color: "var(--clay)", flexShrink: 0 }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(122,144,112,0.5)"}
-              onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}>
-              <Icon name={isAuto ? "auto" : theme === "dark" ? "moon" : "sun"} size={14} />
-            </button>
-            <button onClick={() => setProfileOpen(true)}
-              style={{ width: 34, height: 34, borderRadius: "50%", background: "none", border: "none", cursor: "pointer", padding: 0, WebkitTapHighlightColor: "transparent" }}>
-              <div style={{
-                width: 34, height: 34, borderRadius: "50%",
-                background: "rgba(122,144,112,0.22)",
-                border: "1.5px solid rgba(122,144,112,0.5)",
+            <button
+              onClick={() => setProfileOpen(true)}
+              aria-label="Open profile"
+              style={{
+                width: 44, height: 44,
+                background: "none", border: "none", cursor: "pointer",
+                padding: 0,
                 display: "flex", alignItems: "center", justifyContent: "center",
+                WebkitTapHighlightColor: "transparent",
               }}>
-                <span style={{
-                  fontFamily: "Pinyon Script, cursive",
-                  fontSize: 22,
-                  color: "var(--sage)",
-                  lineHeight: 1,
-                  userSelect: "none",
-                  marginTop: 2,
-                }}>
-                  {user?.name ? user.name.trim()[0].toUpperCase() : "?"}
-                </span>
-              </div>
+              <span style={{
+                fontFamily: "var(--font-display)",
+                fontWeight: 700,
+                fontSize: 22,
+                letterSpacing: "0.04em",
+                color: "var(--color-inky-moss, #2d3d2b)",
+                lineHeight: 1,
+                userSelect: "none",
+              }}>
+                {user?.name ? user.name.trim()[0].toUpperCase() : "?"}
+              </span>
             </button>
           </div>
         </div>
@@ -772,10 +790,10 @@ export default function App() {
 
       {/* Content */}
       <div style={{ maxWidth: 600, margin: "0 auto", padding: "32px 22px 0", animation: "fadeUp 0.3s ease" }} key={tab}>
-        {tab === "dashboard" && <Dashboard products={products} setTab={setTab} checkIns={checkIns} swanPopupDismissed={swanPopupDismissed} onDismissSwanPopup={dismissSwanPopup} treatments={treatments} locationData={locationData} user={user} theme={theme} notifPermission={notifPermission} onRequestNotif={requestNotifications} notifDismissed={notifDismissed} onDismissNotif={() => setNotifDismissed(true)} journals={journals} setCheckIns={setCheckIns} onLoadDemo={() => setProducts(DEMO_PRODUCTS)} />}
+        {tab === "dashboard" && <Dashboard products={products} setTab={setTab} checkIns={checkIns} swanPopupDismissed={swanPopupDismissed} onDismissSwanPopup={dismissSwanPopup} treatments={treatments} locationData={locationData} user={{ ...(user || {}), id: authSession?.user?.id }} notifPermission={notifPermission} onRequestNotif={requestNotifications} notifDismissed={notifDismissed} onDismissNotif={() => setNotifDismissed(true)} journals={journals} setCheckIns={setCheckIns} triggerLog={triggerLog} />}
         {tab === "routine"   && <MyRoutine
           products={products}
-          user={user}
+          user={{ ...(user || {}), id: authSession?.user?.id }}
           cycleDay={getCurrentCycleDay(user)}
           isFlightMode={false}
           journals={journals}
@@ -797,7 +815,6 @@ export default function App() {
           onDelete={id => setProducts(prev => prev.filter(x => x.id !== id))}
           onAdd={() => setModal({ brand: "", name: "", category: "Serum", price: "", ingredients: "" })}
           onToggleRoutine={toggleRoutine}
-          onClearDemo={() => setProducts(prev => prev.filter(p => !p.isDemo))}
           onClearAll={() => setProducts([])}
           onSession={(id, session) => setProducts(prev => prev.map(p => p.id === id ? { ...p, session } : p))}
           waitingRoom={waitingRoom}
@@ -807,58 +824,67 @@ export default function App() {
           }}
           onDismissWaiting={(item) => setWaitingRoom(prev => prev.filter(x => x !== item))}
           checkIns={checkIns}
-          user={user}
-        />}
-        {tab === "reflection" && <Reflection
-          reflections={reflections}
-          onAddReflection={addReflection}
-          products={products}
-          checkIns={checkIns}
-          user={{ ...(user || {}), id: authSession?.user?.id }}
-          locationData={locationData}
           journals={journals}
+          user={{ ...(user || {}), id: authSession?.user?.id }}
+          rampLog={rampLog}
+          onAdvanceRamp={advanceRamp}
+          onHoldRamp={holdRamp}
         />}
-        {tab === "progress"  && <Progress products={products} checkIns={checkIns} setCheckIns={setCheckIns} treatments={treatments} setTreatments={setTreatments} saveTreatment={saveTreatment} removeTreatment={removeTreatment} updateTreatmentDate={updateTreatmentDate} user={user} onAdvanceRamp={advanceRamp} onHoldRamp={holdRamp} onResetRampStart={resetRampStartDate} journals={journals} setJournals={setJournals} onUpdateUser={updateUser} />}
+        {tab === "reflection" && (
+          <Suspense fallback={null}>
+            <Reflection
+              reflections={reflections}
+              onAddReflection={addReflection}
+              products={products}
+              checkIns={checkIns}
+              user={{ ...(user || {}), id: authSession?.user?.id }}
+              locationData={locationData}
+              journals={journals}
+            />
+          </Suspense>
+        )}
+        {tab === "progress"  && <Progress products={products} checkIns={checkIns} setCheckIns={setCheckIns} treatments={treatments} setTreatments={setTreatments} saveTreatment={saveTreatment} removeTreatment={removeTreatment} updateTreatmentDate={updateTreatmentDate} user={user} onAdvanceRamp={advanceRamp} onHoldRamp={holdRamp} onResetRampStart={resetRampStartDate} journals={journals} setJournals={setJournals} onUpdateUser={updateUser} reflections={reflections} triggerLog={triggerLog} setTriggerLog={setTriggerLog} />}
       </div>
 
       {/* Bottom nav */}
-      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: theme === "dark" ? "rgba(13,15,13,0.97)" : "rgba(240,236,230,0.97)", backdropFilter: "blur(16px)", borderTop: "1px solid var(--border)", zIndex: 50 }}>
+      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "rgba(250,249,244,0.97)", backdropFilter: "blur(16px)", borderTop: "1px solid var(--border)", zIndex: 50 }}>
         <div style={{ maxWidth: 600, margin: "0 auto", display: "flex" }}>
           {tabs.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
               style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", padding: "12px 0 18px", background: "none", border: "none", cursor: "pointer", color: tab === t.id ? "var(--sage)" : "var(--clay)", transition: "color 0.2s", gap: 5, position: "relative", opacity: tab === t.id ? 1 : 0.65 }}>
               <Icon name={t.icon} size={tab === t.id ? 20 : 18} />
-              <span style={{ fontFamily: "var(--sans)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", fontWeight: tab === t.id ? 600 : 400 }}>{t.label}</span>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", fontWeight: 400 }}>{t.label}</span>
               {tab === t.id && <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 18, height: 1, background: "var(--sage)" }} />}
             </button>
           ))}
         </div>
       </div>
 
-      {modal && <ProductModal product={modal === "add" ? null : modal} onSave={saveProduct} onClose={() => setModal(null)} user={user} />}
-      {profileOpen && <ProfileSheet user={user} products={products} locationData={locationData} setLocationData={setLocationData} locationDenied={locationDenied} setLocationDenied={setLocationDenied} onUpdateUser={updateUser} onLogout={handleLogout} onClose={() => setProfileOpen(false)} />}
-      {fitSheet && (
-        <RoutineFitSheet
-          product={fitSheet.product}
-          assessment={fitSheet.assessment}
-          onAddNow={() => {
-            setModal(fitSheet.product);
-            setFitSheet(null);
-          }}
-          onDefer={() => {
-            setWaitingRoom(prev => [...prev, {
-              product: fitSheet.product,
-              reason: fitSheet.assessment.reason,
-              detail: fitSheet.assessment.detail,
-              deferTag: fitSheet.assessment.deferTag,
-              savedAt: new Date().toISOString(),
-            }]);
-            setFitSheet(null);
-          }}
-          onClose={() => setFitSheet(null)}
-        />
-      )}
-      {scanOpen && <ScanModal products={products} onAddToShelf={p => {
+      <Suspense fallback={null}>
+        {modal && <ProductModal product={modal === "add" ? null : modal} onSave={saveProduct} onClose={() => setModal(null)} user={user} />}
+        {profileOpen && <ProfileSheet user={user} products={products} locationData={locationData} setLocationData={setLocationData} locationDenied={locationDenied} setLocationDenied={setLocationDenied} onUpdateUser={updateUser} onLogout={handleLogout} onClose={() => setProfileOpen(false)} />}
+        {fitSheet && (
+          <RoutineFitSheet
+            product={fitSheet.product}
+            assessment={fitSheet.assessment}
+            onAddNow={() => {
+              setModal(fitSheet.product);
+              setFitSheet(null);
+            }}
+            onDefer={() => {
+              setWaitingRoom(prev => [...prev, {
+                product: fitSheet.product,
+                reason: fitSheet.assessment.reason,
+                detail: fitSheet.assessment.detail,
+                deferTag: fitSheet.assessment.deferTag,
+                savedAt: new Date().toISOString(),
+              }]);
+              setFitSheet(null);
+            }}
+            onClose={() => setFitSheet(null)}
+          />
+        )}
+        {scanOpen && <ScanModal products={products} onAddToShelf={p => {
           const ingredients = Array.isArray(p.ingredients) ? p.ingredients.join(", ") : (p.ingredients || "");
           // Infer category from ingredients/name when the scan didn't return one
           const inferCategory = () => {
@@ -885,6 +911,7 @@ export default function App() {
             ingredients,
           });
         }} onClose={() => setScanOpen(false)} />}
+      </Suspense>
     </div>
   );
 }

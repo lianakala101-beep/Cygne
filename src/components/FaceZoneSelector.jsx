@@ -107,7 +107,7 @@ export function FaceZoneSelector({ selected = [], onChange }) {
 
       <p
         style={{
-          fontFamily: "var(--font-display, 'Fungis Heavy', 'Space Grotesk', sans-serif)",
+          fontFamily: "var(--font-display, 'Fungis Heavy', 'Fungis Normal', sans-serif)",
           fontWeight: 400,
           fontSize: 10,
           letterSpacing: "0.15em",

@@ -1,14 +1,11 @@
 // Single source of truth for ritual time-of-day period.
 // Import from here; never call getHours() for ritual logic elsewhere.
 
-// Behavior-based: AM until 2pm (or until AM ritual is completed),
-// PM from 2pm onwards and overnight.
+// Morning before noon, evening from noon onwards. If the AM ritual is
+// already fully completed today, surface the PM ritual regardless of hour.
 export const getRitualPeriod = (amCompleted = false) => {
-  const hour = new Date().getHours();
   if (amCompleted) return 'PM';
-  if (hour < 5) return 'PM';          // late night → PM
-  if (hour >= 5 && hour < 14) return 'AM'; // 5am–1:59pm → AM
-  return 'PM';                        // 2pm onwards → PM
+  return new Date().getHours() < 12 ? 'AM' : 'PM';
 };
 
 export const getRitualLabel = (amCompleted = false) => {

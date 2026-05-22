@@ -63,18 +63,100 @@ function buildRoutine(products) {
   return { am: sort(am), pm: sort(pm), periodic };
 }
 
+// Many toning pads list their acid blend on the box but not in app data.
+// Treat anything categorized as a toning pad / pad-named product as having
+// at minimum BHA-like exfoliating action, and surface AHA when "aha" or
+// "glycolic" appears in the name.
+const PAD_NAME_RE = /\b(pad|peel|scrub|exfolian)/i;
+export function isExfoliantLike(product) {
+  if (!product) return false;
+  if (product.category === "Exfoliant") return true;
+  if (product.category === "Toning Pad") return true;
+  if (PAD_NAME_RE.test(product.name || "")) return true;
+  const a = detectActives(product.ingredients || []);
+  return !!(a.AHA || a.BHA || a.PHA);
+}
+
+// Like detectActives, but also infers an exfoliant signature from the
+// product's category and name when the ingredient list doesn't list explicit
+// acids. Used by conflict detection so toning pads still get flagged when
+// stacked with retinol or other exfoliants.
+export function detectActivesFromProduct(product) {
+  if (!product) return {};
+  const actives = { ...detectActives(product.ingredients || []) };
+  const name = (product.name || "").toLowerCase();
+  const isPadCategory = product.category === "Toning Pad";
+  const looksLikePad = PAD_NAME_RE.test(product.name || "");
+  if ((isPadCategory || looksLikePad) && !actives.AHA && !actives.BHA && !actives.PHA) {
+    // Default an unspecified pad to BHA — most clarifying pads are salicylic.
+    actives.BHA = true;
+  }
+  if (/\baha\b|glycolic|lactic|mandelic/i.test(name) && !actives.AHA) actives.AHA = true;
+  if (/\bbha\b|salicylic/i.test(name) && !actives.BHA) actives.BHA = true;
+  if (/\bpha\b|gluconolactone|lactobionic|polyhydroxy/i.test(name) && !actives.PHA) actives.PHA = true;
+  if (/retinol|retinaldehyde|tretinoin/i.test(name) && !actives.retinol) actives.retinol = true;
+  if (/benzoyl peroxide|\bbpo\b/i.test(name) && !actives["benzoyl peroxide"]) actives["benzoyl peroxide"] = true;
+  return actives;
+}
+
+// Returns the sessions a product is scheduled into. Mirrors buildRoutine's
+// daily auto-assignment so periodic products (exfoliants/masks) and shelf
+// products without an explicit session still resolve to the slot they'd
+// land in if used. Used by detectConflicts so we only flag pairs that
+// actually share a session.
+export function getProductSessions(product) {
+  if (!product) return new Set();
+  if (product.session === "am")   return new Set(["am"]);
+  if (product.session === "pm")   return new Set(["pm"]);
+  if (product.session === "both") return new Set(["am", "pm"]);
+  if (product.category === "SPF")          return new Set(["am"]);
+  if (product.category === "Prescription") return new Set(["pm"]);
+  const actives = detectActives(product.ingredients || []);
+  if (product.category === "Toning Pad") {
+    if (actives.AHA && !actives.BHA) return new Set(["pm"]);
+    return new Set(["am", "pm"]);
+  }
+  const hasPMOnly = Object.keys(actives).some(a => ACTIVE_RULES[a]?.pmOnly);
+  const hasAMPref = Object.keys(actives).some(a => ACTIVE_SESSION[a] === "am");
+  if (hasPMOnly) return new Set(["pm"]);
+  if (hasAMPref) {
+    if (["Cleanser", "Moisturizer", "Toner", "Essence", "Mist"].includes(product.category)) return new Set(["am", "pm"]);
+    return new Set(["am"]);
+  }
+  return new Set(["am", "pm"]);
+}
+
 function detectConflicts(products) {
-  const pam = products.map(p => ({ product: p, actives: Object.keys(detectActives(p.ingredients)) }));
+  const pam = products.map(p => ({ product: p, actives: Object.keys(detectActivesFromProduct(p)) }));
   return CONFLICT_RULES.reduce((acc, rule) => {
     const [a, b] = rule.pair;
     const pA = pam.filter(p => p.actives.includes(a)).map(p => p.product);
     const pB = pam.filter(p => p.actives.includes(b)).map(p => p.product);
-    if (pA.length && pB.length) {
-      // Suppress conflict if all products on both sides are intentionally alternating —
-      // they never share a night so the conflict doesn't apply
-      const allAlternating = [...pA, ...pB].every(p => p.frequency === "alternating");
-      if (!allAlternating) acc.push({ ...rule, productsA: pA, productsB: pB });
-    }
+    if (!pA.length || !pB.length) return acc;
+
+    // Only flag the pair when at least one product on each side lands in
+    // the same session. If retinol is auto-scheduled to PM and vitamin C
+    // to AM, the routine engine has already resolved the incompatibility
+    // by splitting them — surfacing a warning would be a false positive.
+    const sharesSession = pA.some(prodA => {
+      const aSes = getProductSessions(prodA);
+      return pB.some(prodB => {
+        if (prodA.id === prodB.id) return false;
+        const bSes = getProductSessions(prodB);
+        for (const s of aSes) if (bSes.has(s)) return true;
+        return false;
+      });
+    });
+    if (!sharesSession) return acc;
+
+    // Suppress when any involved product is on a non-daily schedule.
+    // Alternating, 2-3x, weekly and as-needed all signal that the user
+    // is intentionally spacing the product — the routine is already
+    // handling the conflict and no further nudge is needed.
+    const anyNonDaily = [...pA, ...pB].some(p => p.frequency && p.frequency !== "daily");
+    if (anyNonDaily) return acc;
+
+    acc.push({ ...rule, productsA: pA, productsB: pB });
     return acc;
   }, []);
 }
@@ -82,15 +164,19 @@ function detectConflicts(products) {
 function analyzeShelf(products) {
   const activeMap = {};
   const flags = [];
-  products.forEach(p => { Object.keys(detectActives(p.ingredients)).forEach(a => { if (!activeMap[a]) activeMap[a] = []; activeMap[a].push(p); }); });
+  // Use the product-aware detector so toning pads (and pad-named or
+  // active-named products with sparse ingredient lists) participate in
+  // activeMap. This is what every downstream consumer — intelligence,
+  // swansense, treatment recovery — already expects.
+  products.forEach(p => { Object.keys(detectActivesFromProduct(p)).forEach(a => { if (!activeMap[a]) activeMap[a] = []; activeMap[a].push(p); }); });
   for (const [active, prods] of Object.entries(activeMap)) {
     if (prods.length > 1 && !["hyaluronic acid", "ceramides"].includes(active)) {
       if (active === "niacinamide" && prods.length <= 2) continue;
       flags.push({ severity: "caution", label: `${active} in ${prods.length} products`, detail: prods.map(p => p.name).join(", ") });
     }
   }
-  const exfCount = products.filter(p => { const a = detectActives(p.ingredients); return a.AHA || a.BHA || p.category === "Exfoliant"; }).length;
-  if (exfCount > 1) flags.push({ severity: "warning", label: `${exfCount} exfoliants detected`, detail: "Multiple exfoliants risk barrier damage. Alternate days — never layer." });
+  const exfCount = products.filter(p => isExfoliantLike(p)).length;
+  if (exfCount > 1) flags.push({ severity: "warning", label: `${exfCount} exfoliants detected`, detail: "Multiple exfoliants — including toning pads — risk barrier damage. Alternate days, never layer in the same session." });
   if (!products.some(p => p.category === "SPF" || p.category === "SPF Moisturizer" || detectActives(p.ingredients || []).SPF)) flags.push({ severity: "missing", label: "No SPF in your vanity", detail: "Daily SPF is non-negotiable — even indoors, even in winter." });
   if (!products.some(p => p.category === "Moisturizer" || p.category === "SPF Moisturizer" || p.category === "Oil")) flags.push({ severity: "missing", label: "No moisturizer detected", detail: "A moisturizer is a foundational step in every ritual." });
   return { activeMap, flags };
@@ -104,14 +190,54 @@ function calcSpending(products) {
 }
 
 
+// Humectant-forward products absorb best on damp skin (Essence/HA Serum/etc).
+const DAMP_KEYWORDS = ["hyaluronic", "sodium hyaluronate", "glycerin", "panthenol", "sodium pca", "urea", "propylene glycol", "butylene glycol"];
+const DAMP_CATEGORIES = ["Essence", "Toner", "Mist"];
+export function isDampSkinProduct(product) {
+  if (!product) return false;
+  if (DAMP_CATEGORIES.includes(product.category)) return true;
+  const ingArr = Array.isArray(product.ingredients)
+    ? product.ingredients
+    : typeof product.ingredients === "string"
+      ? product.ingredients.split(",").map(s => s.trim()).filter(Boolean)
+      : [];
+  const lower = ingArr.map(i => i.toLowerCase());
+  return DAMP_KEYWORDS.some(k => lower.some(ing => ing.includes(k)));
+}
+
+// Trim an ordered step list to match the user's stated routine philosophy.
+// Categories considered "optional" cascade out as the philosophy gets
+// shorter:
+//   Multi-Step / blank   → keep everything
+//   Somewhere In Between → drop Mask + Oil
+//   Minimalist           → also drop Eye Cream + Mist + Toning Pad
+// Active core layers (Cleanser, Toner, Essence, Serum, Moisturizer, SPF,
+// Prescription) are always preserved regardless of philosophy.
+export function applyPhilosophy(steps, philosophy = "") {
+  if (!Array.isArray(steps) || !steps.length) return steps;
+  const p = String(philosophy).toLowerCase();
+  if (!p || p.includes("multi-step")) return steps;
+  const drop = new Set();
+  if (p.includes("somewhere") || p.includes("between")) {
+    ["Mask", "Oil"].forEach(c => drop.add(c));
+  } else if (p.includes("minimal")) {
+    ["Mask", "Oil", "Eye Cream", "Mist", "Toning Pad"].forEach(c => drop.add(c));
+  }
+  return steps.filter(s => !drop.has(s.category));
+}
+
+// Returns the conflict rules a single product participates in, given the
+// full product list. Used by Vanity cards to surface per-product warnings.
+export function getProductConflicts(product, products = []) {
+  if (!product) return [];
+  return detectConflicts(products).filter(c =>
+    (c.productsA || []).some(p => p.id === product.id) ||
+    (c.productsB || []).some(p => p.id === product.id)
+  );
+}
+
 export { isScheduledToday, getNextUseLabel, getCurrentSession, detectActives, buildRoutine, detectConflicts, analyzeShelf, calcSpending };
 
 export function hasSPFCoverage(products, activeMap) {
   return products.some(p => p.category === "SPF" || p.category === "SPF Moisturizer" || (p.ingredients && detectActives(p.ingredients).SPF));
-}
-
-export function isDampSkinProduct(product) {
-  const name = (product.name || "").toLowerCase();
-  const cat = (product.category || "").toLowerCase();
-  return cat === "essence" || cat === "toner" || name.includes("essence") || name.includes("lotion") || name.includes("toner");
 }

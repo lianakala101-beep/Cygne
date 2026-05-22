@@ -1,6 +1,27 @@
 // Supabase Edge Function: ask-cygne
-// Accepts a skincare question, checks cache + daily usage limit, fetches
-// user context, calls Claude, and returns a personalised response.
+//
+// Accepts a skincare question + the user's context, checks a 60-minute
+// response cache, enforces a 3/day per-user limit, and proxies to Claude.
+//
+// Context comes FROM THE CLIENT in the request body — the Cygne app stores
+// products / journals / skinProfile in auth.user_metadata, not in tables, so
+// the function doesn't query Postgres for those fields. Two cache + usage
+// tables (ask_cygne_cache, ask_cygne_usage) are persisted server-side via
+// the service role key.
+//
+// Body shape:
+//   {
+//     userId:    string         (required — auth user id)
+//     question:  string         (required)
+//     sessionId: string         (optional — for log correlation)
+//     context:   string         (optional — pre-built context paragraph)
+//     products:  Product[]      (optional — vanity products)
+//     journals:  JournalEntry[] (optional — recent skin journal entries)
+//     checkIns:  CheckIn[]      (optional — ritual check-ins)
+//     skinProfile: object       (optional — onboarding profile)
+//     skinType:  string         (optional)
+//     concerns:  string[]       (optional)
+//   }
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -17,6 +38,98 @@ const json = (data: unknown, status = 200) =>
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
 
+// Convert client-side state into a single context paragraph for the prompt.
+// All inputs are optional — return what we can describe, fall back politely.
+function buildContextFromBody(body: any): string {
+  if (typeof body.context === "string" && body.context.trim()) {
+    return body.context.trim();
+  }
+
+  const parts: string[] = [];
+  const skinType = body.skinType || body.user?.skinType;
+  const concerns = body.concerns || body.user?.concerns;
+  if (skinType) parts.push(`Skin type: ${skinType}.`);
+  if (Array.isArray(concerns) && concerns.length) {
+    parts.push(`Concerns: ${concerns.join(", ")}.`);
+  }
+
+  const profile = body.skinProfile || body.user?.skinProfile;
+  if (profile) {
+    if (profile.skinGoals?.length) parts.push(`Goals: ${profile.skinGoals.join(", ")}.`);
+    if (profile.routinePhilosophy)  parts.push(`Routine philosophy: ${profile.routinePhilosophy}.`);
+    if (profile.climate)            parts.push(`Climate: ${profile.climate}.`);
+    if (profile.environment)        parts.push(`Environment: ${profile.environment}.`);
+    if (profile.fragrance)          parts.push(`Fragrance preference: ${profile.fragrance}.`);
+    if (profile.specialOccasion)    parts.push(`Upcoming occasion: ${profile.specialOccasion}.`);
+    if (profile.ingredientsToAvoid) parts.push(`Ingredients to avoid: ${profile.ingredientsToAvoid}.`);
+  }
+
+  if (Array.isArray(body.products) && body.products.length) {
+    const inRoutine = body.products.filter((p: any) => p?.inRoutine !== false);
+    const list = inRoutine.slice(0, 12)
+      .map((p: any) => [p.brand, p.name].filter(Boolean).join(" "))
+      .filter(Boolean);
+    if (list.length) {
+      parts.push(`In routine (${inRoutine.length} product${inRoutine.length === 1 ? "" : "s"}): ${list.join("; ")}.`);
+    }
+  }
+
+  if (Array.isArray(body.journals) && body.journals.length) {
+    const recent = body.journals.slice(-7);
+    const conditions = recent.map((j: any) => j.condition).filter(Boolean);
+    const zones = [...new Set(recent.flatMap((j: any) => j.affectedZones || []))];
+    const sleepPoor = recent.filter((j: any) => j.sleep === "poor").length;
+    const stressHigh = recent.filter((j: any) => j.stress === "high").length;
+    const journalBits: string[] = [];
+    if (conditions.length) journalBits.push(`recent skin: ${conditions.join(", ")}`);
+    if (zones.length)      journalBits.push(`zones logged: ${zones.join(", ")}`);
+    if (sleepPoor)         journalBits.push(`${sleepPoor} poor-sleep night${sleepPoor === 1 ? "" : "s"}`);
+    if (stressHigh)        journalBits.push(`${stressHigh} high-stress day${stressHigh === 1 ? "" : "s"}`);
+    if (journalBits.length) parts.push(`Last week — ${journalBits.join("; ")}.`);
+  }
+
+  if (Array.isArray(body.checkIns) && body.checkIns.length) {
+    const recent = body.checkIns.slice(-5);
+    const irritated = recent.filter((c: any) => c.irritation && c.irritation !== "none").length;
+    const breakouts = recent.filter((c: any) => c.breakout).length;
+    const checkBits: string[] = [];
+    if (irritated) checkBits.push(`${irritated} irritation flag${irritated === 1 ? "" : "s"}`);
+    if (breakouts) checkBits.push(`${breakouts} breakout day${breakouts === 1 ? "" : "s"}`);
+    if (checkBits.length) parts.push(`Recent check-ins — ${checkBits.join(", ")}.`);
+  }
+
+  if (Array.isArray(body.triggerLog) && body.triggerLog.length) {
+    const recent = body.triggerLog.slice(-7);
+    const triggers: Record<string, number> = {};
+    const symptoms: Record<string, number> = {};
+    recent.forEach((e: any) => {
+      (e?.triggers || []).forEach((t: string) => { triggers[t] = (triggers[t] || 0) + 1; });
+      (e?.symptoms || []).forEach((s: string) => { symptoms[s] = (symptoms[s] || 0) + 1; });
+    });
+    const topTriggers = Object.entries(triggers).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([k]) => k);
+    const topSymptoms = Object.entries(symptoms).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([k]) => k);
+    const bodyBits: string[] = [];
+    if (topTriggers.length) bodyBits.push(`triggers: ${topTriggers.join(", ")}`);
+    if (topSymptoms.length) bodyBits.push(`symptoms: ${topSymptoms.join(", ")}`);
+    if (bodyBits.length) parts.push(`Recent body log — ${bodyBits.join("; ")}.`);
+  }
+
+  return parts.join(" ") || "No detailed context provided.";
+}
+
+const SYSTEM_PROMPT_BASE = `You are Cygne, a luxury skincare expert and the user's personal skin ritual guide.
+
+YOUR RULES:
+- Respond in 3-5 sentences maximum. Be concise.
+- Be empathetic, warm, and clinical — like a knowledgeable friend who is also an expert.
+- Reference the user's SPECIFIC products and patterns from their context whenever relevant — never give generic advice if context is available.
+- If you identify a potential ingredient conflict, name the specific products involved.
+- Always end with one concrete, actionable next step.
+- Never diagnose medical conditions.
+- Always include this exact line at the end: "Note: Cygne provides skincare guidance, not medical advice. For persistent concerns, consult a dermatologist."
+- Tone: editorial, never clinical or chatbot-like.
+- Never use bullet points — write in flowing prose only.`;
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
@@ -32,11 +145,19 @@ Deno.serve(async (req) => {
     const serviceKey  = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const db = createClient(supabaseUrl, serviceKey);
 
-    const { userId, question, sessionId } = await req.json();
+    const body = await req.json();
+    const { userId, question, sessionId } = body;
     if (!userId || !question?.trim()) {
       return json({ error: "Missing userId or question" }, 400);
     }
     const q = question.trim();
+    console.log(
+      "[ask-cygne] received | userId:", userId,
+      "| sessionId:", sessionId,
+      "| question chars:", q.length,
+      "| products:", Array.isArray(body.products) ? body.products.length : 0,
+      "| journals:", Array.isArray(body.journals) ? body.journals.length : 0,
+    );
 
     // ── A. CACHE CHECK ────────────────────────────────────────────────────────
     const sixtyMinutesAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
@@ -65,102 +186,21 @@ Deno.serve(async (req) => {
       .gte("created_at", todayStart.toISOString());
 
     if ((count ?? 0) >= 3) {
+      // Return 200 with a soft-error payload so supabase-js surfaces the
+      // body to the client. (Functions invoke() drops the body on non-2xx.)
       return json({
         error: "limit_reached",
         message:
           "You have used your 3 deep reflections for today. Return tomorrow for fresh insight.",
-      }, 429);
+      }, 200);
     }
 
-    // ── C. FETCH USER CONTEXT ─────────────────────────────────────────────────
-    const sevenDaysAgo   = new Date(Date.now() - 7  * 86_400_000).toISOString();
-    const fourteenDaysAgo = new Date(Date.now() - 14 * 86_400_000).toISOString();
+    // ── C. BUILD CONTEXT ──────────────────────────────────────────────────────
+    const contextSummary = buildContextFromBody(body);
+    const systemPrompt = `${SYSTEM_PROMPT_BASE}\n\nUSER CONTEXT:\n${contextSummary}`;
 
-    const [
-      { data: ritualLogs },
-      { data: vanityProducts },
-      { data: journalEntries },
-      { data: skinProfile },
-    ] = await Promise.all([
-      db.from("ritual_logs")
-        .select("product_name, step_category, used_date, completed")
-        .eq("user_id", userId)
-        .gte("used_date", sevenDaysAgo),
-      db.from("vanity_products")
-        .select("product_name, brand, category, key_ingredients")
-        .eq("user_id", userId),
-      db.from("skin_journal")
-        .select("note, skin_feel, logged_date")
-        .eq("user_id", userId)
-        .gte("logged_date", fourteenDaysAgo),
-      db.from("skin_profiles")
-        .select("skin_goals, skin_frustration, climate, stress_level, sleep_hours")
-        .eq("user_id", userId)
-        .maybeSingle(),
-    ]);
-
-    // ── D. SUMMARISE CONTEXT ──────────────────────────────────────────────────
-    let ritualSummary = "No ritual log data available for this user.";
-    if (ritualLogs?.length) {
-      const completed   = ritualLogs.filter((r) => r.completed).length;
-      const productNames = [...new Set(ritualLogs.map((r) => r.product_name).filter(Boolean))];
-      ritualSummary =
-        `User has completed ${completed} ritual steps in the last 7 days. ` +
-        `Products used include: ${productNames.join(", ") || "none recorded"}.`;
-    }
-
-    let vanitySummary = "No vanity product data available.";
-    if (vanityProducts?.length) {
-      const list = vanityProducts
-        .map((p) => [p.brand, p.product_name].filter(Boolean).join(" "))
-        .filter(Boolean);
-      vanitySummary =
-        `Current vanity contains ${vanityProducts.length} product(s): ${list.join(", ")}.`;
-    }
-
-    let journalSummary = "No recent skin journal entries.";
-    if (journalEntries?.length) {
-      const notes    = journalEntries.map((j) => j.note).filter(Boolean);
-      const feelings = journalEntries.map((j) => j.skin_feel).filter(Boolean);
-      journalSummary =
-        "User has noted the following skin observations: " +
-        (notes.length ? notes.join("; ") : "no text notes") +
-        `. Skin feel logged: ${feelings.join(", ") || "not recorded"}.`;
-    }
-
-    let profileSummary = "No skin profile data available.";
-    if (skinProfile) {
-      const parts: string[] = [];
-      if (skinProfile.skin_goals)       parts.push(`Goals: ${skinProfile.skin_goals}`);
-      if (skinProfile.skin_frustration) parts.push(`Frustrations: ${skinProfile.skin_frustration}`);
-      if (skinProfile.climate)          parts.push(`Climate: ${skinProfile.climate}`);
-      if (skinProfile.stress_level)     parts.push(`Stress level: ${skinProfile.stress_level}`);
-      if (skinProfile.sleep_hours)      parts.push(`Sleep: ${skinProfile.sleep_hours} hours`);
-      if (parts.length) profileSummary = parts.join(". ") + ".";
-    }
-
-    // ── E. SYSTEM PROMPT ──────────────────────────────────────────────────────
-    const systemPrompt = `You are Cygne, a luxury skincare expert and the user's personal skin ritual guide.
-
-USER CONTEXT:
-${ritualSummary}
-${vanitySummary}
-${journalSummary}
-${profileSummary}
-
-YOUR RULES:
-- Respond in 3-5 sentences maximum. Be concise.
-- Be empathetic, warm, and clinical — like a knowledgeable friend who is also an expert
-- Reference the user's SPECIFIC products and patterns from their context — never give generic advice
-- If you identify a potential ingredient conflict, name the specific products involved
-- Always end with one concrete, actionable next step
-- Never diagnose medical conditions
-- Always include this exact line at the end: "Note: Cygne provides skincare guidance, not medical advice. For persistent concerns, consult a dermatologist."
-- Tone: editorial, never clinical or chatbot-like
-- Never use bullet points — write in flowing prose only`;
-
-    // ── F. CALL CLAUDE (streaming to avoid idle-timeout on the TCP connection) ──
-    console.log("[ask-cygne] calling Claude for user", userId, "session", sessionId);
+    // ── D. CALL CLAUDE (streaming SSE; we collect into one string) ────────────
+    console.log("[ask-cygne] calling Claude for user", userId);
     const claudeRes = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
@@ -170,7 +210,7 @@ YOUR RULES:
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-6",
-        max_tokens: 300,
+        max_tokens: 400,
         stream: true,
         system: systemPrompt,
         messages: [{ role: "user", content: q }],
@@ -180,18 +220,20 @@ YOUR RULES:
     if (!claudeRes.ok) {
       const errBody = await claudeRes.text();
       console.error("[ask-cygne] Claude error:", claudeRes.status, errBody.slice(0, 400));
-      return json({ error: "AI request failed" }, 502);
+      return json({ error: "AI request failed", status: claudeRes.status, body: errBody.slice(0, 400) }, 502);
     }
 
-    // Read the SSE stream and collect all text_delta chunks into a single string.
     let responseText = "";
     const reader = claudeRes.body!.getReader();
     const decoder = new TextDecoder();
+    let buffer = "";
     outer: while (true) {
       const { done, value } = await reader.read();
       if (done) break;
-      const chunk = decoder.decode(value, { stream: true });
-      for (const line of chunk.split("\n")) {
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split("\n");
+      buffer = lines.pop() ?? "";
+      for (const line of lines) {
         if (!line.startsWith("data: ")) continue;
         const payload = line.slice(6).trim();
         if (payload === "[DONE]") break outer;
@@ -200,22 +242,32 @@ YOUR RULES:
           if (evt.type === "content_block_delta" && evt.delta?.type === "text_delta") {
             responseText += evt.delta.text;
           }
-        } catch { /* ignore malformed lines */ }
+        } catch {
+          /* ignore malformed lines */
+        }
       }
     }
 
-    if (!responseText) return json({ error: "Empty response from AI" }, 502);
+    if (!responseText.trim()) {
+      console.error("[ask-cygne] empty response from Claude");
+      return json({ error: "Empty response from AI" }, 502);
+    }
 
-    // ── G. SAVE CACHE + USAGE ─────────────────────────────────────────────────
+    // ── E. SAVE CACHE + USAGE (best-effort; failures don't block response) ────
     const now = new Date().toISOString();
-    await Promise.all([
+    const writes = await Promise.allSettled([
       db.from("ask_cygne_cache").insert({
         user_id: userId, question: q, response: responseText, created_at: now,
       }),
       db.from("ask_cygne_usage").insert({ user_id: userId, created_at: now }),
     ]);
+    writes.forEach((w, i) => {
+      if (w.status === "rejected") {
+        console.error("[ask-cygne] persist failed", i, w.reason);
+      }
+    });
 
-    console.log("[ask-cygne] done for user", userId);
+    console.log("[ask-cygne] done for user", userId, "chars:", responseText.length);
     return json({ response: responseText, cached: false });
 
   } catch (err) {

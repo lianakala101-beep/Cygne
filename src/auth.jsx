@@ -74,22 +74,29 @@ function AuthScreen({ onAuth }) {
       padding: "0 36px",
     }}>
 
-      {/* Logo */}
+      {/* Logo — width-only constraint so the natural 6710×3407 aspect ratio
+          is preserved. flexShrink: 0 prevents the column flexbox from
+          compressing the image vertically on short viewports. */}
       <img
         src="/cygne-logo.png"
-        alt=""
+        alt="Cygne"
         style={{
-          width: "48%",
-          maxWidth: 200,
+          width: 180,
+          height: "auto",
+          maxWidth: "70%",
+          flexShrink: 0,
           display: "block",
           margin: "0 auto 52px",
+          opacity: 1,
+          filter: "none",
+          mixBlendMode: "normal",
         }}
       />
 
       {/* Heading */}
       <p style={{
         fontFamily: "var(--font-display, 'Fungis', sans-serif)",
-        fontWeight: 700,
+        fontWeight: 400,
         fontSize: 13,
         letterSpacing: "0.15em",
         textTransform: "uppercase",
@@ -136,11 +143,11 @@ function AuthScreen({ onAuth }) {
           }}>
             {rememberMe && (
               <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
-                <path d="M1 3.5L3.5 6L8 1" stroke="white" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M1 3.5L3.5 6L8 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             )}
           </div>
-          <span style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 10, letterSpacing: "0.15em", color: "var(--color-stone)" }}>
+          <span style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 10, letterSpacing: "0.18em", color: "var(--color-inky-moss, #2d3d2b)" }}>
             REMEMBER ME
           </span>
         </div>
@@ -150,7 +157,7 @@ function AuthScreen({ onAuth }) {
         <p style={{
           width: "100%",
           maxWidth: 320,
-          fontFamily: "var(--font-body, 'Space Grotesk', sans-serif)",
+          fontFamily: "var(--font-body, 'Fungis Normal', sans-serif)",
           fontSize: 11,
           color: "#8b7355",
           margin: "0 0 14px",
@@ -189,9 +196,9 @@ function AuthScreen({ onAuth }) {
           marginTop: 20,
           background: "none",
           border: "none",
-          fontFamily: "var(--font-body, 'Space Grotesk', sans-serif)",
-          fontSize: 11,
-          color: "#7a7a7a",
+          fontFamily: "var(--font-body, 'Fungis Normal', sans-serif)",
+          fontSize: 12,
+          color: "var(--color-inky-moss, #2d3d2b)",
           cursor: "pointer",
           padding: "8px 0",
           letterSpacing: "0.04em",
@@ -215,9 +222,9 @@ function AuthScreen({ onAuth }) {
             marginTop: 12,
             background: "none",
             border: "none",
-            fontFamily: "var(--font-body, 'Space Grotesk', sans-serif)",
-            fontSize: 11,
-            color: "var(--color-pebble, #7a7a7a)",
+            fontFamily: "var(--font-body, 'Fungis Normal', sans-serif)",
+            fontSize: 12,
+            color: "var(--color-inky-moss, #2d3d2b)",
             cursor: "pointer",
             padding: "4px 0",
             letterSpacing: "0.04em",
@@ -228,7 +235,7 @@ function AuthScreen({ onAuth }) {
       )}
 
       {resetSent && (
-        <p style={{ fontSize: 11, color: "var(--color-stone, #5a5a5a)", marginTop: 12, textAlign: "center", letterSpacing: "0.02em" }}>
+        <p style={{ fontSize: 12, color: "var(--color-inky-moss, #2d3d2b)", marginTop: 12, textAlign: "center", letterSpacing: "0.02em" }}>
           Reset link sent — check your email.
         </p>
       )}
@@ -242,7 +249,7 @@ const inputStyle = {
   background: "transparent",
   border: "1px solid rgba(28,28,26,0.25)",
   borderRadius: 0,
-  fontFamily: "var(--font-body, 'Space Grotesk', sans-serif)",
+  fontFamily: "var(--font-body, 'Fungis Normal', sans-serif)",
   fontSize: 14,
   color: "#1c1c1a",
   outline: "none",

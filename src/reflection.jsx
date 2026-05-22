@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "./components.jsx";
 import { supabase } from "./supabase.js";
 import { getSwanSensePredictions } from "./swansense.jsx";
-import { compressImageBlob } from "./utils.jsx";
+import { compressImageBlob, isoWeekNumber, isoWeekYear } from "./utils.jsx";
 
 // ---------------------------------------------------------------------------
 // Reflection — a weekly triptych gallery of the user's skin journey.
@@ -20,32 +20,13 @@ const OVERLAY    = "var(--overlay)";
 const CTA_BG     = "var(--cta)";
 const CTA_BORDER = "rgba(160,160,160,0.40)";
 const CURSIVE    = "var(--font-display)";
-const SANS       = "var(--sans)";
+const SANS       = "var(--font-body)";
 
 const ANGLES = [
   { key: "front", label: "Front", hint: "Face the lens. Chin level, shoulders soft." },
   { key: "left",  label: "Tilt Left",  hint: "Turn your head gently to the left." },
   { key: "right", label: "Tilt Right", hint: "Turn your head gently to the right." },
 ];
-
-// ISO week of the year (1..53). Used as the per-entry week number so the
-// label wheel lines up with the seasons.
-export function isoWeekNumber(date = new Date()) {
-  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-  const day = d.getUTCDay() || 7;
-  d.setUTCDate(d.getUTCDate() + 4 - day);
-  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-  return Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
-}
-
-// ISO week year — the year that "owns" this ISO week (may differ from calendar year
-// in the first/last days of January/December).
-function isoWeekYear(d) {
-  const dt = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-  const day = dt.getUTCDay() || 7;
-  dt.setUTCDate(dt.getUTCDate() + 4 - day);
-  return dt.getUTCFullYear();
-}
 
 // Monday of the given ISO week/year (UTC).
 function isoWeekToMonday(weekNum, isoYear) {
@@ -91,17 +72,46 @@ export function weekLabel(weekNumber) {
 }
 
 // Lunar phase for a given date — names only, no glyphs.
+//
+// Anchor: the new moon at 2000-01-06 18:14 UTC, a NASA-published lunation
+// instant. Mean synodic period 29.53058867 days (Meeus, "Astronomical
+// Algorithms", 2nd ed., ch. 49).
+//
+// Classification follows the public convention used by timeanddate.com and
+// most lunar calendars: the four principal phases (New, First Quarter, Full,
+// Last Quarter) are *instants* — we widen each to a ±0.5-day window so a
+// day-of capture still reads the principal name. Everything else falls into
+// one of the four intermediate phases by quadrant.
+const SYNODIC_MONTH = 29.53058867;
+const REFERENCE_NEW_MOON_MS = Date.UTC(2000, 0, 6, 18, 14, 0);
+
 export function getMoonPhase(date) {
-  const phases = [
-    "New Moon", "Waxing Crescent", "First Quarter", "Waxing Gibbous",
-    "Full Moon", "Waning Gibbous", "Last Quarter", "Waning Crescent",
-  ];
-  const synodicMonth = 29.53058867;
-  const knownNewMoon = new Date("2000-01-06T18:14:00Z");
-  const daysSince = (date - knownNewMoon) / (1000 * 60 * 60 * 24);
-  const phase = ((daysSince % synodicMonth) + synodicMonth) % synodicMonth;
-  const index = Math.round(phase / (synodicMonth / 8)) % 8;
-  return phases[index];
+  const daysSince = (date.getTime() - REFERENCE_NEW_MOON_MS) / 86400000;
+  const phaseDays = ((daysSince % SYNODIC_MONTH) + SYNODIC_MONTH) % SYNODIC_MONTH;
+  const fraction = phaseDays / SYNODIC_MONTH; // 0..1 across the cycle
+
+  // Principal-phase tolerance: ±0.5 day, expressed as a fraction of the cycle.
+  const principalWindow = 0.5 / SYNODIC_MONTH;
+
+  // Snap to the nearest principal anchor at 0 / 0.25 / 0.5 / 0.75. The 0
+  // anchor wraps to 1, so we check both edges when measuring distance.
+  const nearestPrincipal = Math.round(fraction * 4) / 4;
+  const dist = Math.min(
+    Math.abs(fraction - nearestPrincipal),
+    Math.abs(fraction - nearestPrincipal - 1),
+    Math.abs(fraction - nearestPrincipal + 1),
+  );
+  if (dist < principalWindow) {
+    if (nearestPrincipal === 0 || nearestPrincipal === 1) return "New Moon";
+    if (nearestPrincipal === 0.25) return "First Quarter";
+    if (nearestPrincipal === 0.5)  return "Full Moon";
+    if (nearestPrincipal === 0.75) return "Last Quarter";
+  }
+  // Otherwise pick the intermediate phase by quadrant.
+  if (fraction < 0.25) return "Waxing Crescent";
+  if (fraction < 0.5)  return "Waxing Gibbous";
+  if (fraction < 0.75) return "Waning Gibbous";
+  return "Waning Crescent";
 }
 
 function formatDateLong(iso) {
@@ -164,8 +174,20 @@ function dataUrlToBlob(dataUrl) {
 // We prefer signed URLs so the gallery works with private buckets + RLS
 // (which is the right default for per-user photos). Falls back to a public
 // URL, then to the inline data URL if storage isn't configured at all.
+// The first folder segment of the upload path must equal the caller's
+// auth.uid()::text for the RLS policy in the reflections bucket migration
+// to allow the write. A loose "local" or missing userId would write to a
+// folder no one can ever read back. Refuse those uploads up-front so we
+// fall through to the inline data-URL fallback cleanly instead of leaving
+// orphaned objects in storage.
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 async function uploadTriptych(userId, entryId, dataUrl) {
   const blob = dataUrlToBlob(dataUrl);
+  if (!userId || !UUID_RE.test(String(userId))) {
+    console.warn("[Cygne reflection] refusing storage upload — invalid userId:", userId, "(expected auth UUID). Falling back to inline.");
+    return { path: null, url: null, inline: dataUrl };
+  }
   const path = `${userId}/${entryId}.jpg`;
   console.log("[Cygne reflection] uploading to reflections/" + path, "| size:", blob.size, "bytes");
   try {
@@ -173,7 +195,7 @@ async function uploadTriptych(userId, entryId, dataUrl) {
       .from("reflections")
       .upload(path, blob, { contentType: "image/jpeg", upsert: true });
     if (upErr) {
-      console.warn("[Cygne reflection] upload error:", upErr.message, upErr);
+      console.warn("[Cygne reflection] upload error:", upErr.status || "", upErr.message, upErr);
       return { path: null, url: null, inline: dataUrl };
     }
     console.log("[Cygne reflection] upload ok:", upData);
@@ -186,7 +208,7 @@ async function uploadTriptych(userId, entryId, dataUrl) {
       console.log("[Cygne reflection] signed URL:", signed.signedUrl);
       return { path, url: signed.signedUrl };
     }
-    console.warn("[Cygne reflection] createSignedUrl error:", signedErr?.message || "no url");
+    console.warn("[Cygne reflection] createSignedUrl error:", signedErr?.status || "", signedErr?.message || "no url");
 
     // Public URL fallback (only works if bucket is public).
     const { data: pub } = supabase.storage.from("reflections").getPublicUrl(path);
@@ -204,6 +226,12 @@ async function uploadTriptych(userId, entryId, dataUrl) {
 
 // Re-generate a fresh signed URL for an entry on load. Signed URLs expire,
 // so we refresh them each session rather than trusting whatever was stored.
+// On failure, the error.status is logged so the user can distinguish:
+//   400/404 → object missing (path wrong, or bucket recreated and the file
+//             is gone — re-apply the migration won't bring data back)
+//   401/403 → RLS denies (policies missing or auth.uid() doesn't match
+//             the first folder segment — re-apply the migration to fix)
+//   else    → network or transport issue
 async function refreshSignedUrl(path) {
   if (!path) return null;
   try {
@@ -211,7 +239,8 @@ async function refreshSignedUrl(path) {
       .from("reflections")
       .createSignedUrl(path, 60 * 60 * 24 * 7); // 1 week
     if (error) {
-      console.warn("[Cygne reflection] refresh signed URL error for", path, "|", error.message);
+      const status = error.status || error.statusCode || "?";
+      console.warn("[Cygne reflection] refresh signed URL failed for", path, "| status:", status, "| message:", error.message);
       return null;
     }
     return data?.signedUrl || null;
@@ -324,7 +353,7 @@ function CaptureFlow({ onClose, onComplete }) {
                 padding: "14px 40px", borderRadius: 0,
                 background: "transparent", color: "var(--color-inky-moss)", border: "1.5px solid var(--color-inky-moss)",
                 cursor: busy ? "default" : "pointer",
-                fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 700,
+                fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400,
                 letterSpacing: "0.2em", textTransform: "uppercase",
                 transition: "all 0.3s ease",
                 opacity: busy ? 0.5 : 1,
@@ -364,7 +393,7 @@ function CaptureFlow({ onClose, onComplete }) {
                 padding: "14px 40px", borderRadius: 0,
                 background: "transparent", color: "var(--color-inky-moss)", border: "1.5px solid var(--color-inky-moss)",
                 cursor: busy ? "default" : "pointer",
-                fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 700,
+                fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400,
                 letterSpacing: "0.2em", textTransform: "uppercase",
                 transition: "all 0.3s ease",
                 opacity: busy ? 0.5 : 1,
@@ -477,13 +506,13 @@ function ExpandedEntry({ entry, onClose }) {
         <Icon name="x" size={18} />
       </button>
 
-      <p style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: "0 0 6px" }}>
+      <p style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: "0 0 6px" }}>
         Week {entry.weekNumber}
       </p>
-      <h2 style={{ fontFamily: CURSIVE, fontSize: 28, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: TEXT, margin: "0 0 6px", textAlign: "center" }}>
+      <h2 style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-ink, #1c1c1a)", margin: "0 0 6px", textAlign: "center", lineHeight: 1.2 }}>
         {getMoonPhase(new Date(entry.date))}
       </h2>
-      <p style={{ fontFamily: SANS, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: "0 0 26px" }}>
+      <p style={{ fontFamily: SANS, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: "0 0 26px" }}>
         {formatDateLong(entry.date)}
       </p>
 
@@ -559,13 +588,13 @@ function GalleryEntry({ entry, onExpand, caption }) {
         transition: "opacity 500ms ease-out, transform 500ms ease-out",
         willChange: "opacity, transform",
       }}>
-      <p style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: "0 0 4px" }}>
+      <p style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: "var(--color-pebble, #7a7a7a)", margin: "0 0 4px" }}>
         Week {entry.weekNumber}
       </p>
-      <h3 style={{ fontFamily: CURSIVE, fontSize: 24, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: TEXT, margin: "0 0 4px" }}>
+      <h3 style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-ink, #1c1c1a)", margin: "0 0 4px", lineHeight: 1.2 }}>
         {getMoonPhase(new Date(entry.date))}
       </h3>
-      <p style={{ fontFamily: SANS, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: TEXT_SOFT, margin: "0 0 18px", opacity: 0.7 }}>
+      <p style={{ fontFamily: SANS, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--color-pebble, #7a7a7a)", margin: "0 0 18px" }}>
         {formatDateLong(entry.date)}
       </p>
       <div style={{
@@ -577,28 +606,11 @@ function GalleryEntry({ entry, onExpand, caption }) {
         <TriptychImage src={src} alt={`Reflection week ${entry.weekNumber}`} />
       </div>
       {caption && (
-        <p style={{ fontFamily: CURSIVE, fontSize: 22, color: TEXT_SOFT, textAlign: "center", margin: "12px 0 0", letterSpacing: "0.02em", opacity: 0.85 }}>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 400, color: "var(--color-pebble, #7a7a7a)", textAlign: "center", margin: "12px 0 0", letterSpacing: "0.02em", lineHeight: 1.4 }}>
           {caption}
         </p>
       )}
     </button>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// PLACEHOLDER ENTRY — shown for weeks without a captured reflection
-// ---------------------------------------------------------------------------
-
-function MissedWeekLabel({ weekNum }) {
-  return (
-    <div style={{
-      textAlign: "center", margin: "8px 0",
-      fontFamily: "var(--font-display)", fontWeight: 400,
-      fontSize: 9, letterSpacing: "0.2em",
-      color: "var(--color-pebble)", opacity: 0.5,
-    }}>
-      · week {weekNum} ·
-    </div>
   );
 }
 
@@ -612,13 +624,30 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [signedUrls, setSignedUrls] = useState({}); // { [entryId]: signedUrl }
+  // Ephemeral confirmation flash. Set true right after a successful
+  // handleComplete and auto-cleared so the "Captured" line doesn't linger
+  // as a persistent subtitle.
+  const [justCaptured, setJustCaptured] = useState(false);
+  useEffect(() => {
+    if (!justCaptured) return;
+    const t = setTimeout(() => setJustCaptured(false), 4500);
+    return () => clearTimeout(t);
+  }, [justCaptured]);
 
+  // Fingerprint that changes whenever any entry id appears or its url
+  // pointer flips (e.g. a same-week recapture replaces an earlier entry —
+  // length stays the same but the entry's id and date change).
+  const reflectionsFingerprint = reflections
+    .map(r => `${r.id}:${r.date}:${r.path || ""}:${r.url ? "u" : ""}:${r.inline ? "i" : ""}`)
+    .join("|");
   const sorted = [...reflections].sort((a, b) => new Date(b.date) - new Date(a.date));
 
   // Does this ISO week already have a captured reflection?
+  // Use ISO week-year (not calendar year) for the year comparison so the
+  // ISO week 53 boundary doesn't false-match across calendar years.
   const now = new Date();
   const currentWeek = isoWeekNumber(now);
-  const currentYear = now.getFullYear();
+  const currentISOYear = isoWeekYear(now);
 
   // Build gallery items: real entries + placeholders for missed weeks.
   // Only computed when there is at least one reflection.
@@ -659,11 +688,13 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
 
     return items.reverse();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sorted.length]);
+  }, [reflectionsFingerprint]);
+  // Lock is scoped strictly to (ISO week, ISO week-year). Past-week
+  // entries — even matching weekNumber across years — never block a
+  // current-week capture.
   const capturedThisWeek = reflections.some(r => {
     if (r.weekNumber !== currentWeek) return false;
-    const d = new Date(r.date);
-    return d.getFullYear() === currentYear;
+    return isoWeekYear(new Date(r.date)) === currentISOYear;
   });
 
   // Refresh signed URLs on mount / when the reflection set changes. Signed
@@ -685,7 +716,7 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
       if (!cancelled) setSignedUrls(prev => ({ ...prev, ...next }));
     })();
     return () => { cancelled = true; };
-  }, [reflections.length]);
+  }, [reflectionsFingerprint]);
 
   const decorate = (entry) => ({
     ...entry,
@@ -723,6 +754,7 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
       };
       await onAddReflection(entry);
       setCapturing(false);
+      setJustCaptured(true);
     } catch (e) {
       console.error("[Cygne reflection] save failed:", e);
       setError("Couldn't save that reflection. Please try again.");
@@ -740,11 +772,8 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
     }}>
       {/* Header */}
       <div style={{ maxWidth: 560, margin: "0 auto 18px", textAlign: "center" }}>
-        <p style={{ fontFamily: "var(--heading)", fontSize: 9, letterSpacing: "0.30em", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: "0 0 12px" }}>
+        <h1 style={{ fontFamily: "var(--font-display)", fontSize: 32, fontWeight: 700, color: "var(--color-inky-moss)", margin: "0 0 6px", letterSpacing: "0.15em", textTransform: "uppercase", lineHeight: 1.15 }}>
           Reflection
-        </p>
-        <h1 style={{ fontFamily: "var(--font-display)", fontSize: 34, fontWeight: 700, color: "var(--color-inky-moss)", margin: "0 0 10px", letterSpacing: "0.15em", textTransform: "uppercase", lineHeight: 1.2 }}>
-          A Living Gallery.
         </h1>
         {reflections.length === 0 && (
           <p style={{ fontFamily: SANS, fontSize: 12, color: TEXT_SOFT, margin: 0, lineHeight: 1.75, maxWidth: 360, marginLeft: "auto", marginRight: "auto" }}>
@@ -754,40 +783,43 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
       </div>
 
       {error && (
-        <div style={{ maxWidth: 520, margin: "0 auto 20px", padding: "12px 16px", background: "var(--surface)", border: `1px solid ${BORDER}`, borderRadius: 10, textAlign: "center" }}>
+        <div style={{ maxWidth: 520, margin: "0 auto 20px", padding: "12px 16px", background: "var(--surface)", border: `1px solid ${BORDER}`, borderRadius: 8, textAlign: "center" }}>
           <p style={{ fontFamily: SANS, fontSize: 11, color: TEXT_SOFT, margin: 0 }}>{error}</p>
         </div>
       )}
 
       <div style={{ textAlign: "center", marginBottom: 24 }}>
-        {capturedThisWeek ? (
-          <p style={{ fontFamily: CURSIVE, fontSize: 16, letterSpacing: "0.05em", color: TEXT_SOFT, opacity: 0.7, margin: 0 }}>
+        <button onClick={() => setCapturing(true)} disabled={saving}
+          style={{
+            display: "inline-flex", alignItems: "center", gap: 10,
+            padding: "14px 40px", borderRadius: 0,
+            background: "transparent", color: "var(--color-inky-moss)",
+            border: "1.5px solid var(--color-inky-moss)",
+            cursor: saving ? "default" : "pointer",
+            fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400,
+            letterSpacing: "0.2em", textTransform: "uppercase",
+            transition: "all 0.3s ease",
+            opacity: saving ? 0.6 : 1,
+          }}
+          onMouseEnter={e => { if (!saving) { e.currentTarget.style.background = "var(--color-inky-moss)"; e.currentTarget.style.color = "var(--color-ivory)"; } }}
+          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--color-inky-moss)"; }}>
+          <Icon name="camera" size={14} />
+          {saving
+            ? "Saving..."
+            : capturedThisWeek
+              ? "Retake This Week"
+              : "Capture This Week"}
+        </button>
+        {justCaptured && (
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "var(--color-pebble, #7a7a7a)", margin: "12px 0 0", letterSpacing: "0.02em", transition: "opacity 600ms ease" }}>
             Captured — return on your next reset day
           </p>
-        ) : (
-          <button onClick={() => setCapturing(true)} disabled={saving}
-            style={{
-              display: "inline-flex", alignItems: "center", gap: 10,
-              padding: "14px 40px", borderRadius: 0,
-              background: "transparent", color: "var(--color-inky-moss)",
-              border: "1.5px solid var(--color-inky-moss)",
-              cursor: saving ? "default" : "pointer",
-              fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 700,
-              letterSpacing: "0.2em", textTransform: "uppercase",
-              transition: "all 0.3s ease",
-              opacity: saving ? 0.6 : 1,
-            }}
-            onMouseEnter={e => { if (!saving) { e.currentTarget.style.background = "var(--color-inky-moss)"; e.currentTarget.style.color = "var(--color-ivory)"; } }}
-            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--color-inky-moss)"; }}>
-            <Icon name="camera" size={14} />
-            {saving ? "Saving..." : reflections.length === 0 ? "Capture your first reflection" : "Capture this week"}
-          </button>
         )}
       </div>
 
       {/* Empty state */}
       {sorted.length === 0 && (
-        <div style={{ maxWidth: 460, margin: "20px auto 0", textAlign: "center", padding: "40px 24px", background: "var(--surface)", border: `1px solid ${BORDER}`, borderRadius: 18 }}>
+        <div style={{ maxWidth: 460, margin: "20px auto 0", textAlign: "center", padding: "40px 24px", background: "var(--surface)", border: `1px solid ${BORDER}`, borderRadius: 8 }}>
           <div style={{ color: TEXT_SOFT, display: "inline-flex", marginBottom: 14 }}>
             <Icon name="reflection" size={26} />
           </div>
@@ -803,28 +835,16 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
       {/* Gallery */}
       {galleryItems.length > 0 && (
         <div style={{ maxWidth: 560, margin: "0 auto" }}>
-          {galleryItems.map((item, idx) => {
-            if (item.type === "entry") {
-              return (
-                <GalleryEntry
-                  key={item.data.id}
-                  entry={decorate(item.data)}
-                  onExpand={() => setExpandedId(item.data.id)}
-                  caption={idx === 0 ? "The week is behind you." : null}
-                />
-              );
-            }
-            // Current week with no photo — the "Capture this week" button above is the prompt
-            const isCurrentWeek = item.weekNum === currentWeek && item.year === isoWeekYear(now);
-            if (isCurrentWeek) return null;
-            // Past week with no photo — minimal muted label only
-            return (
-              <MissedWeekLabel
-                key={`missed-${item.year}-W${item.weekNum}`}
-                weekNum={item.weekNum}
+          {galleryItems
+            .filter(item => item.type === "entry")
+            .map((item, idx) => (
+              <GalleryEntry
+                key={item.data.id}
+                entry={decorate(item.data)}
+                onExpand={() => setExpandedId(item.data.id)}
+                caption={idx === 0 ? "The week is behind you." : null}
               />
-            );
-          })}
+            ))}
         </div>
       )}
 
