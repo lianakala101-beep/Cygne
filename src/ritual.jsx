@@ -551,8 +551,8 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
         padding: "20px 22px 22px",
         overflow: "hidden",
         isolation: "isolate",
-        boxShadow: "0 1px 3px rgba(28,28,26,0.05), 0 8px 24px rgba(28,28,26,0.06)",
-        border: "1px solid rgba(45,61,43,0.14)",
+        boxShadow: "0 1px 2px rgba(45,61,43,0.04), 0 4px 12px rgba(45,61,43,0.05)",
+        border: "1px solid rgba(45,61,43,0.18)",
       }}>
         {/* Faint logo watermark */}
         <img
