@@ -143,7 +143,7 @@ function AuthScreen({ onAuth }) {
           }}>
             {rememberMe && (
               <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
-                <path d="M1 3.5L3.5 6L8 1" stroke="white" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M1 3.5L3.5 6L8 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             )}
           </div>

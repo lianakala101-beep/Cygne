@@ -60,7 +60,7 @@ function CategoryGlyph({ category }) {
     viewBox: "0 0 100 100",
     fill: "none",
     stroke: "currentColor",
-    strokeWidth: 1.4,
+    strokeWidth: 1.5,
     strokeLinecap: "round",
     strokeLinejoin: "round",
     style: { width: "100%", height: "100%", display: "block" },
@@ -216,10 +216,10 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
             ? <img src={product.imageUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
             : (
               <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10 }}>
-                <div style={{ width: 48, height: 48, color: "var(--color-stone, #5a5a5a)", opacity: 0.4, pointerEvents: "none" }}>
+                <div style={{ width: 48, height: 48, color: "var(--color-pebble, #7a7a7a)", opacity: 0.4, pointerEvents: "none" }}>
                   <CategoryGlyph category={product.category} />
                 </div>
-                <span style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-stone, #5a5a5a)", opacity: 0.65 }}>
+                <span style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-pebble, #7a7a7a)", opacity: 0.65 }}>
                   {product.category}
                 </span>
               </div>
@@ -610,7 +610,7 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearAll,
                       </p>
                       <p style={{
                         fontFamily: "var(--font-body)",
-                        fontSize: 12, color: "var(--color-stone)",
+                        fontSize: 12, color: "var(--color-pebble)",
                         margin: "0 0 14px", lineHeight: 1.65,
                       }}>
                         How has your skin been responding this week?

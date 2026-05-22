@@ -508,7 +508,7 @@ function CycleTracker({ products, activeMap, cycleDay: cycledayProp = 14, onSetC
             ) : (
               <button onClick={() => { setInputVal(String(cycleDay)); setEditing(true); }}
                 style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "5px 10px", cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
-                <span style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 13, letterSpacing: "0.08em", color: "var(--color-stone)", lineHeight: 1.6 }}>Day {cycleDay}</span>
+                <span style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 13, letterSpacing: "0.08em", color: "var(--color-pebble)", lineHeight: 1.6 }}>Day {cycleDay}</span>
               </button>
             )}
             <span style={{ fontFamily: "var(--font-body)", fontSize: 9, color: "var(--clay)", opacity: 0.6, letterSpacing: "0.04em" }}>{daysUntilNext}d in phase</span>

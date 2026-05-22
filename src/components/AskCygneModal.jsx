@@ -156,7 +156,7 @@ export function AskCygneModal({
           style={{
             position: "absolute", top: 18, right: 22,
             background: "none", border: "none", cursor: "pointer",
-            color: "var(--color-stone, #5a5a5a)",
+            color: "var(--color-pebble, #7a7a7a)",
             fontSize: 22, lineHeight: 1, padding: 4,
             WebkitTapHighlightColor: "transparent",
             WebkitAppearance: "none", appearance: "none",

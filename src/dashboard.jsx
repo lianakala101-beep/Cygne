@@ -263,7 +263,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             </svg>
             <div>
               <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: "0 0 2px" }}>Travel Edit</p>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--color-stone, #5a5a5a)", margin: 0, letterSpacing: "0.02em" }}>Pack & skip</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--color-pebble, #7a7a7a)", margin: 0, letterSpacing: "0.02em" }}>Pack & skip</p>
             </div>
           </button>
           <button onClick={() => setShopScanOpen(true)}
@@ -276,7 +276,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             </svg>
             <div>
               <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: "0 0 2px" }}>Shop Scan</p>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--color-stone, #5a5a5a)", margin: 0, letterSpacing: "0.02em" }}>Would my skin like this?</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--color-pebble, #7a7a7a)", margin: 0, letterSpacing: "0.02em" }}>Would my skin like this?</p>
             </div>
           </button>
         </div>

@@ -17,7 +17,7 @@ const CYCLE_PHASES = [
 ];
 
 const PEBBLE = "var(--color-pebble, #7a7a7a)";
-const STONE = "var(--color-stone, #5a5a5a)";
+const STONE = "var(--color-pebble, #7a7a7a)";
 const INKY = "var(--color-inky-moss, #2d3d2b)";
 const IVORY = "var(--color-ivory, #faf9f4)";
 const STROKE_DEFAULT = INKY;

@@ -198,7 +198,7 @@ function IngredientProfile({ user, onUpdateUser }) {
       {!editing ? (
         <div style={{ background: "var(--color-ivory-shadow, #f0ebe0)", borderTop: "1px solid rgba(45,61,43,0.18)", padding: "18px 16px" }}>
           {!hasAny ? (
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-stone, #5a5a5a)", margin: 0 }}>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-pebble, #7a7a7a)", margin: 0 }}>
               No ingredients flagged yet. Tap Edit to mark allergens and loved ingredients — Cygne will cross-reference them on every product.
             </p>
           ) : (
@@ -268,7 +268,7 @@ function IngredientProfile({ user, onUpdateUser }) {
               Save
             </button>
             <button onClick={cancel}
-              style={{ flex: 1, padding: "12px 0", background: "transparent", border: "1px solid rgba(45,61,43,0.22)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-stone, #5a5a5a)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
+              style={{ flex: 1, padding: "12px 0", background: "transparent", border: "1px solid rgba(45,61,43,0.22)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-pebble, #7a7a7a)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
               Cancel
             </button>
           </div>
@@ -476,7 +476,7 @@ function SkinProfileEditor({ user, onUpdateUser }) {
               Save
             </button>
             <button onClick={cancel}
-              style={{ flex: 1, padding: "12px 0", background: "transparent", border: "1px solid rgba(45,61,43,0.22)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-stone, #5a5a5a)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
+              style={{ flex: 1, padding: "12px 0", background: "transparent", border: "1px solid rgba(45,61,43,0.22)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-pebble, #7a7a7a)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
               Cancel
             </button>
           </div>
@@ -599,7 +599,7 @@ function SkinHistory({ user, onUpdateUser }) {
       {!editing ? (
         <div style={{ background: "var(--color-ivory-shadow, #f0ebe0)", borderTop: "1px solid rgba(45,61,43,0.18)", padding: "18px 16px" }}>
           {!hasSomeHistory ? (
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-stone, #5a5a5a)", margin: 0 }}>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-pebble, #7a7a7a)", margin: 0 }}>
               No history logged. Tap Edit to add prescriptions, sensitivities, or dermatologist visits.
             </p>
           ) : (
@@ -659,7 +659,7 @@ function SkinHistory({ user, onUpdateUser }) {
                 <span style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-ink, #1c1c1a)" }}>{rx.name}</span>
                 <button onClick={() => setDraft(d => ({ ...d, prescriptions: d.prescriptions.filter((_, j) => j !== i) }))}
                   aria-label="Remove prescription"
-                  style={{ background: "none", border: "none", color: "var(--color-stone, #5a5a5a)", cursor: "pointer", padding: "0 4px", display: "inline-flex", alignItems: "center" }}>
+                  style={{ background: "none", border: "none", color: "var(--color-pebble, #7a7a7a)", cursor: "pointer", padding: "0 4px", display: "inline-flex", alignItems: "center" }}>
                   <Icon name="x" size={11} />
                 </button>
               </div>
@@ -691,7 +691,7 @@ function SkinHistory({ user, onUpdateUser }) {
                 <span style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-ink, #1c1c1a)" }}>{v.date}{v.note ? ` — ${v.note}` : ""}</span>
                 <button onClick={() => setDraft(d => ({ ...d, dermaVisits: d.dermaVisits.filter((_, j) => j !== i) }))}
                   aria-label="Remove visit"
-                  style={{ background: "none", border: "none", color: "var(--color-stone, #5a5a5a)", cursor: "pointer", padding: "0 4px", display: "inline-flex", alignItems: "center" }}>
+                  style={{ background: "none", border: "none", color: "var(--color-pebble, #7a7a7a)", cursor: "pointer", padding: "0 4px", display: "inline-flex", alignItems: "center" }}>
                   <Icon name="x" size={11} />
                 </button>
               </div>
@@ -713,7 +713,7 @@ function SkinHistory({ user, onUpdateUser }) {
               Save
             </button>
             <button onClick={cancel}
-              style={{ flex: 1, padding: "12px 0", background: "transparent", border: "1px solid rgba(45,61,43,0.22)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-stone, #5a5a5a)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
+              style={{ flex: 1, padding: "12px 0", background: "transparent", border: "1px solid rgba(45,61,43,0.22)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-pebble, #7a7a7a)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
               Cancel
             </button>
           </div>
@@ -775,7 +775,7 @@ function ProfileSheet({ user, products, locationData, setLocationData, locationD
                     Edit
                   </button>
                 )}
-                <button onClick={onClose} aria-label="Close" style={{ background: "none", border: "none", color: "var(--color-stone, #5a5a5a)", cursor: "pointer", padding: 4 }}><Icon name="x" size={18} /></button>
+                <button onClick={onClose} aria-label="Close" style={{ background: "none", border: "none", color: "var(--color-pebble, #7a7a7a)", cursor: "pointer", padding: 4 }}><Icon name="x" size={18} /></button>
               </div>
             </div>
 
@@ -823,7 +823,7 @@ function ProfileSheet({ user, products, locationData, setLocationData, locationD
                       Save
                     </button>
                     <button onClick={() => setEditingAccount(false)}
-                      style={{ flex: 1, padding: "12px 0", background: "transparent", border: "1px solid rgba(45,61,43,0.22)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-stone, #5a5a5a)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
+                      style={{ flex: 1, padding: "12px 0", background: "transparent", border: "1px solid rgba(45,61,43,0.22)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-pebble, #7a7a7a)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
                       Cancel
                     </button>
                   </div>

@@ -5,7 +5,7 @@ import { detectActives, detectConflicts, calcSpending } from "../engine.js";
 const GRAIN = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='250' height='250' filter='url(%23g)' opacity='0.045'/%3E%3C/svg%3E\")";
 
 const PEBBLE = "var(--color-pebble, #7a7a7a)";
-const STONE  = "var(--color-stone, #5a5a5a)";
+const STONE  = "var(--color-pebble, #7a7a7a)";
 const INKY   = "var(--color-inky-moss, #2d3d2b)";
 const IVORY  = "var(--color-ivory, #faf9f4)";
 const INK    = "var(--color-ink, #1c1c1a)";

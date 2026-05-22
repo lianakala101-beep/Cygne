@@ -43,7 +43,7 @@ const Icon = ({ name, size = 20 }) => {
     reflection:   "M12 3a7 7 0 100 14 7 7 0 000-14z M12 17v4 M9 21h6 M12 7v6 M10 10h4",
   };
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       {(d[name] || "").split("M").filter(Boolean).map((seg, i) => <path key={i} d={"M" + seg} />)}
     </svg>
   );
@@ -141,7 +141,7 @@ function FlagCard({ f }) {
         }}>{f.label}</span>
         {hasDetail && (
           <span style={{
-            color: "var(--color-stone, #5a5a5a)", opacity: 0.5,
+            color: "var(--color-pebble, #7a7a7a)", opacity: 0.5,
             transform: open ? "rotate(90deg)" : "none",
             transition: "transform 0.2s",
             display: "inline-flex", flexShrink: 0,
@@ -187,7 +187,7 @@ function FlagCard({ f }) {
 // teardrop body low on the waterline. No legs, no emoji.
 function SwanIcon({ size = 18, color = "currentColor", outlineOnly = false }) {
   const bodyFill   = outlineOnly ? "none" : color;
-  const strokeW    = outlineOnly ? 1.5    : 1.3;
+  const strokeW    = outlineOnly ? 1.5    : 1.5;
   const outStroke  = outlineOnly ? color  : "none";
   return (
     <svg width={size} height={size * 0.7} viewBox="0 0 40 28" fill="none" aria-hidden="true"

@@ -229,7 +229,7 @@ function DrawnCheck({ size = 14, color = "#0d0f0d" }) {
       <path
         d="M5 12.5 L10.2 17.5 L19 7.2"
         stroke={color}
-        strokeWidth="2.6"
+        strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
         style={{
