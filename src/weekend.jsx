@@ -83,7 +83,7 @@ function WeekendNudgeCard({ products, activeMap }) {
     }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
         <span style={{
-          fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 9,
+          fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 9,
           letterSpacing: "0.22em", textTransform: "uppercase",
           color: "var(--color-inky-moss)",
           background: "rgba(45,61,43,0.10)",
@@ -92,7 +92,7 @@ function WeekendNudgeCard({ products, activeMap }) {
         }}>{cfg.label}</span>
         <span style={{
           flex: 1, minWidth: 0,
-          fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 400,
+          fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 400,
           letterSpacing: "0.02em",
           color: "var(--color-inky-moss)",
           lineHeight: 1.4,

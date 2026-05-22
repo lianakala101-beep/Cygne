@@ -219,7 +219,7 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
                 <div style={{ width: 48, height: 48, color: "var(--color-stone, #5a5a5a)", opacity: 0.4, pointerEvents: "none" }}>
                   <CategoryGlyph category={product.category} />
                 </div>
-                <span style={{ fontFamily: "var(--font-display, 'Fungis', sans-serif)", fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-stone, #5a5a5a)", opacity: 0.65 }}>
+                <span style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-stone, #5a5a5a)", opacity: 0.65 }}>
                   {product.category}
                 </span>
               </div>
@@ -273,7 +273,7 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
 
         {/* Text content — 0 top padding (image bleeds to edge), 12px sides + bottom */}
         <div style={{ padding: "10px 12px 12px" }}>
-          <p style={{ fontFamily: "var(--font-display, 'Fungis', sans-serif)", fontSize: 13, fontWeight: 400, letterSpacing: "0.1em", color: "#1c1c1a", margin: "0 0 3px", lineHeight: 1.3 }}>{product.name}</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 13, fontWeight: 400, letterSpacing: "0.04em", color: "#1c1c1a", margin: "0 0 3px", lineHeight: 1.3 }}>{product.name}</p>
           <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "#7a7a7a", margin: 0, letterSpacing: "0.03em" }}>{product.brand}</p>
           {product.price > 0 && (
             <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#1c1c1a", margin: "5px 0 0", fontWeight: 300, letterSpacing: "0.01em" }}>${(product.price || 0).toFixed(0)}</p>
@@ -601,8 +601,8 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearAll,
                         Introduce slowly · week {week}
                       </p>
                       <p style={{
-                        fontFamily: "var(--font-display)",
-                        fontSize: 15, fontWeight: 400, letterSpacing: "0.04em",
+                        fontFamily: "var(--font-body)",
+                        fontSize: 15, fontWeight: 400, letterSpacing: "0.02em",
                         color: "var(--color-ink)",
                         margin: "0 0 4px",
                       }}>
