@@ -214,9 +214,9 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           onClick={() => setTab("routine")}
           style={{
             display: "flex", width: "100%", alignItems: "center", justifyContent: "center", gap: 10,
-            padding: "18px 16px", marginBottom: 24,
+            padding: "18px 16px", marginBottom: 16,
             background: "transparent",
-            border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 0,
+            border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 8,
             cursor: "pointer", fontFamily: "var(--font-display)", fontWeight: 700,
             fontSize: 12, letterSpacing: "0.24em", textTransform: "uppercase",
             color: "var(--color-inky-moss, #2d3d2b)", transition: "background 0.2s",
@@ -250,9 +250,9 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         </div>
 
         {/* 5. Travel Edit + Shop Scan — utility buttons at bottom. */}
-        <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
+        <div style={{ display: "flex", gap: 10, marginBottom: 40 }}>
           <button onClick={() => setFlightOpen(true)}
-            style={{ flex: 1, display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", background: "transparent", border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 0, cursor: "pointer", textAlign: "left", transition: "background 0.2s", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" }}
+            style={{ flex: 1, display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", background: "transparent", border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 8, cursor: "pointer", textAlign: "left", transition: "background 0.2s", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" }}
             onMouseEnter={e => e.currentTarget.style.background = "rgba(45,61,43,0.08)"}
             onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-inky-moss, #2d3d2b)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -264,7 +264,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             </div>
           </button>
           <button onClick={() => setShopScanOpen(true)}
-            style={{ flex: 1, display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", background: "transparent", border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 0, cursor: "pointer", textAlign: "left", transition: "background 0.2s", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" }}
+            style={{ flex: 1, display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", background: "transparent", border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 8, cursor: "pointer", textAlign: "left", transition: "background 0.2s", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" }}
             onMouseEnter={e => e.currentTarget.style.background = "rgba(45,61,43,0.08)"}
             onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-inky-moss, #2d3d2b)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -315,7 +315,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         </div>
 
         {/* 8. Weekend nudge — supplementary seasonal-adjacent context */}
-        <div style={{ marginBottom: 20 }}>
+        <div style={{ marginBottom: 40 }}>
           <WeekendNudgeCard products={products} activeMap={activeMap} />
         </div>
 
@@ -355,6 +355,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
               columnGap: 16,
               padding: "11px 14px",
               background: "var(--color-ivory-shadow)",
+              borderRadius: 8,
               marginBottom: 20,
               fontFamily: "var(--font-body)",
             }}>

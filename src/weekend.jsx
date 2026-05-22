@@ -77,8 +77,8 @@ function WeekendNudgeCard({ products, activeMap }) {
   return (
     <div style={{
       background: "var(--color-inky-moss, #2d3d2b)",
-      border: "1.5px solid var(--color-inky-moss, #2d3d2b)",
-      borderRadius: 0,
+      border: "none",
+      borderRadius: 8,
       padding: "14px 16px",
       marginBottom: 20,
       position: "relative",

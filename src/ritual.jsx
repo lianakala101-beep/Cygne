@@ -547,7 +547,7 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
       <div style={{
         position: "relative",
         background: "var(--color-ivory, #faf9f4)",
-        borderRadius: 14,
+        borderRadius: 8,
         padding: "20px 22px 22px",
         overflow: "hidden",
         isolation: "isolate",
