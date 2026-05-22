@@ -40,11 +40,14 @@ const CARD_IMG_BG = {
   Mask:        "linear-gradient(145deg, #edeae2 0%, #ddd5c7 100%)",
 };
 
-// Ivory product card sitting on the dark inky-moss canvas — the bright
-// surface is intentional editorial contrast against the dark page chrome.
+// Frosted-glass product card on the dark inky-moss canvas — the
+// translucent surface lets the page colour bleed through so the card
+// feels embedded in the canvas rather than sitting on top of it.
 const GLASS_CARD = {
-  background: "var(--color-ivory, #faf9f4)",
-  border: "none",
+  background: "rgba(250, 249, 244, 0.12)",
+  backdropFilter: "blur(16px)",
+  WebkitBackdropFilter: "blur(16px)",
+  border: "1px solid rgba(250, 249, 244, 0.15)",
   borderRadius: 8,
   overflow: "hidden",
   display: "flex",
@@ -204,9 +207,9 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
   }, [menuOpen]);
 
   const inRoutine = product.inRoutine !== false;
-  // Soft ink wash inside the ivory card when there's no product photo —
-  // keeps the placeholder tile readable without competing with the card.
-  const imgBg = "rgba(28,28,26,0.04)";
+  // Faint ivory wash inside the frosted card when there's no product
+  // photo — quieter than the surrounding card surface.
+  const imgBg = "rgba(250,249,244,0.04)";
 
   return (
     <>
@@ -217,10 +220,10 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
             ? <img src={product.imageUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
             : (
               <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10 }}>
-                <div style={{ width: 48, height: 48, color: "#5a5a5a", pointerEvents: "none" }}>
+                <div style={{ width: 48, height: 48, color: "var(--color-ivory, #faf9f4)", opacity: 0.5, pointerEvents: "none" }}>
                   <CategoryGlyph category={product.category} />
                 </div>
-                <span style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: "#5a5a5a", opacity: 0.75 }}>
+                <span style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", opacity: 0.6 }}>
                   {product.category}
                 </span>
               </div>
@@ -230,7 +233,7 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
           {/* ⋯ menu */}
           <div ref={menuRef} style={{ position: "absolute", top: 6, right: 6 }}>
             <button onClick={() => setMenuOpen(o => !o)} aria-label="Options"
-              style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(250,249,244,0.75)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", border: "1px solid rgba(192,192,192,0.35)", color: "#1c1c1a", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, lineHeight: 1, fontFamily: "sans-serif" }}>
+              style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(250,249,244,0.12)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", border: "1px solid rgba(250,249,244,0.2)", color: "var(--color-ivory, #faf9f4)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, lineHeight: 1, fontFamily: "sans-serif" }}>
               ⋯
             </button>
             {menuOpen && (
@@ -274,10 +277,10 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
 
         {/* Text content — 0 top padding (image bleeds to edge), 12px sides + bottom */}
         <div style={{ padding: "10px 12px 12px" }}>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 13, fontWeight: 400, letterSpacing: "0.04em", color: "#1c1c1a", margin: "0 0 3px", lineHeight: 1.3 }}>{product.name}</p>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "#5a5a5a", margin: 0, letterSpacing: "0.03em" }}>{product.brand}</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 13, fontWeight: 400, letterSpacing: "0.04em", color: "var(--color-ivory, #faf9f4)", margin: "0 0 3px", lineHeight: 1.3 }}>{product.name}</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--color-ivory, #faf9f4)", opacity: 0.7, margin: 0, letterSpacing: "0.03em" }}>{product.brand}</p>
           {product.price > 0 && (
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#1c1c1a", margin: "5px 0 0", fontWeight: 300, letterSpacing: "0.01em" }}>${(product.price || 0).toFixed(0)}</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-ivory, #faf9f4)", opacity: 0.7, margin: "5px 0 0", fontWeight: 300, letterSpacing: "0.01em" }}>${(product.price || 0).toFixed(0)}</p>
           )}
         </div>
       </div>
