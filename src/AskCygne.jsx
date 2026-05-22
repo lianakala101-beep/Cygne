@@ -9,7 +9,7 @@ export function AskCygneButton({ onClick }) {
       style={{
         display: "flex", width: "100%", alignItems: "center", justifyContent: "center", gap: 8,
         padding: "14px 16px", background: "transparent",
-        border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 8,
+        border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 6,
         cursor: "pointer", fontFamily: "var(--font-display)", fontWeight: 700,
         fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase",
         color: "var(--color-inky-moss)", transition: "all 0.2s",

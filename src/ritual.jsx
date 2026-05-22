@@ -99,9 +99,7 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
   })();
 
   return (
-    <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: "18px 18px 16px", display: "flex", flexDirection: "column", gap: 12, transition: "border-color 0.2s" }}
-      onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(122,144,112,0.4)"}
-      onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}>
+    <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "16px", display: "flex", flexDirection: "column", gap: 12 }}>
 
       {/* Header row */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
@@ -113,7 +111,7 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
         <div ref={menuRef} style={{ position: "relative", flexShrink: 0, marginLeft: 8 }}>
           <button onClick={() => setMenuOpen(o => !o)} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: "6px 8px", opacity: 0.6, transition: "opacity 0.15s", fontSize: 16, lineHeight: 1, fontFamily: "sans-serif" }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0.6} aria-label="Product options">⋯</button>
           {menuOpen && (
-            <div style={{ position: "absolute", right: 0, top: "100%", zIndex: 50, minWidth: 180, background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 12, padding: "6px 0", boxShadow: "0 8px 28px rgba(0,0,0,0.45)" }}>
+            <div style={{ position: "absolute", right: 0, top: "100%", zIndex: 50, minWidth: 180, background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 8, padding: "6px 0", boxShadow: "0 8px 28px rgba(0,0,0,0.45)" }}>
               <button onClick={() => { setMenuOpen(false); onEdit(product); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "var(--parchment)", fontFamily: "var(--font-body), sans-serif", fontSize: 12, textAlign: "left", transition: "background 0.12s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.1)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>
                 <Icon name="edit" size={12} /><span>Edit product</span>
               </button>
@@ -158,7 +156,7 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
 
       {/* In-ritual toggle */}
       <button onClick={() => onToggleRoutine(product.id)}
-        style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 14px", background: inRoutine ? "rgba(122,144,112,0.08)" : "var(--ink)", border: `1px solid ${inRoutine ? "rgba(122,144,112,0.3)" : "var(--border)"}`, borderRadius: 10, cursor: "pointer", transition: "all 0.18s" }}
+        style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 14px", background: inRoutine ? "rgba(122,144,112,0.08)" : "var(--ink)", border: `1px solid ${inRoutine ? "rgba(122,144,112,0.3)" : "var(--border)"}`, borderRadius: 8, cursor: "pointer", transition: "all 0.18s" }}
         onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(122,144,112,0.5)"}
         onMouseLeave={e => e.currentTarget.style.borderColor = inRoutine ? "rgba(122,144,112,0.3)" : "var(--border)"}>
         <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: inRoutine ? "var(--sage)" : "var(--clay)", fontWeight: 400 }}>
@@ -177,14 +175,14 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
       {/* Delete confirmation */}
       {confirmDelete && (
         <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(8,10,8,0.75)", backdropFilter: "blur(8px)", padding: "0 28px" }} onClick={() => setConfirmDelete(false)}>
-          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 320, background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 18, padding: "26px 24px 22px", boxShadow: "0 16px 48px rgba(0,0,0,0.55)" }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 320, background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 8, padding: "26px 24px 22px", boxShadow: "0 16px 48px rgba(0,0,0,0.55)" }}>
             <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 12px" }}>Confirm</p>
             <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 13, color: "var(--parchment)", margin: "0 0 22px", lineHeight: 1.65 }}>
               Remove <strong>{product.name}</strong> from your vanity? This cannot be undone.
             </p>
             <div style={{ display: "flex", gap: 10 }}>
-              <button onClick={() => setConfirmDelete(false)} style={{ flex: 1, padding: "12px 0", borderRadius: 10, border: "1px solid var(--border)", background: "transparent", color: "var(--parchment)", fontFamily: "var(--font-body), sans-serif", fontSize: 12, fontWeight: 400, cursor: "pointer", transition: "background 0.15s" }} onMouseEnter={e => e.currentTarget.style.background = "var(--surface)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>Cancel</button>
-              <button onClick={() => { setConfirmDelete(false); onDelete(product.id); }} style={{ flex: 1, padding: "12px 0", borderRadius: 10, border: "1px solid rgba(139,115,85,0.35)", background: "rgba(139,115,85,0.12)", color: "#8b7355", fontFamily: "var(--font-body), sans-serif", fontSize: 12, fontWeight: 400, cursor: "pointer", transition: "background 0.15s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(139,115,85,0.2)"} onMouseLeave={e => e.currentTarget.style.background = "rgba(139,115,85,0.12)"}>Remove</button>
+              <button onClick={() => setConfirmDelete(false)} style={{ flex: 1, padding: "12px 0", borderRadius: 8, border: "1px solid var(--border)", background: "transparent", color: "var(--parchment)", fontFamily: "var(--font-body), sans-serif", fontSize: 12, fontWeight: 400, cursor: "pointer", transition: "background 0.15s" }} onMouseEnter={e => e.currentTarget.style.background = "var(--surface)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>Cancel</button>
+              <button onClick={() => { setConfirmDelete(false); onDelete(product.id); }} style={{ flex: 1, padding: "12px 0", borderRadius: 8, border: "1px solid rgba(139,115,85,0.35)", background: "rgba(139,115,85,0.12)", color: "#8b7355", fontFamily: "var(--font-body), sans-serif", fontSize: 12, fontWeight: 400, cursor: "pointer", transition: "background 0.15s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(139,115,85,0.2)"} onMouseLeave={e => e.currentTarget.style.background = "rgba(139,115,85,0.12)"}>Remove</button>
             </div>
           </div>
         </div>
@@ -528,7 +526,7 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
           <button onClick={onDismissPopup} style={{
             width: "100%", padding: "11px 0",
             background: "rgba(232,226,217,0.08)", border: "1px solid rgba(232,226,217,0.18)",
-            borderRadius: 10, cursor: "pointer",
+            borderRadius: 8, cursor: "pointer",
             fontFamily: "var(--font-body), sans-serif", fontSize: 9, letterSpacing: "0.2em",
             textTransform: "uppercase", color: "rgba(232,226,217,0.55)", transition: "all 0.2s",
           }}
@@ -656,7 +654,7 @@ function FlightModeModal({ products, activeMap, onClose }) {
         </p>
 
         {/* Tab toggle */}
-        <div style={{ display: "flex", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10, padding: 3, marginBottom: 24 }}>
+        <div style={{ display: "flex", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: 3, marginBottom: 24 }}>
           {[{ id: "edit", label: "Your Edit" }, { id: "tips", label: "Flight Tips" }].map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
               style={{ flex: 1, padding: "8px 0", borderRadius: 8, border: "none", background: tab === t.id ? "#6e8a72" : "transparent", color: tab === t.id ? "#0d0f0d" : "var(--clay)", fontFamily: "var(--font-body), sans-serif", fontSize: 10, fontWeight: 400, cursor: "pointer", letterSpacing: "0.12em", textTransform: "uppercase", transition: "all 0.18s" }}>
@@ -681,7 +679,7 @@ function FlightModeModal({ products, activeMap, onClose }) {
                 ? unique.join(" and ")
                 : unique.slice(0, -1).join(", ") + " and " + unique.slice(-1);
               return (
-                <div style={{ display: "flex", gap: 12, padding: "13px 16px", background: "rgba(139,115,85,0.07)", border: "1px solid rgba(139,115,85,0.22)", borderRadius: 12, marginBottom: 18 }}>
+                <div style={{ display: "flex", gap: 12, padding: "13px 16px", background: "rgba(139,115,85,0.07)", border: "1px solid rgba(139,115,85,0.22)", borderRadius: 8, marginBottom: 18 }}>
                   <span style={{ color: "#8b7355", flexShrink: 0, marginTop: 2, display: "inline-flex" }}><Icon name="plane" size={16} /></span>
                   <div>
                     <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, fontWeight: 400, color: "var(--parchment)", margin: "0 0 3px" }}>Check your sizes before packing.</p>
@@ -701,7 +699,7 @@ function FlightModeModal({ products, activeMap, onClose }) {
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {keep.map((item, i) => (
-                    <div key={i} style={{ padding: "13px 16px", background: "rgba(122,144,112,0.06)", border: "1px solid rgba(122,144,112,0.2)", borderRadius: 12 }}>
+                    <div key={i} style={{ padding: "13px 16px", background: "rgba(122,144,112,0.06)", border: "1px solid rgba(122,144,112,0.2)", borderRadius: 8 }}>
                       <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 13, color: "var(--parchment)", margin: "0 0 3px", fontWeight: 400 }}>{item.name}</p>
                       <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>{item.reason}</p>
                     </div>
@@ -719,7 +717,7 @@ function FlightModeModal({ products, activeMap, onClose }) {
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {skip.map((item, i) => (
-                    <div key={i} style={{ padding: "13px 16px", background: "rgba(139,115,85,0.06)", border: "1px solid rgba(139,115,85,0.18)", borderRadius: 12 }}>
+                    <div key={i} style={{ padding: "13px 16px", background: "rgba(139,115,85,0.06)", border: "1px solid rgba(139,115,85,0.18)", borderRadius: 8 }}>
                       <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 13, color: "var(--parchment)", margin: "0 0 3px", fontWeight: 400 }}>{item.name}</p>
                       <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>{item.reason}</p>
                     </div>
@@ -738,14 +736,14 @@ function FlightModeModal({ products, activeMap, onClose }) {
         {tab === "tips" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {tips.map((tip, i) => (
-              <div key={i} style={{ display: "flex", gap: 12, padding: "14px 16px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12 }}>
+              <div key={i} style={{ display: "flex", gap: 12, padding: "14px 16px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8 }}>
                 <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 13, color: "var(--clay)", flexShrink: 0, marginTop: 1 }}>{i + 1}.</span>
                 <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 12, color: "var(--parchment)", margin: 0, lineHeight: 1.65 }}>{tip}</p>
               </div>
             ))}
 
             {/* Recovery note */}
-            <div style={{ padding: "16px 18px", background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.25)", borderRadius: 12, marginTop: 4 }}>
+            <div style={{ padding: "16px 18px", background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.25)", borderRadius: 8, marginTop: 4 }}>
               <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "#6e8a72", margin: "0 0 6px" }}>Landing Day</p>
               <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 12, color: "var(--clay)", margin: 0, lineHeight: 1.65 }}>
                 Give your skin 24h to re-acclimate before reintroducing actives. Cleanse, moisturize, SPF. Nothing else the first night.

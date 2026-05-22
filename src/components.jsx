@@ -119,7 +119,7 @@ function FlagCard({ f }) {
         padding: "12px 14px",
         background: "var(--surface)",
         border: "1px solid var(--border)",
-        borderRadius: 12,
+        borderRadius: 8,
         marginBottom: 8,
         cursor: hasDetail ? "pointer" : "default",
         WebkitAppearance: "none", appearance: "none",

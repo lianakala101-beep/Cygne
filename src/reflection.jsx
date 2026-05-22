@@ -783,7 +783,7 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
       </div>
 
       {error && (
-        <div style={{ maxWidth: 520, margin: "0 auto 20px", padding: "12px 16px", background: "var(--surface)", border: `1px solid ${BORDER}`, borderRadius: 10, textAlign: "center" }}>
+        <div style={{ maxWidth: 520, margin: "0 auto 20px", padding: "12px 16px", background: "var(--surface)", border: `1px solid ${BORDER}`, borderRadius: 8, textAlign: "center" }}>
           <p style={{ fontFamily: SANS, fontSize: 11, color: TEXT_SOFT, margin: 0 }}>{error}</p>
         </div>
       )}
@@ -819,7 +819,7 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
 
       {/* Empty state */}
       {sorted.length === 0 && (
-        <div style={{ maxWidth: 460, margin: "20px auto 0", textAlign: "center", padding: "40px 24px", background: "var(--surface)", border: `1px solid ${BORDER}`, borderRadius: 18 }}>
+        <div style={{ maxWidth: 460, margin: "20px auto 0", textAlign: "center", padding: "40px 24px", background: "var(--surface)", border: `1px solid ${BORDER}`, borderRadius: 8 }}>
           <div style={{ color: TEXT_SOFT, display: "inline-flex", marginBottom: 14 }}>
             <Icon name="reflection" size={26} />
           </div>

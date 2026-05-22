@@ -120,7 +120,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
               {emptySteps.map((s, i) => (
-                <div key={i} style={{ display: "flex", gap: 14, padding: "16px 18px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14 }}>
+                <div key={i} style={{ display: "flex", gap: 14, padding: "16px 18px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8 }}>
                   <span style={{ color: "var(--clay)", flexShrink: 0, marginTop: 2, display: "inline-flex" }}><Icon name={s.icon} size={18} /></span>
                   <div style={{ flex: 1 }}>
                     <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.5 }}>Step {i + 1}</span>
@@ -136,7 +136,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
               ))}
             </div>
             <button onClick={() => setTab("shelf")}
-              style={{ width: "100%", padding: "16px 0", background: "var(--cta)", border: "1px solid rgba(122,144,112,0.35)", borderRadius: 14, fontFamily: "var(--font-body), sans-serif", fontSize: 13, fontWeight: 400, color: "var(--parchment)", cursor: "pointer", letterSpacing: "0.04em", marginBottom: 10 }}>
+              style={{ width: "100%", padding: "16px 0", background: "var(--cta)", border: "1px solid rgba(122,144,112,0.35)", borderRadius: 8, fontFamily: "var(--font-body), sans-serif", fontSize: 13, fontWeight: 400, color: "var(--parchment)", cursor: "pointer", letterSpacing: "0.04em", marginBottom: 10 }}>
               Add your first product
             </button>
           </div>
@@ -158,7 +158,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             { label: "Swan Sense activates", done: hasProducts && hasCheckin, action: null, cta: null },
           ];
           return (
-            <div style={{ marginBottom: 24, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: "16px 18px" }}>
+            <div style={{ marginBottom: 24, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "16px 18px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
                 <span style={{ color: "var(--clay)", display: "inline-flex" }}><SwanIcon size={14} /></span>
                 <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)", margin: 0 }}>Getting started</p>
@@ -218,7 +218,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             display: "flex", width: "100%", alignItems: "center", justifyContent: "center", gap: 12,
             padding: "26px 18px", marginBottom: 16,
             background: "transparent",
-            border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 8,
+            border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 6,
             cursor: "pointer", fontFamily: "var(--font-display)", fontWeight: 700,
             fontSize: 18, letterSpacing: "0.04em", textTransform: "uppercase",
             color: "var(--color-inky-moss, #2d3d2b)", lineHeight: 1.05,
@@ -255,7 +255,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         {/* 5. Travel Edit + Shop Scan — utility buttons at bottom. */}
         <div style={{ display: "flex", gap: 10, marginBottom: 40 }}>
           <button onClick={() => setFlightOpen(true)}
-            style={{ flex: 1, display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", background: "transparent", border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 8, cursor: "pointer", textAlign: "left", transition: "background 0.2s", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" }}
+            style={{ flex: 1, display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", background: "transparent", border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 6, cursor: "pointer", textAlign: "left", transition: "background 0.2s", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" }}
             onMouseEnter={e => e.currentTarget.style.background = "rgba(45,61,43,0.08)"}
             onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-inky-moss, #2d3d2b)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -267,7 +267,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             </div>
           </button>
           <button onClick={() => setShopScanOpen(true)}
-            style={{ flex: 1, display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", background: "transparent", border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 8, cursor: "pointer", textAlign: "left", transition: "background 0.2s", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" }}
+            style={{ flex: 1, display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", background: "transparent", border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 6, cursor: "pointer", textAlign: "left", transition: "background 0.2s", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" }}
             onMouseEnter={e => e.currentTarget.style.background = "rgba(45,61,43,0.08)"}
             onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-inky-moss, #2d3d2b)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -284,7 +284,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         {/* 6. Notification nudge — actionable prompt, transitional between
             top-of-page actions and bottom-of-page context. */}
         {!notifDismissed && notifPermission === "default" && (
-          <div style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.25)", borderRadius: 12, padding: "12px 14px", marginBottom: 20 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.25)", borderRadius: 8, padding: "12px 14px", marginBottom: 20 }}>
             <span style={{ color: "#6e8a72", flexShrink: 0, display: "inline-flex" }}><Icon name="bell" size={16} /></span>
             <div style={{ flex: 1 }}>
               <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 12, fontWeight: 400, color: "var(--parchment)", margin: "0 0 2px" }}>Stay on ritual</p>
@@ -304,7 +304,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           const parts = [amOn && `${amTime}am`, pmOn && `${pmTime}pm`].filter(Boolean);
           const label = parts.length > 0 ? `Reminders on — ${parts.join(" & ")} daily.` : "Reminders enabled.";
           return (
-            <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.2)", borderRadius: 12, padding: "10px 14px", marginBottom: 20 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.2)", borderRadius: 8, padding: "10px 14px", marginBottom: 20 }}>
               <span style={{ color: "#6e8a72", display: "inline-flex" }}><Icon name="sparkle" size={12} /></span>
               <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>{label}</p>
               <button onClick={onDismissNotif} aria-label="Dismiss" style={{ marginLeft: "auto", background: "transparent", border: "none", color: "var(--clay)", cursor: "pointer", display: "inline-flex", padding: 4 }}><Icon name="x" size={12} /></button>
@@ -391,7 +391,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             <div onClick={() => setCycleExpanded(false)}
               style={{ position: "fixed", inset: 0, background: "var(--overlay)", backdropFilter: "blur(6px)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 22 }}>
               <div onClick={e => e.stopPropagation()}
-                style={{ background: "var(--ink)", border: `1px solid ${phase.border}`, borderRadius: 18, padding: "24px 22px", maxWidth: 440, width: "100%" }}>
+                style={{ background: "var(--ink)", border: `1px solid ${phase.border}`, borderRadius: 8, padding: "24px 22px", maxWidth: 440, width: "100%" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
                   <div style={{ width: 8, height: 8, borderRadius: "50%", background: phase.dot }} />
                   <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 14, fontWeight: 400, color: "var(--parchment)" }}>{phase.name} Phase</span>
@@ -399,7 +399,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
                   <button onClick={() => setCycleExpanded(false)} aria-label="Close cycle detail" style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", marginLeft: 6, display: "inline-flex", padding: 2 }}><Icon name="x" size={14} /></button>
                 </div>
                 <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 12, color: "var(--clay)", margin: "0 0 14px", lineHeight: 1.65 }}>{phase.description}</p>
-                <div style={{ padding: "12px 14px", background: "rgba(0,0,0,0.2)", borderRadius: 10 }}>
+                <div style={{ padding: "12px 14px", background: "rgba(0,0,0,0.2)", borderRadius: 8 }}>
                   <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--parchment)", margin: 0, lineHeight: 1.6 }}>{phase.nudge}</p>
                 </div>
               </div>

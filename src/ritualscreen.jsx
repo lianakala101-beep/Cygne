@@ -333,7 +333,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
 
       {/* -- Ritual Mode Card ---------------------------------------------- */}
       {ritualMode.name && (
-        <div style={{ background: ritualMode.bg, border: `1px solid ${ritualMode.border}`, borderRadius: 16, padding: "16px 18px", marginBottom: 22, position: "relative" }}>
+        <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "16px", marginBottom: 24, position: "relative" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
             <span style={{ color: "var(--clay)", opacity: 0.6 }}><Icon name={timeOfDayIcon} size={13} /></span>
             <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)" }}>{timeOfDayLabel.toLowerCase()}</span>
@@ -359,7 +359,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
 
       {/* Treatment recovery pause banner */}
       {pausedProducts.length > 0 && pauseTreatment && pausePhase && (
-        <div style={{ marginBottom: 18, padding: "13px 15px", background: "rgba(139,115,85,0.07)", border: "1px solid rgba(139,115,85,0.22)", borderRadius: 12 }}>
+        <div style={{ marginBottom: 18, padding: "13px 15px", background: "rgba(139,115,85,0.07)", border: "1px solid rgba(139,115,85,0.22)", borderRadius: 8 }}>
           <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "#8b7355", margin: "0 0 5px" }}>Paused during recovery</p>
           <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--parchment)", margin: "0 0 8px", lineHeight: 1.55 }}>
             {pausedProducts.map(p => p.name).join(", ")} {pausedProducts.length === 1 ? "is" : "are"} held for your {pausePhase.label.toLowerCase()} phase. They'll return via Introduce Slowly once your skin is ready.
@@ -416,7 +416,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
           </div>
         : <div style={{ padding: "32px 0 16px" }}><div style={{ display: "flex", alignItems: "flex-start", gap: 9, marginBottom: 8 }}><span style={{ color: "var(--clay)", flexShrink: 0, marginTop: 4, display: "inline-flex" }}><SwanIcon size={16} /></span><p style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 400, letterSpacing: "0.05em", color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>Your ritual is waiting. Add products to your vanity and they'll appear here.</p></div></div>}
       {allDone && steps.length > 0 && !todayCheckedIn && (
-        <div style={{ margin: "16px 0", padding: "18px 18px", background: "rgba(45,61,43,0.10)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 14 }}>
+        <div style={{ margin: "16px 0", padding: "18px 18px", background: "rgba(45,61,43,0.10)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 8 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
             <span style={{
               color: "#2d3d2b",
@@ -458,7 +458,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
               const label = scheduledTonight ? "Tonight" : "Tomorrow night";
               const labelColor = scheduledTonight ? "#2d3d2b" : "var(--clay)";
               return (
-                <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: "var(--surface)", border: `1px solid ${scheduledTonight ? "rgba(45,61,43,0.35)" : "var(--border)"}`, borderRadius: 12, marginBottom: 8, opacity: scheduledTonight ? 1 : 0.6 }}>
+                <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: "var(--surface)", border: `1px solid ${scheduledTonight ? "rgba(45,61,43,0.35)" : "var(--border)"}`, borderRadius: 8, marginBottom: 8, opacity: scheduledTonight ? 1 : 0.6 }}>
                   <div>
                     <p style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 400, letterSpacing: "0.08em", color: "var(--parchment)", margin: "0 0 1px" }}>{p.name}</p>
                     <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0 }}>{p.brand}</p>
@@ -478,7 +478,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
             const nextLabel = getNextUseLabel(p);
             const freqLabel = FREQUENCIES.find(f => f.id === (p.frequency || (["Exfoliant","Mask"].includes(p.category) ? "2-3x" : "as-needed")))?.label || "Periodic";
             return (
-              <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, marginBottom: 8 }}>
+              <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, marginBottom: 8 }}>
                 <div>
                   <p style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 400, letterSpacing: "0.08em", color: "var(--parchment)", margin: "0 0 1px" }}>{p.name}</p>
                   <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0 }}>{p.brand} · {freqLabel}</p>
@@ -533,7 +533,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
                 style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 12px", borderRadius: 20, border: `1px solid ${recTab === t.id ? "#2d3d2b" : "var(--border)"}`, background: recTab === t.id ? "rgba(45,61,43,0.11)" : "transparent", color: recTab === t.id ? "#2d3d2b" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 10, fontWeight: recTab === t.id ? 700 : 400, cursor: "pointer", letterSpacing: "0.1em", textTransform: "uppercase", transition: "all 0.16s" }}>
                 <Icon name={t.icon} size={11} />
                 {t.label}
-                <span style={{ fontSize: 9, background: recTab === t.id ? "rgba(45,61,43,0.2)" : "rgba(255,255,255,0.05)", borderRadius: 10, padding: "1px 5px" }}>{t.count}</span>
+                <span style={{ fontSize: 9, background: recTab === t.id ? "rgba(45,61,43,0.2)" : "rgba(255,255,255,0.05)", borderRadius: 8, padding: "1px 5px" }}>{t.count}</span>
               </button>
             ))}
           </div>
@@ -547,7 +547,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
                 .map(id => products.find(p => p.id === id))
                 .filter(Boolean);
               return (
-                <div key={i} style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "13px 15px", marginBottom: 8 }}>
+                <div key={i} style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "13px 15px", marginBottom: 8 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
                     <span style={{ fontSize: 9, fontFamily: "var(--font-body)", fontWeight: 400, letterSpacing: "0.13em", textTransform: "uppercase", color: "var(--parchment)", opacity: 0.7 }}>{r.verb}</span>
                     <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--parchment)", margin: 0, flex: 1, fontWeight: 400, lineHeight: 1.3 }}>{r.title}</p>
@@ -572,7 +572,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
                   {targets.length === 0 && r.addCategory && onAddProduct && (
                     <div style={{ marginTop: 10 }}>
                       <button onClick={() => onAddProduct(r.addCategory)}
-                        style={{ padding: "8px 14px", borderRadius: 10, background: "rgba(45,61,43,0.15)", border: "1px solid rgba(45,61,43,0.35)", fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, color: "#2d3d2b", cursor: "pointer", letterSpacing: "0.05em" }}>
+                        style={{ padding: "8px 14px", borderRadius: 8, background: "rgba(45,61,43,0.15)", border: "1px solid rgba(45,61,43,0.35)", fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, color: "#2d3d2b", cursor: "pointer", letterSpacing: "0.05em" }}>
                         + Add {r.addCategory}
                       </button>
                     </div>
