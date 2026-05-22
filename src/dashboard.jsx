@@ -80,11 +80,11 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         const firstName = user?.name?.split(" ")[0] || "";
         return (
           <div style={{ marginBottom: products.length === 0 ? 20 : 24 }}>
-            <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 14, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 8px", lineHeight: 1, opacity: 0.75 }}>
+            <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 32, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 6px", lineHeight: 1.05 }}>
               {greeting}{firstName ? "," : "."}
-            </p>
+            </h1>
             {firstName && (
-              <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 28, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: 0, lineHeight: 1.05 }}>
+              <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 13, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", opacity: 0.7, margin: 0, lineHeight: 1.1 }}>
                 {firstName}
               </p>
             )}
