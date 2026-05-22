@@ -146,7 +146,7 @@ export function AskCygneModal({
           borderRadius: 0,
           padding: "32px 26px 40px",
           maxHeight: "88vh", overflowY: "auto",
-          color: "var(--color-ink, #1c1c1a)",
+          color: "var(--color-ivory, #faf9f4)",
           position: "relative",
         }}
       >
@@ -156,7 +156,7 @@ export function AskCygneModal({
           style={{
             position: "absolute", top: 18, right: 22,
             background: "none", border: "none", cursor: "pointer",
-            color: "var(--color-pebble, #7a7a7a)",
+            color: "rgba(250,249,244,0.6)",
             fontSize: 22, lineHeight: 1, padding: 4,
             WebkitTapHighlightColor: "transparent",
             WebkitAppearance: "none", appearance: "none",
@@ -173,7 +173,7 @@ export function AskCygneModal({
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
             fontWeight: 700, fontSize: 13, letterSpacing: "0.32em",
             textTransform: "uppercase",
-            color: "var(--color-inky-moss, #2d3d2b)",
+            color: "var(--color-ivory, #faf9f4)",
             margin: 0,
           }}>
             Ask Cygne
@@ -188,7 +188,7 @@ export function AskCygneModal({
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
             fontWeight: 700, fontSize: 11, letterSpacing: "0.22em",
             textTransform: "uppercase",
-            color: "var(--color-inky-moss, #2d3d2b)",
+            color: "var(--color-ivory, #faf9f4)",
             lineHeight: 1.6,
           }}>
             You've reached your daily limit — come back tomorrow
@@ -208,7 +208,7 @@ export function AskCygneModal({
                 borderRadius: 0,
                 fontFamily: "var(--font-body, 'Fungis Normal', 'Fungis Normal', sans-serif)",
                 fontSize: 14, lineHeight: 1.55,
-                color: "var(--color-ink, #1c1c1a)",
+                color: "var(--color-ivory, #faf9f4)",
                 caretColor: "var(--color-inky-moss, #2d3d2b)",
                 resize: "none",
                 outline: "none",
@@ -224,8 +224,8 @@ export function AskCygneModal({
                 marginTop: 14, width: "100%",
                 padding: "14px 0",
                 background: "transparent",
-                border: "1.5px solid var(--color-inky-moss, #2d3d2b)",
-                color: "var(--color-inky-moss, #2d3d2b)",
+                border: "1.5px solid rgba(250,249,244,0.5)",
+                color: "var(--color-ivory, #faf9f4)",
                 borderRadius: 0,
                 fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
                 fontWeight: 700, fontSize: 11, letterSpacing: "0.24em",
@@ -260,7 +260,7 @@ export function AskCygneModal({
             borderRadius: 0,
             fontFamily: "var(--font-body, 'Fungis Normal', 'Fungis Normal', sans-serif)",
             fontSize: 14, lineHeight: 1.7,
-            color: "var(--color-ink, #1c1c1a)",
+            color: "var(--color-ivory, #faf9f4)",
             whiteSpace: "pre-wrap",
           }}>
             {answer}

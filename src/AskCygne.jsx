@@ -9,14 +9,14 @@ export function AskCygneButton({ onClick }) {
       style={{
         display: "flex", width: "100%", alignItems: "center", justifyContent: "center", gap: 8,
         padding: "14px 16px", background: "transparent",
-        border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 6,
+        border: "1.5px solid rgba(250,249,244,0.5)", borderRadius: 6,
         cursor: "pointer", fontFamily: "var(--font-display)", fontWeight: 700,
         fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase",
-        color: "var(--color-inky-moss)", transition: "all 0.2s",
+        color: "var(--color-ivory, #faf9f4)", transition: "all 0.2s",
         WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
       }}
-      onMouseEnter={e => { e.currentTarget.style.background = "var(--color-inky-moss)"; e.currentTarget.style.color = "var(--color-ivory)"; }}
-      onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--color-inky-moss)"; }}>
+      onMouseEnter={e => { e.currentTarget.style.background = "rgba(250,249,244,0.08)"; }}
+      onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
       Ask Cygne
     </button>
   );

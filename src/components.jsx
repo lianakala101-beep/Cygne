@@ -91,7 +91,7 @@ function FlagCard({ f }) {
     high:    { color: "#8b7355", bg: "rgba(139,115,85,0.12)" },
     caution: { color: "#8b7355", bg: "rgba(139,115,85,0.08)" },
     medium:  { color: "#8b7355", bg: "rgba(139,115,85,0.08)" },
-    missing: { color: "var(--color-inky-moss, #2d3d2b)", bg: "rgba(45,61,43,0.08)" },
+    missing: { color: "var(--color-ivory, #faf9f4)", bg: "rgba(45,61,43,0.08)" },
   };
   const label = SEVERITY_LABEL[f.severity] || "Note";
   const tone = SEVERITY_TONE[f.severity] || SEVERITY_TONE.caution;
@@ -141,7 +141,7 @@ function FlagCard({ f }) {
         }}>{f.label}</span>
         {hasDetail && (
           <span style={{
-            color: "var(--color-pebble, #7a7a7a)", opacity: 0.5,
+            color: "rgba(250,249,244,0.6)", opacity: 0.5,
             transform: open ? "rotate(90deg)" : "none",
             transition: "transform 0.2s",
             display: "inline-flex", flexShrink: 0,
@@ -153,7 +153,7 @@ function FlagCard({ f }) {
           {f.detail && (
             <p style={{
               fontFamily: "var(--font-body)", fontSize: 12,
-              color: "var(--color-inky-moss, #2d3d2b)",
+              color: "var(--color-ivory, #faf9f4)",
               margin: 0, lineHeight: 1.55,
               whiteSpace: "normal",
             }}>{f.detail}</p>
@@ -169,7 +169,7 @@ function FlagCard({ f }) {
                     background: "var(--color-ivory-shadow, #f0ebe0)",
                     border: "1px solid rgba(45,61,43,0.14)",
                     fontFamily: "var(--font-body)", fontSize: 10,
-                    color: "var(--color-ink, #1c1c1a)",
+                    color: "var(--color-ivory, #faf9f4)",
                     whiteSpace: "nowrap",
                   }}>{name}</span>
                 );

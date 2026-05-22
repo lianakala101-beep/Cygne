@@ -116,7 +116,7 @@ function ShopScanModal({ products, user = {}, onClose }) {
   };
 
   const verdictConfig = {
-    love:  { color: "#2d3d2b",  bg: "rgba(45,61,43,0.08)", border: "rgba(45,61,43,0.25)", label: "Your skin would love this" },
+    love:  { color: "var(--color-ivory, #faf9f4)",  bg: "rgba(250,249,244,0.08)", border: "rgba(45,61,43,0.25)", label: "Your skin would love this" },
     maybe: { color: "#8b7355",      bg: "rgba(139,115,85,0.08)",  border: "rgba(139,115,85,0.25)",  label: "Think twice" },
     skip:  { color: "#8b7355",      bg: "rgba(139,115,85,0.08)",   border: "rgba(139,115,85,0.25)",   label: "Not for you" },
   };
@@ -159,13 +159,13 @@ function ShopScanModal({ products, user = {}, onClose }) {
                 <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--parchment)", margin: "0 0 14px", fontWeight: 400 }}>Scan product</p>
                 <div style={{ display: "flex", gap: 8 }}>
                   <button onClick={() => cameraRef.current?.click()}
-                    style={{ flex: 1, padding: "11px 0", background: "transparent", border: "1px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 10, cursor: "pointer", fontFamily: "var(--font-display)", fontSize: 10, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", transition: "background 0.2s, color 0.2s" }}
+                    style={{ flex: 1, padding: "11px 0", background: "transparent", border: "1px solid rgba(250,249,244,0.25)", borderRadius: 10, cursor: "pointer", fontFamily: "var(--font-display)", fontSize: 10, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", transition: "background 0.2s, color 0.2s" }}
                     onMouseEnter={e => { e.currentTarget.style.background = "var(--color-inky-moss, #2d3d2b)"; e.currentTarget.style.color = "var(--color-ivory, #faf9f4)"; }}
                     onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--color-inky-moss, #2d3d2b)"; }}>
                     Take Photo
                   </button>
                   <button onClick={() => libraryRef.current?.click()}
-                    style={{ flex: 1, padding: "11px 0", background: "transparent", border: "1px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 10, cursor: "pointer", fontFamily: "var(--font-display)", fontSize: 10, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", transition: "background 0.2s, color 0.2s" }}
+                    style={{ flex: 1, padding: "11px 0", background: "transparent", border: "1px solid rgba(250,249,244,0.25)", borderRadius: 10, cursor: "pointer", fontFamily: "var(--font-display)", fontSize: 10, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", transition: "background 0.2s, color 0.2s" }}
                     onMouseEnter={e => { e.currentTarget.style.background = "var(--color-inky-moss, #2d3d2b)"; e.currentTarget.style.color = "var(--color-ivory, #faf9f4)"; }}
                     onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--color-inky-moss, #2d3d2b)"; }}>
                     Choose Photo
@@ -177,7 +177,7 @@ function ShopScanModal({ products, user = {}, onClose }) {
                 <div style={{ marginTop: 16, padding: "12px 14px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10 }}>
                   <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 6px" }}>Checking against your skin</p>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-                    {user.skinType && <span style={{ fontSize: 10, fontFamily: "var(--font-body)", color: "#2d3d2b", background: "rgba(45,61,43,0.1)", border: "1px solid rgba(45,61,43,0.25)", padding: "2px 9px", borderRadius: 20 }}>{user.skinType}</span>}
+                    {user.skinType && <span style={{ fontSize: 10, fontFamily: "var(--font-body)", color: "var(--color-ivory, #faf9f4)", background: "rgba(45,61,43,0.1)", border: "1px solid rgba(45,61,43,0.25)", padding: "2px 9px", borderRadius: 20 }}>{user.skinType}</span>}
                     {(user.concerns || []).map((c, i) => <span key={i} style={{ fontSize: 10, fontFamily: "var(--font-body)", color: "var(--clay)", background: "var(--surface)", border: "1px solid var(--border)", padding: "2px 9px", borderRadius: 20 }}>{c}</span>)}
                   </div>
                 </div>
@@ -245,7 +245,7 @@ function ShopScanModal({ products, user = {}, onClose }) {
               {/* Fills a gap */}
               {result.fillsGap && result.gap && (
                 <div style={{ padding: "11px 14px", background: "rgba(45,61,43,0.06)", border: "1px solid rgba(45,61,43,0.2)", borderRadius: 10, marginBottom: 10 }}>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "#2d3d2b", margin: "0 0 4px" }}>Fills a gap</p>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 4px" }}>Fills a gap</p>
                   <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{result.gap}</p>
                 </div>
               )}

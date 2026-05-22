@@ -189,13 +189,13 @@ function Section({ label, body, rootRef, divider = true }) {
       <p style={{
         fontFamily: "var(--font-display)",
         fontWeight: 700, fontSize: 9, letterSpacing: "0.22em",
-        textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)",
+        textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)",
         margin: "0 0 14px",
       }}>{label}</p>
       <p style={{
         fontFamily: "var(--font-body)",
         fontWeight: 400, fontSize: 15,
-        color: "var(--color-inky-moss, #2d3d2b)", margin: 0, lineHeight: 1.7,
+        color: "var(--color-ivory, #faf9f4)", margin: 0, lineHeight: 1.7,
       }}>{body}</p>
     </section>
   );
@@ -402,7 +402,7 @@ export function MonthlyRecap({
           <p style={{
             fontFamily: "var(--font-body)",
             fontSize: 11, fontWeight: 400, letterSpacing: "0.18em",
-            textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)",
+            textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)",
             margin: "6px 0 0",
           }}>
             {view.year} · IN REVIEW
@@ -441,7 +441,7 @@ export function MonthlyRecap({
           <p style={{
             fontFamily: "var(--font-body)",
             fontSize: 12, fontWeight: 400, letterSpacing: "0.14em", textTransform: "uppercase",
-            color: "var(--color-inky-moss, #2d3d2b)", margin: 0,
+            color: "var(--color-ivory, #faf9f4)", margin: 0,
           }}>
             built around you.
           </p>
@@ -451,7 +451,7 @@ export function MonthlyRecap({
       {isEmpty ? (
         <p style={{
           fontFamily: "var(--font-body)", fontSize: 13,
-          color: "var(--color-inky-moss, #2d3d2b)", textAlign: "center", margin: "20px 0 8px",
+          color: "var(--color-ivory, #faf9f4)", textAlign: "center", margin: "20px 0 8px",
           lineHeight: 1.6,
         }}>
           Nothing logged this month yet. Check-ins and journals will fill in here.
@@ -473,7 +473,7 @@ export function MonthlyRecap({
             {DOW.map((d, i) => (
               <div key={i} style={{
                 fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.16em",
-                color: "var(--color-inky-moss, #2d3d2b)", textAlign: "center", textTransform: "uppercase",
+                color: "var(--color-ivory, #faf9f4)", textAlign: "center", textTransform: "uppercase",
               }}>{d}</div>
             ))}
           </div>
@@ -527,7 +527,7 @@ export function MonthlyRecap({
             <div style={{ marginBottom: 18 }}>
               <p style={{
                 fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em",
-                textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: "0 0 8px",
+                textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 8px",
               }}>
                 Most-flagged zones
               </p>
@@ -535,14 +535,14 @@ export function MonthlyRecap({
                 {data.topZones.map(([zone, count]) => (
                   <div key={zone} style={{
                     display: "flex", alignItems: "center", justifyContent: "space-between",
-                    padding: "6px 0", borderBottom: "1px solid rgba(45,61,43,0.08)",
+                    padding: "6px 0", borderBottom: "1px solid rgba(250,249,244,0.08)",
                   }}>
                     <span style={{
                       fontFamily: "var(--font-body)", fontSize: 12, color: INK,
                     }}>{zoneLabelDisplay(zone)}</span>
                     <span style={{
                       fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400,
-                      letterSpacing: "0.1em", color: "var(--color-inky-moss, #2d3d2b)",
+                      letterSpacing: "0.1em", color: "var(--color-ivory, #faf9f4)",
                     }}>{count}×</span>
                   </div>
                 ))}
@@ -554,7 +554,7 @@ export function MonthlyRecap({
           {(data.monthReflections.length > 0 || data.monthTreatments.length > 0 || data.breakouts > 0) && (
             <div style={{
               display: "flex", flexWrap: "wrap", gap: 14,
-              paddingTop: 14, borderTop: "1px solid rgba(45,61,43,0.08)",
+              paddingTop: 14, borderTop: "1px solid rgba(250,249,244,0.08)",
             }}>
               {data.monthReflections.length > 0 && (
                 <FooterCount label="Reflections" value={data.monthReflections.length} />
@@ -582,7 +582,7 @@ function Stat({ label, value }) {
       }}>{value}</div>
       <div style={{
         fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em",
-        textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)",
+        textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)",
       }}>{label}</div>
     </div>
   );
@@ -596,7 +596,7 @@ function FooterCount({ label, value }) {
       }}>{value}</span>
       <span style={{
         fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.12em",
-        textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)",
+        textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)",
       }}>{label}</span>
     </div>
   );

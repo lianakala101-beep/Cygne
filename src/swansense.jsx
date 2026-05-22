@@ -188,7 +188,7 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
           headline: "Resilience window opening soon.",
           detail: "Follicular phase starts in a couple of days — your skin will be at peak tolerance for retinol and AHA. A good moment to be consistent with actives.",
           level: "positive",
-          color: "#2d3d2b",
+          color: "var(--color-ivory, #faf9f4)",
           bg: "rgba(45,61,43,0.07)",
           border: "rgba(45,61,43,0.2)",
         });
@@ -239,7 +239,7 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
         headline: "Set your cycle day to unlock predictions.",
         detail: "Swan Sense can predict sensitivity windows, oil surges, and ideal active nights — but needs your cycle day to do it. Add it in the Progress tab.",
         level: "positive",
-        color: "#2d3d2b",
+        color: "var(--color-ivory, #faf9f4)",
         bg: "rgba(45,61,43,0.07)",
         border: "rgba(45,61,43,0.2)",
       });
@@ -259,7 +259,7 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
         headline: "Log your first check-in to activate predictions.",
         detail: "Swan Sense learns from your skin over time. After a few check-ins, it can flag irritation trends, barrier risk, and optimal active windows before they happen.",
         level: "positive",
-        color: "#2d3d2b",
+        color: "var(--color-ivory, #faf9f4)",
         bg: "rgba(45,61,43,0.07)",
         border: "rgba(45,61,43,0.2)",
       });

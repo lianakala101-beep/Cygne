@@ -305,7 +305,7 @@ function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }
         fontFamily: "var(--font-display)",
         fontSize: 26, fontWeight: 700,
         letterSpacing: "0.04em", textTransform: "uppercase",
-        color: "var(--color-inky-moss, #2d3d2b)",
+        color: "var(--color-ivory, #faf9f4)",
         lineHeight: 1.05,
         margin: "0 0 8px",
         textDecoration: checked ? "line-through" : "none",
@@ -366,7 +366,7 @@ function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }
             fontFamily: "var(--font-display)",
             fontSize: 10, fontWeight: 400,
             letterSpacing: "0.22em", textTransform: "uppercase",
-            color: "var(--color-inky-moss, #2d3d2b)",
+            color: "var(--color-ivory, #faf9f4)",
             display: "inline-flex", alignItems: "center", gap: 4,
           }}
         >

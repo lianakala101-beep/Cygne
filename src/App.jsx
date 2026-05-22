@@ -651,7 +651,7 @@ export default function App() {
 
   // -- Main app ---------------------------------------------------------------
   return (
-    <div style={{ minHeight: "100vh", background: tab === "dashboard" ? "var(--color-inky-moss, #2d3d2b)" : "var(--deep)", paddingBottom: 88, transition: "background 0.4s ease" }}>
+    <div style={{ minHeight: "100vh", background: "var(--color-inky-moss, #2d3d2b)", paddingBottom: 88 }}>
       <style>{`
         /* Fonts are declared once in src/index.css. Everything below is
            the runtime token sheet — colors and aliases the legacy inline
@@ -670,18 +670,21 @@ export default function App() {
           --color-pebble:       #7a7a7a;
           --font-display:  'Fungis Heavy', 'Fungis', sans-serif;
           --font-body:     'Fungis Normal', 'Fungis', sans-serif;
-          /* Surfaces (single light theme) */
-          --deep:      #faf9f4;
-          --ink:       #f7f4f0;
-          --surface:   #ffffff;
-          --border:    rgba(0,0,0,0.10);
-          --parchment: #1c1c1a;
-          --clay:      #5a5a5a;
-          --muted:     #7a7a7a;
-          --taupe:     #6b5338;
-          --overlay:   rgba(30,25,20,0.5);
-          --sage:      #526859;
-          --cta:       #2d3d2b;
+          /* Dark editorial canvas — every legacy alias resolves to the
+             dark theme so any callsite using --parchment / --clay /
+             --border / --surface auto-skins without a hand edit. */
+          --deep:               var(--color-inky-moss);
+          --ink:                #354a32;
+          --surface:            rgba(255,255,255,0.06);
+          --border:             rgba(250,249,244,0.2);
+          --parchment:          var(--color-ivory);
+          --clay:               rgba(250,249,244,0.6);
+          --muted:              rgba(250,249,244,0.4);
+          --taupe:              rgba(250,249,244,0.5);
+          --overlay:            rgba(8,12,8,0.6);
+          --sage:               var(--color-ivory);
+          --cta:                rgba(250,249,244,0.08);
+          --color-ivory-shadow: rgba(255,255,255,0.06);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         input, select, textarea { outline: none; }
@@ -740,14 +743,13 @@ export default function App() {
         .modal-bg { background: rgba(232,226,217,0.55); }
       `}</style>
 
-      {/* Header */}
+      {/* Header — dark across every tab */}
       <div style={{
         position: "sticky", top: 0, zIndex: 50,
-        background: tab === "dashboard" ? "rgba(45,61,43,0.94)" : "rgba(250,249,244,0.94)",
+        background: "rgba(45,61,43,0.94)",
         backdropFilter: "blur(16px)",
-        borderBottom: tab === "dashboard" ? "1px solid rgba(250,249,244,0.12)" : "1px solid var(--border)",
+        borderBottom: "1px solid rgba(250,249,244,0.12)",
         padding: "0 22px",
-        transition: "background 0.4s ease, border-bottom-color 0.4s ease",
       }}>
         <div style={{ position: "relative", maxWidth: 600, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "flex-end", height: 76 }}>
           <img
@@ -762,11 +764,8 @@ export default function App() {
               width: "auto",
               pointerEvents: "none",
               userSelect: "none",
-              filter: tab === "dashboard"
-                ? "brightness(0) invert(1)"
-                : "brightness(0.45) contrast(1.35) saturate(0.6)",
-              opacity: tab === "dashboard" ? 0.95 : 1,
-              transition: "filter 0.4s ease, opacity 0.4s ease",
+              filter: "brightness(0) invert(1)",
+              opacity: 0.95,
             }}
           />
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -785,10 +784,9 @@ export default function App() {
                 fontWeight: 700,
                 fontSize: 22,
                 letterSpacing: "0.04em",
-                color: tab === "dashboard" ? "var(--color-ivory, #faf9f4)" : "var(--color-inky-moss, #2d3d2b)",
+                color: "var(--color-ivory, #faf9f4)",
                 lineHeight: 1,
                 userSelect: "none",
-                transition: "color 0.4s ease",
               }}>
                 {user?.name ? user.name.trim()[0].toUpperCase() : "?"}
               </span>
@@ -855,8 +853,8 @@ export default function App() {
         {tab === "progress"  && <Progress products={products} checkIns={checkIns} setCheckIns={setCheckIns} treatments={treatments} setTreatments={setTreatments} saveTreatment={saveTreatment} removeTreatment={removeTreatment} updateTreatmentDate={updateTreatmentDate} user={user} onAdvanceRamp={advanceRamp} onHoldRamp={holdRamp} onResetRampStart={resetRampStartDate} journals={journals} setJournals={setJournals} onUpdateUser={updateUser} reflections={reflections} triggerLog={triggerLog} setTriggerLog={setTriggerLog} />}
       </div>
 
-      {/* Bottom nav */}
-      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "rgba(250,249,244,0.97)", backdropFilter: "blur(16px)", borderTop: "1px solid var(--border)", zIndex: 50 }}>
+      {/* Bottom nav — dark across every tab */}
+      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "rgba(45,61,43,0.97)", backdropFilter: "blur(16px)", borderTop: "1px solid rgba(250,249,244,0.12)", zIndex: 50 }}>
         <div style={{ maxWidth: 600, margin: "0 auto", display: "flex" }}>
           {tabs.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}

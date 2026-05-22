@@ -351,7 +351,7 @@ function CaptureFlow({ onClose, onComplete }) {
               style={{
                 display: "inline-flex", alignItems: "center", gap: 10,
                 padding: "14px 40px", borderRadius: 0,
-                background: "transparent", color: "var(--color-inky-moss)", border: "1.5px solid var(--color-inky-moss)",
+                background: "transparent", color: "var(--color-ivory)", border: "1.5px solid rgba(250,249,244,0.5)",
                 cursor: busy ? "default" : "pointer",
                 fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400,
                 letterSpacing: "0.2em", textTransform: "uppercase",
@@ -391,7 +391,7 @@ function CaptureFlow({ onClose, onComplete }) {
               style={{
                 display: "inline-flex", alignItems: "center", gap: 10,
                 padding: "14px 40px", borderRadius: 0,
-                background: "transparent", color: "var(--color-inky-moss)", border: "1.5px solid var(--color-inky-moss)",
+                background: "transparent", color: "var(--color-ivory)", border: "1.5px solid rgba(250,249,244,0.5)",
                 cursor: busy ? "default" : "pointer",
                 fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400,
                 letterSpacing: "0.2em", textTransform: "uppercase",
@@ -506,13 +506,13 @@ function ExpandedEntry({ entry, onClose }) {
         <Icon name="x" size={18} />
       </button>
 
-      <p style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: "0 0 6px" }}>
+      <p style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 6px" }}>
         Week {entry.weekNumber}
       </p>
-      <h2 style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-ink, #1c1c1a)", margin: "0 0 6px", textAlign: "center", lineHeight: 1.2 }}>
+      <h2 style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 6px", textAlign: "center", lineHeight: 1.2 }}>
         {getMoonPhase(new Date(entry.date))}
       </h2>
-      <p style={{ fontFamily: SANS, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: "0 0 26px" }}>
+      <p style={{ fontFamily: SANS, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 26px" }}>
         {formatDateLong(entry.date)}
       </p>
 
@@ -588,13 +588,13 @@ function GalleryEntry({ entry, onExpand, caption }) {
         transition: "opacity 500ms ease-out, transform 500ms ease-out",
         willChange: "opacity, transform",
       }}>
-      <p style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: "var(--color-pebble, #7a7a7a)", margin: "0 0 4px" }}>
+      <p style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(250,249,244,0.6)", margin: "0 0 4px" }}>
         Week {entry.weekNumber}
       </p>
-      <h3 style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-ink, #1c1c1a)", margin: "0 0 4px", lineHeight: 1.2 }}>
+      <h3 style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 4px", lineHeight: 1.2 }}>
         {getMoonPhase(new Date(entry.date))}
       </h3>
-      <p style={{ fontFamily: SANS, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--color-pebble, #7a7a7a)", margin: "0 0 18px" }}>
+      <p style={{ fontFamily: SANS, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: "rgba(250,249,244,0.6)", margin: "0 0 18px" }}>
         {formatDateLong(entry.date)}
       </p>
       <div style={{
@@ -606,7 +606,7 @@ function GalleryEntry({ entry, onExpand, caption }) {
         <TriptychImage src={src} alt={`Reflection week ${entry.weekNumber}`} />
       </div>
       {caption && (
-        <p style={{ fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 400, color: "var(--color-pebble, #7a7a7a)", textAlign: "center", margin: "12px 0 0", letterSpacing: "0.02em", lineHeight: 1.4 }}>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 400, color: "rgba(250,249,244,0.6)", textAlign: "center", margin: "12px 0 0", letterSpacing: "0.02em", lineHeight: 1.4 }}>
           {caption}
         </p>
       )}
@@ -772,7 +772,7 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
     }}>
       {/* Header */}
       <div style={{ maxWidth: 560, margin: "0 auto 18px", textAlign: "center" }}>
-        <h1 style={{ fontFamily: "var(--font-display)", fontSize: 32, fontWeight: 700, color: "var(--color-inky-moss)", margin: "0 0 6px", letterSpacing: "0.15em", textTransform: "uppercase", lineHeight: 1.15 }}>
+        <h1 style={{ fontFamily: "var(--font-display)", fontSize: 32, fontWeight: 700, color: "var(--color-ivory)", margin: "0 0 6px", letterSpacing: "0.15em", textTransform: "uppercase", lineHeight: 1.15 }}>
           Reflection
         </h1>
         {reflections.length === 0 && (
@@ -793,8 +793,8 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
           style={{
             display: "inline-flex", alignItems: "center", gap: 10,
             padding: "14px 40px", borderRadius: 0,
-            background: "transparent", color: "var(--color-inky-moss)",
-            border: "1.5px solid var(--color-inky-moss)",
+            background: "transparent", color: "var(--color-ivory)",
+            border: "1.5px solid rgba(250,249,244,0.5)",
             cursor: saving ? "default" : "pointer",
             fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400,
             letterSpacing: "0.2em", textTransform: "uppercase",
@@ -811,7 +811,7 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
               : "Capture This Week"}
         </button>
         {justCaptured && (
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "var(--color-pebble, #7a7a7a)", margin: "12px 0 0", letterSpacing: "0.02em", transition: "opacity 600ms ease" }}>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "rgba(250,249,244,0.6)", margin: "12px 0 0", letterSpacing: "0.02em", transition: "opacity 600ms ease" }}>
             Captured — return on your next reset day
           </p>
         )}

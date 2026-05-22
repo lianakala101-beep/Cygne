@@ -30,7 +30,7 @@ function daysAgoIso(n) {
 
 function fillForScore(s) {
   if (s <= 0) return "none";
-  if (s <= 0.25) return "rgba(45,61,43,0.08)";
+  if (s <= 0.25) return "rgba(250,249,244,0.08)";
   if (s <= 0.50) return "rgba(45,61,43,0.20)";
   if (s <= 0.75) return "rgba(45,61,43,0.40)";
   return "rgba(45,61,43,0.65)";
@@ -89,7 +89,7 @@ export function FaceHeatMap({ journals = [], products = [], user = {} }) {
       background: IVORY,
       borderRadius: 16,
       padding: "22px 20px 26px",
-      border: "1px solid rgba(45,61,43,0.10)",
+      border: "1px solid rgba(250,249,244,0.10)",
     }}>
       {/* Time filter */}
       <div style={{ display: "flex", justifyContent: "center", gap: 0, marginBottom: 18 }}>
@@ -156,7 +156,7 @@ export function FaceHeatMap({ journals = [], products = [], user = {} }) {
           <p style={{
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
             fontWeight: 400,
-            fontSize: 13, color: "var(--color-inky-moss, #2d3d2b)",
+            fontSize: 13, color: "var(--color-ivory, #faf9f4)",
             textAlign: "center", marginTop: 16,
           }}>
             your map is taking shape
@@ -164,7 +164,7 @@ export function FaceHeatMap({ journals = [], products = [], user = {} }) {
           <p style={{
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
             fontSize: 10, letterSpacing: "0.1em",
-            color: "var(--color-inky-moss, #2d3d2b)", opacity: 0.7,
+            color: "var(--color-ivory, #faf9f4)", opacity: 0.7,
             textAlign: "center", marginTop: 6, textTransform: "uppercase",
           }}>
             log skin observations to reveal your patterns
@@ -264,7 +264,7 @@ function ZoneInsightDrawer({ zoneId, journals, products, user, onClose, onAskCyg
           borderRadius: "20px 20px 0 0",
           padding: "24px 22px 32px",
           maxHeight: "85vh", overflowY: "auto",
-          color: "var(--color-ink, #1c1c1a)",
+          color: "var(--color-ivory, #faf9f4)",
         }}
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
@@ -285,7 +285,7 @@ function ZoneInsightDrawer({ zoneId, journals, products, user, onClose, onAskCyg
         {/* Stats */}
         <p style={{
           fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
-          fontWeight: 400, fontSize: 13, color: "var(--color-inky-moss, #2d3d2b)",
+          fontWeight: 400, fontSize: 13, color: "var(--color-ivory, #faf9f4)",
           margin: "0 0 12px",
         }}>
           Logged {flareCount} time{flareCount === 1 ? "" : "s"} this month
@@ -308,7 +308,7 @@ function ZoneInsightDrawer({ zoneId, journals, products, user, onClose, onAskCyg
           <p style={{
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
             fontWeight: 400, fontSize: 10, letterSpacing: "0.15em",
-            color: "var(--color-inky-moss, #2d3d2b)", textTransform: "uppercase",
+            color: "var(--color-ivory, #faf9f4)", textTransform: "uppercase",
             margin: "0 0 8px",
           }}>
             Products present during flare-ups
@@ -316,7 +316,7 @@ function ZoneInsightDrawer({ zoneId, journals, products, user, onClose, onAskCyg
           {topProducts.length === 0 ? (
             <p style={{
               fontFamily: "var(--font-body, 'Fungis Normal', 'Fungis Normal', sans-serif)",
-              fontSize: 12, color: "var(--color-inky-moss, #2d3d2b)", opacity: 0.75, margin: 0,
+              fontSize: 12, color: "var(--color-ivory, #faf9f4)", opacity: 0.75, margin: 0,
             }}>
               Not enough data yet.
             </p>
@@ -327,12 +327,12 @@ function ZoneInsightDrawer({ zoneId, journals, products, user, onClose, onAskCyg
                   key={p.id}
                   style={{
                     fontFamily: "var(--font-body, 'Fungis Normal', 'Fungis Normal', sans-serif)",
-                    fontSize: 13, color: "var(--color-ink, #1c1c1a)",
+                    fontSize: 13, color: "var(--color-ivory, #faf9f4)",
                     padding: "6px 0",
-                    borderBottom: "1px solid rgba(45,61,43,0.08)",
+                    borderBottom: "1px solid rgba(250,249,244,0.08)",
                   }}
                 >
-                  {p.name || "(unnamed)"}{p.brand ? <span style={{ color: "var(--color-inky-moss, #2d3d2b)" }}> · {p.brand}</span> : null}
+                  {p.name || "(unnamed)"}{p.brand ? <span style={{ color: "var(--color-ivory, #faf9f4)" }}> · {p.brand}</span> : null}
                 </li>
               ))}
             </ul>
@@ -344,7 +344,7 @@ function ZoneInsightDrawer({ zoneId, journals, products, user, onClose, onAskCyg
           style={{
             width: "100%", padding: "14px 0",
             background: "transparent",
-            border: "1px solid var(--color-inky-moss, #2d3d2b)",
+            border: "1px solid rgba(250,249,244,0.25)",
             color: INKY,
             borderRadius: 12,
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
