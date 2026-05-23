@@ -145,12 +145,12 @@ function IngredientProfile({ user, onUpdateUser }) {
   // Shared visual language with SkinProfileEditor — same card chrome,
   // header treatment, edit chrome, field labels, Save/Cancel buttons.
   const fieldLabel = (txt) => (
-    <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 8px" }}>{txt}</p>
+    <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(250,249,244,0.7)", margin: "0 0 8px" }}>{txt}</p>
   );
   const editInputStyle = {
     width: "100%", boxSizing: "border-box",
     background: "rgba(255,255,255,0.06)",
-    border: "1px solid rgba(250,249,244,0.2)",
+    border: "1px solid rgba(250,249,244,0.3)",
     borderRadius: 0, padding: "11px 14px",
     fontFamily: "var(--font-body)", fontSize: 13,
     color: "var(--color-ivory, #faf9f4)",
@@ -159,21 +159,16 @@ function IngredientProfile({ user, onUpdateUser }) {
     WebkitAppearance: "none", appearance: "none",
     WebkitTapHighlightColor: "transparent",
   };
-  // Loved (moss) and avoided (clay) keep their tonal distinction via
-  // background + text color when active; inactive is the neutral outline.
+  // Uniform ivory pill treatment on the dark canvas — unselected reads at
+  // 0.5/0.3 ivory, selected at full ivory text + border.
   const tagButton = ({ on, tone, onClick, children }) => {
-    const palettes = {
-      love:  { active: { color: "var(--color-ivory, #faf9f4)", bg: "rgba(45,61,43,0.12)", border: "var(--color-inky-moss, #2d3d2b)" } },
-      avoid: { active: { color: "#8b7355", bg: "rgba(139,115,85,0.10)", border: "rgba(139,115,85,0.5)" } },
-    };
-    const p = palettes[tone].active;
     return (
       <button type="button" onClick={onClick}
         style={{
           padding: "6px 12px", borderRadius: 24,
-          border: `1px solid ${on ? p.border : "rgba(45,61,43,0.35)"}`,
-          background: on ? p.bg : "transparent",
-          color: on ? p.color : "var(--color-inky-moss, #2d3d2b)",
+          border: `1px solid ${on ? "var(--color-ivory, #faf9f4)" : "rgba(250,249,244,0.3)"}`,
+          background: on ? "rgba(250,249,244,0.12)" : "transparent",
+          color: on ? "var(--color-ivory, #faf9f4)" : "rgba(250,249,244,0.5)",
           fontFamily: "var(--font-body)", fontSize: 11, fontWeight: on ? 700 : 400,
           cursor: "pointer", letterSpacing: "0.02em", transition: "all 0.18s",
           WebkitAppearance: "none", appearance: "none",
@@ -223,7 +218,7 @@ function IngredientProfile({ user, onUpdateUser }) {
               {COMMON_ALLERGENS.map(s => tagButton({ on: draftAllergens.includes(s), tone: "avoid", onClick: () => toggleAllergen(s), children: s }))}
               {draftAllergens.filter(a => !COMMON_ALLERGENS.includes(a)).map(a => (
                 <button key={a} onClick={() => toggleAllergen(a)}
-                  style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "6px 12px", borderRadius: 24, border: "1px solid rgba(139,115,85,0.5)", background: "rgba(139,115,85,0.10)", fontFamily: "var(--font-body)", fontSize: 11, color: "#8b7355", fontWeight: 700, cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
+                  style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "6px 12px", borderRadius: 24, border: "1px solid var(--color-ivory, #faf9f4)", background: "rgba(250,249,244,0.12)", fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-ivory, #faf9f4)", fontWeight: 700, cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
                   {a} <Icon name="x" size={9} />
                 </button>
               ))}
@@ -246,7 +241,7 @@ function IngredientProfile({ user, onUpdateUser }) {
               {COMMON_LOVED.map(s => tagButton({ on: draftLoved.includes(s), tone: "love", onClick: () => toggleLoved(s), children: s }))}
               {draftLoved.filter(l => !COMMON_LOVED.includes(l)).map(l => (
                 <button key={l} onClick={() => toggleLoved(l)}
-                  style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "6px 12px", borderRadius: 24, border: "1px solid rgba(250,249,244,0.25)", background: "rgba(45,61,43,0.12)", fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-ivory, #faf9f4)", fontWeight: 700, cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
+                  style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "6px 12px", borderRadius: 24, border: "1px solid var(--color-ivory, #faf9f4)", background: "rgba(250,249,244,0.12)", fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-ivory, #faf9f4)", fontWeight: 700, cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
                   {l} <Icon name="x" size={9} />
                 </button>
               ))}
@@ -268,7 +263,7 @@ function IngredientProfile({ user, onUpdateUser }) {
               Save
             </button>
             <button onClick={cancel}
-              style={{ flex: 1, padding: "12px 0", background: "transparent", border: "1px solid rgba(45,61,43,0.22)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(250,249,244,0.6)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
+              style={{ flex: 1, padding: "12px 0", background: "transparent", border: "none", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
               Cancel
             </button>
           </div>
@@ -476,7 +471,7 @@ function SkinProfileEditor({ user, onUpdateUser }) {
               Save
             </button>
             <button onClick={cancel}
-              style={{ flex: 1, padding: "12px 0", background: "transparent", border: "1px solid rgba(45,61,43,0.22)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(250,249,244,0.6)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
+              style={{ flex: 1, padding: "12px 0", background: "transparent", border: "none", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
               Cancel
             </button>
           </div>
@@ -542,12 +537,12 @@ function SkinHistory({ user, onUpdateUser }) {
     </div>
   );
   const fieldLabel = (txt) => (
-    <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 8px" }}>{txt}</p>
+    <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(250,249,244,0.7)", margin: "0 0 8px" }}>{txt}</p>
   );
   const editInputStyle = {
     width: "100%", boxSizing: "border-box",
     background: "rgba(255,255,255,0.06)",
-    border: "1px solid rgba(250,249,244,0.2)",
+    border: "1px solid rgba(250,249,244,0.3)",
     borderRadius: 0, padding: "11px 14px",
     fontFamily: "var(--font-body)", fontSize: 13,
     color: "var(--color-ivory, #faf9f4)",
@@ -556,17 +551,16 @@ function SkinHistory({ user, onUpdateUser }) {
     WebkitAppearance: "none", appearance: "none",
     WebkitTapHighlightColor: "transparent",
   };
+  // Uniform ivory pill treatment on the dark canvas — unselected at
+  // 0.5/0.3 ivory, selected at full ivory text + border.
   const Pill = ({ on, tone, onClick, children }) => {
-    const active = tone === "avoid"
-      ? { color: "#8b7355", bg: "rgba(139,115,85,0.10)", border: "rgba(139,115,85,0.5)" }
-      : { color: "var(--color-ivory, #faf9f4)", bg: "rgba(45,61,43,0.12)", border: "var(--color-inky-moss, #2d3d2b)" };
     return (
       <button type="button" onClick={onClick}
         style={{
           padding: "6px 12px", borderRadius: 24,
-          border: `1px solid ${on ? active.border : "rgba(45,61,43,0.35)"}`,
-          background: on ? active.bg : "transparent",
-          color: on ? active.color : "var(--color-inky-moss, #2d3d2b)",
+          border: `1px solid ${on ? "var(--color-ivory, #faf9f4)" : "rgba(250,249,244,0.3)"}`,
+          background: on ? "rgba(250,249,244,0.12)" : "transparent",
+          color: on ? "var(--color-ivory, #faf9f4)" : "rgba(250,249,244,0.5)",
           fontFamily: "var(--font-body)", fontSize: 11, fontWeight: on ? 700 : 400,
           cursor: "pointer", letterSpacing: "0.02em", transition: "all 0.18s",
           WebkitAppearance: "none", appearance: "none",
@@ -713,7 +707,7 @@ function SkinHistory({ user, onUpdateUser }) {
               Save
             </button>
             <button onClick={cancel}
-              style={{ flex: 1, padding: "12px 0", background: "transparent", border: "1px solid rgba(45,61,43,0.22)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(250,249,244,0.6)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
+              style={{ flex: 1, padding: "12px 0", background: "transparent", border: "none", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
               Cancel
             </button>
           </div>

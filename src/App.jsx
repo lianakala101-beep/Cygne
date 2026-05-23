@@ -689,7 +689,7 @@ export default function App() {
         * { box-sizing: border-box; margin: 0; padding: 0; }
         input, select, textarea { outline: none; }
         input:focus, select:focus, textarea:focus { border-color: var(--sage) !important; }
-        input::placeholder, textarea::placeholder { color: var(--muted); opacity: 0.7; }
+        input::placeholder, textarea::placeholder { color: rgba(250,249,244,0.4); opacity: 1; }
         ::-webkit-scrollbar { display: none; }
         /* Keyboard focus: visible inky-moss ring for :focus-visible only, so
            mouse/touch interactions stay clean but keyboard navigation is
