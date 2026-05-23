@@ -142,7 +142,7 @@ export function AskCygneModal({
         onClick={e => e.stopPropagation()}
         style={{
           width: "100%", maxWidth: 520,
-          background: "var(--color-ivory, #faf9f4)",
+          background: "var(--color-inky-moss, #2d3d2b)",
           borderRadius: 0,
           padding: "32px 26px 40px",
           maxHeight: "88vh", overflowY: "auto",
@@ -167,7 +167,7 @@ export function AskCygneModal({
           <img
             src="/cygne-logo.png"
             alt=""
-            style={{ height: 56, width: "auto", display: "block", margin: "0 auto 14px", filter: "brightness(0.45) contrast(1.35) saturate(0.6)" }}
+            style={{ height: 56, width: "auto", display: "block", margin: "0 auto 14px", filter: "brightness(0) invert(1)", opacity: 0.95 }}
           />
           <p style={{
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
@@ -203,13 +203,13 @@ export function AskCygneModal({
               style={{
                 width: "100%", boxSizing: "border-box",
                 padding: "14px 16px",
-                background: "var(--color-ivory-shadow, #f0ebe0)",
-                border: "1px solid rgba(45,61,43,0.14)",
+                background: "rgba(255,255,255,0.06)",
+                border: "1px solid rgba(250,249,244,0.2)",
                 borderRadius: 0,
                 fontFamily: "var(--font-body, 'Fungis Normal', 'Fungis Normal', sans-serif)",
                 fontSize: 14, lineHeight: 1.55,
                 color: "var(--color-ivory, #faf9f4)",
-                caretColor: "var(--color-inky-moss, #2d3d2b)",
+                caretColor: "var(--color-ivory, #faf9f4)",
                 resize: "none",
                 outline: "none",
                 WebkitAppearance: "none", appearance: "none",
@@ -255,8 +255,8 @@ export function AskCygneModal({
         {answer && (
           <div style={{
             marginTop: 24, padding: "20px 20px",
-            background: "var(--color-ivory-shadow, #f0ebe0)",
-            borderTop: "1px solid rgba(45,61,43,0.18)",
+            background: "rgba(255,255,255,0.06)",
+            borderTop: "1px solid rgba(250,249,244,0.18)",
             borderRadius: 0,
             fontFamily: "var(--font-body, 'Fungis Normal', 'Fungis Normal', sans-serif)",
             fontSize: 14, lineHeight: 1.7,
