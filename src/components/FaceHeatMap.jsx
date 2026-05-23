@@ -86,10 +86,10 @@ export function FaceHeatMap({ journals = [], products = [], user = {} }) {
 
   return (
     <div style={{
-      background: IVORY,
-      borderRadius: 16,
+      background: "rgba(250, 249, 244, 0.92)",
+      borderRadius: 8,
       padding: "22px 20px 26px",
-      border: "1px solid rgba(250,249,244,0.10)",
+      border: "1px solid rgba(250,249,244,0.25)",
     }}>
       {/* Time filter */}
       <div style={{ display: "flex", justifyContent: "center", gap: 0, marginBottom: 18 }}>
@@ -123,7 +123,7 @@ export function FaceHeatMap({ journals = [], products = [], user = {} }) {
       >
         <ellipse
           cx="100" cy="128" rx="74" ry="104"
-          fill="none" stroke={STROKE_DEFAULT} strokeOpacity="0.3" strokeWidth="1"
+          fill="none" stroke={STROKE_DEFAULT} strokeOpacity="0.55" strokeWidth="1.4"
           pointerEvents="none"
         />
         {FACE_ZONES.map(z => {
@@ -135,9 +135,9 @@ export function FaceHeatMap({ journals = [], products = [], user = {} }) {
               key={z.id}
               d={z.d}
               fill={fill}
-              stroke={isActive ? "rgba(45,61,43,0.7)" : STROKE_DEFAULT}
-              strokeOpacity={isActive ? 1 : 0.3}
-              strokeWidth="1"
+              stroke={isActive ? "rgba(45,61,43,0.85)" : STROKE_DEFAULT}
+              strokeOpacity={isActive ? 1 : 0.55}
+              strokeWidth="1.4"
               onClick={isEmpty ? undefined : () => setActiveZone(z.id)}
               style={{
                 cursor: isEmpty ? "default" : "pointer",
