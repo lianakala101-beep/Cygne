@@ -149,12 +149,12 @@ function IngredientProfile({ user, onUpdateUser }) {
   );
   const editInputStyle = {
     width: "100%", boxSizing: "border-box",
-    background: "var(--color-ivory, #faf9f4)",
-    border: "1px solid rgba(45,61,43,0.18)",
+    background: "rgba(255,255,255,0.06)",
+    border: "1px solid rgba(250,249,244,0.2)",
     borderRadius: 0, padding: "11px 14px",
     fontFamily: "var(--font-body)", fontSize: 13,
     color: "var(--color-ivory, #faf9f4)",
-    caretColor: "var(--color-inky-moss, #2d3d2b)",
+    caretColor: "var(--color-ivory, #faf9f4)",
     outline: "none",
     WebkitAppearance: "none", appearance: "none",
     WebkitTapHighlightColor: "transparent",
@@ -377,12 +377,12 @@ function SkinProfileEditor({ user, onUpdateUser }) {
 
   const editInputStyle = {
     width: "100%", boxSizing: "border-box",
-    background: "var(--color-ivory, #faf9f4)",
-    border: "1px solid rgba(45,61,43,0.18)",
+    background: "rgba(255,255,255,0.06)",
+    border: "1px solid rgba(250,249,244,0.2)",
     borderRadius: 0, padding: "11px 14px",
     fontFamily: "var(--font-body)", fontSize: 13,
     color: "var(--color-ivory, #faf9f4)",
-    caretColor: "var(--color-inky-moss, #2d3d2b)",
+    caretColor: "var(--color-ivory, #faf9f4)",
     outline: "none",
     WebkitAppearance: "none", appearance: "none",
     WebkitTapHighlightColor: "transparent",
@@ -546,12 +546,12 @@ function SkinHistory({ user, onUpdateUser }) {
   );
   const editInputStyle = {
     width: "100%", boxSizing: "border-box",
-    background: "var(--color-ivory, #faf9f4)",
-    border: "1px solid rgba(45,61,43,0.18)",
+    background: "rgba(255,255,255,0.06)",
+    border: "1px solid rgba(250,249,244,0.2)",
     borderRadius: 0, padding: "11px 14px",
     fontFamily: "var(--font-body)", fontSize: 13,
     color: "var(--color-ivory, #faf9f4)",
-    caretColor: "var(--color-inky-moss, #2d3d2b)",
+    caretColor: "var(--color-ivory, #faf9f4)",
     outline: "none",
     WebkitAppearance: "none", appearance: "none",
     WebkitTapHighlightColor: "transparent",
@@ -742,7 +742,7 @@ function ProfileSheet({ user, products, locationData, setLocationData, locationD
     <div style={{ position: "fixed", inset: 0, zIndex: 400, display: "flex", alignItems: "flex-end", justifyContent: "center" }}
       >
       <div style={{ position: "absolute", inset: 0, background: "rgba(28,28,26,0.45)", backdropFilter: "blur(10px)" }} onClick={onClose} />
-      <div style={{ position: "relative", background: "var(--color-ivory, #faf9f4)", width: "100%", maxWidth: 520, borderRadius: 0, maxHeight: "88vh", overflowY: "auto", zIndex: 1 }}>
+      <div style={{ position: "relative", background: "var(--color-inky-moss, #2d3d2b)", width: "100%", maxWidth: 520, borderRadius: 0, maxHeight: "88vh", overflowY: "auto", zIndex: 1 }}>
         <div style={{ display: "flex", justifyContent: "center", padding: "12px 0 0" }}>
           <div style={{ width: 32, height: 3, borderRadius: 2, background: "rgba(45,61,43,0.18)" }} />
         </div>
