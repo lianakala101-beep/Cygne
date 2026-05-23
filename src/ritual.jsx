@@ -542,10 +542,10 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
   // -- INLINE (settled) version — note-card on home dashboard -----------------
   // ivory-flat variant: fully transparent surface, ivory text only. Used on
   // the dark homepage canvas where the card chrome would clash with the
-  // editorial line treatment.
+  // editorial line treatment. Centered text per homepage spec.
   if (variant === "ivory-flat") {
     return (
-      <div style={{ position: "relative" }}>
+      <div style={{ position: "relative", textAlign: "center" }}>
         <p style={{
           fontFamily: "var(--font-display)",
           fontSize: 10, fontWeight: 700,

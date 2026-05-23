@@ -168,25 +168,18 @@ function SeasonalNudgeCard({ products, activeMap, user, lineMode = false }) {
           onClick={() => setOpen(o => !o)}
           aria-expanded={open}
           style={{
-            display: "flex", width: "100%", textAlign: "left",
+            display: "flex", width: "100%", textAlign: "center",
             flexDirection: "column", gap: 8,
             background: "none", border: "none", padding: 0, cursor: "pointer",
             WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
+            position: "relative",
           }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
-            <span style={{
-              fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 11,
-              letterSpacing: "0.22em", textTransform: "uppercase",
-              color: "var(--color-ivory, #faf9f4)",
-              whiteSpace: "nowrap",
-            }}>{cfg.label}</span>
-            <span style={{
-              color: "var(--color-ivory, #faf9f4)", opacity: 0.7,
-              transform: open ? "rotate(90deg)" : "none",
-              transition: "transform 0.2s",
-              display: "inline-flex", flexShrink: 0,
-            }}><Icon name="chevron" size={11} /></span>
-          </div>
+          <span style={{
+            fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 11,
+            letterSpacing: "0.22em", textTransform: "uppercase",
+            color: "var(--color-ivory, #faf9f4)",
+            whiteSpace: "nowrap",
+          }}>{cfg.label}</span>
           <span style={{
             width: "100%",
             fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 400,
@@ -196,9 +189,15 @@ function SeasonalNudgeCard({ products, activeMap, user, lineMode = false }) {
             lineHeight: 1.4,
             overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
           }}>{cfg.headline}</span>
+          <span style={{
+            position: "absolute", right: 0, top: "50%", transform: `translateY(-50%) ${open ? "rotate(90deg)" : "none"}`,
+            color: "var(--color-ivory, #faf9f4)", opacity: 0.7,
+            transition: "transform 0.2s",
+            display: "inline-flex",
+          }}><Icon name="chevron" size={11} /></span>
         </button>
         {open && (
-          <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid rgba(250,249,244,0.18)" }}>
+          <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid rgba(250,249,244,0.18)", textAlign: "center" }}>
             <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-ivory, #faf9f4)", opacity: 0.85, margin: "0 0 8px", lineHeight: 1.65 }}>{cfg.body}</p>
             <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-ivory, #faf9f4)", opacity: 0.85, margin: 0, lineHeight: 1.65 }}>{nudge}</p>
           </div>
