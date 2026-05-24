@@ -1627,7 +1627,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
 
       {/* -- Header ----------------------------------------------------------- */}
       <div style={{ marginBottom: 20, paddingTop: 44 }}>
-        <h1 style={{ fontFamily: "var(--font-display)", fontSize: 32, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-ivory)", margin: 0, lineHeight: 1.15 }}>Your Progress</h1>
+        <h1 style={{ fontFamily: "var(--font-display)", fontSize: 32, fontWeight: 500, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-ivory)", margin: 0, lineHeight: 1.15 }}>Your Progress</h1>
       </div>
 
       {/* -- Skin Journal ------------------------------------------------------ */}
@@ -1718,7 +1718,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
               <span style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", marginLeft: 8, opacity: 0.7 }}>{lastCheckIn.irritation} irritation</span>
             )}
           </div>
-          <button onClick={() => setShowCheckIn(true)} style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.08em", color: "var(--clay)", background: "none", border: "1px solid var(--border)", borderRadius: 20, padding: "5px 12px", cursor: "pointer" }}>Update</button>
+          <button onClick={() => setShowCheckIn(true)} style={{ display: "inline-flex", alignItems: "center", gap: 5, fontFamily: "var(--font-display)", fontSize: 10, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", background: "none", border: "none", padding: 0, cursor: "pointer", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" }}>Update <Icon name="arrow-right" size={11} /></button>
         </div>
       )}
 

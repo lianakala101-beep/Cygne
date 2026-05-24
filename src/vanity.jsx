@@ -207,9 +207,10 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
   }, [menuOpen]);
 
   const inRoutine = product.inRoutine !== false;
-  // Faint ink wash inside the warm ivory card when there's no product
-  // photo — a soft category tile against the near-opaque surface.
-  const imgBg = "rgba(28,28,26,0.04)";
+  // Transparent so the placeholder area shares the card's solid ivory
+  // surface — the card reads as one unified block, no split between the
+  // icon area and the text area below it.
+  const imgBg = "transparent";
 
   return (
     <>
@@ -545,7 +546,7 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearAll,
       {/* -- Header ----------------------------------------------------------- */}
       <div style={{ marginBottom: 24, paddingTop: 44 }}>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-          <h1 style={{ fontFamily: "var(--font-display)", fontSize: 32, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-ivory)", margin: "0 0 4px", lineHeight: 1.15 }}>Your Vanity</h1>
+          <h1 style={{ fontFamily: "var(--font-display)", fontSize: 32, fontWeight: 500, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-ivory)", margin: "0 0 4px", lineHeight: 1.15 }}>Your Vanity</h1>
           {false && <ClearAllButton onClearAll={onClearAll} />}  {/* hidden — dev only */}
         </div>
         <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: 0 }}>

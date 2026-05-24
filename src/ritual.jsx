@@ -328,18 +328,18 @@ function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }
       <p style={{
         fontFamily: "var(--font-body)",
         fontSize: 12, fontWeight: 400,
-        color: "var(--clay)",
+        color: "rgba(255,255,255,0.6)",
         margin: 0,
         lineHeight: 1.4,
       }}>
         {step.brand}
         {sessionTag && (
-          <span style={{ marginLeft: 10, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", opacity: 0.75 }}>
+          <span style={{ marginLeft: 10, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase" }}>
             {sessionTag}
           </span>
         )}
         {freqLabel && (
-          <span style={{ marginLeft: 10, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", opacity: 0.75 }}>
+          <span style={{ marginLeft: 10, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase" }}>
             {freqLabel}
           </span>
         )}

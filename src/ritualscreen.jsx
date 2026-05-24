@@ -327,18 +327,18 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
       <div style={{ marginBottom: 16, paddingTop: 44 }}>
         <BreathText
           text="Your Ritual"
-          style={{ fontFamily: "var(--font-display)", fontSize: 32, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-ivory)", margin: 0, lineHeight: 1.15 }}
+          style={{ fontFamily: "var(--font-display)", fontSize: 32, fontWeight: 500, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-ivory)", margin: 0, lineHeight: 1.15 }}
         />
       </div>
 
       {/* -- Ritual Mode Card ---------------------------------------------- */}
       {ritualMode.name && (
-        <div style={{ background: "rgba(250, 249, 244, 0.92)", border: "1px solid rgba(250, 249, 244, 0.25)", borderRadius: 8, padding: "16px", marginBottom: 24, position: "relative" }}>
+        <div style={{ background: "rgba(250, 249, 244, 0.92)", border: "1px solid rgba(250, 249, 244, 0.25)", borderRadius: 8, padding: "19px 19px 16px", marginBottom: 24, position: "relative" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-            <span style={{ color: "#5a5a5a" }}><Icon name={timeOfDayIcon} size={13} /></span>
-            <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#5a5a5a" }}>{timeOfDayLabel.toLowerCase()}</span>
+            <span style={{ color: "rgba(28,28,26,0.5)" }}><Icon name={timeOfDayIcon} size={13} /></span>
+            <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(28,28,26,0.5)" }}>{timeOfDayLabel.toLowerCase()}</span>
             {cyclePhase && (
-              <span style={{ marginLeft: "auto", fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "#5a5a5a" }}>{cyclePhase} phase</span>
+              <span style={{ marginLeft: "auto", fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(28,28,26,0.5)" }}>{cyclePhase} phase</span>
             )}
           </div>
           <p style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 700, letterSpacing: "0.08em", color: "#1c1c1a", margin: "0 0 2px" }}>{ritualMode.name}</p>
