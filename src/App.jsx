@@ -678,8 +678,8 @@ export default function App() {
           --surface:            rgba(255,255,255,0.06);
           --border:             rgba(250,249,244,0.2);
           --parchment:          var(--color-ivory);
-          --clay:               rgba(250,249,244,0.6);
-          --muted:              rgba(250,249,244,0.4);
+          --clay:               rgba(255,255,255,0.6);
+          --muted:              rgba(255,255,255,0.4);
           --taupe:              rgba(250,249,244,0.5);
           --overlay:            rgba(8,12,8,0.6);
           --sage:               var(--color-ivory);
