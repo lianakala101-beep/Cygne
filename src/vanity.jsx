@@ -30,16 +30,6 @@ function getRampCheckInDue(product, rampLog = []) {
 }
 
 
-const CARD_IMG_BG = {
-  Cleanser:    "linear-gradient(145deg, #ede8de 0%, #ddd5c8 100%)",
-  Moisturizer: "linear-gradient(145deg, #eee9e1 0%, #e2d9cd 100%)",
-  Serum:       "linear-gradient(145deg, #eae4da 0%, #d8d0c4 100%)",
-  SPF:         "linear-gradient(145deg, #f0ebe3 0%, #e4dcce 100%)",
-  Toner:       "linear-gradient(145deg, #ece7de 0%, #ddd6c9 100%)",
-  Exfoliant:   "linear-gradient(145deg, #e8e2d8 0%, #d8d0c3 100%)",
-  Mask:        "linear-gradient(145deg, #edeae2 0%, #ddd5c7 100%)",
-};
-
 // Warm near-ivory product card on the dark inky-moss canvas — the
 // 0.92-alpha ivory background lets just enough of the inky-moss bleed
 // through to give the card a subtle green undertone, so it reads as
@@ -207,16 +197,15 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
   }, [menuOpen]);
 
   const inRoutine = product.inRoutine !== false;
-  // Transparent so the placeholder area shares the card's solid ivory
-  // surface — the card reads as one unified block, no split between the
-  // icon area and the text area below it.
-  const imgBg = "transparent";
 
   return (
     <>
       <div style={GLASS_CARD}>
-        {/* Image area — full width, rounded top corners */}
-        <div style={{ position: "relative", width: "100%", aspectRatio: "1 / 1", background: product.imageUrl ? "transparent" : imgBg, flexShrink: 0, overflow: "hidden" }}>
+        {/* Image area — sits directly on the card's single ivory surface
+            (no background or divider of its own), so the card reads as one
+            unified block. A product photo fills this area when present;
+            otherwise the placeholder glyph shows over the same ivory. */}
+        <div style={{ position: "relative", width: "100%", aspectRatio: "1 / 1", background: "transparent", flexShrink: 0, overflow: "hidden" }}>
           {product.imageUrl
             ? <img src={product.imageUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
             : (
