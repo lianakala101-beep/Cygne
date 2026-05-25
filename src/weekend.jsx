@@ -60,66 +60,132 @@ function buildWeekendAdvice(phase, products, activeMap) {
 }
 
 const WEEKEND_PHASE_CONFIG = {
-  before: {
-    label: "The Weekend Is Near",
-    sublabel: "Thursday · Friday",
-    headline: "Prep your skin before the night.",
-    accent: "#8b7355",
-    bg: "rgba(139,115,85,0.07)",
-    border: "rgba(139,115,85,0.2)",
-  },
-  during: {
-    label: "Weekend",
-    sublabel: "Saturday",
-    headline: "A few things worth remembering.",
-    accent: "#8b7355",
-    bg: "rgba(139,115,85,0.07)",
-    border: "rgba(139,115,85,0.2)",
-  },
-  after: {
-    label: "Recovery Day",
-    sublabel: "Sunday",
-    headline: "Your skin needs a quiet day.",
-    accent: "#6e8a72",
-    bg: "rgba(122,144,112,0.07)",
-    border: "rgba(122,144,112,0.2)",
-  },
+  before: { label: "The Weekend Is Near", headline: "Prep your skin before the night." },
+  during: { label: "Weekend",             headline: "A few things worth remembering." },
+  after:  { label: "Recovery Day",        headline: "Your skin needs a quiet day." },
 };
 
-function WeekendNudgeCard({ products, activeMap }) {
+function WeekendNudgeCard({ products, activeMap, lineMode = false }) {
   const phase = getWeekendPhase();
+  const [open, setOpen] = useState(false);
   if (!phase) return null;
 
   const cfg = WEEKEND_PHASE_CONFIG[phase];
   const advice = buildWeekendAdvice(phase, products, activeMap);
-  const [dismissed, setDismissed] = useState(false);
-  if (dismissed) return null;
+  const lines = [...advice.skip, ...advice.do];
+
+  // Editorial line treatment for the dark homepage canvas.
+  if (lineMode) {
+    return (
+      <div style={{ borderTop: "1px solid rgba(250,249,244,0.25)", borderBottom: "1px solid rgba(250,249,244,0.25)", marginTop: -1, padding: "18px 0" }}>
+        <button
+          type="button"
+          onClick={() => setOpen(o => !o)}
+          aria-expanded={open}
+          style={{
+            display: "flex", width: "100%", textAlign: "center",
+            flexDirection: "column", gap: 8,
+            background: "none", border: "none", padding: 0, cursor: "pointer",
+            fontFamily: "var(--font-body)",
+            WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
+            position: "relative",
+          }}>
+          <span style={{
+            fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 11,
+            letterSpacing: "0.22em", textTransform: "uppercase",
+            color: "var(--color-ivory, #faf9f4)",
+            whiteSpace: "nowrap",
+          }}>{cfg.label}</span>
+          <span style={{
+            width: "100%",
+            fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 400,
+            letterSpacing: "0.04em",
+            color: "var(--color-ivory, #faf9f4)",
+            opacity: 0.85,
+            lineHeight: 1.4,
+            overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+          }}>{cfg.headline}</span>
+          <span style={{
+            position: "absolute", right: 0, top: "50%", transform: `translateY(-50%) ${open ? "rotate(90deg)" : "none"}`,
+            color: "var(--color-ivory, #faf9f4)", opacity: 0.7,
+            transition: "transform 0.2s",
+            display: "inline-flex",
+          }}><Icon name="chevron" size={11} /></span>
+        </button>
+        {open && lines.length > 0 && (
+          <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid rgba(250,249,244,0.18)", textAlign: "center" }}>
+            {lines.map((s, i) => (
+              <p key={i} style={{
+                fontFamily: "var(--font-body)", fontSize: 12,
+                color: "var(--color-ivory, #faf9f4)", opacity: 0.85,
+                margin: i === lines.length - 1 ? 0 : "0 0 8px",
+                lineHeight: 1.65,
+              }}>{s}</p>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
-    <div style={{ marginBottom: 20, background: cfg.bg, border: `1px solid ${cfg.border}`, borderRadius: 16, padding: "18px 20px 16px", position: "relative" }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-        <div>
-          <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: cfg.accent }}>{cfg.label}</span>
-          <p style={{ fontFamily: "var(--font-body)", fontStyle: "italic", fontSize: 18, fontWeight: 400, color: "var(--parchment)", margin: "2px 0 0", lineHeight: 1.3, letterSpacing: "0.005em" }}>{cfg.headline}</p>
-        </div>
-        <button onClick={() => setDismissed(true)} style={{ background: "none", border: "none", color: "var(--clay)", opacity: 0.35, cursor: "pointer", padding: "2px 4px", display: "inline-flex" }}><Icon name="x" size={12} /></button>
-      </div>
-      {advice.skip.length > 0 && (
-        <div style={{ marginBottom: 10 }}>
-          {advice.skip.map((s, i) => (
-            <div key={i} style={{ display: "flex", gap: 8, marginBottom: 6 }}>
-              <span style={{ color: "#8b7355", fontSize: 10, flexShrink: 0, marginTop: 1 }}>—</span>
-              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{s}</p>
-            </div>
+    <div style={{
+      background: "var(--color-inky-moss, #2d3d2b)",
+      border: "none",
+      borderRadius: 8,
+      padding: "14px 16px",
+      marginBottom: 20,
+      position: "relative",
+      overflow: "hidden",
+    }}>
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        aria-expanded={open}
+        style={{
+          display: "flex", width: "100%", textAlign: "left",
+          alignItems: "center", gap: 12,
+          background: "none", border: "none", padding: 0,
+          cursor: "pointer",
+          fontFamily: "var(--font-body)",
+          WebkitAppearance: "none", appearance: "none",
+          WebkitTapHighlightColor: "transparent",
+        }}>
+        <span style={{
+          fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 11,
+          letterSpacing: "0.22em", textTransform: "uppercase",
+          color: "var(--color-ivory, #faf9f4)",
+          background: "rgba(250,249,244,0.15)",
+          padding: "3px 8px", borderRadius: 2,
+          flexShrink: 0, whiteSpace: "nowrap",
+        }}>{cfg.label}</span>
+        <span style={{
+          flex: 1, minWidth: 0,
+          fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 400,
+          letterSpacing: "0.02em",
+          color: "var(--color-ivory, #faf9f4)",
+          lineHeight: 1.4,
+          overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+        }}>{cfg.headline}</span>
+        <span style={{
+          color: "var(--color-ivory, #faf9f4)", opacity: 0.7,
+          transform: open ? "rotate(90deg)" : "none",
+          transition: "transform 0.2s",
+          display: "inline-flex", flexShrink: 0,
+        }}><Icon name="chevron" size={11} /></span>
+      </button>
+      {open && lines.length > 0 && (
+        <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid rgba(250,249,244,0.18)" }}>
+          {lines.map((s, i) => (
+            <p key={i} style={{
+              fontFamily: "var(--font-body)", fontSize: 12,
+              color: "var(--color-ivory, #faf9f4)",
+              margin: i === lines.length - 1 ? 0 : "0 0 8px",
+              lineHeight: 1.65,
+            }}>{s}</p>
           ))}
         </div>
       )}
-      {advice.do.map((s, i) => (
-        <div key={i} style={{ display: "flex", gap: 8, marginBottom: 6 }}>
-          <span style={{ color: cfg.accent, fontSize: 10, flexShrink: 0, marginTop: 1 }}>+</span>
-          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{s}</p>
-        </div>
-      ))}
     </div>
   );
 }

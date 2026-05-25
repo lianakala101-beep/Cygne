@@ -5,6 +5,19 @@ import { getSeason } from "./seasonal.jsx";
 import { supabase, invokeEdgeFunction } from "./supabase.js";
 import { compressImage } from "./utils.jsx";
 
+// Visually hidden but DOM-present input style — see shopscan.jsx for the
+// iOS rationale. display:none drops programmatic .click() on iOS Safari.
+const HIDDEN_INPUT_STYLE = {
+  position: "absolute",
+  width: 1, height: 1,
+  padding: 0, margin: -1,
+  overflow: "hidden",
+  clip: "rect(0,0,0,0)",
+  whiteSpace: "nowrap",
+  border: 0,
+  opacity: 0,
+  pointerEvents: "none",
+};
 
 // SCAN MODAL
 function ScanModal({ products, onAddToShelf, onClose }) {
@@ -25,7 +38,7 @@ function ScanModal({ products, onAddToShelf, onClose }) {
   const searchTimeout = useRef(null);
 
   const verdictConfig = {
-    pass:    { color: "#2d3d2b", bg: "rgba(45,61,43,0.10)", border: "rgba(45,61,43,0.35)", label: "Good fit" },
+    pass:    { color: "var(--color-ivory, #faf9f4)", bg: "rgba(250,249,244,0.10)", border: "rgba(45,61,43,0.35)", label: "Good fit" },
     caution: { color: "#8b7355", bg: "rgba(139,115,85,0.08)",  border: "rgba(139,115,85,0.30)",  label: "Use with care" },
     skip:    { color: "#8b7355", bg: "rgba(139,115,85,0.08)",   border: "rgba(139,115,85,0.30)",   label: "Skip this one" },
   };
@@ -148,7 +161,9 @@ function ScanModal({ products, onAddToShelf, onClose }) {
   };
 
   const handleFile = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files && e.target.files[0];
+    // Reset so the same photo can be re-selected after an aborted scan.
+    if (e.target) e.target.value = "";
     if (!file) return;
     const reader = new FileReader();
     reader.onload = ev => setImgPreview(ev.target.result);
@@ -159,6 +174,10 @@ function ScanModal({ products, onAddToShelf, onClose }) {
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(8,10,9,0.88)", backdropFilter: "blur(12px)", zIndex: 200, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
       <div style={{ background: "var(--ink)", width: "100%", maxWidth: 520, borderRadius: "20px 20px 0 0", padding: "24px 24px 48px", maxHeight: "92vh", overflowY: "auto", border: "1px solid var(--border)", borderBottom: "none" }}>
+        {/* Always-mounted file input so the ref is live in any mode and the
+            button onClick can call .click() synchronously inside the user
+            gesture. iOS Safari rejects deferred clicks (setTimeout, async). */}
+        <input ref={fileRef} type="file" accept="image/*" capture="environment" aria-label="Scan a product label" style={HIDDEN_INPUT_STYLE} onChange={handleFile} />
 
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
@@ -196,7 +215,7 @@ function ScanModal({ products, onAddToShelf, onClose }) {
                   <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0 }}>Type the product name — fastest in store.</p>
                 </div>
               </button>
-              <button onClick={() => { setMode("scan"); setTimeout(() => fileRef.current && fileRef.current.click(), 100); }}
+              <button onClick={() => { fileRef.current && fileRef.current.click(); setMode("scan"); }}
                 style={{ display: "flex", alignItems: "center", gap: 16, padding: "18px 20px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, cursor: "pointer", textAlign: "left" }}>
                 <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(45,61,43,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                   <Icon name="camera" size={16} color="var(--sage)" />
@@ -250,12 +269,11 @@ function ScanModal({ products, onAddToShelf, onClose }) {
         {/* SCAN MODE */}
         {mode === "scan" && (
           <div>
-            <input ref={fileRef} type="file" accept="image/*" capture="environment" style={{ display: "none" }} onChange={handleFile} />
             {scanError && (
               <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#8b7355", margin: "0 0 10px", padding: "8px 12px", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.2)", borderRadius: 8 }}>{scanError}</p>
             )}
-            <button onClick={() => fileRef.current.click()}
-              style={{ width: "100%", padding: "32px 0", background: "rgba(45,61,43,0.08)", border: "1px dashed rgba(45,61,43,0.35)", borderRadius: 14, cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+            <button onClick={() => fileRef.current && fileRef.current.click()}
+              style={{ width: "100%", padding: "32px 0", background: "rgba(250,249,244,0.08)", border: "1px dashed rgba(45,61,43,0.35)", borderRadius: 14, cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
               <Icon name="camera" size={28} color="var(--sage)" />
               <span style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", letterSpacing: "0.06em" }}>Tap to open camera</span>
               <span style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", opacity: 0.5 }}>Point at the ingredient list for best results</span>
@@ -315,7 +333,7 @@ function ScanModal({ products, onAddToShelf, onClose }) {
             {scanned.actives && scanned.actives.length > 0 && (
               <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 16 }}>
                 {scanned.actives.map((a, i) => (
-                  <span key={i} style={{ fontSize: 9, fontFamily: "var(--font-body)", color: "#2d3d2b", background: "rgba(45,61,43,0.1)", padding: "3px 10px", borderRadius: 20, border: "1px solid rgba(45,61,43,0.25)", letterSpacing: "0.1em", textTransform: "uppercase" }}>{a}</span>
+                  <span key={i} style={{ fontSize: 9, fontFamily: "var(--font-body)", color: "var(--color-ivory, #faf9f4)", background: "rgba(45,61,43,0.1)", padding: "3px 10px", borderRadius: 20, border: "1px solid rgba(45,61,43,0.25)", letterSpacing: "0.1em", textTransform: "uppercase" }}>{a}</span>
                 ))}
               </div>
             )}
@@ -328,7 +346,7 @@ function ScanModal({ products, onAddToShelf, onClose }) {
                   {verdict === "skip" ? "Add anyway" : "Save to Vanity"}
                 </button>
               ) : (
-                <div style={{ flex: 1, padding: "13px 0", background: "rgba(45,61,43,0.1)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 12, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontFamily: "var(--font-body)", fontSize: 12, color: "#2d3d2b" }}>
+                <div style={{ flex: 1, padding: "13px 0", background: "rgba(45,61,43,0.1)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 12, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-ivory, #faf9f4)" }}>
                   <Icon name="check" size={12} /> Saved to Vanity
                 </div>
               )}
@@ -457,7 +475,7 @@ function assessRoutineFit(product, products, checkIns = [], user = {}) {
 }
 
 const DEFER_TAG_CONFIG = {
-  season:  { color: "#2d3d2b", bg: "rgba(45,61,43,0.10)", label: "Seasonal hold" },
+  season:  { color: "var(--color-ivory, #faf9f4)", bg: "rgba(250,249,244,0.10)", label: "Seasonal hold" },
   ramp:    { color: "#8b7355", bg: "rgba(139,115,85,0.10)",  label: "Ritual at capacity" },
   skin:    { color: "#8b7355", bg: "rgba(139,115,85,0.10)",   label: "Skin recovery" },
   overlap: { color: "#8b7355", bg: "rgba(139,115,85,0.10)", label: "Redundant active" },

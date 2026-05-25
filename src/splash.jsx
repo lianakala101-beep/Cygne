@@ -1,94 +1,139 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { AuthScreen } from "./auth.jsx";
 
-function SplashScreen({ onDone }) {
-  const [fading, setFading] = useState(false);
-
-  const handleTap = () => {
-    if (fading) return;
-    setFading(true);
-    setTimeout(onDone, 600);
-  };
-
-  const handleButton = (e) => {
-    e.stopPropagation();
-    handleTap();
-  };
-
+// Persistent swan-video backdrop. Lives across both the splash beat and
+// the auth form so the video never restarts — the user sees a single
+// continuous loop until they sign in.
+function SwanVideoBackdrop({ fadingOut = false }) {
+  const [videoFailed, setVideoFailed] = useState(false);
   return (
-    <div
-      onClick={handleTap}
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 9999,
-        background: "var(--color-ivory)",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        opacity: fading ? 0 : 1,
-        transition: "opacity 0.6s ease",
-        cursor: "default",
-        userSelect: "none",
-        WebkitTapHighlightColor: "transparent",
-      }}>
-
-      <img
-        src="/cygne-logo.png"
-        alt=""
-        style={{
-          width: "72%",
-          maxWidth: 320,
-          display: "block",
-          margin: "0 auto",
-          background: "transparent",
-          border: "none",
-        }}
-      />
-
-      {/* Tagline + CTA — pinned to bottom, above safe area */}
+    <div style={{
+      position: "fixed",
+      inset: 0,
+      zIndex: 9990,
+      background: "var(--color-inky-moss, #2d3d2b)",
+      overflow: "hidden",
+      opacity: fadingOut ? 0 : 1,
+      transition: "opacity 0.6s ease",
+      pointerEvents: "none",
+    }}>
+      {!videoFailed && (
+        <video
+          src="/swan-intro.mp4"
+          autoPlay
+          muted
+          playsInline
+          loop
+          preload="auto"
+          onError={() => setVideoFailed(true)}
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            display: "block",
+          }}
+        />
+      )}
+      {/* Soft dark wash so the foreground content reads cleanly */}
       <div style={{
         position: "absolute",
-        bottom: "calc(60px + env(safe-area-inset-bottom, 0px))",
-        left: 0,
-        right: 0,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-      }}>
-        <p style={{
-          fontFamily: "var(--font-display, 'Fungis', sans-serif)",
-          fontSize: 13,
-          fontWeight: 400,
-          letterSpacing: "0.15em",
-          textTransform: "uppercase",
-          color: "#7a7a7a",
-          margin: 0,
-        }}>Built Around You</p>
-
-        <button
-          onClick={handleButton}
-          style={{
-            marginTop: 32,
-            padding: "14px 40px",
-            fontFamily: "var(--font-display, 'Fungis', sans-serif)",
-            fontSize: 12,
-            fontWeight: 400,
-            letterSpacing: "0.2em",
-            textTransform: "uppercase",
-            color: "#1c1c1a",
-            background: "transparent",
-            border: "1px solid #1c1c1a",
-            borderRadius: 0,
-            width: "auto",
-            cursor: "pointer",
-            WebkitTapHighlightColor: "transparent",
-          }}>
-          Begin Your Ritual
-        </button>
-      </div>
+        inset: 0,
+        background: "rgba(0,0,0,0.3)",
+      }} />
     </div>
   );
 }
 
-export { SplashScreen };
+// Logo + tagline overlay shown for the first 2.5s of app launch. Fades
+// out on its own; the parent never needs to unmount it directly.
+function SplashOverlay({ onDone }) {
+  const [fading, setFading] = useState(false);
+
+  useEffect(() => {
+    const fadeAt = setTimeout(() => setFading(true), 2500);
+    const doneAt = setTimeout(() => onDone(), 3100);
+    return () => {
+      clearTimeout(fadeAt);
+      clearTimeout(doneAt);
+    };
+  }, [onDone]);
+
+  return (
+    <div style={{
+      position: "fixed",
+      inset: 0,
+      zIndex: 9995,
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 28,
+      opacity: fading ? 0 : 1,
+      transition: "opacity 0.6s ease",
+      pointerEvents: "none",
+      userSelect: "none",
+    }}>
+      <img
+        src="/cygne-logo.png"
+        alt="Cygne"
+        style={{
+          width: "60%",
+          maxWidth: 280,
+          height: "auto",
+          display: "block",
+          filter: "brightness(0) invert(1)",
+          opacity: 0.95,
+        }}
+      />
+      <p style={{
+        fontFamily: "var(--font-body)",
+        fontSize: 12,
+        fontWeight: 400,
+        letterSpacing: "0.2em",
+        textTransform: "uppercase",
+        color: "var(--color-ivory, #faf9f4)",
+        margin: 0,
+      }}>Built Around You</p>
+    </div>
+  );
+}
+
+// Pre-auth shell — owns the persistent video backdrop, runs the 2.5s
+// splash overlay, then hands off to the (frosted-glass) AuthScreen. On a
+// successful auth result we fade the whole layer out before calling
+// onAuth, so the transition into the main app is a smooth crossfade
+// instead of an abrupt cut.
+function PreAuthScreen({ onAuth }) {
+  const [splashDone, setSplashDone] = useState(false);
+  const [fadingOut, setFadingOut] = useState(false);
+
+  const handleAuth = (...args) => {
+    setFadingOut(true);
+    setTimeout(() => onAuth(...args), 600);
+  };
+
+  return (
+    <>
+      <SwanVideoBackdrop fadingOut={fadingOut} />
+      <div style={{
+        position: "fixed", inset: 0, zIndex: 9996,
+        opacity: fadingOut ? 0 : 1,
+        transition: "opacity 0.6s ease",
+        pointerEvents: fadingOut ? "none" : "auto",
+      }}>
+        {!splashDone
+          ? <SplashOverlay onDone={() => setSplashDone(true)} />
+          : <AuthScreen onAuth={handleAuth} />
+        }
+      </div>
+    </>
+  );
+}
+
+// Legacy named export kept so any external mention of `SplashScreen` keeps
+// resolving — the canonical entry is now PreAuthScreen.
+const SplashScreen = SplashOverlay;
+
+export { PreAuthScreen, SwanVideoBackdrop, SplashOverlay, SplashScreen };

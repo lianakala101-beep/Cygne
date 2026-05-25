@@ -4,12 +4,37 @@ import { analyzeShelf, detectActives } from "./engine.js";
 import { invokeEdgeFunction } from "./supabase.js";
 import { compressImage } from "./utils.jsx";
 
+// Visually hidden but DOM-present input style. iOS Safari silently drops
+// programmatic .click() on display:none / visibility:hidden file inputs (the
+// classic "first tap does nothing, second tap works" symptom). Off-screen
+// + opacity 0 keeps the element interactable to .click() while invisible.
+const HIDDEN_INPUT_STYLE = {
+  position: "absolute",
+  width: 1, height: 1,
+  padding: 0, margin: -1,
+  overflow: "hidden",
+  clip: "rect(0,0,0,0)",
+  whiteSpace: "nowrap",
+  border: 0,
+  opacity: 0,
+  pointerEvents: "none",
+};
+
 function ShopScanModal({ products, user = {}, onClose }) {
   const [phase, setPhase] = useState("prompt"); // prompt | scanning | result
   const [imgPreview, setImgPreview] = useState(null);
   const [result, setResult] = useState(null);
   const [scanError, setScanError] = useState(null);
-  const fileRef = useRef();
+  // Two separate inputs so we can offer Camera vs. Photo Library explicitly.
+  // iOS Safari treats `capture` as a request to open the camera directly; a
+  // bare input without `capture` opens the native sheet (Camera / Photo
+  // Library / Browse). Splitting them gives the user a deterministic path
+  // to each on every platform. Both are mounted at the top of the modal —
+  // not gated behind {phase === "prompt"} — so the ref is always live when
+  // a button is tapped and the programmatic click never races with React
+  // re-mount.
+  const cameraRef = useRef();
+  const libraryRef = useRef();
   const { activeMap } = analyzeShelf(products);
 
   const analyze = async (file) => {
@@ -78,7 +103,11 @@ function ShopScanModal({ products, user = {}, onClose }) {
   };
 
   const handleFile = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files && e.target.files[0];
+    // Reset the input so the SAME file can be re-selected later. Without
+    // this iOS won't refire `change` if the user picks the same photo twice
+    // (e.g. after a failed scan).
+    if (e.target) e.target.value = "";
     if (!file) return;
     const reader = new FileReader();
     reader.onload = ev => setImgPreview(ev.target.result);
@@ -87,7 +116,7 @@ function ShopScanModal({ products, user = {}, onClose }) {
   };
 
   const verdictConfig = {
-    love:  { color: "#2d3d2b",  bg: "rgba(45,61,43,0.08)", border: "rgba(45,61,43,0.25)", label: "Your skin would love this" },
+    love:  { color: "var(--color-ivory, #faf9f4)",  bg: "rgba(250,249,244,0.08)", border: "rgba(45,61,43,0.25)", label: "Your skin would love this" },
     maybe: { color: "#8b7355",      bg: "rgba(139,115,85,0.08)",  border: "rgba(139,115,85,0.25)",  label: "Think twice" },
     skip:  { color: "#8b7355",      bg: "rgba(139,115,85,0.08)",   border: "rgba(139,115,85,0.25)",   label: "Not for you" },
   };
@@ -107,6 +136,13 @@ function ShopScanModal({ products, user = {}, onClose }) {
           <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: 4, marginTop: 2 }}><Icon name="x" size={17} /></button>
         </div>
 
+        {/* Always-mounted file inputs. They live outside every phase
+            conditional so the refs stay alive across phase transitions and
+            React never re-mounts them between the button onClick and the
+            picker opening. */}
+        <input ref={cameraRef} type="file" accept="image/*" capture="environment" aria-label="Take a photo of the product" style={HIDDEN_INPUT_STYLE} onChange={handleFile} />
+        <input ref={libraryRef} type="file" accept="image/*" aria-label="Choose a photo from your library" style={HIDDEN_INPUT_STYLE} onChange={handleFile} />
+
         <div style={{ padding: "20px 24px 40px" }}>
           {/* Prompt phase */}
           {phase === "prompt" && (
@@ -117,21 +153,31 @@ function ShopScanModal({ products, user = {}, onClose }) {
               {scanError && (
                 <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#8b7355", margin: "0 0 12px", padding: "8px 12px", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.2)", borderRadius: 8 }}>{scanError}</p>
               )}
-              <input ref={fileRef} type="file" accept="image/*" capture="environment" style={{ display: "none" }} onChange={handleFile} />
-              <button onClick={() => fileRef.current?.click()}
-                style={{ width: "100%", padding: "36px 20px", border: "1.5px dashed var(--border)", borderRadius: 16, background: "var(--surface)", cursor: "pointer", transition: "border-color 0.2s, background 0.2s" }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(45,61,43,0.5)"; e.currentTarget.style.background = "rgba(45,61,43,0.06)"; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.background = "var(--surface)"; }}>
-                <div style={{ color: "var(--clay)", marginBottom: 10, display: "flex", justifyContent: "center" }}><Icon name="camera" size={28} /></div>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--parchment)", margin: "0 0 4px", fontWeight: 400 }}>Scan product</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", margin: 0 }}>Tap to open camera or choose a photo</p>
-              </button>
+
+              <div style={{ width: "100%", padding: "26px 20px 20px", border: "1.5px dashed var(--border)", borderRadius: 16, background: "var(--surface)", textAlign: "center" }}>
+                <div style={{ color: "var(--clay)", marginBottom: 8, display: "flex", justifyContent: "center" }}><Icon name="camera" size={28} /></div>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--parchment)", margin: "0 0 14px", fontWeight: 400 }}>Scan product</p>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button onClick={() => cameraRef.current?.click()}
+                    style={{ flex: 1, padding: "11px 0", background: "transparent", border: "1px solid rgba(250,249,244,0.25)", borderRadius: 10, cursor: "pointer", fontFamily: "var(--font-display)", fontSize: 10, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", transition: "background 0.2s, color 0.2s" }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "var(--color-inky-moss, #2d3d2b)"; e.currentTarget.style.color = "var(--color-ivory, #faf9f4)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--color-inky-moss, #2d3d2b)"; }}>
+                    Take Photo
+                  </button>
+                  <button onClick={() => libraryRef.current?.click()}
+                    style={{ flex: 1, padding: "11px 0", background: "transparent", border: "1px solid rgba(250,249,244,0.25)", borderRadius: 10, cursor: "pointer", fontFamily: "var(--font-display)", fontSize: 10, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", transition: "background 0.2s, color 0.2s" }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "var(--color-inky-moss, #2d3d2b)"; e.currentTarget.style.color = "var(--color-ivory, #faf9f4)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--color-inky-moss, #2d3d2b)"; }}>
+                    Choose Photo
+                  </button>
+                </div>
+              </div>
               {/* Skin context preview */}
               {(user.skinType || user.concerns?.length > 0) && (
                 <div style={{ marginTop: 16, padding: "12px 14px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10 }}>
                   <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 6px" }}>Checking against your skin</p>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-                    {user.skinType && <span style={{ fontSize: 10, fontFamily: "var(--font-body)", color: "#2d3d2b", background: "rgba(45,61,43,0.1)", border: "1px solid rgba(45,61,43,0.25)", padding: "2px 9px", borderRadius: 20 }}>{user.skinType}</span>}
+                    {user.skinType && <span style={{ fontSize: 10, fontFamily: "var(--font-body)", color: "var(--color-ivory, #faf9f4)", background: "rgba(45,61,43,0.1)", border: "1px solid rgba(45,61,43,0.25)", padding: "2px 9px", borderRadius: 20 }}>{user.skinType}</span>}
                     {(user.concerns || []).map((c, i) => <span key={i} style={{ fontSize: 10, fontFamily: "var(--font-body)", color: "var(--clay)", background: "var(--surface)", border: "1px solid var(--border)", padding: "2px 9px", borderRadius: 20 }}>{c}</span>)}
                   </div>
                 </div>
@@ -199,7 +245,7 @@ function ShopScanModal({ products, user = {}, onClose }) {
               {/* Fills a gap */}
               {result.fillsGap && result.gap && (
                 <div style={{ padding: "11px 14px", background: "rgba(45,61,43,0.06)", border: "1px solid rgba(45,61,43,0.2)", borderRadius: 10, marginBottom: 10 }}>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "#2d3d2b", margin: "0 0 4px" }}>Fills a gap</p>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 4px" }}>Fills a gap</p>
                   <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{result.gap}</p>
                 </div>
               )}

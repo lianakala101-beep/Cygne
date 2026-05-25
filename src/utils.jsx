@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Icon, LOGO_SRC, SwanIcon } from "./components.jsx";
+import { Icon, SwanIcon } from "./components.jsx";
 
 /** Compress an image file to JPEG, max 1080px on longest side, keeps output well under 1MB */
 export async function compressImage(file, maxDim = 1080, quality = 0.82) {
@@ -61,23 +61,23 @@ function SwanWelcomeScreen({ user, onDone }) {
   return (
     <div style={{ position: "fixed", inset: 0, background: "var(--color-ivory)", display: "flex", flexDirection: "column", alignItems: "flex-start", justifyContent: "space-between", padding: "72px 36px 64px", zIndex: 500 }}>
       <div>
-        <div style={{ marginBottom: 32, color: "rgba(232,226,217,0.95)" }}><SwanIcon size={56} /></div>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(232,226,217,0.5)", margin: "0 0 14px" }}>
+        <div style={{ marginBottom: 32, color: "var(--color-inky-moss, #2d3d2b)" }}><SwanIcon size={56} /></div>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: "0 0 14px" }}>
           {name ? "Welcome, " + name + "." : "Welcome."}
         </p>
-        <h1 style={{ fontFamily: "var(--font-display)", fontSize: 38, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(232,226,217,0.95)", margin: "0 0 20px", lineHeight: 1.2 }}>
+        <h1 style={{ fontFamily: "var(--font-display)", fontSize: 38, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-ink, #1c1c1a)", margin: "0 0 20px", lineHeight: 1.2 }}>
           Your ritual starts here.
         </h1>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "rgba(232,226,217,0.55)", lineHeight: 1.7, maxWidth: 320 }}>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "var(--color-inky-moss, #2d3d2b)", lineHeight: 1.7, maxWidth: 320 }}>
           Add the products already on your shelf. Cygne will build your ritual, sequence your steps, and start learning your skin.
         </p>
       </div>
       <div style={{ width: "100%" }}>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "rgba(232,226,217,0.35)", letterSpacing: "0.06em", marginBottom: 16, textAlign: "center" }}>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--color-inky-moss, #2d3d2b)", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 16, textAlign: "center" }}>
           Takes about 2 minutes
         </p>
         <button onClick={onDone}
-          style={{ width: "100%", padding: "16px 0", background: "rgba(232,226,217,0.12)", border: "1px solid rgba(232,226,217,0.2)", borderRadius: 14, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 400, color: "rgba(232,226,217,0.9)", cursor: "pointer", letterSpacing: "0.04em" }}>
+          style={{ width: "100%", padding: "15px 0", background: "transparent", border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 10, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, fontFamily: "var(--font-display)", fontSize: 12, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer" }}>
           Add my products <Icon name="arrow-right" size={14} />
         </button>
       </div>
@@ -105,18 +105,6 @@ function useLocalStorage(key, initialValue) {
   };
   return [storedValue, setValue];
 }
-
-const DEMO_VERSION = "3";
-const DEMO_PRODUCTS = [
-  { id: "demo1", brand: "CeraVe", name: "Hydrating Facial Cleanser", category: "Cleanser", ingredients: ["water", "glycerin", "ceramide np", "ceramide ap", "ceramide eg", "hyaluronic acid", "niacinamide"], inRoutine: true, session: "both", frequency: "daily", price: 16, isDemo: true },
-  { id: "demo2", brand: "Paula's Choice", name: "C15 Super Booster", category: "Serum", ingredients: ["ascorbic acid", "vitamin c", "ferulic acid", "vitamin e", "tocopherol", "hyaluronic acid"], inRoutine: true, session: "am", frequency: "daily", price: 49, isDemo: true },
-  { id: "demo3", brand: "The Ordinary", name: "Granactive Retinoid 2% Emulsion", category: "Serum", ingredients: ["retinol", "hydroxypinacolone retinoate", "squalane", "glycerin", "hyaluronic acid"], inRoutine: true, session: "pm", frequency: "alternating", price: 14, routineStartDate: new Date(Date.now() - 14*86400000).toISOString().split("T")[0], rampWeek: 3, isDemo: true },
-  { id: "demo4", brand: "La Roche-Posay", name: "Anthelios Melt-In Sunscreen SPF 60", category: "SPF", ingredients: ["avobenzone", "homosalate", "octisalate", "octocrylene", "glycerin", "niacinamide"], inRoutine: true, session: "am", frequency: "daily", price: 38, isDemo: true },
-  { id: "demo5", brand: "CeraVe", name: "Moisturizing Cream", category: "Moisturizer", ingredients: ["ceramide np", "ceramide ap", "ceramide eg", "hyaluronic acid", "cholesterol", "glycerin", "petrolatum"], inRoutine: true, session: "both", frequency: "daily", price: 19, isDemo: true },
-  { id: "demo6", brand: "Paula's Choice", name: "Skin Perfecting 2% BHA Liquid", category: "Toning Pad", ingredients: ["salicylic acid", "niacinamide", "methylpropanediol", "green tea extract"], inRoutine: true, session: "pm", frequency: "alternating", price: 34, routineStartDate: new Date(Date.now() - 21*86400000).toISOString().split("T")[0], rampWeek: 4, isDemo: true },
-  { id: "demo7", brand: "The Ordinary", name: "Hyaluronic Acid 2% + B5", category: "Serum", ingredients: ["hyaluronic acid", "sodium hyaluronate", "panthenol", "vitamin b5", "glycerin"], inRoutine: true, session: "both", frequency: "daily", price: 9, isDemo: true },
-];
-
 
 // --- SHARED LOCAL DATE HELPERS ---------------------------------------------
 // Use local midnight (not UTC) so cycle & treatment tracking advance at the
@@ -169,4 +157,23 @@ function getTreatmentElapsed(treatmentDate) {
   return daysBetweenLocal(treatmentDate) + 1;
 }
 
-export { SwanWelcomeScreen, useLocalStorage, DEMO_PRODUCTS, DEMO_VERSION, daysBetweenLocal, getCurrentCycleDay, getTreatmentElapsed, toLocalMidnight };
+// ISO week of the year (1..53). Kept here (eagerly loaded) so App.jsx can use
+// it without pulling in the lazy-loaded reflection.jsx chunk.
+function isoWeekNumber(date = new Date()) {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const day = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - day);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
+}
+
+// ISO week year — the year that "owns" this ISO week (may differ from calendar
+// year at the boundary).
+function isoWeekYear(d) {
+  const dt = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const day = dt.getUTCDay() || 7;
+  dt.setUTCDate(dt.getUTCDate() + 4 - day);
+  return dt.getUTCFullYear();
+}
+
+export { SwanWelcomeScreen, useLocalStorage, daysBetweenLocal, getCurrentCycleDay, getTreatmentElapsed, toLocalMidnight, isoWeekNumber, isoWeekYear };

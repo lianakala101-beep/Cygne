@@ -12,6 +12,22 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
   const cycleDay = getCurrentCycleDay(user);
   const activeMap = analyzeShelf(products).activeMap;
 
+  // Onboarding-derived context
+  const skinProfile = user?.skinProfile || {};
+  const climate = (skinProfile.climate || "").toLowerCase();
+  const environment = (skinProfile.environment || "").toLowerCase();
+  const fragrancePref = (skinProfile.fragrance || "").toLowerCase();
+  const avoidsFragrance = fragrancePref.startsWith("yes") || fragrancePref.startsWith("sometimes");
+  // Only surface event/occasion-prep content when the user has logged BOTH
+  // a real upcoming event AND a date for it. 'Just For Me' and 'Not Right
+  // Now' are explicit non-events — we never want to render a countdown or a
+  // pacing line for them, and the slot should fall through to the next
+  // most relevant insight (cycle phase, active streak, sleep, etc.).
+  const occasion = skinProfile.specialOccasion || "";
+  const occasionDateRaw = skinProfile.occasionDate || "";
+  const isRealEvent = occasion && !/^\s*(not right now|just for me|none|n\/?a)\s*$/i.test(occasion);
+  const hasOccasion = isRealEvent && !!occasionDateRaw;
+
   // -- Journal-based predictions ----------------------------------------------
   const recentJournals = journals.slice(-5);
   const poorSleepCount  = recentJournals.filter(j => j.sleep === "poor").length;
@@ -172,7 +188,7 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
           headline: "Resilience window opening soon.",
           detail: "Follicular phase starts in a couple of days — your skin will be at peak tolerance for retinol and AHA. A good moment to be consistent with actives.",
           level: "positive",
-          color: "#2d3d2b",
+          color: "var(--color-ivory, #faf9f4)",
           bg: "rgba(45,61,43,0.07)",
           border: "rgba(45,61,43,0.2)",
         });
@@ -223,7 +239,7 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
         headline: "Set your cycle day to unlock predictions.",
         detail: "Swan Sense can predict sensitivity windows, oil surges, and ideal active nights — but needs your cycle day to do it. Add it in the Progress tab.",
         level: "positive",
-        color: "#2d3d2b",
+        color: "var(--color-ivory, #faf9f4)",
         bg: "rgba(45,61,43,0.07)",
         border: "rgba(45,61,43,0.2)",
       });
@@ -243,7 +259,7 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
         headline: "Log your first check-in to activate predictions.",
         detail: "Swan Sense learns from your skin over time. After a few check-ins, it can flag irritation trends, barrier risk, and optimal active windows before they happen.",
         level: "positive",
-        color: "#2d3d2b",
+        color: "var(--color-ivory, #faf9f4)",
         bg: "rgba(45,61,43,0.07)",
         border: "rgba(45,61,43,0.2)",
       });
@@ -340,9 +356,98 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
     });
   }
 
+  // -- Onboarding profile-driven predictions ----------------------------------
+  const hasHA = !!(activeMap["hyaluronic acid"]?.length);
+  const hasCeramides = !!(activeMap["ceramides"]?.length);
+  const hasSPF = !!(activeMap["SPF"]?.length) || products.some(p => p.category === "SPF" || p.category === "SPF Moisturizer");
+
+  if ((climate === "dry" || climate === "cold") && !hasHA && !hasCeramides) {
+    predictions.push({
+      type: "climate_barrier",
+      level: "caution",
+      headline: `${climate.charAt(0).toUpperCase() + climate.slice(1)} climate, no barrier support`,
+      detail: `You're based somewhere ${climate}, but your ritual doesn't include a humectant or ceramide layer. Trans-epidermal water loss compounds in low humidity — a hyaluronic-acid serum or ceramide cream goes further than any active right now.`,
+    });
+  }
+
+  if (environment === "outdoors" && !hasSPF) {
+    predictions.push({
+      type: "outdoor_no_spf",
+      level: "alert",
+      headline: "Outdoors most days, no SPF in your routine",
+      detail: "You log most of your day outdoors. UV exposure without daily SPF is the single biggest accelerator of premature aging and pigmentation — adding broad-spectrum SPF should outrank every other change.",
+    });
+  } else if (environment === "outdoors" && hasSPF) {
+    predictions.push({
+      type: "outdoor_spf_reapply",
+      level: "cycle",
+      headline: "Outdoor day — reapply SPF every two hours",
+      detail: "Single-application SPF degrades within ~2 hours, especially with sweat and friction. A stick or powder reapplication option keeps you covered without disturbing makeup.",
+    });
+  }
+
+  if (avoidsFragrance) {
+    const fragranced = products.filter(p => {
+      const ings = (p.ingredients || []).map(i => i.toLowerCase());
+      return ings.some(i => /fragrance|parfum|perfume|essential oil/.test(i));
+    });
+    const recentIrritation = checkIns.slice(-5).some(c => c.irritation === "mild" || c.irritation === "moderate");
+    if (fragranced.length && recentIrritation) {
+      predictions.push({
+        type: "fragrance_irritation",
+        level: "caution",
+        headline: "Fragrance + recent irritation — pause and isolate",
+        detail: `You said you avoid fragrance, but ${fragranced.length} product${fragranced.length === 1 ? "" : "s"} in your vanity list${fragranced.length === 1 ? "s" : ""} it. Recent check-ins show irritation. Hold the fragranced product${fragranced.length === 1 ? "" : "s"} for 5–7 days and see if your skin settles.`,
+      });
+    } else if (fragranced.length) {
+      predictions.push({
+        type: "fragrance_watch",
+        level: "cycle",
+        headline: `${fragranced.length} fragranced product${fragranced.length === 1 ? "" : "s"} on your shelf`,
+        detail: `You flagged sensitivity to fragrance in onboarding. ${fragranced.map(p => p.name).join(", ")} list${fragranced.length === 1 ? "s" : ""} fragrance — worth checking whether they correlate with any flare-ups.`,
+      });
+    }
+  }
+
+  // Event-prep prediction. hasOccasion already requires both a real upcoming
+  // event AND an occasionDate, so we never produce a pacing/countdown line
+  // when there's nothing logged — the slot falls through to cycle, active
+  // streak, sleep, etc.
+  if (hasOccasion) {
+    const target = new Date(occasionDateRaw + "T00:00:00").getTime();
+    const days = Math.ceil((target - Date.now()) / 86400000);
+    if (Number.isFinite(days) && days >= 0) {
+      const weeks = Math.round(days / 7);
+      const headline = days <= 7
+        ? `${days} day${days === 1 ? "" : "s"} until your ${occasion.toLowerCase()}.`
+        : weeks <= 8
+          ? `${weeks} weeks until your ${occasion.toLowerCase()}.`
+          : `${weeks} weeks out from your ${occasion.toLowerCase()} — early days, keep building.`;
+      const level = days <= 28 ? "alert" : weeks <= 8 ? "caution" : "cycle";
+      const detail = days <= 7
+        ? "Final week — stay with what's working. No new actives, no peels, no aggressive masks. Hydration and SPF only."
+        : days <= 28
+          ? "Inside the four-week window. Hold any new actives or treatments. Lean into hydration and barrier support so skin reads even and luminous."
+          : days <= 56
+            ? "Inside two months. This is your build window — establish actives now so they're past purging by the date. Schedule any in-office treatments at least three weeks out."
+            : "Hold off on introducing new actives in the four weeks before. Stay with what's working, prioritize hydration, and book any in-office treatments at least three weeks out so any redness has time to settle.";
+      predictions.push({ type: "occasion_focus", level, headline, detail });
+    }
+  }
+
+  // Adherence-aware tone shaping. When the user told onboarding they only
+  // log skincare "When I Remember", down-rank the streak / risk warnings —
+  // those readings need a steady log to be reliable, and the lecturing
+  // tone fights the user instead of meeting them where they are.
+  const adherence = (skinProfile.consistency || "").toLowerCase();
+  const lowAdherence = adherence.startsWith("when i remember");
+  const tonedPredictions = lowAdherence
+    ? predictions.filter(p => p.type !== "active_streak" && p.type !== "stress_streak")
+    : predictions;
+
   // Return top 3, prioritising alert > caution > cycle > positive
   const order = { alert: 0, caution: 1, cycle: 2, positive: 3 };
-  return predictions.sort((a, b) => (order[a.level] ?? 4) - (order[b.level] ?? 4)).slice(0, 3);
+  return tonedPredictions.sort((a, b) => (order[a.level] ?? 4) - (order[b.level] ?? 4)).slice(0, 3);
 }
 
 function SwanSenseCard({ products, checkIns = [], user = {}, locationData = null, journals = [] }) {

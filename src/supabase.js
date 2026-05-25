@@ -8,8 +8,71 @@ console.log("[Cygne] Supabase key prefix:", supabaseAnonKey.substring(0, 20) + "
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+// ---------------------------------------------------------------------------
+// Per-function daily call cap (client-side, per device).
+//
+// rapid-action is a thin pass-through to Anthropic's Messages API with
+// image payloads (vision-token billing). It has no JWT verification and
+// no server-side per-user cap, so a single user could spam dozens of
+// scans in minutes. Cap at 20/day per device — enough for a first-vanity
+// setup (5-10 products) plus shop-scans, blocks abuse.
+//
+// Keyed on the local date so the count resets automatically at midnight.
+// Stale keys for prior days are pruned on every read so localStorage
+// doesn't grow unbounded.
+// ---------------------------------------------------------------------------
+const DAILY_LIMITS = {
+  "rapid-action": 20,
+};
+
+function rateLimitKey(functionName) {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `cygne_edge_count_${functionName}_${y}-${m}-${day}`;
+}
+
+function readEdgeCount(functionName) {
+  try {
+    const today = rateLimitKey(functionName);
+    const prefix = `cygne_edge_count_${functionName}_`;
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith(prefix) && k !== today) {
+        try { localStorage.removeItem(k); } catch { /* ignore */ }
+      }
+    }
+    const v = localStorage.getItem(today);
+    const n = v ? parseInt(v, 10) : 0;
+    return Number.isFinite(n) && n >= 0 ? n : 0;
+  } catch { return 0; }
+}
+
+function bumpEdgeCount(functionName) {
+  try {
+    const next = readEdgeCount(functionName) + 1;
+    localStorage.setItem(rateLimitKey(functionName), String(next));
+    return next;
+  } catch { return 0; }
+}
+
 /** Call a Supabase edge function with a fresh session token */
 export async function invokeEdgeFunction(functionName, body) {
+  // --- Daily call cap ------------------------------------------------------
+  // Refuse to fire if the function is rate-limited and the cap is already
+  // reached. Error message flows through each caller's existing try/catch
+  // and surfaces in their error-state UI ("Scan failed: …").
+  const limit = DAILY_LIMITS[functionName];
+  if (limit && readEdgeCount(functionName) >= limit) {
+    const err = new Error(
+      `Daily scan limit reached (${limit} per day). Come back tomorrow.`
+    );
+    err.code = "daily_limit_reached";
+    console.warn("[Cygne edge]", functionName, "blocked by daily cap");
+    throw err;
+  }
+
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) {
     console.error("[Cygne edge] no session — user is not signed in");
@@ -26,6 +89,11 @@ export async function invokeEdgeFunction(functionName, body) {
     console.error("[Cygne edge] error:", error);
     throw new Error(error.message || "Edge function call failed");
   }
+
+  // Bump count only on success so a network/Anthropic failure doesn't burn
+  // a credit. Limit-bypass risk is bounded because the cap is checked
+  // before each call.
+  if (limit) bumpEdgeCount(functionName);
 
   console.log("[Cygne edge] success, response type:", typeof data);
   return data;

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Icon, Section, Wordmark, SwanIcon } from "./components.jsx";
+import { Icon, Section, SwanIcon } from "./components.jsx";
 import { detectActives, analyzeShelf, buildRoutine, isDampSkinProduct, hasSPFCoverage } from "./engine.js";
 import { FREQUENCIES } from "./constants.js";
 import { getLockedSession, getAutoSession } from "./productmodal.jsx";
@@ -14,12 +14,12 @@ function SessionPicker({ productId, product, initial, onSession }) {
     const isAM = locked.session === "am";
     return (
       <div onClick={e => e.stopPropagation()} style={{ marginTop: 10 }}>
-        <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 6px", opacity: 0.6 }}>Session</p>
+        <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 6px", opacity: 0.6 }}>Session</p>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ padding: "5px 12px", borderRadius: 8, background: isAM ? "rgba(122,144,112,0.14)" : "rgba(232,226,217,0.10)", border: "1px solid " + (isAM ? "rgba(122,144,112,0.4)" : "rgba(232,226,217,0.3)"), fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: 400, color: isAM ? "var(--sage)" : "#e8e2d9" }}>{isAM ? "AM only" : "PM only"}</span>
-          <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", opacity: 0.5 }}>locked by ingredients</span>
+          <span style={{ padding: "5px 12px", borderRadius: 8, background: isAM ? "rgba(122,144,112,0.14)" : "rgba(232,226,217,0.10)", border: "1px solid " + (isAM ? "rgba(122,144,112,0.4)" : "rgba(232,226,217,0.3)"), fontFamily: "var(--font-body), sans-serif", fontSize: 10, fontWeight: 400, color: isAM ? "var(--sage)" : "#e8e2d9" }}>{isAM ? "AM only" : "PM only"}</span>
+          <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 10, color: "var(--clay)", opacity: 0.5 }}>locked by ingredients</span>
         </div>
-        <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 10, color: "var(--clay)", margin: "8px 0 0", lineHeight: 1.5, opacity: 0.6 }}>{locked.reason}</p>
+        <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 10, color: "var(--clay)", margin: "8px 0 0", lineHeight: 1.5, opacity: 0.6 }}>{locked.reason}</p>
       </div>
     );
   }
@@ -27,13 +27,13 @@ function SessionPicker({ productId, product, initial, onSession }) {
   const options = [{ id: "am", label: "AM only" }, { id: "pm", label: "PM only" }, { id: "both", label: "AM + PM" }];
   return (
     <div onClick={e => e.stopPropagation()} style={{ marginTop: 10 }}>
-      <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 6px", opacity: 0.6 }}>Session</p>
+      <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 6px", opacity: 0.6 }}>Session</p>
       <div style={{ display: "flex", gap: 6 }}>
         {options.map(s => {
           const active = selected === s.id;
           return (
             <button key={s.id} onClick={e => { e.stopPropagation(); setSelected(s.id); if (onSession) onSession(productId, s.id); }}
-              style={{ flex: 1, padding: "7px 0", borderRadius: 8, border: "1px solid " + (active ? "rgba(122,144,112,0.55)" : "var(--border)"), background: active ? "rgba(122,144,112,0.18)" : "transparent", color: active ? "var(--parchment)" : "var(--clay)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: active ? 700 : 400, cursor: "pointer" }}>
+              style={{ flex: 1, padding: "7px 0", borderRadius: 8, border: "1px solid " + (active ? "rgba(122,144,112,0.55)" : "var(--border)"), background: active ? "rgba(122,144,112,0.18)" : "transparent", color: active ? "var(--parchment)" : "var(--clay)", fontFamily: "var(--font-body), sans-serif", fontSize: 10, fontWeight: 400, cursor: "pointer" }}>
               {s.label}
             </button>
           );
@@ -56,7 +56,20 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
     return () => document.removeEventListener("pointerdown", close);
   }, [menuOpen]);
   const ingredientList = (product.ingredients || []).map(i => i.toLowerCase());
-  const allergenHits = (user?.ingredientProfile?.allergens || []).filter(a =>
+  // Merge allergen-style avoidance lists from three sources:
+  //   1. user.ingredientProfile.allergens — explicit allergen list
+  //   2. skinProfile.ingredientsToAvoid   — free-text from onboarding
+  //   3. skinProfile.fragrance            — auto-add fragrance keywords
+  //                                         when the user opted to avoid it
+  const explicitAllergens = user?.ingredientProfile?.allergens || [];
+  const avoidText = user?.skinProfile?.ingredientsToAvoid || "";
+  const avoidList = avoidText.split(/[,\n;]+/).map(s => s.trim()).filter(Boolean);
+  const fragrancePref = (user?.skinProfile?.fragrance || "").toLowerCase();
+  const fragranceTerms = (fragrancePref.startsWith("yes") || fragrancePref.startsWith("sometimes"))
+    ? ["fragrance", "parfum", "perfume", "essential oil"]
+    : [];
+  const allAvoidance = [...explicitAllergens, ...avoidList, ...fragranceTerms];
+  const allergenHits = allAvoidance.filter(a =>
     ingredientList.some(i => i.includes(a.toLowerCase()))
   );
   const lovedHits = (user?.ingredientProfile?.loved || []).filter(l =>
@@ -86,26 +99,24 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
   })();
 
   return (
-    <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: "18px 18px 16px", display: "flex", flexDirection: "column", gap: 12, transition: "border-color 0.2s" }}
-      onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(122,144,112,0.4)"}
-      onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}>
+    <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "16px", display: "flex", flexDirection: "column", gap: 12 }}>
 
       {/* Header row */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
         <div style={{ minWidth: 0 }}>
-          <div style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--sage)", marginBottom: 6 }}>{product.category}</div>
-          <h3 style={{ fontFamily: "var(--script)", fontSize: 22, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: "0 0 2px", lineHeight: 1.15 }}>{product.name}</h3>
-          <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, letterSpacing: "0.04em" }}>{product.brand}</p>
+          <div style={{ fontSize: 9, fontFamily: "var(--font-body), sans-serif", letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--sage)", marginBottom: 6 }}>{product.category}</div>
+          <h3 style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--parchment)", margin: "0 0 2px", lineHeight: 1.2 }}>{product.name}</h3>
+          <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, letterSpacing: "0.04em" }}>{product.brand}</p>
         </div>
         <div ref={menuRef} style={{ position: "relative", flexShrink: 0, marginLeft: 8 }}>
           <button onClick={() => setMenuOpen(o => !o)} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: "6px 8px", opacity: 0.6, transition: "opacity 0.15s", fontSize: 16, lineHeight: 1, fontFamily: "sans-serif" }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0.6} aria-label="Product options">⋯</button>
           {menuOpen && (
-            <div style={{ position: "absolute", right: 0, top: "100%", zIndex: 50, minWidth: 180, background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 12, padding: "6px 0", boxShadow: "0 8px 28px rgba(0,0,0,0.45)" }}>
-              <button onClick={() => { setMenuOpen(false); onEdit(product); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "var(--parchment)", fontFamily: "Space Grotesk, sans-serif", fontSize: 12, textAlign: "left", transition: "background 0.12s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.1)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>
+            <div style={{ position: "absolute", right: 0, top: "100%", zIndex: 50, minWidth: 180, background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 8, padding: "6px 0", boxShadow: "0 8px 28px rgba(0,0,0,0.45)" }}>
+              <button onClick={() => { setMenuOpen(false); onEdit(product); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "var(--parchment)", fontFamily: "var(--font-body), sans-serif", fontSize: 12, textAlign: "left", transition: "background 0.12s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.1)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>
                 <Icon name="edit" size={12} /><span>Edit product</span>
               </button>
               <div style={{ height: 1, background: "var(--border)", margin: "4px 12px" }} />
-              <button onClick={() => { setMenuOpen(false); setConfirmDelete(true); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#8b7355", fontFamily: "Space Grotesk, sans-serif", fontSize: 12, textAlign: "left", transition: "background 0.12s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(139,115,85,0.08)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>
+              <button onClick={() => { setMenuOpen(false); setConfirmDelete(true); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#8b7355", fontFamily: "var(--font-body), sans-serif", fontSize: 12, textAlign: "left", transition: "background 0.12s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(139,115,85,0.08)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>
                 <Icon name="trash" size={12} /><span>Remove from vanity</span>
               </button>
             </div>
@@ -116,10 +127,10 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
       {/* Price + shelf life row */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
         {product.price > 0 && (
-          <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 18, color: "var(--parchment)", fontWeight: 300, letterSpacing: "-0.01em" }}>${(product.price || 0).toFixed(2)}</span>
+          <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 18, color: "var(--parchment)", fontWeight: 300, letterSpacing: "-0.01em" }}>${(product.price || 0).toFixed(2)}</span>
         )}
         {shelfStatus && (
-          <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 400, color: shelfStatus.color, background: shelfStatus.bg, border: `1px solid ${shelfStatus.border}`, padding: "3px 9px", borderRadius: 20 }}>
+          <span style={{ fontSize: 9, fontFamily: "var(--font-body), sans-serif", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 400, color: shelfStatus.color, background: shelfStatus.bg, border: `1px solid ${shelfStatus.border}`, padding: "3px 9px", borderRadius: 20 }}>
             {shelfStatus.label}
           </span>
         )}
@@ -127,7 +138,7 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
       {/* Active tags */}
       {activeKeys.length > 0 && (
         <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-          {activeKeys.map(a => <span key={a} style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)", background: "var(--ink)", padding: "3px 8px", borderRadius: 20, border: "1px solid var(--border)" }}>{a}</span>)}
+          {activeKeys.map(a => <span key={a} style={{ fontSize: 9, fontFamily: "var(--font-body), sans-serif", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)", background: "var(--ink)", padding: "3px 8px", borderRadius: 20, border: "1px solid var(--border)" }}>{a}</span>)}
         </div>
       )}
 
@@ -135,20 +146,20 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
       {(allergenHits.length > 0 || lovedHits.length > 0) && (
         <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: activeKeys.length > 0 ? 5 : 0 }}>
           {allergenHits.map(a => (
-            <span key={a} style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.08em", color: "#8b7355", background: "rgba(139,115,85,0.08)", padding: "3px 8px", borderRadius: 20, border: "1px solid rgba(139,115,85,0.22)" }}><Icon name="warning" size={9} /> {a}</span>
+            <span key={a} style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 9, fontFamily: "var(--font-body), sans-serif", letterSpacing: "0.08em", color: "#8b7355", background: "rgba(139,115,85,0.08)", padding: "3px 8px", borderRadius: 20, border: "1px solid rgba(139,115,85,0.22)" }}><Icon name="warning" size={9} /> {a}</span>
           ))}
           {lovedHits.map(l => (
-            <span key={l} style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 9, fontFamily: "Space Grotesk, sans-serif", letterSpacing: "0.08em", color: "#6e8a72", background: "rgba(122,144,112,0.08)", padding: "3px 8px", borderRadius: 20, border: "1px solid rgba(122,144,112,0.2)" }}><Icon name="sparkle" size={9} /> {l}</span>
+            <span key={l} style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 9, fontFamily: "var(--font-body), sans-serif", letterSpacing: "0.08em", color: "#6e8a72", background: "rgba(122,144,112,0.08)", padding: "3px 8px", borderRadius: 20, border: "1px solid rgba(122,144,112,0.2)" }}><Icon name="sparkle" size={9} /> {l}</span>
           ))}
         </div>
       )}
 
       {/* In-ritual toggle */}
       <button onClick={() => onToggleRoutine(product.id)}
-        style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 14px", background: inRoutine ? "rgba(122,144,112,0.08)" : "var(--ink)", border: `1px solid ${inRoutine ? "rgba(122,144,112,0.3)" : "var(--border)"}`, borderRadius: 10, cursor: "pointer", transition: "all 0.18s" }}
+        style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 14px", background: inRoutine ? "rgba(122,144,112,0.08)" : "var(--ink)", border: `1px solid ${inRoutine ? "rgba(122,144,112,0.3)" : "var(--border)"}`, borderRadius: 8, cursor: "pointer", transition: "all 0.18s" }}
         onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(122,144,112,0.5)"}
         onMouseLeave={e => e.currentTarget.style.borderColor = inRoutine ? "rgba(122,144,112,0.3)" : "var(--border)"}>
-        <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: inRoutine ? "var(--sage)" : "var(--clay)", fontWeight: inRoutine ? 600 : 400 }}>
+        <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: inRoutine ? "var(--sage)" : "var(--clay)", fontWeight: 400 }}>
           {inRoutine ? "In ritual" : "Not in ritual"}
         </span>
         <div style={{ width: 28, height: 16, borderRadius: 8, background: inRoutine ? "var(--sage)" : "var(--border)", position: "relative", transition: "background 0.2s", flexShrink: 0 }}>
@@ -164,14 +175,14 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
       {/* Delete confirmation */}
       {confirmDelete && (
         <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(8,10,8,0.75)", backdropFilter: "blur(8px)", padding: "0 28px" }} onClick={() => setConfirmDelete(false)}>
-          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 320, background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 18, padding: "26px 24px 22px", boxShadow: "0 16px 48px rgba(0,0,0,0.55)" }}>
-            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 12px" }}>Confirm</p>
-            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, color: "var(--parchment)", margin: "0 0 22px", lineHeight: 1.65 }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 320, background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 8, padding: "26px 24px 22px", boxShadow: "0 16px 48px rgba(0,0,0,0.55)" }}>
+            <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 12px" }}>Confirm</p>
+            <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 13, color: "var(--parchment)", margin: "0 0 22px", lineHeight: 1.65 }}>
               Remove <strong>{product.name}</strong> from your vanity? This cannot be undone.
             </p>
             <div style={{ display: "flex", gap: 10 }}>
-              <button onClick={() => setConfirmDelete(false)} style={{ flex: 1, padding: "12px 0", borderRadius: 10, border: "1px solid var(--border)", background: "transparent", color: "var(--parchment)", fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 400, cursor: "pointer", transition: "background 0.15s" }} onMouseEnter={e => e.currentTarget.style.background = "var(--surface)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>Cancel</button>
-              <button onClick={() => { setConfirmDelete(false); onDelete(product.id); }} style={{ flex: 1, padding: "12px 0", borderRadius: 10, border: "1px solid rgba(139,115,85,0.35)", background: "rgba(139,115,85,0.12)", color: "#8b7355", fontFamily: "Space Grotesk, sans-serif", fontSize: 12, fontWeight: 400, cursor: "pointer", transition: "background 0.15s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(139,115,85,0.2)"} onMouseLeave={e => e.currentTarget.style.background = "rgba(139,115,85,0.12)"}>Remove</button>
+              <button onClick={() => setConfirmDelete(false)} style={{ flex: 1, padding: "12px 0", borderRadius: 8, border: "1px solid var(--border)", background: "transparent", color: "var(--parchment)", fontFamily: "var(--font-body), sans-serif", fontSize: 12, fontWeight: 400, cursor: "pointer", transition: "background 0.15s" }} onMouseEnter={e => e.currentTarget.style.background = "var(--surface)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>Cancel</button>
+              <button onClick={() => { setConfirmDelete(false); onDelete(product.id); }} style={{ flex: 1, padding: "12px 0", borderRadius: 8, border: "1px solid rgba(139,115,85,0.35)", background: "rgba(139,115,85,0.12)", color: "#8b7355", fontFamily: "var(--font-body), sans-serif", fontSize: 12, fontWeight: 400, cursor: "pointer", transition: "background 0.15s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(139,115,85,0.2)"} onMouseLeave={e => e.currentTarget.style.background = "rgba(139,115,85,0.12)"}>Remove</button>
             </div>
           </div>
         </div>
@@ -216,7 +227,7 @@ function DrawnCheck({ size = 14, color = "#0d0f0d" }) {
       <path
         d="M5 12.5 L10.2 17.5 L19 7.2"
         stroke={color}
-        strokeWidth="2.6"
+        strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
         style={{
@@ -294,12 +305,12 @@ function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }
         fontFamily: "var(--font-display)",
         fontSize: 26, fontWeight: 700,
         letterSpacing: "0.04em", textTransform: "uppercase",
-        color: "var(--parchment)",
+        color: "var(--color-ivory, #faf9f4)",
         lineHeight: 1.05,
         margin: "0 0 8px",
         textDecoration: checked ? "line-through" : "none",
         textDecorationThickness: "2px",
-        textDecorationColor: "rgba(232,226,217,0.55)",
+        textDecorationColor: "rgba(45,61,43,0.45)",
         transition: "text-decoration-color 280ms ease",
       }}>
         {verb}
@@ -317,18 +328,18 @@ function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }
       <p style={{
         fontFamily: "var(--font-body)",
         fontSize: 12, fontWeight: 400,
-        color: "var(--clay)",
+        color: "rgba(255,255,255,0.6)",
         margin: 0,
         lineHeight: 1.4,
       }}>
         {step.brand}
         {sessionTag && (
-          <span style={{ marginLeft: 10, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", opacity: 0.75 }}>
+          <span style={{ marginLeft: 10, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase" }}>
             {sessionTag}
           </span>
         )}
         {freqLabel && (
-          <span style={{ marginLeft: 10, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", opacity: 0.75 }}>
+          <span style={{ marginLeft: 10, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase" }}>
             {freqLabel}
           </span>
         )}
@@ -337,7 +348,7 @@ function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }
       {damp && (
         <p style={{
           fontFamily: "var(--font-body)",
-          fontStyle: "italic", fontSize: 11,
+          fontSize: 11,
           color: "rgba(139,115,85,0.85)",
           margin: "8px 0 0",
         }}>
@@ -355,7 +366,7 @@ function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }
             fontFamily: "var(--font-display)",
             fontSize: 10, fontWeight: 400,
             letterSpacing: "0.22em", textTransform: "uppercase",
-            color: "var(--color-inky-moss, #2d3d2b)",
+            color: "var(--color-ivory, #faf9f4)",
             display: "inline-flex", alignItems: "center", gap: 4,
           }}
         >
@@ -403,7 +414,26 @@ function renderInsightLines(text) {
   ));
 }
 
-function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = {}, predictions = [] }) {
+// Stable per-day generic editorial lines used when the LLM daily call fails.
+// Pick by local day-of-year so the same user sees the same line all day even
+// across reloads.
+const GENERIC_FALLBACK_LINES = [
+  "Consistency, not intensity, builds skin.",
+  "Today's ritual is tomorrow's resilience.",
+  "Quiet care compounds.",
+  "Your skin is reading every choice you make.",
+  "The barrier remembers what you do today.",
+  "Less, done well, beats more, done sometimes.",
+  "Hydration is the floor every active stands on.",
+];
+function genericFallbackLine() {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  const doy = Math.floor((now - start) / 86400000);
+  return GENERIC_FALLBACK_LINES[doy % GENERIC_FALLBACK_LINES.length];
+}
+
+function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = {}, predictions = [], dailyLine = null, dailyLoading = false, dailyFailed = false, variant = "default" }) {
   const now = new Date();
   const isBirthday = user.birthMonth && user.birthDay &&
     (now.getMonth() + 1) === parseInt(user.birthMonth) &&
@@ -421,13 +451,27 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
     return key && !key.startsWith("baseline_");
   });
   const hasMeaningful = meaningfulPredictions.length > 0;
+  const trimmedDaily = dailyLine && dailyLine.trim();
 
-  // Line: SwanSense prediction > birthday > "not enough data yet"
+  // Line precedence:
+  //   birthday → birthday line
+  //   LLM line landed → LLM line
+  //   loading + no LLM line yet → em dash (subtle placeholder, no spinner)
+  //   LLM call failed and no rule-based prediction → generic editorial line
+  //   else → rule-based prediction or "no data yet"
+  // The LLM line takes priority over the rule-based prediction once it lands;
+  // we keep the rule engine running underneath so popup detail still renders.
   const line = isBirthday
     ? BIRTHDAY_LINES[now.getFullYear() % BIRTHDAY_LINES.length]
-    : hasMeaningful
-      ? meaningfulPredictions[0].headline
-      : NO_DATA_LINE;
+    : trimmedDaily
+      ? trimmedDaily
+      : dailyLoading
+        ? "—"
+        : dailyFailed && !hasMeaningful
+          ? genericFallbackLine()
+          : hasMeaningful
+            ? meaningfulPredictions[0].headline
+            : NO_DATA_LINE;
 
   const grain ="url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E\")";
 
@@ -451,7 +495,6 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
           boxShadow: "0 24px 60px rgba(0,0,0,0.7), 0 1px 0 rgba(232,220,180,0.06) inset",
           border: "1px solid rgba(139,115,85,0.22)",
         }}>
-<<<<<<< HEAD
           <img
             src="/cygne-logo.png"
             alt=""
@@ -463,40 +506,28 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
               pointerEvents: "none", userSelect: "none",
             }}
           />
-=======
-          <span aria-hidden="true" style={{
-            position: "absolute", top: "50%", left: "50%",
-            transform: "translate(-50%, -50%)",
-            fontFamily: "var(--script)",
-            fontSize: 160, lineHeight: 1,
-            color: "#f5f0e8", opacity: 0.07,
-            pointerEvents: "none", userSelect: "none",
-            whiteSpace: "nowrap",
-            zIndex: -1,
-          }}>Cygne</span>
->>>>>>> 7d9bb5c (feat(swansense): ivory card, /cygne-logo.png watermark, rename Swan Song → Swan Sense)
           <div style={{ position: "absolute", inset: 0, borderRadius: 22, pointerEvents: "none", backgroundImage: grain, backgroundSize: "180px 180px", opacity: 0.7 }} />
           <div style={{ position: "absolute", inset: 0, borderRadius: 22, pointerEvents: "none", background: "radial-gradient(ellipse at 85% 15%, rgba(139,115,85,0.12) 0%, transparent 65%)" }} />
 
           <div style={{ textAlign: "center", marginBottom: 18 }}>
-            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(232,226,217,0.65)", margin: 0 }}>
+            <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 9, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(232,226,217,0.65)", margin: 0 }}>
               Swan Song
             </p>
           </div>
           <div style={{ height: 1, background: "rgba(232,226,217,0.12)", marginBottom: 18 }} />
 
-          <p style={{ fontFamily: "var(--font-signature)", fontSize: 34, fontWeight: 400, lineHeight: 1.4, color: "#e8e3d6", letterSpacing: "0.01em", margin: "0 0 18px" }}>{renderInsightLines(line)}</p>
+          <p style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 700, lineHeight: 1.35, color: "#e8e3d6", letterSpacing: "0.04em", textTransform: "uppercase", margin: "0 0 18px" }}>{renderInsightLines(line)}</p>
 
           {/* Show first prediction detail in popup */}
           {hasMeaningful && meaningfulPredictions[0].detail && (
-            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "rgba(232,226,217,0.5)", margin: "0 0 22px", lineHeight: 1.65 }}>{meaningfulPredictions[0].detail}</p>
+            <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "rgba(232,226,217,0.5)", margin: "0 0 22px", lineHeight: 1.65 }}>{meaningfulPredictions[0].detail}</p>
           )}
 
           <button onClick={onDismissPopup} style={{
             width: "100%", padding: "11px 0",
             background: "rgba(232,226,217,0.08)", border: "1px solid rgba(232,226,217,0.18)",
-            borderRadius: 10, cursor: "pointer",
-            fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.2em",
+            borderRadius: 8, cursor: "pointer",
+            fontFamily: "var(--font-body), sans-serif", fontSize: 9, letterSpacing: "0.2em",
             textTransform: "uppercase", color: "rgba(232,226,217,0.55)", transition: "all 0.2s",
           }}
             onMouseEnter={e => { e.currentTarget.style.background = "rgba(232,226,217,0.14)"; e.currentTarget.style.color = "rgba(232,226,217,0.85)"; }}
@@ -508,90 +539,83 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
     );
   }
 
-<<<<<<< HEAD
   // -- INLINE (settled) version — note-card on home dashboard -----------------
-=======
-  // -- INLINE (settled) version — ivory SwanSense card ----------------------
->>>>>>> 7d9bb5c (feat(swansense): ivory card, /cygne-logo.png watermark, rename Swan Song → Swan Sense)
+  // ivory-flat variant: fully transparent surface, ivory text only. Used on
+  // the dark homepage canvas where the card chrome would clash with the
+  // editorial line treatment. Centered text per homepage spec.
+  if (variant === "ivory-flat") {
+    return (
+      <div style={{ position: "relative", textAlign: "center" }}>
+        <p style={{
+          fontFamily: "var(--font-display)",
+          fontSize: 10, fontWeight: 700,
+          letterSpacing: "0.28em", textTransform: "uppercase",
+          color: "var(--color-ivory, #faf9f4)",
+          opacity: 0.75,
+          margin: "0 0 10px",
+        }}>
+          Swan Sense
+        </p>
+        <p style={{
+          fontFamily: "var(--font-body)",
+          fontSize: 16, fontWeight: 400,
+          lineHeight: 1.5, letterSpacing: "0.01em",
+          color: "var(--color-ivory, #faf9f4)",
+          margin: 0,
+        }}>
+          {renderInsightLines(line)}
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div style={{ position: "relative", marginTop: 8 }}>
       <div style={{
         position: "relative",
-        background: "var(--color-ivory, #faf9f4)",
-        borderRadius: 14,
+        background: "var(--color-inky-moss, #2d3d2b)",
+        borderRadius: 8,
         padding: "20px 22px 22px",
         overflow: "hidden",
         isolation: "isolate",
-<<<<<<< HEAD
-        boxShadow: "0 1px 3px rgba(28,28,26,0.05), 0 8px 24px rgba(28,28,26,0.06)",
-        border: "1px solid rgba(45,61,43,0.14)",
+        border: "none",
       }}>
-        {/* Faint logo watermark */}
+        {/* Faint logo watermark — inverted to read as ivory on the dark base. */}
         <img
           src="/cygne-logo.png"
           alt=""
           aria-hidden="true"
           style={{
             position: "absolute", bottom: 10, right: 14,
-            height: 100, width: "auto",
-            opacity: 0.06,
-            filter: "brightness(0.3) saturate(0.5)",
+            height: 48, width: "auto",
+            opacity: 0.10,
+            filter: "brightness(0) invert(1)",
             pointerEvents: "none", userSelect: "none",
           }}
         />
-        {/* Paper / linen texture — multiplies the noise into the ivory base */}
-        <div style={{
-          position: "absolute", inset: 0,
-          pointerEvents: "none",
-          backgroundImage: grain,
-          backgroundSize: "220px 220px",
-          opacity: 0.55,
-          mixBlendMode: "multiply",
-        }} />
 
         <div style={{ position: "relative", marginBottom: 12 }}>
           <p style={{
             fontFamily: "var(--font-body)",
             fontSize: 9, fontWeight: 400,
             letterSpacing: "0.28em", textTransform: "uppercase",
-            color: "var(--color-inky-moss, #2d3d2b)",
+            color: "var(--color-ivory, #faf9f4)",
             margin: 0,
           }}>
-            Swan Song
+            Swan Sense
           </p>
         </div>
 
         <p style={{
           position: "relative",
-          fontFamily: "var(--font-signature)",
-          fontSize: 34, fontWeight: 400,
-          lineHeight: 1.35, letterSpacing: "0.01em",
-          color: "var(--color-ink, #1c1c1a)",
+          fontFamily: "var(--font-body)",
+          fontSize: 15, fontWeight: 400,
+          lineHeight: 1.55, letterSpacing: "0.01em",
+          color: "var(--color-ivory, #faf9f4)",
           margin: 0,
         }}>
           {renderInsightLines(line)}
         </p>
-=======
-        border: "1px solid var(--color-ivory-shadow, #f0ebe0)",
-        boxShadow: "0 2px 12px rgba(28,28,26,0.06)",
-      }}>
-        <div style={{ position: "absolute", inset: 0, borderRadius: 14, pointerEvents: "none", backgroundImage: grain, backgroundSize: "180px 180px", opacity: 0.4 }} />
-        <img src="/cygne-logo.png" alt="" style={{
-          position: "absolute", bottom: 10, right: 14,
-          height: 48, width: "auto", opacity: 0.06,
-          pointerEvents: "none", userSelect: "none",
-        }} />
-
-        <div style={{ marginBottom: 10 }}>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 8, letterSpacing: "0.28em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: 0 }}>Swan Sense</p>
-        </div>
-
-        <p style={{ fontFamily: "var(--script)", fontSize: 26, fontWeight: 400, lineHeight: 1.35, color: "var(--color-ink, #1c1c1a)", letterSpacing: "0.01em", margin: "0 0 8px" }}>{renderInsightLines(line)}</p>
-
-        {hasMeaningful && meaningfulPredictions[0].detail && (
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-stone, #5a5a5a)", margin: 0, lineHeight: 1.65 }}>{meaningfulPredictions[0].detail}</p>
-        )}
->>>>>>> 7d9bb5c (feat(swansense): ivory card, /cygne-logo.png watermark, rename Swan Song → Swan Sense)
       </div>
     </div>
   );
@@ -648,21 +672,21 @@ function FlightModeModal({ products, activeMap, onClose }) {
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
           <div>
-            <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 5px" }}>Flight Day</p>
-            <h2 style={{ fontFamily: "var(--script)", fontSize: 22, fontWeight: 400, letterSpacing: "0.02em", color: "var(--parchment)", margin: 0, lineHeight: 1.1 }}>Your Ritual, Anywhere</h2>
+            <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 5px" }}>Flight Day</p>
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--parchment)", margin: 0, lineHeight: 1.2 }}>Your Ritual, Anywhere</h2>
           </div>
           <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: 4 }}><Icon name="x" size={17} /></button>
         </div>
 
-        <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: "0 0 22px", lineHeight: 1.6 }}>
+        <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--clay)", margin: "0 0 22px", lineHeight: 1.6 }}>
           What to pack, what to skip, and how to land without losing your skin.
         </p>
 
         {/* Tab toggle */}
-        <div style={{ display: "flex", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10, padding: 3, marginBottom: 24 }}>
+        <div style={{ display: "flex", background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: 3, marginBottom: 24 }}>
           {[{ id: "edit", label: "Your Edit" }, { id: "tips", label: "Flight Tips" }].map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
-              style={{ flex: 1, padding: "8px 0", borderRadius: 8, border: "none", background: tab === t.id ? "#6e8a72" : "transparent", color: tab === t.id ? "#0d0f0d" : "var(--clay)", fontFamily: "Space Grotesk, sans-serif", fontSize: 10, fontWeight: tab === t.id ? 700 : 400, cursor: "pointer", letterSpacing: "0.12em", textTransform: "uppercase", transition: "all 0.18s" }}>
+              style={{ flex: 1, padding: "8px 0", borderRadius: 8, border: "none", background: tab === t.id ? "#6e8a72" : "transparent", color: tab === t.id ? "#0d0f0d" : "var(--clay)", fontFamily: "var(--font-body), sans-serif", fontSize: 10, fontWeight: 400, cursor: "pointer", letterSpacing: "0.12em", textTransform: "uppercase", transition: "all 0.18s" }}>
               {t.label}
             </button>
           ))}
@@ -684,11 +708,11 @@ function FlightModeModal({ products, activeMap, onClose }) {
                 ? unique.join(" and ")
                 : unique.slice(0, -1).join(", ") + " and " + unique.slice(-1);
               return (
-                <div style={{ display: "flex", gap: 12, padding: "13px 16px", background: "rgba(139,115,85,0.07)", border: "1px solid rgba(139,115,85,0.22)", borderRadius: 12, marginBottom: 18 }}>
+                <div style={{ display: "flex", gap: 12, padding: "13px 16px", background: "rgba(139,115,85,0.07)", border: "1px solid rgba(139,115,85,0.22)", borderRadius: 8, marginBottom: 18 }}>
                   <span style={{ color: "#8b7355", flexShrink: 0, marginTop: 2, display: "inline-flex" }}><Icon name="plane" size={16} /></span>
                   <div>
-                    <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, fontWeight: 400, color: "var(--parchment)", margin: "0 0 3px" }}>Check your sizes before packing.</p>
-                    <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>
+                    <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, fontWeight: 400, color: "var(--parchment)", margin: "0 0 3px" }}>Check your sizes before packing.</p>
+                    <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>
                       Your {listed} {unique.length === 1 ? "is" : "are"} often over 100ml. Decant into travel bottles or pick up minis — carry-on limit is 100ml per liquid.
                     </p>
                   </div>
@@ -700,13 +724,13 @@ function FlightModeModal({ products, activeMap, onClose }) {
               <div style={{ marginBottom: 20 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
                   <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#6e8a72" }} />
-                  <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#6e8a72" }}>Pack These</span>
+                  <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#6e8a72" }}>Pack These</span>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {keep.map((item, i) => (
-                    <div key={i} style={{ padding: "13px 16px", background: "rgba(122,144,112,0.06)", border: "1px solid rgba(122,144,112,0.2)", borderRadius: 12 }}>
-                      <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, color: "var(--parchment)", margin: "0 0 3px", fontWeight: 400 }}>{item.name}</p>
-                      <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>{item.reason}</p>
+                    <div key={i} style={{ padding: "13px 16px", background: "rgba(122,144,112,0.06)", border: "1px solid rgba(122,144,112,0.2)", borderRadius: 8 }}>
+                      <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 13, color: "var(--parchment)", margin: "0 0 3px", fontWeight: 400 }}>{item.name}</p>
+                      <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>{item.reason}</p>
                     </div>
                   ))}
                 </div>
@@ -718,13 +742,13 @@ function FlightModeModal({ products, activeMap, onClose }) {
               <div style={{ marginBottom: 20 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
                   <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#8b7355" }} />
-                  <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#8b7355" }}>Leave Behind</span>
+                  <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#8b7355" }}>Leave Behind</span>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {skip.map((item, i) => (
-                    <div key={i} style={{ padding: "13px 16px", background: "rgba(139,115,85,0.06)", border: "1px solid rgba(139,115,85,0.18)", borderRadius: 12 }}>
-                      <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, color: "var(--parchment)", margin: "0 0 3px", fontWeight: 400 }}>{item.name}</p>
-                      <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>{item.reason}</p>
+                    <div key={i} style={{ padding: "13px 16px", background: "rgba(139,115,85,0.06)", border: "1px solid rgba(139,115,85,0.18)", borderRadius: 8 }}>
+                      <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 13, color: "var(--parchment)", margin: "0 0 3px", fontWeight: 400 }}>{item.name}</p>
+                      <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>{item.reason}</p>
                     </div>
                   ))}
                 </div>
@@ -732,7 +756,7 @@ function FlightModeModal({ products, activeMap, onClose }) {
             )}
 
             {keep.length === 0 && skip.length === 0 && (
-              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", textAlign: "center", padding: "24px 0" }}>Add products to your vanity to generate your travel edit.</p>
+              <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 12, color: "var(--clay)", textAlign: "center", padding: "24px 0" }}>Add products to your vanity to generate your travel edit.</p>
             )}
           </div>
         )}
@@ -741,16 +765,16 @@ function FlightModeModal({ products, activeMap, onClose }) {
         {tab === "tips" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {tips.map((tip, i) => (
-              <div key={i} style={{ display: "flex", gap: 12, padding: "14px 16px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12 }}>
-                <span style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 13, color: "var(--clay)", flexShrink: 0, marginTop: 1 }}>{i + 1}.</span>
-                <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--parchment)", margin: 0, lineHeight: 1.65 }}>{tip}</p>
+              <div key={i} style={{ display: "flex", gap: 12, padding: "14px 16px", background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8 }}>
+                <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 13, color: "var(--clay)", flexShrink: 0, marginTop: 1 }}>{i + 1}.</span>
+                <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 12, color: "var(--parchment)", margin: 0, lineHeight: 1.65 }}>{tip}</p>
               </div>
             ))}
 
             {/* Recovery note */}
-            <div style={{ padding: "16px 18px", background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.25)", borderRadius: 12, marginTop: 4 }}>
-              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "#6e8a72", margin: "0 0 6px" }}>Landing Day</p>
-              <p style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: 12, color: "var(--clay)", margin: 0, lineHeight: 1.65 }}>
+            <div style={{ padding: "16px 18px", background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.25)", borderRadius: 8, marginTop: 4 }}>
+              <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "#6e8a72", margin: "0 0 6px" }}>Landing Day</p>
+              <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 12, color: "var(--clay)", margin: 0, lineHeight: 1.65 }}>
                 Give your skin 24h to re-acclimate before reintroducing actives. Cleanse, moisturize, SPF. Nothing else the first night.
               </p>
             </div>

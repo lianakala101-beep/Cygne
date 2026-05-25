@@ -66,185 +66,201 @@ function AuthScreen({ onAuth }) {
   return (
     <div style={{
       minHeight: "100vh",
-      background: "var(--color-ivory)",
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
-      padding: "0 36px",
+      padding: "0 28px",
+      position: "relative",
     }}>
 
-      {/* Logo */}
-      <img
-        src="/cygne-logo.png"
-        alt=""
-        style={{
-          width: "48%",
-          maxWidth: 200,
-          display: "block",
-          margin: "0 auto 52px",
-        }}
-      />
-
-      {/* Heading */}
-      <p style={{
-        fontFamily: "var(--font-display, 'Fungis', sans-serif)",
-        fontWeight: 400,
-        fontSize: 13,
-        letterSpacing: "0.15em",
-        textTransform: "uppercase",
-        color: "#1c1c1a",
-        margin: "0 0 28px",
-        textAlign: "center",
+      {/* Frosted-glass card sitting over the persistent video backdrop. */}
+      <div style={{
+        width: "100%",
+        maxWidth: 360,
+        padding: "32px 28px 28px",
+        background: "rgba(250, 249, 244, 0.15)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        border: "1px solid rgba(250, 249, 244, 0.25)",
+        borderRadius: 8,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
       }}>
-        {mode === "login" ? "Welcome Back" : "Create Account"}
-      </p>
 
-      {/* Inputs */}
-      <div style={{ width: "100%", maxWidth: 320, display: "flex", flexDirection: "column", gap: 12, marginBottom: 16 }}>
-        <input
-          type="email"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Email"
-          autoFocus
-          style={inputStyle}
-        />
-        <input
-          type="password"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Password"
-          style={inputStyle}
-        />
-      </div>
-
-      {/* Remember Me — login mode only */}
-      {mode === "login" && (
-        <div
-          onClick={() => setRememberMe(r => !r)}
-          style={{ display: "flex", alignItems: "center", gap: 9, width: "100%", maxWidth: 320, marginBottom: 16, cursor: "pointer", userSelect: "none" }}>
-          <div style={{
-            width: 14, height: 14, flexShrink: 0,
-            border: "1px solid rgba(45,61,43,0.4)",
-            borderRadius: 2,
-            background: rememberMe ? "var(--color-inky-moss)" : "transparent",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            transition: "background 0.15s",
-          }}>
-            {rememberMe && (
-              <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
-                <path d="M1 3.5L3.5 6L8 1" stroke="white" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            )}
-          </div>
-          <span style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 10, letterSpacing: "0.15em", color: "var(--color-stone)" }}>
-            REMEMBER ME
-          </span>
-        </div>
-      )}
-
-      {error && (
         <p style={{
-          width: "100%",
-          maxWidth: 320,
-          fontFamily: "var(--font-body, 'Space Grotesk', sans-serif)",
-          fontSize: 11,
-          color: "#8b7355",
-          margin: "0 0 14px",
-          lineHeight: 1.5,
-        }}>{error}</p>
-      )}
-
-      {/* Primary button — matches BEGIN YOUR RITUAL style */}
-      <button
-        onClick={handleSubmit}
-        disabled={loading}
-        style={{
-          width: "100%",
-          maxWidth: 320,
-          padding: "14px 40px",
-          fontFamily: "var(--font-display, 'Fungis', sans-serif)",
-          fontSize: 12,
-          fontWeight: 400,
-          letterSpacing: "0.2em",
+          fontFamily: "var(--font-display)",
+          fontWeight: 700,
+          fontSize: 13,
+          letterSpacing: "0.22em",
           textTransform: "uppercase",
-          color: "#1c1c1a",
-          background: "transparent",
-          border: "1px solid #1c1c1a",
-          borderRadius: 0,
-          cursor: loading ? "default" : "pointer",
-          opacity: loading ? 0.5 : 1,
-          transition: "opacity 0.2s",
+          color: "var(--color-ivory, #faf9f4)",
+          margin: "0 0 26px",
+          textAlign: "center",
         }}>
-        {loading ? "..." : mode === "login" ? "Sign In" : "Create Account"}
-      </button>
+          {mode === "login" ? "Welcome Back" : "Create Account"}
+        </p>
 
-      {/* Toggle link */}
-      <button
-        onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(null); }}
-        style={{
-          marginTop: 20,
-          background: "none",
-          border: "none",
-          fontFamily: "var(--font-body, 'Space Grotesk', sans-serif)",
-          fontSize: 11,
-          color: "#7a7a7a",
-          cursor: "pointer",
-          padding: "8px 0",
-          letterSpacing: "0.04em",
-        }}>
-        {mode === "login" ? "Create an account" : "Already have an account? Sign in"}
-      </button>
+        {/* Inputs */}
+        <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 12, marginBottom: 16 }}>
+          <input
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Email"
+            autoFocus
+            className="cygne-auth-input"
+            style={inputStyle}
+          />
+          <input
+            type="password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Password"
+            className="cygne-auth-input"
+            style={inputStyle}
+          />
+        </div>
 
-      {/* Forgot password — show after first failed attempt */}
-      {mode === "login" && failedAttempts >= 1 && !resetSent && (
+        {/* Remember Me — login mode only */}
+        {mode === "login" && (
+          <div
+            onClick={() => setRememberMe(r => !r)}
+            style={{ display: "flex", alignItems: "center", gap: 9, width: "100%", marginBottom: 18, cursor: "pointer", userSelect: "none" }}>
+            <div style={{
+              width: 14, height: 14, flexShrink: 0,
+              border: "1px solid rgba(250,249,244,0.6)",
+              borderRadius: 2,
+              background: rememberMe ? "rgba(250,249,244,0.9)" : "transparent",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              transition: "background 0.15s",
+            }}>
+              {rememberMe && (
+                <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
+                  <path d="M1 3.5L3.5 6L8 1" stroke="#2d3d2b" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              )}
+            </div>
+            <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)" }}>
+              Remember Me
+            </span>
+          </div>
+        )}
+
+        {error && (
+          <p style={{
+            width: "100%",
+            fontFamily: "var(--font-body)",
+            fontSize: 11,
+            color: "var(--color-ivory, #faf9f4)",
+            opacity: 0.85,
+            margin: "0 0 14px",
+            lineHeight: 1.5,
+          }}>{error}</p>
+        )}
+
+        {/* Primary button — ivory outlined to match the editorial outlined
+            language but on the dark video surface. */}
         <button
-          onClick={async () => {
-            if (!email) { setError("Enter your email above first."); return; }
-            const { error: err } = await supabase.auth.resetPasswordForEmail(email, {
-              redirectTo: window.location.origin,
-            });
-            if (err) { setError(err.message); return; }
-            setResetSent(true);
-            setError(null);
-          }}
+          onClick={handleSubmit}
+          disabled={loading}
           style={{
-            marginTop: 12,
+            width: "100%",
+            padding: "14px 24px",
+            fontFamily: "var(--font-display)",
+            fontSize: 12,
+            fontWeight: 700,
+            letterSpacing: "0.22em",
+            textTransform: "uppercase",
+            color: "var(--color-ivory, #faf9f4)",
+            background: "transparent",
+            border: "1.5px solid var(--color-ivory, #faf9f4)",
+            borderRadius: 6,
+            cursor: loading ? "default" : "pointer",
+            opacity: loading ? 0.5 : 1,
+            transition: "opacity 0.2s, background 0.2s",
+            WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
+          }}
+          onMouseEnter={e => { if (!loading) e.currentTarget.style.background = "rgba(250,249,244,0.12)"; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
+          {loading ? "..." : mode === "login" ? "Sign In" : "Create Account"}
+        </button>
+
+        {/* Toggle link */}
+        <button
+          onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(null); }}
+          style={{
+            marginTop: 18,
             background: "none",
             border: "none",
-            fontFamily: "var(--font-body, 'Space Grotesk', sans-serif)",
-            fontSize: 11,
-            color: "var(--color-pebble, #7a7a7a)",
+            fontFamily: "var(--font-body)",
+            fontSize: 12,
+            color: "var(--color-ivory, #faf9f4)",
             cursor: "pointer",
-            padding: "4px 0",
+            padding: "8px 0",
             letterSpacing: "0.04em",
-            textDecoration: "underline",
+            opacity: 0.85,
           }}>
-          Forgot your password?
+          {mode === "login" ? "Create an account" : "Already have an account? Sign in"}
         </button>
-      )}
 
-      {resetSent && (
-        <p style={{ fontSize: 11, color: "var(--color-stone, #5a5a5a)", marginTop: 12, textAlign: "center", letterSpacing: "0.02em" }}>
-          Reset link sent — check your email.
-        </p>
-      )}
+        {/* Forgot password — show after first failed attempt */}
+        {mode === "login" && failedAttempts >= 1 && !resetSent && (
+          <button
+            onClick={async () => {
+              if (!email) { setError("Enter your email above first."); return; }
+              const { error: err } = await supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: window.location.origin,
+              });
+              if (err) { setError(err.message); return; }
+              setResetSent(true);
+              setError(null);
+            }}
+            style={{
+              marginTop: 10,
+              background: "none",
+              border: "none",
+              fontFamily: "var(--font-body)",
+              fontSize: 12,
+              color: "var(--color-ivory, #faf9f4)",
+              cursor: "pointer",
+              padding: "4px 0",
+              letterSpacing: "0.04em",
+              textDecoration: "underline",
+              opacity: 0.8,
+            }}>
+            Forgot your password?
+          </button>
+        )}
+
+        {resetSent && (
+          <p style={{ fontSize: 12, color: "var(--color-ivory, #faf9f4)", marginTop: 12, textAlign: "center", letterSpacing: "0.02em", opacity: 0.9 }}>
+            Reset link sent — check your email.
+          </p>
+        )}
+      </div>
+
+      {/* Ivory placeholder styling — inline style can't reach :placeholder so
+          a small scoped <style> block is the cleanest way to tint them. */}
+      <style>{`
+        .cygne-auth-input::placeholder { color: rgba(250,249,244,0.55); }
+      `}</style>
     </div>
   );
 }
 
 const inputStyle = {
   width: "100%",
-  padding: "14px 16px",
-  background: "transparent",
-  border: "1px solid rgba(28,28,26,0.25)",
-  borderRadius: 0,
-  fontFamily: "var(--font-body, 'Space Grotesk', sans-serif)",
+  padding: "14px 14px",
+  background: "rgba(250,249,244,0.06)",
+  border: "1px solid rgba(250,249,244,0.25)",
+  borderRadius: 6,
+  fontFamily: "var(--font-body)",
   fontSize: 14,
-  color: "#1c1c1a",
+  color: "var(--color-ivory, #faf9f4)",
   outline: "none",
   boxSizing: "border-box",
 };

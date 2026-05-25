@@ -43,7 +43,7 @@ const Icon = ({ name, size = 20 }) => {
     reflection:   "M12 3a7 7 0 100 14 7 7 0 000-14z M12 17v4 M9 21h6 M12 7v6 M10 10h4",
   };
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       {(d[name] || "").split("M").filter(Boolean).map((seg, i) => <path key={i} d={"M" + seg} />)}
     </svg>
   );
@@ -51,7 +51,7 @@ const Icon = ({ name, size = 20 }) => {
 
 // --- SHARED -------------------------------------------------------------------
 const labelSt = { display: "block", fontFamily: "var(--heading)", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--clay)", marginBottom: 8 };
-const inputSt = { width: "100%", padding: "12px 14px", background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 0, color: "var(--parchment)", fontFamily: "var(--sans)", fontSize: 14, outline: "none", boxSizing: "border-box" };
+const inputSt = { width: "100%", padding: "12px 14px", background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 0, color: "var(--parchment)", fontFamily: "var(--font-body)", fontSize: 14, outline: "none", boxSizing: "border-box" };
 
 function Pill({ children, active, onClick }) {
   return (
@@ -74,71 +74,111 @@ function Section({ title, icon, children }) {
   );
 }
 
+// Collapsed by default — just severity label + title in one row, with a
+// subtle chevron when there's detail or product context to expand into.
+// Tap to expand reveals f.detail and any conflict-side product pills.
 function FlagCard({ f }) {
-  const variants = {
-    warning: { border: "var(--border)", bg: "var(--surface)", dot: "var(--parchment)", text: "var(--parchment)" },
-    caution: { border: "var(--border)", bg: "var(--surface)", dot: "var(--sage)",      text: "var(--parchment)" },
-    missing: { border: "var(--border)", bg: "var(--surface)", dot: "var(--sage)",      text: "var(--parchment)" },
+  const [open, setOpen] = useState(false);
+  const SEVERITY_LABEL = {
+    warning: "Warning",
+    high:    "Warning",
+    caution: "Caution",
+    medium:  "Caution",
+    missing: "Note",
   };
-  const v = variants[f.severity] || variants.caution;
+  const SEVERITY_TONE = {
+    warning: { color: "#8b7355", bg: "rgba(139,115,85,0.12)" },
+    high:    { color: "#8b7355", bg: "rgba(139,115,85,0.12)" },
+    caution: { color: "#8b7355", bg: "rgba(139,115,85,0.08)" },
+    medium:  { color: "#8b7355", bg: "rgba(139,115,85,0.08)" },
+    missing: { color: "var(--color-ivory, #faf9f4)", bg: "rgba(45,61,43,0.08)" },
+  };
+  const label = SEVERITY_LABEL[f.severity] || "Note";
+  const tone = SEVERITY_TONE[f.severity] || SEVERITY_TONE.caution;
+
+  const pillProducts = [...(f.productsA || []), ...(f.productsB || []), ...(f.products || [])];
+  // De-duplicate by id so a product appearing on both sides of a conflict
+  // doesn't render twice.
+  const uniqueProducts = [];
+  const seen = new Set();
+  for (const p of pillProducts) {
+    const id = p?.id || p?.name || (typeof p === "string" ? p : null);
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+    uniqueProducts.push(p);
+  }
+  const hasDetail = !!f.detail || uniqueProducts.length > 0;
+
   return (
-    <div style={{ display: "flex", gap: 14, padding: "14px 16px", background: v.bg, borderRadius: 12, border: `1px solid ${v.border}`, marginBottom: 8 }}>
-      <div style={{ width: 6, height: 6, borderRadius: "50%", background: v.dot, flexShrink: 0, marginTop: 6 }} />
-      <div>
-        <p style={{ fontFamily: "var(--sans)", fontSize: 13, color: v.text, margin: "0 0 3px", fontWeight: 400 }}>{f.label}</p>
-        <p style={{ fontFamily: "var(--sans)", fontSize: 12, color: "var(--clay)", margin: 0, lineHeight: 1.5 }}>{f.detail}</p>
+    <button
+      type="button"
+      onClick={() => hasDetail && setOpen(o => !o)}
+      aria-expanded={hasDetail ? open : undefined}
+      style={{
+        display: "block", width: "100%", textAlign: "left",
+        padding: "12px 14px",
+        background: "var(--surface)",
+        border: "1px solid var(--border)",
+        borderRadius: 8,
+        marginBottom: 8,
+        cursor: hasDetail ? "pointer" : "default",
+        WebkitAppearance: "none", appearance: "none",
+        WebkitTapHighlightColor: "transparent",
+      }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <span style={{
+          fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 9,
+          letterSpacing: "0.18em", textTransform: "uppercase",
+          color: tone.color, background: tone.bg,
+          padding: "3px 8px", borderRadius: 2,
+          flexShrink: 0, whiteSpace: "nowrap",
+        }}>{label}</span>
+        <span style={{
+          flex: 1, minWidth: 0,
+          fontFamily: "var(--font-body)", fontSize: 13,
+          color: "var(--parchment)", fontWeight: 400,
+          overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+        }}>{f.label}</span>
+        {hasDetail && (
+          <span style={{
+            color: "rgba(250,249,244,0.6)", opacity: 0.5,
+            transform: open ? "rotate(90deg)" : "none",
+            transition: "transform 0.2s",
+            display: "inline-flex", flexShrink: 0,
+          }}><Icon name="chevron" size={11} /></span>
+        )}
       </div>
-    </div>
-  );
-}
-
-// --- CYGNE WORDMARK ----------------------------------------------------------
-const LOGO_SRC = (
-  "data:image/jpeg;base64,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"
-);
-
-function Wordmark({ size = 28 }) {
-  return (
-    <span style={{
-      fontFamily: "var(--font-signature, 'Hellasta Signature', cursive)",
-      fontSize: size * 0.95,
-      fontWeight: 400,
-      letterSpacing: "0.04em",
-      lineHeight: 1,
-      display: "block",
-      background: "linear-gradient(135deg, #505050 0%, #B8B8B8 22%, #EBEBEB 38%, #C4C4C4 55%, #909090 70%, #D8D8D8 85%, #585858 100%)",
-      WebkitBackgroundClip: "text",
-      WebkitTextFillColor: "transparent",
-      backgroundClip: "text",
-    }}>Cygne</span>
+      {open && hasDetail && (
+        <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid rgba(45,61,43,0.08)" }}>
+          {f.detail && (
+            <p style={{
+              fontFamily: "var(--font-body)", fontSize: 12,
+              color: "var(--color-ivory, #faf9f4)",
+              margin: 0, lineHeight: 1.55,
+              whiteSpace: "normal",
+            }}>{f.detail}</p>
+          )}
+          {uniqueProducts.length > 0 && (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: f.detail ? 10 : 0 }}>
+              {uniqueProducts.map((p, i) => {
+                const name = p?.name || (typeof p === "string" ? p : "");
+                if (!name) return null;
+                return (
+                  <span key={p?.id || name + i} style={{
+                    padding: "3px 9px", borderRadius: 20,
+                    background: "var(--color-ivory-shadow, #f0ebe0)",
+                    border: "1px solid rgba(45,61,43,0.14)",
+                    fontFamily: "var(--font-body)", fontSize: 10,
+                    color: "var(--color-ivory, #faf9f4)",
+                    whiteSpace: "nowrap",
+                  }}>{name}</span>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+    </button>
   );
 }
 
@@ -147,7 +187,7 @@ function Wordmark({ size = 28 }) {
 // teardrop body low on the waterline. No legs, no emoji.
 function SwanIcon({ size = 18, color = "currentColor", outlineOnly = false }) {
   const bodyFill   = outlineOnly ? "none" : color;
-  const strokeW    = outlineOnly ? 1.5    : 1.3;
+  const strokeW    = outlineOnly ? 1.5    : 1.5;
   const outStroke  = outlineOnly ? color  : "none";
   return (
     <svg width={size} height={size * 0.7} viewBox="0 0 40 28" fill="none" aria-hidden="true"
@@ -170,4 +210,4 @@ function SwanIcon({ size = 18, color = "currentColor", outlineOnly = false }) {
 // --- SPLASH SCREEN -----------------------------------------------------------
 
 
-export { Icon, Pill, Section, FlagCard, Wordmark, LOGO_SRC, SwanIcon };
+export { Icon, Pill, Section, FlagCard, SwanIcon };
