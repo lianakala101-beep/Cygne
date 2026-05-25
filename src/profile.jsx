@@ -11,34 +11,34 @@ function Profile({ user, products, onLogout, locationData, setLocationData, loca
   return (
     <div>
       <div style={{ marginBottom: 32 }}>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", marginBottom: 6 }}>account</p>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.6)", marginBottom: 6 }}>account</p>
         <h2 style={{ fontFamily: "var(--font-display)", fontSize: 28, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-ivory)", margin: "0 0 2px" }}>{user.name}</h2>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", letterSpacing: "0.04em" }}>{user.email}</p>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "rgba(255,255,255,0.6)", letterSpacing: "0.04em" }}>{user.email}</p>
       </div>
 
       {/* Your Skin section */}
       {(user.skinType || (user.concerns && user.concerns.length > 0) || user.skinAgeBracket) && (
         <div style={{ marginBottom: 24 }}>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", marginBottom: 12 }}>Your Skin</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.6)", marginBottom: 12 }}>Your Skin</p>
           <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "16px 18px" }}>
             {user.skinAgeBracket && (
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, paddingBottom: 12, borderBottom: "1px solid var(--border)" }}>
-                <span style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)" }}>Age Bracket</span>
-                <span style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--parchment)", fontWeight: 400 }}>{user.skinAgeBracket}</span>
+                <span style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(255,255,255,0.6)" }}>Age Bracket</span>
+                <span style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-ivory, #faf9f4)", fontWeight: 400 }}>{user.skinAgeBracket}</span>
               </div>
             )}
             {user.skinType && (
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: user.concerns?.length > 0 ? 12 : 0, paddingBottom: user.concerns?.length > 0 ? 12 : 0, borderBottom: user.concerns?.length > 0 ? "1px solid var(--border)" : "none" }}>
-                <span style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)" }}>Skin Type</span>
+                <span style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(255,255,255,0.6)" }}>Skin Type</span>
                 <span style={{ padding: "4px 12px", borderRadius: 20, background: "rgba(250,249,244,0.10)", border: "1px solid rgba(45,61,43,0.3)", fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-ivory, #faf9f4)", fontWeight: 400 }}>{user.skinType}</span>
               </div>
             )}
             {user.concerns && user.concerns.length > 0 && (
               <div>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 8px" }}>Concerns</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(255,255,255,0.6)", margin: "0 0 8px" }}>Concerns</p>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                   {user.concerns.map((c, i) => (
-                    <span key={i} style={{ padding: "4px 12px", borderRadius: 20, background: "var(--ink)", border: "1px solid var(--border)", fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)" }}>{c}</span>
+                    <span key={i} style={{ padding: "4px 12px", borderRadius: 20, background: "var(--ink)", border: "1px solid var(--border)", fontFamily: "var(--font-body)", fontSize: 11, color: "rgba(255,255,255,0.6)" }}>{c}</span>
                   ))}
                 </div>
               </div>
@@ -50,31 +50,31 @@ function Profile({ user, products, onLogout, locationData, setLocationData, loca
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 32 }}>
         {[["Products", products.length], ["Categories", new Set(products.map(p => p.category)).size], ["Value", `$${spending.total.toFixed(0)}`]].map(([l, v]) => (
           <div key={l} style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "18px 12px", textAlign: "center" }}>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 24, fontWeight: 200, color: "var(--parchment)", margin: "0 0 4px", letterSpacing: "-0.02em" }}>{v}</p>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", margin: 0 }}>{l}</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 24, fontWeight: 200, color: "var(--color-ivory, #faf9f4)", margin: "0 0 4px", letterSpacing: "-0.02em" }}>{v}</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(255,255,255,0.6)", margin: 0 }}>{l}</p>
           </div>
         ))}
       </div>
 
       {/* Location */}
       <div style={{ marginBottom: 24 }}>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", marginBottom: 12 }}>Your Environment</p>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.6)", marginBottom: 12 }}>Your Environment</p>
         <LocationManager locationData={locationData} setLocationData={setLocationData} locationDenied={locationDenied} setLocationDenied={setLocationDenied} />
       </div>
 
       <Section title="About Cygne" icon="leaf">
         <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "20px 20px" }}>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "var(--clay)", margin: "0 0 14px", lineHeight: 1.7 }}>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "rgba(255,255,255,0.6)", margin: "0 0 14px", lineHeight: 1.7 }}>
             Cygne transforms your product collection into a properly sequenced, conflict-free routine. Correct layering. Ingredient compatibility. Reduced redundancy.
           </p>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, opacity: 0.6, lineHeight: 1.6 }}>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "rgba(255,255,255,0.6)", margin: 0, opacity: 0.6, lineHeight: 1.6 }}>
             All analysis is rule-based and logic-driven. Product identification uses AI vision on upload. No chat, no social, no telehealth.
           </p>
         </div>
       </Section>
 
       <button onClick={onLogout}
-        style={{ width: "100%", padding: "13px 0", background: "none", color: "var(--clay)", border: "1px solid var(--border)", borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", cursor: "pointer", transition: "border-color 0.2s, color 0.2s" }}
+        style={{ width: "100%", padding: "13px 0", background: "none", color: "rgba(255,255,255,0.6)", border: "1px solid var(--border)", borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", cursor: "pointer", transition: "border-color 0.2s, color 0.2s" }}
         onMouseEnter={e => { e.currentTarget.style.borderColor = "#2d3d2b"; e.currentTarget.style.color = "#2d3d2b"; }}
         onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--clay)"; }}>
         Sign Out
@@ -145,7 +145,7 @@ function IngredientProfile({ user, onUpdateUser }) {
   // Shared visual language with SkinProfileEditor — same card chrome,
   // header treatment, edit chrome, field labels, Save/Cancel buttons.
   const fieldLabel = (txt) => (
-    <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(250,249,244,0.7)", margin: "0 0 8px" }}>{txt}</p>
+    <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(255,255,255,0.6)", margin: "0 0 8px" }}>{txt}</p>
   );
   const editInputStyle = {
     width: "100%", boxSizing: "border-box",
@@ -193,7 +193,7 @@ function IngredientProfile({ user, onUpdateUser }) {
       {!editing ? (
         <div style={{ background: "var(--color-ivory-shadow, #f0ebe0)", borderTop: "1px solid rgba(45,61,43,0.18)", padding: "18px 16px" }}>
           {!hasAny ? (
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "rgba(250,249,244,0.6)", margin: 0 }}>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "rgba(255,255,255,0.6)", margin: 0 }}>
               No ingredients flagged yet. Tap Edit to mark allergens and loved ingredients — Cygne will cross-reference them on every product.
             </p>
           ) : (
@@ -537,7 +537,7 @@ function SkinHistory({ user, onUpdateUser }) {
     </div>
   );
   const fieldLabel = (txt) => (
-    <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(250,249,244,0.7)", margin: "0 0 8px" }}>{txt}</p>
+    <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(255,255,255,0.6)", margin: "0 0 8px" }}>{txt}</p>
   );
   const editInputStyle = {
     width: "100%", boxSizing: "border-box",
@@ -593,7 +593,7 @@ function SkinHistory({ user, onUpdateUser }) {
       {!editing ? (
         <div style={{ background: "var(--color-ivory-shadow, #f0ebe0)", borderTop: "1px solid rgba(45,61,43,0.18)", padding: "18px 16px" }}>
           {!hasSomeHistory ? (
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "rgba(250,249,244,0.6)", margin: 0 }}>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "rgba(255,255,255,0.6)", margin: 0 }}>
               No history logged. Tap Edit to add prescriptions, sensitivities, or dermatologist visits.
             </p>
           ) : (
@@ -653,7 +653,7 @@ function SkinHistory({ user, onUpdateUser }) {
                 <span style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-ivory, #faf9f4)" }}>{rx.name}</span>
                 <button onClick={() => setDraft(d => ({ ...d, prescriptions: d.prescriptions.filter((_, j) => j !== i) }))}
                   aria-label="Remove prescription"
-                  style={{ background: "none", border: "none", color: "rgba(250,249,244,0.6)", cursor: "pointer", padding: "0 4px", display: "inline-flex", alignItems: "center" }}>
+                  style={{ background: "none", border: "none", color: "rgba(255,255,255,0.6)", cursor: "pointer", padding: "0 4px", display: "inline-flex", alignItems: "center" }}>
                   <Icon name="x" size={11} />
                 </button>
               </div>
@@ -685,7 +685,7 @@ function SkinHistory({ user, onUpdateUser }) {
                 <span style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-ivory, #faf9f4)" }}>{v.date}{v.note ? ` — ${v.note}` : ""}</span>
                 <button onClick={() => setDraft(d => ({ ...d, dermaVisits: d.dermaVisits.filter((_, j) => j !== i) }))}
                   aria-label="Remove visit"
-                  style={{ background: "none", border: "none", color: "rgba(250,249,244,0.6)", cursor: "pointer", padding: "0 4px", display: "inline-flex", alignItems: "center" }}>
+                  style={{ background: "none", border: "none", color: "rgba(255,255,255,0.6)", cursor: "pointer", padding: "0 4px", display: "inline-flex", alignItems: "center" }}>
                   <Icon name="x" size={11} />
                 </button>
               </div>
@@ -758,8 +758,8 @@ function ProfileSheet({ user, products, locationData, setLocationData, locationD
                   {(accountDraft.name || user?.name || "?").trim()[0].toUpperCase()}
                 </span>
                 <div>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: 16, fontWeight: 400, color: "var(--parchment)", margin: "0 0 2px" }}>{user?.name || "—"}</p>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0 }}>{user?.email || ""}</p>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: 16, fontWeight: 400, color: "var(--color-ivory, #faf9f4)", margin: "0 0 2px" }}>{user?.name || "—"}</p>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "rgba(255,255,255,0.6)", margin: 0 }}>{user?.email || ""}</p>
                 </div>
               </div>
               <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
@@ -769,7 +769,7 @@ function ProfileSheet({ user, products, locationData, setLocationData, locationD
                     Edit
                   </button>
                 )}
-                <button onClick={onClose} aria-label="Close" style={{ background: "none", border: "none", color: "rgba(250,249,244,0.6)", cursor: "pointer", padding: 4 }}><Icon name="x" size={18} /></button>
+                <button onClick={onClose} aria-label="Close" style={{ background: "none", border: "none", color: "rgba(255,255,255,0.6)", cursor: "pointer", padding: 4 }}><Icon name="x" size={18} /></button>
               </div>
             </div>
 
@@ -817,7 +817,7 @@ function ProfileSheet({ user, products, locationData, setLocationData, locationD
                       Save
                     </button>
                     <button onClick={() => setEditingAccount(false)}
-                      style={{ flex: 1, padding: "12px 0", background: "transparent", border: "1px solid rgba(45,61,43,0.22)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(250,249,244,0.6)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
+                      style={{ flex: 1, padding: "12px 0", background: "transparent", border: "1px solid rgba(45,61,43,0.22)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.6)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
                       Cancel
                     </button>
                   </div>
@@ -829,8 +829,8 @@ function ProfileSheet({ user, products, locationData, setLocationData, locationD
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 24 }}>
             {[["Products", products.length], ["Value", `$${products.reduce((s, p) => s + (p.price || 0), 0).toFixed(0)}`], ["Age Bracket", user?.skinAgeBracket || "—"]].map(([l, v]) => (
               <div key={l} style={{ background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 8, padding: "14px 10px", textAlign: "center" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: 18, fontWeight: 200, color: "var(--parchment)", margin: "0 0 3px", letterSpacing: "-0.02em" }}>{v}</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", margin: 0 }}>{l}</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: 18, fontWeight: 200, color: "var(--color-ivory, #faf9f4)", margin: "0 0 3px", letterSpacing: "-0.02em" }}>{v}</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(255,255,255,0.6)", margin: 0 }}>{l}</p>
               </div>
             ))}
           </div>
@@ -847,7 +847,7 @@ function ProfileSheet({ user, products, locationData, setLocationData, locationD
 
           {/* Location */}
           <div style={{ marginBottom: 20 }}>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 10px" }}>Your Environment</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(255,255,255,0.6)", margin: "0 0 10px" }}>Your Environment</p>
             <LocationManager locationData={locationData} setLocationData={setLocationData} locationDenied={locationDenied} setLocationDenied={setLocationDenied} />
           </div>
 
