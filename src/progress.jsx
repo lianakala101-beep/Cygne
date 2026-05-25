@@ -1725,7 +1725,7 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
       {/* -- Inflammation Heat Map ------------------------------------------ */}
       {sectionLabel("map-pin", "Inflammation Map")}
       <div style={{ marginBottom: 28 }}>
-        <FaceHeatMap journals={journals} onAskCygne={(q, ctx) => setAskCygneQuestion({ q, ctx })} />
+        <FaceHeatMap checkIns={checkIns} onAskCygne={(q, ctx) => setAskCygneQuestion({ q, ctx })} />
       </div>
 
       {/* -- Consistency score — only when there are check-ins ------------------ */}
