@@ -74,12 +74,10 @@ function buildContext(body: any): string {
   if (Array.isArray(body.journals) && body.journals.length) {
     const recent = body.journals.slice(-5);
     const conditions = recent.map((j: any) => j.condition).filter(Boolean);
-    const zones = [...new Set(recent.flatMap((j: any) => j.affectedZones || []))];
     const sleepPoor = recent.filter((j: any) => j.sleep === "poor").length;
     const stressHigh = recent.filter((j: any) => j.stress === "high").length;
     const bits: string[] = [];
     if (conditions.length) bits.push(`recent skin: ${conditions.join(", ")}`);
-    if (zones.length)      bits.push(`zones flagged: ${zones.join(", ")}`);
     if (sleepPoor)         bits.push(`${sleepPoor} poor-sleep night${sleepPoor === 1 ? "" : "s"}`);
     if (stressHigh)        bits.push(`${stressHigh} high-stress day${stressHigh === 1 ? "" : "s"}`);
     if (bits.length) parts.push(`Last week — ${bits.join("; ")}.`);
@@ -88,9 +86,12 @@ function buildContext(body: any): string {
     const recent = body.checkIns.slice(-5);
     const irr = recent.filter((c: any) => c.irritation && c.irritation !== "none").length;
     const brk = recent.filter((c: any) => c.breakout).length;
+    // Breakout locations live on the check-in (breakoutZones), not the journal.
+    const zones = [...new Set(recent.flatMap((c: any) => c.breakoutZones || []))];
     const bits: string[] = [];
     if (irr) bits.push(`${irr} irritation flag${irr === 1 ? "" : "s"}`);
     if (brk) bits.push(`${brk} breakout day${brk === 1 ? "" : "s"}`);
+    if (zones.length) bits.push(`zones flagged: ${zones.join(", ")}`);
     if (bits.length) parts.push(`Recent check-ins — ${bits.join(", ")}.`);
   }
   if (Array.isArray(body.triggerLog) && body.triggerLog.length) {

@@ -44,7 +44,7 @@ function narrateSkin({ journalsM, checkInsM }) {
 
 function narrateTelling({ journalsM, checkInsM }) {
   const zoneCounts = {};
-  journalsM.forEach(j => (j.affectedZones || []).forEach(z => { zoneCounts[z] = (zoneCounts[z] || 0) + 1; }));
+  checkInsM.forEach(c => (c.breakoutZones || []).forEach(z => { zoneCounts[z] = (zoneCounts[z] || 0) + 1; }));
   const top = Object.entries(zoneCounts).sort((a, b) => b[1] - a[1])[0];
 
   const poorSleep = journalsM.filter(j => j.sleep === "poor").length;
@@ -310,7 +310,7 @@ export function MonthlyRecap({
     const breakouts  = checkInsM.filter(c => c?.breakout).length;
 
     const zoneCounts = {};
-    journalsM.forEach(j => (j?.affectedZones || []).forEach(z => {
+    checkInsM.forEach(c => (c?.breakoutZones || []).forEach(z => {
       if (!z) return;
       zoneCounts[z] = (zoneCounts[z] || 0) + 1;
     }));

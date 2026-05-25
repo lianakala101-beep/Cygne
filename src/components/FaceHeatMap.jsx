@@ -23,6 +23,35 @@ const INKY = "var(--color-inky-moss, #2d3d2b)";
 const IVORY = "var(--color-ivory, #faf9f4)";
 const STROKE_DEFAULT = INKY;
 
+// Check-ins store breakout locations as free-text labels (see CheckInModal in
+// progress.jsx), but this map renders 7 fixed SVG zones keyed by id. Translate
+// each label to the id(s) it covers so the signal actually lands on the face.
+// Neck/body labels have no facial zone and are intentionally dropped here.
+const ZONE_LABEL_TO_IDS = {
+  "Forehead": ["forehead"],
+  "Hairline": ["forehead"],
+  "Temples": ["forehead"],
+  "T-zone": ["forehead", "nose"],
+  "Nose": ["nose"],
+  "Left cheek": ["left_cheek"],
+  "Right cheek": ["right_cheek"],
+  "Jawline": ["jawline_left", "jawline_right"],
+  "Chin": ["chin"],
+  "Above lip": ["chin"],
+  "Mustache area": ["chin"],
+};
+
+// Map one check-in's breakoutZones labels to a deduped set of SVG zone ids.
+// Deduping per entry means a single check-in counts a zone at most once even
+// when several of its labels fold into the same zone (e.g. Forehead + T-zone).
+function checkInZoneIds(breakoutZones) {
+  const ids = new Set();
+  for (const label of breakoutZones || []) {
+    for (const id of (ZONE_LABEL_TO_IDS[label] || [])) ids.add(id);
+  }
+  return [...ids];
+}
+
 function daysAgoIso(n) {
   const d = new Date();
   d.setDate(d.getDate() - n);
@@ -56,29 +85,29 @@ function zoneLabelDisplay(id) {
   return (FACE_ZONE_LABELS[id] || id.replace(/_/g, " ")).toUpperCase();
 }
 
-export function FaceHeatMap({ journals = [], products = [], user = {} }) {
+export function FaceHeatMap({ checkIns = [], products = [], user = {} }) {
   const [period, setPeriod] = useState(30);
   const [activeZone, setActiveZone] = useState(null);
   const [askingZone, setAskingZone] = useState(null);
 
   const cutoffIso = daysAgoIso(period);
-  const journalsInPeriod = useMemo(
-    () => journals.filter(j => j?.date && j.date >= cutoffIso && Array.isArray(j.affectedZones)),
-    [journals, cutoffIso]
+  const checkInsInPeriod = useMemo(
+    () => checkIns.filter(c => c?.date && c.date >= cutoffIso && Array.isArray(c.breakoutZones)),
+    [checkIns, cutoffIso]
   );
 
   // Total entries in window that contributed at least one zone — used for empty-state gating.
-  const entriesWithZones = journalsInPeriod.filter(j => j.affectedZones.length > 0).length;
+  const entriesWithZones = checkInsInPeriod.filter(c => checkInZoneIds(c.breakoutZones).length > 0).length;
 
   const zoneFrequency = useMemo(() => {
     const base = FACE_ZONE_IDS.reduce((acc, id) => { acc[id] = 0; return acc; }, {});
-    for (const j of journalsInPeriod) {
-      for (const z of j.affectedZones) {
-        if (z in base) base[z] += 1;
+    for (const c of checkInsInPeriod) {
+      for (const id of checkInZoneIds(c.breakoutZones)) {
+        if (id in base) base[id] += 1;
       }
     }
     return base;
-  }, [journalsInPeriod]);
+  }, [checkInsInPeriod]);
 
   const maxCount = Math.max(...Object.values(zoneFrequency), 0);
   const normalized = (z) => (maxCount > 0 ? zoneFrequency[z] / maxCount : 0);
@@ -176,7 +205,7 @@ export function FaceHeatMap({ journals = [], products = [], user = {} }) {
       {activeZone && !isEmpty && (
         <ZoneInsightDrawer
           zoneId={activeZone}
-          journals={journals}
+          checkIns={checkIns}
           products={products}
           user={user}
           onClose={() => setActiveZone(null)}
@@ -187,7 +216,7 @@ export function FaceHeatMap({ journals = [], products = [], user = {} }) {
       {askingZone && (
         <AskCygneModal
           initialQuestion={`Why do I keep breaking out on my ${zoneLabelDisplay(askingZone).toLowerCase()}?`}
-          context={buildContext(askingZone, journals, products, user)}
+          context={buildContext(askingZone, checkIns, products, user)}
           onClose={() => setAskingZone(null)}
         />
       )}
@@ -195,11 +224,11 @@ export function FaceHeatMap({ journals = [], products = [], user = {} }) {
   );
 }
 
-function buildContext(zoneId, journals, products, user) {
+function buildContext(zoneId, checkIns, products, user) {
   const lines = [];
   const label = zoneLabelDisplay(zoneId).toLowerCase();
   const cutoff = daysAgoIso(30);
-  const flares = journals.filter(j => j?.date && j.date >= cutoff && Array.isArray(j.affectedZones) && j.affectedZones.includes(zoneId));
+  const flares = checkIns.filter(c => c?.date && c.date >= cutoff && Array.isArray(c.breakoutZones) && checkInZoneIds(c.breakoutZones).includes(zoneId));
   lines.push(`Zone: ${label}.`);
   lines.push(`Logged ${flares.length} times in the last 30 days.`);
   if (user?.skinType) lines.push(`Skin type: ${user.skinType}.`);
@@ -209,11 +238,11 @@ function buildContext(zoneId, journals, products, user) {
   return lines.join(" ");
 }
 
-function ZoneInsightDrawer({ zoneId, journals, products, user, onClose, onAskCygne }) {
+function ZoneInsightDrawer({ zoneId, checkIns, products, user, onClose, onAskCygne }) {
   const cutoff30 = daysAgoIso(30);
-  const flareEntries = journals.filter(j =>
-    j?.date && j.date >= cutoff30 &&
-    Array.isArray(j.affectedZones) && j.affectedZones.includes(zoneId)
+  const flareEntries = checkIns.filter(c =>
+    c?.date && c.date >= cutoff30 &&
+    Array.isArray(c.breakoutZones) && checkInZoneIds(c.breakoutZones).includes(zoneId)
   );
   const flareCount = flareEntries.length;
 
@@ -222,7 +251,7 @@ function ZoneInsightDrawer({ zoneId, journals, products, user, onClose, onAskCyg
   const phaseTally = {};
   if (cycleStart) {
     for (const f of flareEntries) {
-      const day = cycleDayForDate(f.date, cycleStart);
+      const day = cycleDayForDate(f.date.split("T")[0], cycleStart);
       const phase = phaseForDay(day);
       if (phase) phaseTally[phase] = (phaseTally[phase] || 0) + 1;
     }
