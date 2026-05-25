@@ -204,9 +204,9 @@ function CheckInModal({ onSubmit, onClose }) {
           style={{
             position: "relative",
             width: "100%", marginTop: 8, padding: "15px 0",
-            background: "#2d3d2b", color: "#fdfcf9", border: "none", borderRadius: 8,
-            fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 400,
-            letterSpacing: "0.14em", textTransform: "uppercase",
+            background: "transparent", color: "var(--color-ivory, #faf9f4)", border: "1px solid var(--color-ivory, #faf9f4)", borderRadius: 8,
+            fontFamily: "var(--font-display)", fontSize: 12, fontWeight: 700,
+            letterSpacing: "0.15em", textTransform: "uppercase",
             cursor: submitState === "idle" ? "pointer" : "default",
             overflow: "visible",
           }}>
@@ -352,7 +352,7 @@ function SkinJournalModal({ onSubmit, onClose, existing = null }) {
 
         <button
           onClick={() => canSubmit && onSubmit({ date: today, condition, sleep, stress, notes: notes.trim() })}
-          style={{ width: "100%", padding: "15px 0", background: canSubmit ? "#2d3d2b" : "var(--surface)", color: canSubmit ? "#fdfcf9" : "var(--clay)", border: `1px solid ${canSubmit ? "transparent" : "var(--border)"}`, borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 400, letterSpacing: "0.08em", cursor: canSubmit ? "pointer" : "default", transition: "all 0.2s" }}>
+          style={{ width: "100%", padding: "15px 0", background: "transparent", color: "var(--color-ivory, #faf9f4)", border: "1px solid var(--color-ivory, #faf9f4)", borderRadius: 8, fontFamily: "var(--font-display)", fontSize: 12, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", opacity: canSubmit ? 1 : 0.45, cursor: canSubmit ? "pointer" : "default", transition: "all 0.2s" }}>
           Save Entry
         </button>
       </div>
@@ -463,9 +463,9 @@ function CycleTracker({ products, activeMap, cycleDay: cycledayProp = 14, onSetC
           Your hormones shift every week. Your ritual should too. Enable this to receive phase-aware nudges drawn from what's already on your vanity.
         </p>
         <button onClick={() => onUpdateUser({ ...user, cycleTrackingEnabled: true })}
-          style={{ padding: "10px 20px", background: "rgba(250,249,244,0.10)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", cursor: "pointer", transition: "all 0.2s" }}
-          onMouseEnter={e => { e.currentTarget.style.background = "rgba(45,61,43,0.18)"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = "rgba(250,249,244,0.10)"; }}>
+          style={{ padding: "10px 20px", background: "transparent", border: "1px solid var(--color-ivory, #faf9f4)", borderRadius: 8, fontFamily: "var(--font-display)", fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", cursor: "pointer", transition: "all 0.2s" }}
+          onMouseEnter={e => { e.currentTarget.style.background = "rgba(250,249,244,0.08)"; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
           Enable
         </button>
       </div>
@@ -503,7 +503,7 @@ function CycleTracker({ products, activeMap, cycleDay: cycledayProp = 14, onSetC
                   style={{ width: 48, padding: "4px 8px", background: "var(--ink)", border: `1px solid ${phase.border}`, borderRadius: 6, color: "var(--parchment)", fontFamily: "var(--font-body)", fontSize: 13, textAlign: "center", outline: "none" }}
                   autoFocus
                 />
-                <button onClick={handleSetDay} style={{ padding: "4px 10px", background: phase.bg, border: `1px solid ${phase.border}`, borderRadius: 6, color: phase.color, fontFamily: "var(--font-body)", fontSize: 9, cursor: "pointer", letterSpacing: "0.1em", textTransform: "uppercase" }}>Set</button>
+                <button onClick={handleSetDay} style={{ padding: "4px 10px", background: "transparent", border: "1px solid var(--color-ivory, #faf9f4)", borderRadius: 6, color: "var(--color-ivory, #faf9f4)", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 9, cursor: "pointer", letterSpacing: "0.15em", textTransform: "uppercase" }}>Set</button>
               </div>
             ) : (
               <button onClick={() => { setInputVal(String(cycleDay)); setEditing(true); }}
@@ -818,7 +818,7 @@ function AddTreatmentModal({ onSave, onClose }) {
         </div>
 
         <button onClick={() => onSave({ id: Date.now().toString(), typeId, date, label: selected?.label })}
-          style={{ width: "100%", padding: "14px 0", background: "#2d3d2b", color: "#fdfcf9", border: "none", borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 400, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}>
+          style={{ width: "100%", padding: "14px 0", background: "transparent", color: "var(--color-ivory, #faf9f4)", border: "1px solid var(--color-ivory, #faf9f4)", borderRadius: 8, fontFamily: "var(--font-display)", fontSize: 12, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", cursor: "pointer" }}>
           Start Recovery Tracking
         </button>
       </div>
@@ -865,7 +865,7 @@ function TreatmentRecoveryCard({ treatment, products, activeMap, onDismiss, onRe
             )}
           </div>
           {isLastPhase && (
-            <button onClick={onDismiss} style={{ padding: "6px 12px", background: "rgba(232,226,217,0.18)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 9, color: "var(--color-ivory, #faf9f4)", cursor: "pointer", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+            <button onClick={onDismiss} style={{ padding: "6px 12px", background: "transparent", border: "1px solid var(--color-ivory, #faf9f4)", borderRadius: 8, fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 9, color: "var(--color-ivory, #faf9f4)", cursor: "pointer", letterSpacing: "0.15em", textTransform: "uppercase" }}>
               All Clear
             </button>
           )}
@@ -933,11 +933,11 @@ function TreatmentRecoveryCard({ treatment, products, activeMap, onDismiss, onRe
               <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                 <span style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", flex: 1 }}>Reset Day 1 to today?</span>
                 <button onClick={() => { onResetDate(); setConfirmReset(false); }}
-                  style={{ padding: "6px 12px", background: "rgba(139,115,85,0.12)", border: "1px solid rgba(139,115,85,0.35)", borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 400, letterSpacing: "0.1em", textTransform: "uppercase", color: "#8b7355", cursor: "pointer" }}>
+                  style={{ padding: "6px 12px", background: "transparent", border: "1px solid var(--color-ivory, #faf9f4)", borderRadius: 8, fontFamily: "var(--font-display)", fontSize: 9, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", cursor: "pointer" }}>
                   Confirm
                 </button>
                 <button onClick={() => setConfirmReset(false)}
-                  style={{ padding: "6px 12px", background: "transparent", border: "1px solid var(--border)", borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)", cursor: "pointer" }}>
+                  style={{ padding: "6px 12px", background: "transparent", border: "1px solid var(--color-ivory, #faf9f4)", borderRadius: 8, fontFamily: "var(--font-display)", fontSize: 9, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", cursor: "pointer" }}>
                   Cancel
                 </button>
               </div>
@@ -964,7 +964,7 @@ function TreatmentSection({ treatments, saveTreatment, removeTreatment, updateTr
   return (
     <div style={{ marginBottom: 28 }}>
       <button onClick={() => setAddOpen(true)}
-        style={{ width: "100%", padding: "13px 0", marginBottom: 16, background: "transparent", color: "var(--color-ivory, #faf9f4)", border: "1.5px solid rgba(250,249,244,0.5)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 700, letterSpacing: "0.22em", textTransform: "uppercase", cursor: "pointer", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" }}>
+        style={{ width: "100%", padding: "13px 0", marginBottom: 16, background: "transparent", color: "var(--color-ivory, #faf9f4)", border: "1px solid var(--color-ivory, #faf9f4)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", cursor: "pointer", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" }}>
         Log
       </button>
 
@@ -1214,9 +1214,9 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
           Track body acne zones, identify triggers, and get advice drawn from what's already on your vanity.
         </p>
         <button onClick={() => setEnabled(true)}
-          style={{ padding: "10px 20px", background: "rgba(250,249,244,0.10)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", cursor: "pointer", transition: "all 0.2s" }}
-          onMouseEnter={e => e.currentTarget.style.background = "rgba(45,61,43,0.18)"}
-          onMouseLeave={e => e.currentTarget.style.background = "rgba(250,249,244,0.10)"}>
+          style={{ padding: "10px 20px", background: "transparent", border: "1px solid var(--color-ivory, #faf9f4)", borderRadius: 8, fontFamily: "var(--font-display)", fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", cursor: "pointer", transition: "all 0.2s" }}
+          onMouseEnter={e => e.currentTarget.style.background = "rgba(250,249,244,0.08)"}
+          onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
           Enable
         </button>
       </div>
@@ -1466,7 +1466,7 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
                 setShowTriggerModal(false);
               }
             }}
-              style={{ width: "100%", padding: "14px 0", background: (selectedTriggers.length > 0 || selectedSymptoms.length > 0) ? "#2d3d2b" : "var(--ink)", color: (selectedTriggers.length > 0 || selectedSymptoms.length > 0) ? "#fdfcf9" : "var(--clay)", border: "none", borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 400, letterSpacing: "0.14em", textTransform: "uppercase", cursor: (selectedTriggers.length > 0 || selectedSymptoms.length > 0) ? "pointer" : "default", opacity: (selectedTriggers.length > 0 || selectedSymptoms.length > 0) ? 1 : 0.5 }}>
+              style={{ width: "100%", padding: "14px 0", background: "transparent", color: "var(--color-ivory, #faf9f4)", border: "1px solid var(--color-ivory, #faf9f4)", borderRadius: 8, fontFamily: "var(--font-display)", fontSize: 12, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", cursor: (selectedTriggers.length > 0 || selectedSymptoms.length > 0) ? "pointer" : "default", opacity: (selectedTriggers.length > 0 || selectedSymptoms.length > 0) ? 1 : 0.5 }}>
               Save
             </button>
           </div>
