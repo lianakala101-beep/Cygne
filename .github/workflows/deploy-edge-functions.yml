@@ -33,7 +33,7 @@ jobs:
         run: supabase functions deploy ask-cygne --project-ref "$SUPABASE_PROJECT_ID"
 
       - name: Deploy swan-sense-daily
-        run: supabase functions deploy swan-sense-daily --project-ref "$SUPABASE_PROJECT_ID"
+        run: supabase functions deploy swan-sense-daily --project-ref "$SUPABASE_PROJECT_ID" --no-verify-jwt
 
       - name: Deploy rapid-action
         run: supabase functions deploy rapid-action --project-ref "$SUPABASE_PROJECT_ID" --no-verify-jwt
