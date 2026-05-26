@@ -1,0 +1,29 @@
+name: Deploy Edge Functions
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Deploy ask-cygne
+        run: supabase functions deploy ask-cygne --project-ref "$SUPABASE_PROJECT_ID"
+
+      - name: Deploy swan-sense-daily
+        run: supabase functions deploy swan-sense-daily --project-ref "$SUPABASE_PROJECT_ID"
+
+      - name: Deploy rapid-action
+        run: supabase functions deploy rapid-action --project-ref "$SUPABASE_PROJECT_ID" --no-verify-jwt
