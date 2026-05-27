@@ -480,7 +480,11 @@ export default function App() {
   // user_metadata or the entry won't round-trip on reload.
   const stripInlineForCloud = (rs) => rs.map(r => {
     if (!r) return r;
-    if (!r.path) return r;          // no storage — keep inline as the carrier
+    // Keep inline as the carrier unless we have BOTH a storage path and a
+    // usable url. A path with no url means signed-URL generation failed at
+    // upload; dropping inline there would leave the entry with no displayable
+    // source ("Image unavailable") if the on-load signed-URL refresh also fails.
+    if (!r.path || !r.url) return r;
     const { inline: _drop, ...rest } = r;
     return rest;
   });
@@ -499,6 +503,9 @@ export default function App() {
       entry,
     ];
     setReflections(next);
+    // Capturing a reflection satisfies the breakout-zone nudge — auto-dismiss
+    // it and persist today's date so it doesn't reappear for the rest of today.
+    dismissReflectionPrompt();
     if (authSession) {
       try {
         await supabase.auth.updateUser({ data: { reflections: stripInlineForCloud(next) } });

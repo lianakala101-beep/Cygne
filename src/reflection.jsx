@@ -210,13 +210,12 @@ async function uploadTriptych(userId, entryId, dataUrl) {
     }
     console.warn("[Cygne reflection] createSignedUrl error:", signedErr?.status || "", signedErr?.message || "no url");
 
-    // Public URL fallback (only works if bucket is public).
-    const { data: pub } = supabase.storage.from("reflections").getPublicUrl(path);
-    if (pub?.publicUrl) {
-      console.log("[Cygne reflection] public URL:", pub.publicUrl);
-      return { path, url: pub.publicUrl };
-    }
-    console.warn("[Cygne reflection] no URL available after upload — falling back to inline");
+    // The reflections bucket is PRIVATE, so getPublicUrl() would hand back a
+    // URL that 403s — storing it masks the failure and the gallery shows
+    // "Image unavailable". Instead keep the inline data URL as the carrier; the
+    // gallery regenerates a signed URL from `path` on load, and inline covers
+    // the gap if that refresh ever fails.
+    console.warn("[Cygne reflection] no signed URL after upload — keeping inline as the carrier");
     return { path, url: null, inline: dataUrl };
   } catch (e) {
     console.warn("[Cygne reflection] storage upload failed, falling back to inline:", e?.message || e);
