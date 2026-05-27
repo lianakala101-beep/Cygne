@@ -19,15 +19,12 @@ jobs:
         with:
           version: latest
 
-      - name: Drop local Supabase config
-        # The committed supabase/config.toml uses a [project] table that the
-        # current CLI schema rejects ("'config.config' has invalid keys:
-        # project"), which aborts every deploy. The deploys below are fully
-        # standalone — they target the project via --project-ref and
-        # authenticate with SUPABASE_ACCESS_TOKEN — so remove the local config
-        # on the runner so the CLI never parses it. (Runner checkout only; the
-        # repo file is unaffected.)
-        run: rm -f supabase/config.toml
+      # NOTE: supabase/config.toml is intentionally NOT removed anymore. With
+      # the invalid [project] key gone, the CLI parses it cleanly and applies
+      # the per-function `verify_jwt = false` settings — which persist the
+      # gateway setting reliably, unlike the --no-verify-jwt flag (ignored on
+      # function updates, supabase/cli#4059). The flags below are kept as
+      # belt-and-suspenders.
 
       - name: Deploy ask-cygne
         run: supabase functions deploy ask-cygne --project-ref "$SUPABASE_PROJECT_ID" --no-verify-jwt
