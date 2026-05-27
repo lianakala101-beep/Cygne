@@ -480,11 +480,12 @@ export default function App() {
   // user_metadata or the entry won't round-trip on reload.
   const stripInlineForCloud = (rs) => rs.map(r => {
     if (!r) return r;
-    // Keep inline as the carrier unless we have BOTH a storage path and a
-    // usable url. A path with no url means signed-URL generation failed at
-    // upload; dropping inline there would leave the entry with no displayable
-    // source ("Image unavailable") if the on-load signed-URL refresh also fails.
-    if (!r.path || !r.url) return r;
+    // Never store the large inline base64 in user_metadata once the photo is in
+    // storage. A triptych data URL can exceed the metadata size limit and make
+    // updateUser fail — which silently drops the just-captured entry so it never
+    // persists. Keep inline only when there's no storage path at all (the upload
+    // itself failed and inline is the only copy).
+    if (!r.path) return r;
     const { inline: _drop, ...rest } = r;
     return rest;
   });
@@ -973,6 +974,7 @@ export default function App() {
             <Reflection
               reflections={reflections}
               onAddReflection={addReflection}
+              onReplaceReflections={setReflections}
               products={products}
               checkIns={checkIns}
               user={{ ...(user || {}), id: authSession?.user?.id }}
