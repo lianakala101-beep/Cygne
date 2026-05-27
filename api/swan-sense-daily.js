@@ -93,6 +93,41 @@ function buildContext(body) {
   return parts.join(" ") || "No context recorded yet.";
 }
 
+// Reflections are not in a table — they live on auth user_metadata.reflections
+// (the photo files live in the private `reflections` storage bucket). Read them
+// server-side with the service-role admin API, newest first.
+async function fetchRecentReflections(db, userId, n = 5) {
+  try {
+    const { data, error } = await db.auth.admin.getUserById(userId);
+    if (error || !data?.user) return [];
+    const reflections = data.user.user_metadata?.reflections;
+    if (!Array.isArray(reflections) || !reflections.length) return [];
+    return reflections
+      .filter((r) => r?.date)
+      .sort((a, b) => new Date(b.date) - new Date(a.date))
+      .slice(0, n);
+  } catch (e) {
+    console.error("[swan-sense-daily] reflections fetch failed:", e?.message ?? e);
+    return [];
+  }
+}
+
+// Render the recent reflections as a clear prompt block. The textual "notes"
+// is the weekly Swan Sense insight (headline/detail); photo URL is appended
+// when present.
+function formatReflections(reflections) {
+  if (!reflections.length) return "";
+  const lines = reflections.map((r) => {
+    const date = (r.date || "").split("T")[0];
+    const note = r.insight
+      ? [r.insight.headline, r.insight.detail].filter(Boolean).join(" — ")
+      : "(no insight recorded)";
+    const photo = r.url || r.path ? ` [photo: ${r.url || r.path}]` : "";
+    return `- ${date}: ${note}${photo}`;
+  });
+  return `Recent reflections (last ${reflections.length}):\n${lines.join("\n")}`;
+}
+
 const SYSTEM_PROMPT = `You are Cygne — a luxury skincare guide writing one short editorial line that opens the user's day on the home dashboard.
 
 WRITE: one to two sentences total. Editorial. Observational. Never clinical, never a chatbot.
@@ -158,7 +193,9 @@ export default async function handler(req, res) {
 
     // ── B. CALL CLAUDE ───────────────────────────────────────────────────────
     const context = buildContext(body);
-    const system = `${SYSTEM_PROMPT}\n\nUSER CONTEXT:\n${context}`;
+    const recentReflections = await fetchRecentReflections(db, userId, 5);
+    const reflectionsBlock = formatReflections(recentReflections);
+    const system = `${SYSTEM_PROMPT}\n\nUSER CONTEXT:\n${context}${reflectionsBlock ? `\n\n${reflectionsBlock}` : ""}`;
 
     const claudeRes = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
