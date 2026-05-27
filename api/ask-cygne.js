@@ -101,6 +101,41 @@ function buildContextFromBody(body) {
   return parts.join(" ") || "No detailed context provided.";
 }
 
+// Reflections are not in a table — they live on auth user_metadata.reflections
+// (the photo files live in the private `reflections` storage bucket). Read them
+// server-side with the service-role admin API, newest first.
+async function fetchRecentReflections(db, userId, n = 5) {
+  try {
+    const { data, error } = await db.auth.admin.getUserById(userId);
+    if (error || !data?.user) return [];
+    const reflections = data.user.user_metadata?.reflections;
+    if (!Array.isArray(reflections) || !reflections.length) return [];
+    return reflections
+      .filter((r) => r?.date)
+      .sort((a, b) => new Date(b.date) - new Date(a.date))
+      .slice(0, n);
+  } catch (e) {
+    console.error("[ask-cygne] reflections fetch failed:", e?.message ?? e);
+    return [];
+  }
+}
+
+// Render the recent reflections as a clear prompt block. The textual "notes"
+// is the weekly Swan Sense insight (headline/detail); photo URL is appended
+// when present.
+function formatReflections(reflections) {
+  if (!reflections.length) return "";
+  const lines = reflections.map((r) => {
+    const date = (r.date || "").split("T")[0];
+    const note = r.insight
+      ? [r.insight.headline, r.insight.detail].filter(Boolean).join(" — ")
+      : "(no insight recorded)";
+    const photo = r.url || r.path ? ` [photo: ${r.url || r.path}]` : "";
+    return `- ${date}: ${note}${photo}`;
+  });
+  return `Recent reflections (last ${reflections.length}):\n${lines.join("\n")}`;
+}
+
 const SYSTEM_PROMPT_BASE = `You are Cygne, a luxury skincare expert and the user's personal skin ritual guide.
 
 YOUR RULES:
@@ -181,7 +216,9 @@ export default async function handler(req, res) {
 
     // ── C. BUILD CONTEXT ──────────────────────────────────────────────────────
     const contextSummary = buildContextFromBody(body);
-    const systemPrompt = `${SYSTEM_PROMPT_BASE}\n\nUSER CONTEXT:\n${contextSummary}`;
+    const recentReflections = await fetchRecentReflections(db, userId, 5);
+    const reflectionsBlock = formatReflections(recentReflections);
+    const systemPrompt = `${SYSTEM_PROMPT_BASE}\n\nUSER CONTEXT:\n${contextSummary}${reflectionsBlock ? `\n\n${reflectionsBlock}` : ""}`;
 
     // ── D. CALL CLAUDE (streaming SSE; we collect into one string) ────────────
     console.log("[ask-cygne] calling Claude for user", userId);
