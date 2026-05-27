@@ -30,7 +30,7 @@ jobs:
         run: rm -f supabase/config.toml
 
       - name: Deploy ask-cygne
-        run: supabase functions deploy ask-cygne --project-ref "$SUPABASE_PROJECT_ID"
+        run: supabase functions deploy ask-cygne --project-ref "$SUPABASE_PROJECT_ID" --no-verify-jwt
 
       - name: Deploy swan-sense-daily
         run: supabase functions deploy swan-sense-daily --project-ref "$SUPABASE_PROJECT_ID" --no-verify-jwt
