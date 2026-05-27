@@ -80,14 +80,31 @@ export async function invokeEdgeFunction(functionName, body) {
   }
   console.log("[Cygne edge] calling", functionName, "| payload:", JSON.stringify(body).length, "bytes");
 
-  const { data, error } = await supabase.functions.invoke(functionName, {
-    body,
-    headers: { Authorization: `Bearer ${session.access_token}` },
-  });
+  // Vercel serverless functions live under /api/<functionName> (same origin as
+  // the app). They read userId from the body and handle auth themselves; we
+  // still forward the session token for parity / future use.
+  let res;
+  try {
+    res = await fetch(`/api/${functionName}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify(body),
+    });
+  } catch (e) {
+    console.error("[Cygne edge] network error:", e);
+    throw new Error(e?.message || "Edge function call failed");
+  }
 
-  if (error) {
-    console.error("[Cygne edge] error:", error);
-    throw new Error(error.message || "Edge function call failed");
+  let data = null;
+  try { data = await res.json(); } catch { /* non-JSON / empty body */ }
+
+  if (!res.ok) {
+    const message = data?.error || `Edge function returned ${res.status}`;
+    console.error("[Cygne edge] error:", res.status, data);
+    throw new Error(message);
   }
 
   // Bump count only on success so a network/Anthropic failure doesn't burn
