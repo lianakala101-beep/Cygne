@@ -120,9 +120,9 @@ async function fetchRecentReflections(db, userId, n = 5) {
   }
 }
 
-// Render the recent reflections as a clear prompt block. The textual "notes"
-// is the weekly Swan Sense insight (headline/detail); photo URL is appended
-// when present.
+// Render the recent reflections as a clear prompt block — date + the weekly
+// Swan Sense insight (headline/detail) only. Photo paths/URLs are intentionally
+// omitted: they're not useful to a text model.
 function formatReflections(reflections) {
   if (!reflections.length) return "";
   const lines = reflections.map((r) => {
@@ -130,8 +130,7 @@ function formatReflections(reflections) {
     const note = r.insight
       ? [r.insight.headline, r.insight.detail].filter(Boolean).join(" — ")
       : "(no insight recorded)";
-    const photo = r.url || r.path ? ` [photo: ${r.url || r.path}]` : "";
-    return `- ${date}: ${note}${photo}`;
+    return `- ${date}: ${note}`;
   });
   return `Recent reflections (last ${reflections.length}):\n${lines.join("\n")}`;
 }
