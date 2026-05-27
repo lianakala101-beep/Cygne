@@ -21,6 +21,90 @@ const ScanModal        = lazy(() => import("./modals.jsx").then(m => ({ default:
 const ProductModal     = lazy(() => import("./productmodal.jsx").then(m => ({ default: m.ProductModal })));
 const RoutineFitSheet  = lazy(() => import("./productmodal.jsx").then(m => ({ default: m.RoutineFitSheet })));
 
+// Scan the last 7 days of check-ins and return the breakout zone logged 2+
+// times (the most frequent), or null. Drives the home-screen reflection
+// prompt. Zone values are the human labels stored in checkIns[].breakoutZones.
+function findActiveBreakoutZone(checkIns) {
+  if (!Array.isArray(checkIns) || !checkIns.length) return null;
+  const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  const counts = {};
+  for (const c of checkIns) {
+    if (!c?.date || new Date(c.date).getTime() < weekAgo) continue;
+    for (const z of (c.breakoutZones || [])) {
+      if (!z) continue;
+      counts[z] = (counts[z] || 0) + 1;
+    }
+  }
+  const top = Object.entries(counts)
+    .filter(([, n]) => n >= 2)
+    .sort((a, b) => b[1] - a[1])[0];
+  return top ? top[0] : null;
+}
+
+// Home-screen nudge inviting the user to capture a reflection when a breakout
+// zone has been active. Editorial styling: dark canvas, ivory outline, Fungis
+// Normal, no bold.
+function ReflectionPromptCard({ zone, onOpen, onDismiss }) {
+  return (
+    <div style={{
+      position: "relative",
+      background: "var(--color-inky-moss, #2d3d2b)",
+      border: "1px solid var(--color-ivory, #faf9f4)",
+      borderRadius: 8,
+      padding: "20px 22px",
+      marginBottom: 24,
+      color: "var(--color-ivory, #faf9f4)",
+    }}>
+      <button
+        onClick={onDismiss}
+        aria-label="Dismiss"
+        style={{
+          position: "absolute", top: 12, right: 12,
+          background: "none", border: "none", cursor: "pointer",
+          color: "rgba(250,249,244,0.6)", padding: 4, display: "inline-flex",
+          WebkitTapHighlightColor: "transparent",
+        }}
+      >
+        <Icon name="x" size={12} />
+      </button>
+
+      <p style={{
+        margin: "0 0 16px",
+        paddingRight: 18,
+        fontFamily: "var(--font-body, 'Fungis Normal', sans-serif)",
+        fontWeight: 400,
+        fontSize: 12,
+        letterSpacing: "0.12em",
+        lineHeight: 1.7,
+        textTransform: "uppercase",
+        color: "var(--color-ivory, #faf9f4)",
+      }}>
+        Your {zone} has been active — this would be a good moment to capture a reflection.
+      </p>
+
+      <button
+        onClick={onOpen}
+        style={{
+          background: "transparent",
+          border: "1px solid var(--color-ivory, #faf9f4)",
+          borderRadius: 6,
+          color: "var(--color-ivory, #faf9f4)",
+          fontFamily: "var(--font-body, 'Fungis Normal', sans-serif)",
+          fontWeight: 400,
+          fontSize: 11,
+          letterSpacing: "0.18em",
+          textTransform: "uppercase",
+          padding: "11px 20px",
+          cursor: "pointer",
+          WebkitTapHighlightColor: "transparent",
+        }}
+      >
+        Open Reflection
+      </button>
+    </div>
+  );
+}
+
 export default function App() {
   // -- Auth state --------------------------------------------------------------
   const [authSession, setAuthSession] = useState(null);
@@ -54,6 +138,35 @@ export default function App() {
 
   const dismissSwanPopup = () => {
     setSwanPopupDismissed(true);
+  };
+
+  // -- Reflection prompt from logged breakout zones --------------------------
+  const [showReflectionPrompt, setShowReflectionPrompt] = useState(false);
+  const [reflectionPromptZone, setReflectionPromptZone] = useState(null);
+
+  // After a check-in saves (checkIns changes), scan the last 7 days. If a zone
+  // appears 2+ times, surface the home-screen reflection prompt — unless it's
+  // already been dismissed today.
+  useEffect(() => {
+    const zone = findActiveBreakoutZone(checkIns);
+    if (!zone) {
+      setShowReflectionPrompt(false);
+      setReflectionPromptZone(null);
+      return;
+    }
+    let dismissedOn = null;
+    try { dismissedOn = localStorage.getItem("cygne_reflection_prompt_dismissed"); } catch { /* ignore */ }
+    if (dismissedOn === today) {
+      setShowReflectionPrompt(false);
+      return;
+    }
+    setReflectionPromptZone(zone);
+    setShowReflectionPrompt(true);
+  }, [checkIns, today]);
+
+  const dismissReflectionPrompt = () => {
+    try { localStorage.setItem("cygne_reflection_prompt_dismissed", today); } catch { /* ignore */ }
+    setShowReflectionPrompt(false);
   };
   const [treatments, setTreatments] = useLocalStorage("cygne_treatments", []);
   const [locationData, setLocationData] = useState(null);
@@ -797,7 +910,18 @@ export default function App() {
 
       {/* Content */}
       <div style={{ maxWidth: 600, margin: "0 auto", padding: "32px 22px 0", animation: "fadeUp 0.3s ease" }} key={tab}>
-        {tab === "dashboard" && <Dashboard products={products} setTab={setTab} checkIns={checkIns} swanPopupDismissed={swanPopupDismissed} onDismissSwanPopup={dismissSwanPopup} treatments={treatments} locationData={locationData} user={{ ...(user || {}), id: authSession?.user?.id }} notifPermission={notifPermission} onRequestNotif={requestNotifications} notifDismissed={notifDismissed} onDismissNotif={() => setNotifDismissed(true)} journals={journals} setCheckIns={setCheckIns} triggerLog={triggerLog} />}
+        {tab === "dashboard" && (
+          <>
+            {showReflectionPrompt && reflectionPromptZone && (
+              <ReflectionPromptCard
+                zone={reflectionPromptZone}
+                onOpen={() => { setShowReflectionPrompt(false); setTab("reflection"); }}
+                onDismiss={dismissReflectionPrompt}
+              />
+            )}
+            <Dashboard products={products} setTab={setTab} checkIns={checkIns} swanPopupDismissed={swanPopupDismissed} onDismissSwanPopup={dismissSwanPopup} treatments={treatments} locationData={locationData} user={{ ...(user || {}), id: authSession?.user?.id }} notifPermission={notifPermission} onRequestNotif={requestNotifications} notifDismissed={notifDismissed} onDismissNotif={() => setNotifDismissed(true)} journals={journals} setCheckIns={setCheckIns} triggerLog={triggerLog} />
+          </>
+        )}
         {tab === "routine"   && <MyRoutine
           products={products}
           user={{ ...(user || {}), id: authSession?.user?.id }}
