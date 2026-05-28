@@ -743,6 +743,68 @@ export default function App() {
     }
   };
 
+  // -- Introduce Slowly: auto-graduation safety net ---------------------------
+  // If a ramping product is more than 2 weeks past its schedule's max week, the
+  // user never tapped "Skin Handled It" on the final week — graduate it for
+  // them so it doesn't sit on the IntroduceSlowlyCard forever. Mirrors the
+  // manual graduation path in recordRampAction("handled") final-week branch:
+  // clears routineStartDate, rampWeek, rampHeld and logs an "auto_graduated"
+  // rampLog entry. Runs on app load (when checkIns hydrates from metadata),
+  // after each new check-in, and when the auth session lands. Manual flow,
+  // UI, and other components are untouched.
+  useEffect(() => {
+    // Mirror recordRampAction's guard so we don't graduate based on stale state
+    // while waiting for the Supabase profile to hydrate.
+    if (authSession && !profileLoaded.current) return;
+    if (!Array.isArray(products) || products.length === 0) return;
+
+    const nowIso = new Date().toISOString();
+    const userId = authSession?.user?.id || null;
+    const newEntries = [];
+    let changed = false;
+
+    const updatedProducts = products.map(p => {
+      if (!p || p.inRoutine === false || !p.routineStartDate) return p;
+      const activeKey = p.category === "Toning Pad"
+        ? "toning pad"
+        : RAMP_ACTIVES.find(a => detectActives(p.ingredients || [])[a]);
+      if (!activeKey) return p;
+      const schedule = RAMP_SCHEDULES[activeKey];
+      if (!schedule) return p;
+      const maxWeek = Math.max(...schedule.phases[schedule.phases.length - 1].weeks);
+      const currentWeek = Math.max(1, Math.floor(daysBetweenLocal(p.routineStartDate) / 7) + 1);
+      if (currentWeek > maxWeek + 2) {
+        changed = true;
+        newEntries.push({
+          userId,
+          productId: p.id,
+          week: currentWeek,
+          status: "auto_graduated",
+          timestamp: nowIso,
+        });
+        return { ...p, rampWeek: undefined, routineStartDate: undefined, rampHeld: false };
+      }
+      return p;
+    });
+
+    if (!changed) return;
+
+    const newLog = [...rampLog, ...newEntries];
+    setProducts(updatedProducts);
+    setRampLog(newLog);
+    console.log(
+      "[Cygne] auto-graduated", newEntries.length,
+      "ramp product" + (newEntries.length === 1 ? "" : "s") + ":",
+      newEntries.map(e => ({ productId: e.productId, week: e.week })),
+    );
+    if (authSession) {
+      supabase.auth.updateUser({ data: { products: updatedProducts, rampLog: newLog } })
+        .then(() => console.log("[Cygne] auto-graduate saved to Supabase — entries:", newLog.length))
+        .catch(e => console.error("[Cygne] auto-graduate save failed:", e));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [checkIns, authSession]);
+
   // -- Loading state ----------------------------------------------------------
   // Hold the loading screen while authLoading is still true OR there's a
   // session but the profile hasn't resolved yet (user not set AND
