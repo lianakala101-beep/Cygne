@@ -185,7 +185,7 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 async function uploadTriptych(userId, entryId, dataUrl) {
   const blob = dataUrlToBlob(dataUrl);
   if (!userId || !UUID_RE.test(String(userId))) {
-    console.warn("[Cygne reflection] refusing storage upload — invalid userId:", userId, "(expected auth UUID). Falling back to inline.");
+    console.error("[Cygne reflection] refusing storage upload — invalid userId:", userId, "(expected auth UUID). Falling back to inline.");
     return { path: null, url: null, inline: dataUrl };
   }
   const path = `${userId}/${entryId}.jpg`;
@@ -195,7 +195,7 @@ async function uploadTriptych(userId, entryId, dataUrl) {
       .from("reflections")
       .upload(path, blob, { contentType: "image/jpeg", upsert: true });
     if (upErr) {
-      console.warn("[Cygne reflection] upload error:", upErr.status || "", upErr.message, upErr);
+      console.error("[Cygne reflection] upload error:", upErr.status || "", upErr.message, upErr);
       return { path: null, url: null, inline: dataUrl };
     }
     console.log("[Cygne reflection] upload ok:", upData);
@@ -210,17 +210,17 @@ async function uploadTriptych(userId, entryId, dataUrl) {
       console.log("[Cygne reflection] signed URL:", signed.signedUrl);
       return { path, url: signed.signedUrl };
     }
-    console.warn("[Cygne reflection] createSignedUrl error:", signedErr?.status || "", signedErr?.message || "no url");
+    console.error("[Cygne reflection] createSignedUrl error:", signedErr?.status || "", signedErr?.message || "no url");
 
     // The reflections bucket is PRIVATE, so getPublicUrl() would hand back a
     // URL that 403s — storing it masks the failure and the gallery shows
     // "Image unavailable". Instead keep the inline data URL as the carrier; the
     // gallery regenerates a signed URL from `path` on load, and inline covers
     // the gap if that refresh ever fails.
-    console.warn("[Cygne reflection] no signed URL after upload — keeping inline as the carrier");
+    console.error("[Cygne reflection] no signed URL after upload — keeping inline as the carrier");
     return { path, url: null, inline: dataUrl };
   } catch (e) {
-    console.warn("[Cygne reflection] storage upload failed, falling back to inline:", e?.message || e);
+    console.error("[Cygne reflection] storage upload failed, falling back to inline:", e?.message || e);
     return { path: null, url: null, inline: dataUrl };
   }
 }
@@ -791,6 +791,16 @@ function Reflection({ reflections = [], onAddReflection, onReplaceReflections, p
     let cancelled = false;
     (async () => {
       const results = await Promise.all(reflections.map(async (r) => {
+        // Age gate: never auto-drop an entry less than 24h old, regardless of
+        // any URL HEAD-probe result. Freshly issued Supabase signed URLs can
+        // fail HEAD (CORS / 405 / transient) even when GET works fine — without
+        // this gate the cleanup deletes the just-captured entry on the very
+        // next render after addReflection runs. Old broken entries can still
+        // be cleaned up below.
+        const ageMs = r?.date ? (Date.now() - new Date(r.date).getTime()) : Infinity;
+        if (Number.isFinite(ageMs) && ageMs < 24 * 60 * 60 * 1000) {
+          return { r, keep: true, reason: "fresh" };
+        }
         const inline = r?.inline && String(r.inline).trim();
         if (inline) return { r, keep: true, reason: "inline" };
         const storedUrl = r?.url && String(r.url).trim();
@@ -852,7 +862,11 @@ function Reflection({ reflections = [], onAddReflection, onReplaceReflections, p
         id, weekNumber, date,
         path: path || null,
         url: url || null,
-        inline: inline || null,
+        // Always keep the captured data URL on the entry so the freshly
+        // uploaded photo displays on first load without depending on the signed
+        // URL round-trip. stripInlineForCloud retains this on the newest entry
+        // only and strips it from older entries to keep user_metadata small.
+        inline: triptychDataUrl,
         insight,
       };
       console.log("[Cygne reflection] capture →", { id, week: weekNumber, hasPath: !!entry.path, hasUrl: !!entry.url, hasInline: !!entry.inline });
