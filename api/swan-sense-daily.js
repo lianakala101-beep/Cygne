@@ -127,6 +127,93 @@ function formatReflections(reflections) {
   return `Recent reflections (last ${reflections.length}):\n${lines.join("\n")}`;
 }
 
+// Introduce Slowly schedules live in src/ramp.jsx — these are inlined here so
+// the API can render the prompt block without importing the React module. Keys
+// match RAMP_ACTIVES (+ the "toning pad" category special case). Maximum week
+// per active is the highest weeks[] value in the schedule's final phase.
+const RAMP_MAX_WEEKS = {
+  "retinol": 12,
+  "AHA": 12,
+  "BHA": 12,
+  "vitamin C": 12,
+  "toning pad": 7,
+};
+
+// Lightweight client-of-engine.detectActives — substring match on ingredients
+// plus the Toning Pad category. Mirrors the four RAMP_ACTIVES the UI uses to
+// decide whether to surface IntroduceSlowlyCard for a product.
+function detectRampActive(product) {
+  if (!product) return null;
+  if (product.category === "Toning Pad") return "toning pad";
+  const ing = Array.isArray(product.ingredients)
+    ? product.ingredients.join(" ").toLowerCase()
+    : String(product.ingredients || "").toLowerCase();
+  if (!ing) return null;
+  if (/retin(ol|oid|al|yl)|tretinoin|adapalene/.test(ing)) return "retinol";
+  if (/glycolic|lactic|mandelic|\baha\b/.test(ing)) return "AHA";
+  if (/salicylic|\bbha\b/.test(ing)) return "BHA";
+  if (/ascorbic|\bvitamin\s*c\b|ascorbyl/.test(ing)) return "vitamin C";
+  return null;
+}
+
+// Compute the current ramp week from routineStartDate. Mirrors getRampWeek in
+// src/ramp.jsx (Math.max(1, floor(days/7) + 1)).
+function computeRampWeek(routineStartDate) {
+  if (!routineStartDate) return 1;
+  const start = new Date(String(routineStartDate).split("T")[0] + "T00:00:00").getTime();
+  if (Number.isNaN(start)) return 1;
+  const days = Math.floor((Date.now() - start) / 86400000);
+  return Math.max(1, Math.floor(days / 7) + 1);
+}
+
+// Pull the user's rampLog (audit trail of ramp actions) from auth user_metadata
+// via the service-role admin API. Same pattern as fetchRecentReflections.
+async function fetchRampLog(db, userId) {
+  try {
+    const { data, error } = await db.auth.admin.getUserById(userId);
+    if (error || !data?.user) return [];
+    const log = data.user.user_metadata?.rampLog;
+    return Array.isArray(log) ? log : [];
+  } catch (e) {
+    console.error("[swan-sense-daily] rampLog fetch failed:", e?.message ?? e);
+    return [];
+  }
+}
+
+// Render the user's in-flight Introduce Slowly products as a prompt block.
+// Lists every in-routine product with a routineStartDate and a detectable ramp
+// active, with current week / total weeks, hold status, start date, and the
+// most recent rampLog action when present. Returns "" when nothing is ramping.
+function formatIntroduceSlowly(products, rampLog) {
+  if (!Array.isArray(products) || !products.length) return "";
+  const log = Array.isArray(rampLog) ? rampLog : [];
+  const ramping = [];
+  for (const p of products) {
+    if (!p || p.inRoutine === false || !p.routineStartDate) continue;
+    const activeKey = detectRampActive(p);
+    if (!activeKey) continue;
+    const maxWeeks = RAMP_MAX_WEEKS[activeKey];
+    const currentWeek = computeRampWeek(p.routineStartDate);
+    const last = log
+      .filter(e => e?.productId === p.id && e?.timestamp)
+      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0] || null;
+    ramping.push({ p, maxWeeks, currentWeek, last });
+  }
+  if (!ramping.length) return "";
+  const lines = ramping.map(({ p, maxWeeks, currentWeek, last }) => {
+    const name = p.name || "(unnamed)";
+    const brandPart = p.brand ? ` (${p.brand})` : "";
+    const totalPart = maxWeeks ? ` of ${maxWeeks}` : "";
+    const held = p.rampHeld ? "yes" : "no";
+    const started = String(p.routineStartDate).split("T")[0];
+    const lastPart = last
+      ? ` Last action: ${last.status || "unknown"}, ${String(last.timestamp).split("T")[0]}.`
+      : "";
+    return `- ${name}${brandPart}: Week ${currentWeek}${totalPart}. Held: ${held}. Started ${started}.${lastPart}`;
+  });
+  return `Introduce Slowly products:\n${lines.join("\n")}`;
+}
+
 const SYSTEM_PROMPT = `You are Cygne — a luxury skincare guide writing one short editorial line that opens the user's day on the home dashboard.
 
 WRITE: one to two sentences total. Editorial. Observational. Never clinical, never a chatbot.
@@ -193,9 +280,13 @@ export default async function handler(req, res) {
 
     // ── B. CALL CLAUDE ───────────────────────────────────────────────────────
     const context = buildContext(body);
-    const recentReflections = await fetchRecentReflections(db, userId, 5);
+    const [recentReflections, rampLog] = await Promise.all([
+      fetchRecentReflections(db, userId, 5),
+      fetchRampLog(db, userId),
+    ]);
     const reflectionsBlock = formatReflections(recentReflections);
-    const system = `${SYSTEM_PROMPT}\n\nUSER CONTEXT:\n${context}${reflectionsBlock ? `\n\n${reflectionsBlock}` : ""}`;
+    const introduceSlowlyBlock = formatIntroduceSlowly(body.products, rampLog);
+    const system = `${SYSTEM_PROMPT}\n\nUSER CONTEXT:\n${context}${reflectionsBlock ? `\n\n${reflectionsBlock}` : ""}${introduceSlowlyBlock ? `\n\n${introduceSlowlyBlock}` : ""}`;
 
     const claudeRes = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
