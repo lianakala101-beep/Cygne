@@ -784,7 +784,7 @@ export default function App() {
           --sans:      'Fungis Normal', 'Fungis', sans-serif;
           /* Cygne design system tokens */
           --color-ivory:        #faf9f4;
-          --color-ivory-shadow: #f0ebe0;
+          --color-ivory-shadow: rgba(250, 249, 244, 0.92);
           --color-ink:          #1c1c1a;
           --color-inky-moss:    #2d3d2b;
           --color-stone:        #5a5a5a;

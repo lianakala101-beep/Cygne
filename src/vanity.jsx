@@ -580,7 +580,7 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearAll,
                 <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 18 }}>
                   {rampCheckIns.map(({ product: p, week }) => (
                     <div key={p.id} style={{
-                      background: "var(--color-ivory)",
+                      background: "rgba(250, 249, 244, 0.92)",
                       border: "1px solid rgba(45,61,43,0.22)",
                       borderRadius: 8,
                       padding: "16px 18px",
