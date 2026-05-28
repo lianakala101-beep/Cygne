@@ -200,10 +200,12 @@ async function uploadTriptych(userId, entryId, dataUrl) {
     }
     console.log("[Cygne reflection] upload ok:", upData);
 
-    // Signed URL — works for private buckets scoped by RLS.
+    // Match the load-time refresh expiry (1 week). The gallery regenerates this
+    // signed URL on every load, so a long-lived URL adds no value and risks
+    // being rejected — which would leave the entry without a working URL.
     const { data: signed, error: signedErr } = await supabase.storage
       .from("reflections")
-      .createSignedUrl(path, 60 * 60 * 24 * 365); // 1 year
+      .createSignedUrl(path, 60 * 60 * 24 * 7); // 1 week
     if (signed?.signedUrl) {
       console.log("[Cygne reflection] signed URL:", signed.signedUrl);
       return { path, url: signed.signedUrl };
@@ -617,7 +619,7 @@ function GalleryEntry({ entry, onExpand, caption }) {
 // MAIN REFLECTION SCREEN
 // ---------------------------------------------------------------------------
 
-function Reflection({ reflections = [], onAddReflection, products = [], checkIns = [], user = {}, locationData = null, journals = [] }) {
+function Reflection({ reflections = [], onAddReflection, onReplaceReflections, products = [], checkIns = [], user = {}, locationData = null, journals = [] }) {
   const [capturing, setCapturing] = useState(false);
   const [expandedId, setExpandedId] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -717,6 +719,45 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
     return () => { cancelled = true; };
   }, [reflectionsFingerprint]);
 
+  // One-time cleanup: drop stranded entries that have no displayable source —
+  // no url, no inline, and no storage path from which a signed URL can be
+  // recovered. (e.g. a legacy entry whose photo never made it to storage and
+  // whose inline fallback was stripped.) Runs once per mount, after reflections
+  // are available; only writes back when something is actually removed.
+  const cleanupRan = useRef(false);
+  useEffect(() => {
+    if (cleanupRan.current) return;
+    if (!Array.isArray(reflections) || reflections.length === 0) return;
+    cleanupRan.current = true;
+    let cancelled = false;
+    (async () => {
+      const keep = [];
+      const dropped = [];
+      for (const r of reflections) {
+        const hasUrl = !!(r?.url && String(r.url).trim());
+        const hasInline = !!(r?.inline && String(r.inline).trim());
+        if (hasUrl || hasInline) { keep.push(r); continue; }
+        // No stored source — recoverable only if a signed URL can be generated.
+        if (r?.path) {
+          const recovered = await refreshSignedUrl(r.path);
+          if (cancelled) return;
+          if (recovered) { keep.push(r); continue; }
+        }
+        dropped.push(r);
+      }
+      if (!cancelled && dropped.length > 0 && onReplaceReflections) {
+        console.warn(
+          "[Cygne reflection] cleanup removing", dropped.length,
+          "stranded entr" + (dropped.length === 1 ? "y" : "ies") + ":",
+          dropped.map(d => ({ id: d?.id, week: d?.weekNumber, path: d?.path })),
+        );
+        onReplaceReflections(keep);
+      }
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reflections]);
+
   const decorate = (entry) => ({
     ...entry,
     url: signedUrls[entry.id] || entry.url,
@@ -751,6 +792,7 @@ function Reflection({ reflections = [], onAddReflection, products = [], checkIns
         inline: inline || null,
         insight,
       };
+      console.log("[Cygne reflection] capture →", { id, week: weekNumber, hasPath: !!entry.path, hasUrl: !!entry.url, hasInline: !!entry.inline });
       await onAddReflection(entry);
       setCapturing(false);
       setJustCaptured(true);
