@@ -784,7 +784,7 @@ export default function App() {
           --sans:      'Fungis Normal', 'Fungis', sans-serif;
           /* Cygne design system tokens */
           --color-ivory:        #faf9f4;
-          --color-ivory-shadow: rgba(250, 249, 244, 0.92);
+          --color-ivory-shadow: #f0ebe0;
           --color-ink:          #1c1c1a;
           --color-inky-moss:    #2d3d2b;
           --color-stone:        #5a5a5a;
@@ -805,7 +805,7 @@ export default function App() {
           --overlay:            rgba(8,12,8,0.6);
           --sage:               var(--color-ivory);
           --cta:                rgba(250,249,244,0.08);
-          --color-ivory-shadow: rgba(250, 249, 244, 0.82);
+          --color-ivory-shadow: rgba(255,255,255,0.06);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         input, select, textarea { outline: none; }

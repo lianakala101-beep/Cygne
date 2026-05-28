@@ -333,7 +333,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
 
       {/* -- Ritual Mode Card ---------------------------------------------- */}
       {ritualMode.name && (
-        <div style={{ background: "rgba(250, 249, 244, 0.92)", border: "1px solid rgba(250, 249, 244, 0.25)", borderRadius: 8, padding: "19px 19px 16px", marginBottom: 24, position: "relative" }}>
+        <div style={{ background: "rgba(250, 249, 244, 0.82)", border: "1px solid rgba(250, 249, 244, 0.25)", borderRadius: 8, padding: "19px 19px 16px", marginBottom: 24, position: "relative" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
             <span style={{ color: "var(--color-stone, #5a5a5a)" }}><Icon name={timeOfDayIcon} size={13} /></span>
             <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-stone, #5a5a5a)" }}>{timeOfDayLabel.toLowerCase()}</span>

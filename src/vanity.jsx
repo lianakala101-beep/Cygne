@@ -200,7 +200,7 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
 
   return (
     <>
-      <div style={GLASS_CARD}>
+      <div style={{ ...GLASS_CARD, background: "rgba(250, 249, 244, 0.82)" }}>
         {/* Image area — sits directly on the card's single ivory surface
             (no background or divider of its own), so the card reads as one
             unified block. A product photo fills this area when present;
