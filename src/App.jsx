@@ -744,7 +744,13 @@ export default function App() {
   };
 
   // -- Loading state ----------------------------------------------------------
-  if (authLoading) {
+  // Hold the loading screen while authLoading is still true OR there's a
+  // session but the profile hasn't resolved yet (user not set AND
+  // needsOnboarding not flagged). That second condition is the brief window
+  // between the auth session landing and loadUserProfile / handleAuth
+  // populating user — without this gate the render below falls through to
+  // OnboardingScreen for an instant ("What should we call you" flash).
+  if (authLoading || (authSession && !user && !needsOnboarding)) {
     return (
       <div style={{ minHeight: "100vh", background: "#323d30", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div style={{ width: 24, height: 24, border: "2px solid rgba(232,227,214,0.3)", borderTopColor: "rgba(232,227,214,0.8)", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
