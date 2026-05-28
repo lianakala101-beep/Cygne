@@ -478,17 +478,30 @@ export default function App() {
   // When the storage upload FAILS (no bucket, RLS, network), inline is the
   // only copy of the photo we have, so we must let it through to
   // user_metadata or the entry won't round-trip on reload.
-  const stripInlineForCloud = (rs) => rs.map(r => {
-    if (!r) return r;
-    // Never store the large inline base64 in user_metadata once the photo is in
-    // storage. A triptych data URL can exceed the metadata size limit and make
-    // updateUser fail — which silently drops the just-captured entry so it never
-    // persists. Keep inline only when there's no storage path at all (the upload
-    // itself failed and inline is the only copy).
-    if (!r.path) return r;
-    const { inline: _drop, ...rest } = r;
-    return rest;
-  });
+  const stripInlineForCloud = (rs) => {
+    if (!Array.isArray(rs) || rs.length === 0) return rs;
+    // Keep the inline base64 on the newest entry — so the freshly captured
+    // photo displays on first load without depending on a signed-URL refresh —
+    // and strip it from every older entry so user_metadata stays small. The
+    // upload-failure carrier case (no path) still keeps inline regardless.
+    let newestId = null;
+    let newestTime = -Infinity;
+    for (const r of rs) {
+      if (!r?.date) continue;
+      const t = new Date(r.date).getTime();
+      if (Number.isFinite(t) && t > newestTime) {
+        newestTime = t;
+        newestId = r.id;
+      }
+    }
+    return rs.map(r => {
+      if (!r) return r;
+      if (!r.path) return r;
+      if (r.id && r.id === newestId) return r;
+      const { inline: _drop, ...rest } = r;
+      return rest;
+    });
+  };
 
   const addReflection = async (entry) => {
     if (!profileLoaded.current && authSession) {
