@@ -251,6 +251,23 @@ async function refreshSignedUrl(path) {
   }
 }
 
+// HEAD-check a URL to confirm it actually serves an object. createSignedUrl()
+// happily signs ANY path — even one whose object no longer exists — so we can't
+// trust a non-null signed URL alone to mean "recoverable." A 200 here is the
+// real proof. Failures (timeout / network / 4xx / 5xx) → returns false.
+async function urlReachable(url, timeoutMs = 4000) {
+  if (!url) return false;
+  try {
+    const controller = new AbortController();
+    const t = setTimeout(() => controller.abort(), timeoutMs);
+    const resp = await fetch(url, { method: "HEAD", signal: controller.signal });
+    clearTimeout(t);
+    return resp.ok;
+  } catch {
+    return false;
+  }
+}
+
 // ---------------------------------------------------------------------------
 // CAPTURE FLOW
 // ---------------------------------------------------------------------------
@@ -423,7 +440,7 @@ function CaptureFlow({ onClose, onComplete }) {
 // position and slides each in from the right with a staggered delay.
 // ---------------------------------------------------------------------------
 
-function TriptychImage({ src, alt, placeholderFontSize = 11 }) {
+function TriptychImage({ src, alt, placeholderFontSize = 11, onError }) {
   const [status, setStatus] = useState("loading"); // loading | ready | error
   const [revealed, setRevealed] = useState(false);
 
@@ -445,6 +462,11 @@ function TriptychImage({ src, alt, placeholderFontSize = 11 }) {
     const id = requestAnimationFrame(() => setRevealed(true));
     return () => cancelAnimationFrame(id);
   }, [status]);
+
+  // Notify parent on failure so the gallery card can offer a manual remove.
+  useEffect(() => {
+    if (status === "error" && typeof onError === "function") onError();
+  }, [status, onError]);
 
   if (!src || status === "error") {
     return (
@@ -554,13 +576,17 @@ function ExpandedEntry({ entry, onClose }) {
 // GALLERY ENTRY
 // ---------------------------------------------------------------------------
 
-function GalleryEntry({ entry, onExpand, caption }) {
+function GalleryEntry({ entry, onExpand, onRemove, caption }) {
   const src = entry.url || entry.inline;
   // Reveal once the entry scrolls into view. Disconnects after the first
   // intersection so the animation never replays on exit. Browsers without
   // IntersectionObserver fall back to immediately-visible.
   const ref = useRef(null);
   const [revealed, setRevealed] = useState(false);
+  // Track image-load failure so we can offer a manual remove on "unavailable".
+  const [hasError, setHasError] = useState(!src);
+  useEffect(() => { setHasError(!src); }, [src]);
+
   useEffect(() => {
     const node = ref.current;
     if (!node) return;
@@ -579,39 +605,70 @@ function GalleryEntry({ entry, onExpand, caption }) {
   }, []);
 
   return (
-    <button onClick={onExpand} ref={ref}
+    <div ref={ref}
       style={{
-        display: "block", width: "100%", margin: "0 auto 48px",
-        background: "none", border: "none", padding: 0, cursor: "pointer",
-        textAlign: "center", color: TEXT,
+        position: "relative", width: "100%", margin: "0 auto 48px",
         opacity: revealed ? 1 : 0,
         transform: revealed ? "translateY(0)" : "translateY(16px)",
         transition: "opacity 500ms ease-out, transform 500ms ease-out",
         willChange: "opacity, transform",
       }}>
-      <p style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(250,249,244,0.6)", margin: "0 0 4px" }}>
-        Week {entry.weekNumber}
-      </p>
-      <h3 style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 4px", lineHeight: 1.2 }}>
-        {getMoonPhase(new Date(entry.date))}
-      </h3>
-      <p style={{ fontFamily: SANS, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: "rgba(250,249,244,0.6)", margin: "0 0 18px" }}>
-        {formatDateLong(entry.date)}
-      </p>
-      <div style={{
-        width: "100%", maxWidth: 520, margin: "0 auto",
-        borderTop: `1px solid ${BORDER}`,
-        borderBottom: `1px solid ${BORDER}`,
-        boxShadow: "0 18px 44px rgba(0,0,0,0.2)",
-      }}>
-        <TriptychImage src={src} alt={`Reflection week ${entry.weekNumber}`} />
-      </div>
-      {caption && (
-        <p style={{ fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 400, color: "rgba(250,249,244,0.6)", textAlign: "center", margin: "12px 0 0", letterSpacing: "0.02em", lineHeight: 1.4 }}>
-          {caption}
+      <button onClick={onExpand}
+        style={{
+          display: "block", width: "100%",
+          background: "none", border: "none", padding: 0, cursor: "pointer",
+          textAlign: "center", color: TEXT,
+        }}>
+        <p style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(250,249,244,0.6)", margin: "0 0 4px" }}>
+          Week {entry.weekNumber}
         </p>
+        <h3 style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 4px", lineHeight: 1.2 }}>
+          {getMoonPhase(new Date(entry.date))}
+        </h3>
+        <p style={{ fontFamily: SANS, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: "rgba(250,249,244,0.6)", margin: "0 0 18px" }}>
+          {formatDateLong(entry.date)}
+        </p>
+        <div style={{
+          width: "100%", maxWidth: 520, margin: "0 auto",
+          borderTop: `1px solid ${BORDER}`,
+          borderBottom: `1px solid ${BORDER}`,
+          boxShadow: "0 18px 44px rgba(0,0,0,0.2)",
+        }}>
+          <TriptychImage
+            src={src}
+            alt={`Reflection week ${entry.weekNumber}`}
+            onError={() => setHasError(true)}
+          />
+        </div>
+        {caption && (
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 400, color: "rgba(250,249,244,0.6)", textAlign: "center", margin: "12px 0 0", letterSpacing: "0.02em", lineHeight: 1.4 }}>
+            {caption}
+          </p>
+        )}
+      </button>
+
+      {hasError && onRemove && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onRemove(entry.id); }}
+          aria-label={`Remove Week ${entry.weekNumber} reflection`}
+          style={{
+            position: "absolute",
+            top: 72, right: 8,
+            background: "rgba(28,28,26,0.65)",
+            border: "1px solid rgba(250,249,244,0.4)",
+            borderRadius: 999,
+            width: 30, height: 30,
+            display: "inline-flex", alignItems: "center", justifyContent: "center",
+            color: "var(--color-ivory, #faf9f4)",
+            cursor: "pointer",
+            WebkitTapHighlightColor: "transparent",
+            zIndex: 2,
+          }}
+        >
+          <Icon name="x" size={12} />
+        </button>
       )}
-    </button>
+    </div>
   );
 }
 
@@ -719,11 +776,13 @@ function Reflection({ reflections = [], onAddReflection, onReplaceReflections, p
     return () => { cancelled = true; };
   }, [reflectionsFingerprint]);
 
-  // One-time cleanup: drop stranded entries that have no displayable source —
-  // no url, no inline, and no storage path from which a signed URL can be
-  // recovered. (e.g. a legacy entry whose photo never made it to storage and
-  // whose inline fallback was stripped.) Runs once per mount, after reflections
-  // are available; only writes back when something is actually removed.
+  // One-time cleanup: drop entries whose photo is unrecoverable. We have to
+  // actually verify URLs load — createSignedUrl() signs ANY path and a stored
+  // `url` may be a stale/broken (e.g. pre-#28 public-URL) string, so simple
+  // truthiness checks falsely keep stranded entries. inline data URLs are
+  // always displayable; otherwise the stored url and a fresh signed-from-path
+  // url are HEAD-checked. Runs once per mount; only writes back when something
+  // is actually removed.
   const cleanupRan = useRef(false);
   useEffect(() => {
     if (cleanupRan.current) return;
@@ -731,25 +790,29 @@ function Reflection({ reflections = [], onAddReflection, onReplaceReflections, p
     cleanupRan.current = true;
     let cancelled = false;
     (async () => {
-      const keep = [];
-      const dropped = [];
-      for (const r of reflections) {
-        const hasUrl = !!(r?.url && String(r.url).trim());
-        const hasInline = !!(r?.inline && String(r.inline).trim());
-        if (hasUrl || hasInline) { keep.push(r); continue; }
-        // No stored source — recoverable only if a signed URL can be generated.
-        if (r?.path) {
-          const recovered = await refreshSignedUrl(r.path);
-          if (cancelled) return;
-          if (recovered) { keep.push(r); continue; }
+      const results = await Promise.all(reflections.map(async (r) => {
+        const inline = r?.inline && String(r.inline).trim();
+        if (inline) return { r, keep: true, reason: "inline" };
+        const storedUrl = r?.url && String(r.url).trim();
+        if (storedUrl && await urlReachable(storedUrl)) {
+          return { r, keep: true, reason: "stored-url" };
         }
-        dropped.push(r);
-      }
-      if (!cancelled && dropped.length > 0 && onReplaceReflections) {
+        if (r?.path) {
+          const fresh = await refreshSignedUrl(r.path);
+          if (fresh && await urlReachable(fresh)) {
+            return { r, keep: true, reason: "signed-from-path" };
+          }
+        }
+        return { r, keep: false };
+      }));
+      if (cancelled) return;
+      const keep = results.filter(x => x.keep).map(x => x.r);
+      const dropped = results.filter(x => !x.keep).map(x => x.r);
+      if (dropped.length > 0 && onReplaceReflections) {
         console.warn(
           "[Cygne reflection] cleanup removing", dropped.length,
           "stranded entr" + (dropped.length === 1 ? "y" : "ies") + ":",
-          dropped.map(d => ({ id: d?.id, week: d?.weekNumber, path: d?.path })),
+          dropped.map(d => ({ id: d?.id, week: d?.weekNumber, path: d?.path, hadUrl: !!d?.url, hadInline: !!d?.inline })),
         );
         onReplaceReflections(keep);
       }
@@ -883,6 +946,11 @@ function Reflection({ reflections = [], onAddReflection, onReplaceReflections, p
                 key={item.data.id}
                 entry={decorate(item.data)}
                 onExpand={() => setExpandedId(item.data.id)}
+                onRemove={onReplaceReflections ? (id) => {
+                  const next = reflections.filter(r => r?.id !== id);
+                  console.warn("[Cygne reflection] manual remove:", { id, week: item.data.weekNumber });
+                  onReplaceReflections(next);
+                } : undefined}
                 caption={idx === 0 ? "The week is behind you." : null}
               />
             ))}
