@@ -805,7 +805,7 @@ export default function App() {
           --overlay:            rgba(8,12,8,0.6);
           --sage:               var(--color-ivory);
           --cta:                rgba(250,249,244,0.08);
-          --color-ivory-shadow: rgba(255,255,255,0.06);
+          --color-ivory-shadow: rgba(250, 249, 244, 0.82);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         input, select, textarea { outline: none; }
