@@ -241,12 +241,12 @@ async function refreshSignedUrl(path) {
       .createSignedUrl(path, 60 * 60 * 24 * 7); // 1 week
     if (error) {
       const status = error.status || error.statusCode || "?";
-      console.warn("[Cygne reflection] refresh signed URL failed for", path, "| status:", status, "| message:", error.message);
+      console.error("[Cygne reflection] refresh signed URL failed for", path, "| status:", status, "| message:", error.message);
       return null;
     }
     return data?.signedUrl || null;
   } catch (e) {
-    console.warn("[Cygne reflection] refresh signed URL threw for", path, "|", e?.message || e);
+    console.error("[Cygne reflection] refresh signed URL threw for", path, "|", e?.message || e);
     return null;
   }
 }
@@ -440,22 +440,38 @@ function CaptureFlow({ onClose, onComplete }) {
 // position and slides each in from the right with a staggered delay.
 // ---------------------------------------------------------------------------
 
-function TriptychImage({ src, alt, placeholderFontSize = 11, onError }) {
+function TriptychImage({ src, fallbackSrc, alt, placeholderFontSize = 11, onError }) {
   const [status, setStatus] = useState("loading"); // loading | ready | error
   const [revealed, setRevealed] = useState(false);
+  // `activeSrc` is what we actually render. We try `src` first and fall back to
+  // `fallbackSrc` if the primary image fails to load — covers the common case
+  // where the stored signed URL has expired or is otherwise unreachable but
+  // the inline data URL carrier is still present locally.
+  const [activeSrc, setActiveSrc] = useState(src || fallbackSrc || null);
 
   useEffect(() => {
-    if (!src) { setStatus("error"); return; }
-    setStatus("loading");
+    setActiveSrc(src || fallbackSrc || null);
+    setStatus(src || fallbackSrc ? "loading" : "error");
     setRevealed(false);
+  }, [src, fallbackSrc]);
+
+  useEffect(() => {
+    if (!activeSrc) { setStatus("error"); return; }
+    setStatus("loading");
     const img = new Image();
     img.onload = () => setStatus("ready");
     img.onerror = () => {
-      console.warn("[Cygne reflection] image failed to load:", src);
+      // First failure: switch to the fallback if we haven't tried it yet.
+      if (fallbackSrc && activeSrc !== fallbackSrc) {
+        console.warn("[Cygne reflection] primary image failed, falling back to inline:", String(activeSrc).slice(0, 80));
+        setActiveSrc(fallbackSrc);
+        return;
+      }
+      console.error("[Cygne reflection] image failed to load (no fallback available):", String(activeSrc).slice(0, 80));
       setStatus("error");
     };
-    img.src = src;
-  }, [src]);
+    img.src = activeSrc;
+  }, [activeSrc, fallbackSrc]);
 
   useEffect(() => {
     if (status !== "ready") return;
@@ -468,7 +484,7 @@ function TriptychImage({ src, alt, placeholderFontSize = 11, onError }) {
     if (status === "error" && typeof onError === "function") onError();
   }, [status, onError]);
 
-  if (!src || status === "error") {
+  if (!activeSrc || status === "error") {
     return (
       <div style={{
         width: "100%", aspectRatio: "3/1.3",
@@ -486,7 +502,7 @@ function TriptychImage({ src, alt, placeholderFontSize = 11, onError }) {
       {[0, 1, 2].map((i) => (
         <div key={i} style={{
           flex: 1,
-          backgroundImage: `url(${src})`,
+          backgroundImage: `url(${activeSrc})`,
           backgroundSize: "300% 100%",
           backgroundPosition: `${i * 50}% 50%`,
           opacity: revealed ? 1 : 0,
@@ -546,7 +562,7 @@ function ExpandedEntry({ entry, onClose }) {
           borderBottom: `1px solid ${BORDER}`,
           boxShadow: "0 30px 80px rgba(0,0,0,0.3)",
         }}>
-        <TriptychImage src={src} alt={`Reflection for week ${entry.weekNumber}`} placeholderFontSize={12} />
+        <TriptychImage src={src} fallbackSrc={entry.inline} alt={`Reflection for week ${entry.weekNumber}`} placeholderFontSize={12} />
       </div>
 
       <div onClick={(e) => e.stopPropagation()}
@@ -636,6 +652,7 @@ function GalleryEntry({ entry, onExpand, onRemove, caption }) {
         }}>
           <TriptychImage
             src={src}
+            fallbackSrc={entry.inline}
             alt={`Reflection week ${entry.weekNumber}`}
             onError={() => setHasError(true)}
           />

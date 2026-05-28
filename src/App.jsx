@@ -321,7 +321,10 @@ export default function App() {
             const cloud = byId.get(r.id);
             if (!cloud) {
               byId.set(r.id, r);
-            } else if (!cloud.url && !cloud.path && r.inline) {
+            } else if (!cloud.inline && r.inline) {
+              // Cloud stripped inline to keep user_metadata small; preserve the
+              // local copy so the gallery always has an inline fallback when the
+              // signed URL is stale / unreachable.
               byId.set(r.id, { ...cloud, inline: r.inline });
             }
           }
@@ -505,9 +508,18 @@ export default function App() {
 
   const addReflection = async (entry) => {
     if (!profileLoaded.current && authSession) {
-      console.warn("[Cygne] reflection save blocked — profile not loaded yet");
+      console.error("[Cygne] reflection save BLOCKED — profile not loaded yet (entry NOT persisted)");
       return;
     }
+    console.log("[Cygne] addReflection received:", {
+      id: entry?.id,
+      week: entry?.weekNumber,
+      hasPath: !!entry?.path,
+      hasUrl: !!entry?.url,
+      urlLength: entry?.url?.length || 0,
+      hasInline: !!entry?.inline,
+      inlineLength: entry?.inline?.length || 0,
+    });
     // Replace any existing entry for the same ISO (week, week-year) so a
     // re-capture overwrites cleanly. ISO week-year is used here (not the
     // calendar year) so a year boundary doesn't misclassify the match.
@@ -521,11 +533,18 @@ export default function App() {
     // it and persist today's date so it doesn't reappear for the rest of today.
     dismissReflectionPrompt();
     if (authSession) {
+      const payload = stripInlineForCloud(next);
+      const payloadBytes = JSON.stringify(payload).length;
+      console.log("[Cygne] updateUser attempt: reflections payload bytes:", payloadBytes, "| entries:", payload.length);
       try {
-        await supabase.auth.updateUser({ data: { reflections: stripInlineForCloud(next) } });
-        console.log("[Cygne] reflection saved to Supabase — total:", next.length, "(inline stripped)");
+        const { error } = await supabase.auth.updateUser({ data: { reflections: payload } });
+        if (error) {
+          console.error("[Cygne] updateUser RETURNED ERROR:", error.message || error, "| status:", error.status || "n/a", "| code:", error.code || "n/a");
+        } else {
+          console.log("[Cygne] reflection saved to Supabase — total:", next.length, "(inline retained on newest)");
+        }
       } catch (e) {
-        console.error("[Cygne] reflection save failed:", e);
+        console.error("[Cygne] updateUser THREW:", e?.message ?? e, e);
       }
     }
   };
@@ -534,7 +553,11 @@ export default function App() {
   // applies so we don't blow the user_metadata size limit.
   useEffect(() => {
     if (!profileLoaded.current || !authSession) return;
-    supabase.auth.updateUser({ data: { reflections: stripInlineForCloud(reflections) } }).catch(() => {});
+    supabase.auth.updateUser({ data: { reflections: stripInlineForCloud(reflections) } })
+      .then(({ error }) => {
+        if (error) console.error("[Cygne] belt-and-suspenders reflections sync FAILED:", error.message || error, "| status:", error.status || "n/a");
+      })
+      .catch(e => console.error("[Cygne] belt-and-suspenders reflections sync THREW:", e?.message ?? e));
   }, [reflections]);
 
   // -- Weekly reflection reminder --------------------------------------------
