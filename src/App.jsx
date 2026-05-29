@@ -481,26 +481,16 @@ export default function App() {
   // When the storage upload FAILS (no bucket, RLS, network), inline is the
   // only copy of the photo we have, so we must let it through to
   // user_metadata or the entry won't round-trip on reload.
+  // Inline base64 is NEVER stored in user_metadata. A triptych data URL can
+  // exceed the GoTrue metadata size limit and cause updateUser to reject the
+  // whole request (Chrome surfaces this as "Failed to load resource: bad URL"
+  // on the /auth/v1/user endpoint). Local React state + localStorage keep the
+  // inline copy for same-session and same-device reload, and the auth-load
+  // merge preserves local inline whenever the cloud entry lacks one.
   const stripInlineForCloud = (rs) => {
     if (!Array.isArray(rs) || rs.length === 0) return rs;
-    // Keep the inline base64 on the newest entry — so the freshly captured
-    // photo displays on first load without depending on a signed-URL refresh —
-    // and strip it from every older entry so user_metadata stays small. The
-    // upload-failure carrier case (no path) still keeps inline regardless.
-    let newestId = null;
-    let newestTime = -Infinity;
-    for (const r of rs) {
-      if (!r?.date) continue;
-      const t = new Date(r.date).getTime();
-      if (Number.isFinite(t) && t > newestTime) {
-        newestTime = t;
-        newestId = r.id;
-      }
-    }
     return rs.map(r => {
       if (!r) return r;
-      if (!r.path) return r;
-      if (r.id && r.id === newestId) return r;
       const { inline: _drop, ...rest } = r;
       return rest;
     });
@@ -535,16 +525,36 @@ export default function App() {
     if (authSession) {
       const payload = stripInlineForCloud(next);
       const payloadBytes = JSON.stringify(payload).length;
-      console.log("[Cygne] updateUser attempt: reflections payload bytes:", payloadBytes, "| entries:", payload.length);
+      console.log("[Cygne] updateUser attempt | reflections payload bytes:", payloadBytes, "| entries:", payload.length);
       try {
         const { error } = await supabase.auth.updateUser({ data: { reflections: payload } });
         if (error) {
-          console.error("[Cygne] updateUser RETURNED ERROR:", error.message || error, "| status:", error.status || "n/a", "| code:", error.code || "n/a");
+          // Dump every property off the error — including non-enumerable ones —
+          // so the raw HTTP status / response body reach the console BEFORE
+          // Chrome relabels the failure as "Failed to load resource: bad URL".
+          const dump = {};
+          for (const k of Object.getOwnPropertyNames(error)) dump[k] = error[k];
+          console.error(
+            "[Cygne] updateUser FAILED",
+            "| http_status:", error.status ?? "n/a",
+            "| code:", error.code ?? "n/a",
+            "| name:", error.name ?? "n/a",
+            "| message:", error.message ?? String(error),
+            "| payload_bytes:", payloadBytes,
+            "| raw_error:", dump,
+          );
         } else {
-          console.log("[Cygne] reflection saved to Supabase — total:", next.length, "(inline retained on newest)");
+          console.log("[Cygne] reflection saved to Supabase — total:", next.length, "| payload bytes:", payloadBytes, "(inline stripped)");
         }
       } catch (e) {
-        console.error("[Cygne] updateUser THREW:", e?.message ?? e, e);
+        const dump = {};
+        if (e) for (const k of Object.getOwnPropertyNames(e)) dump[k] = e[k];
+        console.error(
+          "[Cygne] updateUser THREW",
+          "| message:", e?.message ?? String(e),
+          "| payload_bytes:", payloadBytes,
+          "| raw_error:", dump,
+        );
       }
     }
   };
@@ -553,11 +563,35 @@ export default function App() {
   // applies so we don't blow the user_metadata size limit.
   useEffect(() => {
     if (!profileLoaded.current || !authSession) return;
-    supabase.auth.updateUser({ data: { reflections: stripInlineForCloud(reflections) } })
+    const payload = stripInlineForCloud(reflections);
+    const payloadBytes = JSON.stringify(payload).length;
+    console.log("[Cygne] belt-and-suspenders updateUser attempt | reflections payload bytes:", payloadBytes, "| entries:", payload.length);
+    supabase.auth.updateUser({ data: { reflections: payload } })
       .then(({ error }) => {
-        if (error) console.error("[Cygne] belt-and-suspenders reflections sync FAILED:", error.message || error, "| status:", error.status || "n/a");
+        if (error) {
+          const dump = {};
+          for (const k of Object.getOwnPropertyNames(error)) dump[k] = error[k];
+          console.error(
+            "[Cygne] belt-and-suspenders reflections sync FAILED",
+            "| http_status:", error.status ?? "n/a",
+            "| code:", error.code ?? "n/a",
+            "| name:", error.name ?? "n/a",
+            "| message:", error.message ?? String(error),
+            "| payload_bytes:", payloadBytes,
+            "| raw_error:", dump,
+          );
+        }
       })
-      .catch(e => console.error("[Cygne] belt-and-suspenders reflections sync THREW:", e?.message ?? e));
+      .catch(e => {
+        const dump = {};
+        if (e) for (const k of Object.getOwnPropertyNames(e)) dump[k] = e[k];
+        console.error(
+          "[Cygne] belt-and-suspenders reflections sync THREW",
+          "| message:", e?.message ?? String(e),
+          "| payload_bytes:", payloadBytes,
+          "| raw_error:", dump,
+        );
+      });
   }, [reflections]);
 
   // -- Weekly reflection reminder --------------------------------------------
