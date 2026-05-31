@@ -192,6 +192,25 @@ async function fetchRampLog(db, userId) {
 // Lists every in-routine product with a routineStartDate and a detectable ramp
 // active, with current week / total weeks, hold status, start date, and the
 // most recent rampLog action when present. Returns "" when nothing is ramping.
+// Race a promise against a deadline. If the promise hasn't settled by
+// `timeoutMs`, resolve with `fallback` so the caller can keep going without
+// that piece of context. Used to keep admin getUserById calls from holding the
+// whole function past Vercel Hobby's 10-second limit.
+function withTimeout(promise, timeoutMs, fallback, label) {
+  let timer;
+  const timeout = new Promise((resolve) => {
+    timer = setTimeout(() => {
+      console.warn(`[ask-cygne] ${label} timed out after ${timeoutMs}ms — continuing without it`);
+      resolve(fallback);
+    }, timeoutMs);
+  });
+  return Promise.race([
+    promise.then((value) => { clearTimeout(timer); return value; })
+           .catch((e)   => { clearTimeout(timer); console.warn(`[ask-cygne] ${label} threw — continuing without it:`, e?.message ?? e); return fallback; }),
+    timeout,
+  ]);
+}
+
 function formatIntroduceSlowly(products, rampLog) {
   if (!Array.isArray(products) || !products.length) return "";
   const log = Array.isArray(rampLog) ? rampLog : [];
@@ -283,14 +302,24 @@ export default async function handler(req, res) {
       return res.status(200).json({ response: cached.response, cached: true });
     }
 
-    // ── B. USAGE LIMIT CHECK ──────────────────────────────────────────────────
+    // ── B+C. PARALLEL: usage check, reflections fetch, rampLog fetch ─────────
+    // All three fire at once. Reflections + rampLog (admin getUserById calls)
+    // get a 3s deadline so a slow admin API doesn't push the whole function
+    // past Vercel Hobby's 10-second cap; on timeout we proceed without that
+    // context rather than failing the whole request.
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
-    const { count } = await db
+    const usagePromise = db
       .from("ask_cygne_usage")
       .select("*", { count: "exact", head: true })
       .eq("user_id", userId)
       .gte("created_at", todayStart.toISOString());
+
+    const [{ count }, recentReflections, rampLog] = await Promise.all([
+      usagePromise,
+      withTimeout(fetchRecentReflections(db, userId, 5), 3000, [], "reflections fetch"),
+      withTimeout(fetchRampLog(db, userId), 3000, [], "rampLog fetch"),
+    ]);
 
     if ((count ?? 0) >= 3) {
       // Return 200 with a soft-error payload so the client surfaces the body.
@@ -301,12 +330,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // ── C. BUILD CONTEXT ──────────────────────────────────────────────────────
     const contextSummary = buildContextFromBody(body);
-    const [recentReflections, rampLog] = await Promise.all([
-      fetchRecentReflections(db, userId, 5),
-      fetchRampLog(db, userId),
-    ]);
     const reflectionsBlock = formatReflections(recentReflections);
     const introduceSlowlyBlock = formatIntroduceSlowly(body.products, rampLog);
     const systemPrompt = `${SYSTEM_PROMPT_BASE}\n\nUSER CONTEXT:\n${contextSummary}${reflectionsBlock ? `\n\n${reflectionsBlock}` : ""}${introduceSlowlyBlock ? `\n\n${introduceSlowlyBlock}` : ""}`;
