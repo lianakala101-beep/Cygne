@@ -75,6 +75,7 @@ export async function invokeEdgeFunction(functionName, body) {
 
   const { data: { session } } = await supabase.auth.getSession();
   console.log("[Cygne auth] session:", session ? "present" : "NULL", "token length:", session?.access_token?.length);
+  console.log("[Cygne auth] token preview:", session?.access_token?.substring(0, 100));
   if (!session) {
     console.error("[Cygne edge] no session — user is not signed in");
     throw new Error("Not signed in. Please log in and try again.");
