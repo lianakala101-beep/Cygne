@@ -94,16 +94,27 @@ export async function invokeEdgeFunction(functionName, body) {
       body: JSON.stringify(body),
     });
   } catch (e) {
-    console.error("[Cygne edge] network error:", e);
+    console.error("[Cygne API] network error /api/" + functionName, e);
     throw new Error(e?.message || "Edge function call failed");
   }
 
+  // Read the raw body as text first so we ALWAYS capture the underlying server
+  // response — Vercel error pages are HTML, and res.json() would silently throw
+  // and leave us with null instead of the real failure message. Parse to JSON
+  // optionally; the raw text is what gets logged on failure.
+  const rawText = await res.text().catch(() => "");
   let data = null;
-  try { data = await res.json(); } catch { /* non-JSON / empty body */ }
+  if (rawText) {
+    try { data = JSON.parse(rawText); } catch { /* response wasn't JSON — keep rawText */ }
+  }
 
   if (!res.ok) {
-    const message = data?.error || `Edge function returned ${res.status}`;
-    console.error("[Cygne edge] error:", res.status, data);
+    // Surface the actual HTTP status + URL + raw body BEFORE Chrome can
+    // relabel the failure as "Load failed" / "bad URL". This is the line that
+    // tells you whether it's 401 (auth), 404 (not deployed), 500 (function
+    // crash), 504 (timeout), 413 (payload too large), or something else.
+    console.error("[Cygne API] HTTP", res.status, `/api/${functionName}`, rawText || "(empty body)");
+    const message = data?.error || rawText || `Edge function returned ${res.status}`;
     throw new Error(message);
   }
 
