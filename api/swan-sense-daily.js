@@ -184,6 +184,25 @@ async function fetchRampLog(db, userId) {
 // Lists every in-routine product with a routineStartDate and a detectable ramp
 // active, with current week / total weeks, hold status, start date, and the
 // most recent rampLog action when present. Returns "" when nothing is ramping.
+// Race a promise against a deadline. If the promise hasn't settled by
+// `timeoutMs`, resolve with `fallback` so the caller can keep going without
+// that piece of context. Used to keep admin getUserById calls from holding the
+// whole function past Vercel Hobby's 10-second limit.
+function withTimeout(promise, timeoutMs, fallback, label) {
+  let timer;
+  const timeout = new Promise((resolve) => {
+    timer = setTimeout(() => {
+      console.warn(`[swan-sense-daily] ${label} timed out after ${timeoutMs}ms — continuing without it`);
+      resolve(fallback);
+    }, timeoutMs);
+  });
+  return Promise.race([
+    promise.then((value) => { clearTimeout(timer); return value; })
+           .catch((e)   => { clearTimeout(timer); console.warn(`[swan-sense-daily] ${label} threw — continuing without it:`, e?.message ?? e); return fallback; }),
+    timeout,
+  ]);
+}
+
 function formatIntroduceSlowly(products, rampLog) {
   if (!Array.isArray(products) || !products.length) return "";
   const log = Array.isArray(rampLog) ? rampLog : [];
@@ -280,9 +299,12 @@ export default async function handler(req, res) {
 
     // ── B. CALL CLAUDE ───────────────────────────────────────────────────────
     const context = buildContext(body);
+    // 3s deadline on each admin getUserById so the whole function can't be
+    // held past Vercel Hobby's 10-second cap by a slow admin API call; on
+    // timeout we proceed without that piece of context.
     const [recentReflections, rampLog] = await Promise.all([
-      fetchRecentReflections(db, userId, 5),
-      fetchRampLog(db, userId),
+      withTimeout(fetchRecentReflections(db, userId, 5), 3000, [], "reflections fetch"),
+      withTimeout(fetchRampLog(db, userId), 3000, [], "rampLog fetch"),
     ]);
     const reflectionsBlock = formatReflections(recentReflections);
     const introduceSlowlyBlock = formatIntroduceSlowly(body.products, rampLog);
