@@ -191,11 +191,13 @@ async function uploadTriptych(userId, entryId, dataUrl) {
   const path = `${userId}/${entryId}.jpg`;
   console.log("[Cygne reflection] uploading to reflections/" + path, "| size:", blob.size, "bytes");
   try {
+    const { data: { session: uploadSession } } = await supabase.auth.getSession();
+    console.log("[Cygne reflection] session at upload time:", uploadSession ? "present" : "NULL", "uid:", uploadSession?.user?.id);
     const { data: upData, error: upErr } = await supabase.storage
       .from("reflections")
       .upload(path, blob, { contentType: "image/jpeg", upsert: true });
     if (upErr) {
-      console.error("[Cygne reflection] upload error:", upErr.status || "", upErr.message, upErr);
+      console.error("[Cygne reflection] upload error FULL:", JSON.stringify(upErr), upErr.status, upErr.message, upErr.statusCode, upErr.error);
       return { path: null, url: null, inline: dataUrl };
     }
     console.log("[Cygne reflection] upload ok:", upData);
