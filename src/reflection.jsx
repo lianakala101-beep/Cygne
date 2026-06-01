@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "./components.jsx";
-import { supabase, supabaseUrl, supabaseAnonKey } from "./supabase.js";
+import { supabase } from "./supabase.js";
 import { getSwanSensePredictions } from "./swansense.jsx";
 import { compressImageBlob, isoWeekNumber, isoWeekYear } from "./utils.jsx";
 
@@ -160,100 +160,60 @@ function fileToDataUrl(file) {
   });
 }
 
-// Convert a data URL to a Blob for upload.
-function dataUrlToBlob(dataUrl) {
-  const [header, b64] = dataUrl.split(",");
-  const mime = (header.match(/data:(.*?);/) || [])[1] || "image/jpeg";
-  const bin = atob(b64);
-  const arr = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
-  return new Blob([arr], { type: mime });
-}
-
-// Upload the stitched triptych to Supabase Storage and return a signed URL.
-// We prefer signed URLs so the gallery works with private buckets + RLS
-// (which is the right default for per-user photos). Falls back to a public
-// URL, then to the inline data URL if storage isn't configured at all.
-// The first folder segment of the upload path must equal the caller's
-// auth.uid()::text for the RLS policy in the reflections bucket migration
-// to allow the write. A loose "local" or missing userId would write to a
-// folder no one can ever read back. Refuse those uploads up-front so we
-// fall through to the inline data-URL fallback cleanly instead of leaving
-// orphaned objects in storage.
+// Upload the stitched triptych to Supabase Storage via /api/upload-reflection.
+// Routing through a serverless function with the service-role key keeps the
+// client's (oversized) JWT off the Storage gateway, which rejects Authorization
+// headers above ~8KB with an opaque HTTP 400. The function returns a 7-day
+// signed URL on success; on any failure we fall back to the inline data URL.
+//
+// The first folder segment of the path must equal the caller's auth.uid()::text
+// for RLS on /storage/v1/object reads to work — the upload itself is via service
+// role so it bypasses RLS, but reads still hit RLS. A loose "local" or missing
+// userId would write to a folder no one can ever read back. Refuse those uploads
+// up-front so we fall through to the inline data-URL fallback cleanly instead of
+// leaving orphaned objects in storage.
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 async function uploadTriptych(userId, entryId, dataUrl) {
-  const blob = dataUrlToBlob(dataUrl);
   if (!userId || !UUID_RE.test(String(userId))) {
-    console.error("[Cygne reflection] refusing storage upload — invalid userId:", userId, "(expected auth UUID). Falling back to inline.");
+    console.error("[Cygne reflection] refusing upload — invalid userId:", userId, "(expected auth UUID). Falling back to inline.");
     return { path: null, url: null, inline: dataUrl };
   }
-  const path = `${userId}/${entryId}.jpg`;
-  console.log("[Cygne reflection] uploading to reflections/" + path, "| size:", blob.size, "bytes");
+  // Strip any "data:image/jpeg;base64," prefix — the server accepts both, but
+  // sending raw base64 cuts a few bytes per request.
+  const imageBase64 = typeof dataUrl === "string" && dataUrl.startsWith("data:")
+    ? dataUrl.slice(dataUrl.indexOf(",") + 1)
+    : dataUrl;
+  console.log("[Cygne reflection] uploading via /api/upload-reflection | userId:", userId, "| entryId:", entryId, "| base64 chars:", imageBase64.length);
   try {
-    const { data: { session: uploadSession } } = await supabase.auth.getSession();
-    console.log("[Cygne reflection] session at upload time:", uploadSession ? "present" : "NULL", "uid:", uploadSession?.user?.id);
-    const { data: upData, error: upErr } = await supabase.storage
-      .from("reflections")
-      .upload(path, blob, { contentType: "image/jpeg", upsert: true });
-    if (upErr) {
-      console.error("[Cygne reflection] upload error FULL:", JSON.stringify(upErr), upErr.status, upErr.message, upErr.statusCode, upErr.error);
-      // Diagnostic: supabase-js swallows the raw response body on storage
-      // errors, so re-issue the same POST via fetch() and log the verbatim
-      // status + body text the storage gateway is returning. (If the retry
-      // happens to succeed transiently, the file is orphan-only — we still
-      // return the inline carrier below; the original upload attempt has
-      // already aborted.)
-      try {
-        const diagUrl = `${supabaseUrl}/storage/v1/object/reflections/${path}`;
-        const diagRes = await fetch(diagUrl, {
-          method: "POST",
-          headers: {
-            "Content-Type": "image/jpeg",
-            "Authorization": `Bearer ${uploadSession?.access_token ?? ""}`,
-            "apikey": supabaseAnonKey,
-            "x-upsert": "true",
-          },
-          body: blob,
-        });
-        const diagText = await diagRes.text().catch(() => "<could not read body>");
-        const headersDump = {};
-        diagRes.headers.forEach((v, k) => { headersDump[k] = v; });
-        console.error(
-          "[Cygne reflection] RAW upload diagnostic",
-          "| status:", diagRes.status,
-          "| auth_header_bytes:", (uploadSession?.access_token?.length ?? 0) + "Bearer ".length,
-          "| body:", diagText,
-          "| response_headers:", headersDump,
-        );
-      } catch (diagErr) {
-        console.error("[Cygne reflection] RAW upload diagnostic threw:", diagErr?.message ?? diagErr);
-      }
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      console.error("[Cygne reflection] no session at upload time — falling back to inline");
       return { path: null, url: null, inline: dataUrl };
     }
-    console.log("[Cygne reflection] upload ok:", upData);
-
-    // Match the load-time refresh expiry (1 week). The gallery regenerates this
-    // signed URL on every load, so a long-lived URL adds no value and risks
-    // being rejected — which would leave the entry without a working URL.
-    const { data: signed, error: signedErr } = await supabase.storage
-      .from("reflections")
-      .createSignedUrl(path, 60 * 60 * 24 * 7); // 1 week
-    if (signed?.signedUrl) {
-      console.log("[Cygne reflection] signed URL:", signed.signedUrl);
-      return { path, url: signed.signedUrl };
+    const res = await fetch("/api/upload-reflection", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ userId, entryId, imageBase64 }),
+    });
+    const rawText = await res.text().catch(() => "");
+    let data = null;
+    if (rawText) { try { data = JSON.parse(rawText); } catch { /* not JSON */ } }
+    if (!res.ok) {
+      console.error("[Cygne reflection] /api/upload-reflection HTTP", res.status, rawText || "(empty body)");
+      return { path: null, url: null, inline: dataUrl };
     }
-    console.error("[Cygne reflection] createSignedUrl error:", signedErr?.status || "", signedErr?.message || "no url");
-
-    // The reflections bucket is PRIVATE, so getPublicUrl() would hand back a
-    // URL that 403s — storing it masks the failure and the gallery shows
-    // "Image unavailable". Instead keep the inline data URL as the carrier; the
-    // gallery regenerates a signed URL from `path` on load, and inline covers
-    // the gap if that refresh ever fails.
-    console.error("[Cygne reflection] no signed URL after upload — keeping inline as the carrier");
-    return { path, url: null, inline: dataUrl };
+    if (!data?.path || !data?.url) {
+      console.error("[Cygne reflection] /api/upload-reflection returned unexpected shape:", data);
+      return { path: null, url: null, inline: dataUrl };
+    }
+    console.log("[Cygne reflection] upload ok | path:", data.path);
+    return { path: data.path, url: data.url };
   } catch (e) {
-    console.error("[Cygne reflection] storage upload failed, falling back to inline:", e?.message || e);
+    console.error("[Cygne reflection] upload via /api failed, falling back to inline:", e?.message || e);
     return { path: null, url: null, inline: dataUrl };
   }
 }
