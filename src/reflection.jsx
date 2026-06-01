@@ -218,26 +218,36 @@ async function uploadTriptych(userId, entryId, dataUrl) {
   }
 }
 
-// Re-generate a fresh signed URL for an entry on load. Signed URLs expire,
-// so we refresh them each session rather than trusting whatever was stored.
-// On failure, the error.status is logged so the user can distinguish:
-//   400/404 → object missing (path wrong, or bucket recreated and the file
-//             is gone — re-apply the migration won't bring data back)
-//   401/403 → RLS denies (policies missing or auth.uid() doesn't match
-//             the first folder segment — re-apply the migration to fix)
-//   else    → network or transport issue
+// Re-generate a fresh signed URL for an entry on load via /api/sign-reflection.
+// The signed URL is produced server-side with the service-role key, so the
+// client's (oversized) JWT never reaches the Storage gateway — which was
+// rejecting the previous direct supabase.storage.createSignedUrl() call with
+// an opaque HTTP 400. Returns null on any failure (no session, function error,
+// network) so the gallery falls back through entry.url then entry.inline.
 async function refreshSignedUrl(path) {
   if (!path) return null;
   try {
-    const { data, error } = await supabase.storage
-      .from("reflections")
-      .createSignedUrl(path, 60 * 60 * 24 * 7); // 1 week
-    if (error) {
-      const status = error.status || error.statusCode || "?";
-      console.error("[Cygne reflection] refresh signed URL failed for", path, "| status:", status, "| message:", error.message);
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      console.error("[Cygne reflection] refresh signed URL — no session, cannot sign for", path);
       return null;
     }
-    return data?.signedUrl || null;
+    const res = await fetch("/api/sign-reflection", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ userId: session.user.id, path }),
+    });
+    const rawText = await res.text().catch(() => "");
+    let data = null;
+    if (rawText) { try { data = JSON.parse(rawText); } catch { /* not JSON */ } }
+    if (!res.ok) {
+      console.error("[Cygne reflection] /api/sign-reflection HTTP", res.status, "| body:", rawText || "(empty)", "| path:", path);
+      return null;
+    }
+    return data?.url || null;
   } catch (e) {
     console.error("[Cygne reflection] refresh signed URL threw for", path, "|", e?.message || e);
     return null;
