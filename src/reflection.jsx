@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "./components.jsx";
-import { supabase } from "./supabase.js";
+import { supabase, supabaseUrl, supabaseAnonKey } from "./supabase.js";
 import { getSwanSensePredictions } from "./swansense.jsx";
 import { compressImageBlob, isoWeekNumber, isoWeekYear } from "./utils.jsx";
 
@@ -198,6 +198,37 @@ async function uploadTriptych(userId, entryId, dataUrl) {
       .upload(path, blob, { contentType: "image/jpeg", upsert: true });
     if (upErr) {
       console.error("[Cygne reflection] upload error FULL:", JSON.stringify(upErr), upErr.status, upErr.message, upErr.statusCode, upErr.error);
+      // Diagnostic: supabase-js swallows the raw response body on storage
+      // errors, so re-issue the same POST via fetch() and log the verbatim
+      // status + body text the storage gateway is returning. (If the retry
+      // happens to succeed transiently, the file is orphan-only — we still
+      // return the inline carrier below; the original upload attempt has
+      // already aborted.)
+      try {
+        const diagUrl = `${supabaseUrl}/storage/v1/object/reflections/${path}`;
+        const diagRes = await fetch(diagUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "image/jpeg",
+            "Authorization": `Bearer ${uploadSession?.access_token ?? ""}`,
+            "apikey": supabaseAnonKey,
+            "x-upsert": "true",
+          },
+          body: blob,
+        });
+        const diagText = await diagRes.text().catch(() => "<could not read body>");
+        const headersDump = {};
+        diagRes.headers.forEach((v, k) => { headersDump[k] = v; });
+        console.error(
+          "[Cygne reflection] RAW upload diagnostic",
+          "| status:", diagRes.status,
+          "| auth_header_bytes:", (uploadSession?.access_token?.length ?? 0) + "Bearer ".length,
+          "| body:", diagText,
+          "| response_headers:", headersDump,
+        );
+      } catch (diagErr) {
+        console.error("[Cygne reflection] RAW upload diagnostic threw:", diagErr?.message ?? diagErr);
+      }
       return { path: null, url: null, inline: dataUrl };
     }
     console.log("[Cygne reflection] upload ok:", upData);
