@@ -522,7 +522,17 @@ export default function App() {
     // Capturing a reflection satisfies the breakout-zone nudge — auto-dismiss
     // it and persist today's date so it doesn't reappear for the rest of today.
     dismissReflectionPrompt();
-    if (authSession) {
+    // Recover the session before the save: React-state `authSession` can be
+    // null while supabase-js's internal cache still holds a valid session
+    // (initial mount, stale onAuthStateChange, signed-out-in-another-tab race).
+    // getSession() reads the cache without a network call.
+    let sessionForSave = authSession;
+    if (!sessionForSave) {
+      const { data: { session: refreshed } } = await supabase.auth.getSession();
+      sessionForSave = refreshed;
+      console.log("[Cygne] addReflection — authSession was null, refreshed:", refreshed ? "got session" : "still null");
+    }
+    if (sessionForSave) {
       const payload = stripInlineForCloud(next);
       const payloadBytes = JSON.stringify(payload).length;
       console.log("[Cygne] save-reflection-metadata attempt | reflections payload bytes:", payloadBytes, "| entries:", payload.length);
@@ -531,9 +541,9 @@ export default function App() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${authSession.access_token}`,
+            Authorization: `Bearer ${sessionForSave.access_token}`,
           },
-          body: JSON.stringify({ userId: authSession.user.id, reflections: payload }),
+          body: JSON.stringify({ userId: sessionForSave.user.id, reflections: payload }),
         });
         const rawText = await res.text().catch(() => "");
         if (!res.ok) {
@@ -556,6 +566,8 @@ export default function App() {
           "| raw_error:", dump,
         );
       }
+    } else {
+      console.error("[Cygne] addReflection SILENT SKIP — authSession is null at save time. Entry in local state only, will not persist.");
     }
   };
 
