@@ -525,32 +525,32 @@ export default function App() {
     if (authSession) {
       const payload = stripInlineForCloud(next);
       const payloadBytes = JSON.stringify(payload).length;
-      console.log("[Cygne] updateUser attempt | reflections payload bytes:", payloadBytes, "| entries:", payload.length);
+      console.log("[Cygne] save-reflection-metadata attempt | reflections payload bytes:", payloadBytes, "| entries:", payload.length);
       try {
-        const { error } = await supabase.auth.updateUser({ data: { reflections: payload } });
-        if (error) {
-          // Dump every property off the error — including non-enumerable ones —
-          // so the raw HTTP status / response body reach the console BEFORE
-          // Chrome relabels the failure as "Failed to load resource: bad URL".
-          const dump = {};
-          for (const k of Object.getOwnPropertyNames(error)) dump[k] = error[k];
+        const res = await fetch("/api/save-reflection-metadata", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authSession.access_token}`,
+          },
+          body: JSON.stringify({ userId: authSession.user.id, reflections: payload }),
+        });
+        const rawText = await res.text().catch(() => "");
+        if (!res.ok) {
           console.error(
-            "[Cygne] updateUser FAILED",
-            "| http_status:", error.status ?? "n/a",
-            "| code:", error.code ?? "n/a",
-            "| name:", error.name ?? "n/a",
-            "| message:", error.message ?? String(error),
+            "[Cygne] /api/save-reflection-metadata FAILED",
+            "| http_status:", res.status,
+            "| body:", rawText || "(empty)",
             "| payload_bytes:", payloadBytes,
-            "| raw_error:", dump,
           );
         } else {
-          console.log("[Cygne] reflection saved to Supabase — total:", next.length, "| payload bytes:", payloadBytes, "(inline stripped)");
+          console.log("[Cygne] reflection saved to Supabase — total:", next.length, "| payload bytes:", payloadBytes, "(server-mediated)");
         }
       } catch (e) {
         const dump = {};
         if (e) for (const k of Object.getOwnPropertyNames(e)) dump[k] = e[k];
         console.error(
-          "[Cygne] updateUser THREW",
+          "[Cygne] /api/save-reflection-metadata THREW",
           "| message:", e?.message ?? String(e),
           "| payload_bytes:", payloadBytes,
           "| raw_error:", dump,
@@ -559,26 +559,30 @@ export default function App() {
     }
   };
 
-  // Belt-and-suspenders sync for reflections — same inline-stripping
-  // applies so we don't blow the user_metadata size limit.
+  // Belt-and-suspenders sync for reflections — same inline-stripping applies,
+  // and routed through /api/save-reflection-metadata so the bloated JWT never
+  // hits the /auth/v1/user gateway directly.
   useEffect(() => {
     if (!profileLoaded.current || !authSession) return;
     const payload = stripInlineForCloud(reflections);
     const payloadBytes = JSON.stringify(payload).length;
-    console.log("[Cygne] belt-and-suspenders updateUser attempt | reflections payload bytes:", payloadBytes, "| entries:", payload.length);
-    supabase.auth.updateUser({ data: { reflections: payload } })
-      .then(({ error }) => {
-        if (error) {
-          const dump = {};
-          for (const k of Object.getOwnPropertyNames(error)) dump[k] = error[k];
+    console.log("[Cygne] belt-and-suspenders save-reflection-metadata | reflections payload bytes:", payloadBytes, "| entries:", payload.length);
+    fetch("/api/save-reflection-metadata", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authSession.access_token}`,
+      },
+      body: JSON.stringify({ userId: authSession.user.id, reflections: payload }),
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          const rawText = await res.text().catch(() => "");
           console.error(
-            "[Cygne] belt-and-suspenders reflections sync FAILED",
-            "| http_status:", error.status ?? "n/a",
-            "| code:", error.code ?? "n/a",
-            "| name:", error.name ?? "n/a",
-            "| message:", error.message ?? String(error),
+            "[Cygne] belt-and-suspenders save-reflection-metadata FAILED",
+            "| http_status:", res.status,
+            "| body:", rawText || "(empty)",
             "| payload_bytes:", payloadBytes,
-            "| raw_error:", dump,
           );
         }
       })
@@ -586,7 +590,7 @@ export default function App() {
         const dump = {};
         if (e) for (const k of Object.getOwnPropertyNames(e)) dump[k] = e[k];
         console.error(
-          "[Cygne] belt-and-suspenders reflections sync THREW",
+          "[Cygne] belt-and-suspenders save-reflection-metadata THREW",
           "| message:", e?.message ?? String(e),
           "| payload_bytes:", payloadBytes,
           "| raw_error:", dump,
