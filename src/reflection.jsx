@@ -499,13 +499,21 @@ function TriptychImage({ src, fallbackSrc, alt, placeholderFontSize = 11, onErro
     );
   }
 
+  // Slicing strategy: object-fit: cover scales the source (1560×680, ratio 2.29)
+  // to fill each panel (1:1.31 ratio) without distortion, with the wide edges
+  // cropped off. object-position then picks WHICH horizontal third stays
+  // visible — 0% pins the left edge (panel 0 shows the leftmost third), 50%
+  // centers (middle), 100% pins the right edge (rightmost). This replaces the
+  // previous `width: 300%, left: -i*100%` absolute-positioning math, which
+  // resolved to width: 0 in some browsers because percentage sizes on
+  // absolutely positioned children of flex items can compute against an
+  // indefinite containing-block size.
   return (
     <div role="img" aria-label={alt}
       style={{ display: "flex", width: "100%", aspectRatio: "1560 / 680", overflow: "hidden", background: SURFACE_BG }}>
-      {[0, 1, 2].map((i) => (
+      {[0, 50, 100].map((objX, i) => (
         <div key={i} style={{
           flex: 1,
-          position: "relative",
           overflow: "hidden",
           opacity: status === "ready" ? 1 : 0,
           transform: status === "ready" ? "translateX(0)" : "translateX(20px)",
@@ -519,11 +527,10 @@ function TriptychImage({ src, fallbackSrc, alt, placeholderFontSize = 11, onErro
             onLoad={i === 0 ? handleLoad : undefined}
             onError={i === 0 ? handleError : undefined}
             style={{
-              position: "absolute",
-              top: 0,
-              left: `${-i * 100}%`,
-              width: "300%",
+              width: "100%",
               height: "100%",
+              objectFit: "cover",
+              objectPosition: `${objX}% center`,
               display: "block",
               pointerEvents: "none",
             }}
