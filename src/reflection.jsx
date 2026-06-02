@@ -451,8 +451,17 @@ function TriptychImage({ src, fallbackSrc, alt, placeholderFontSize = 11, onErro
   // where the stored signed URL has expired or is otherwise unreachable but
   // the inline data URL carrier is still present locally.
   const [activeSrc, setActiveSrc] = useState(src || fallbackSrc || null);
+  // Track the src we've already successfully loaded so we don't thrash
+  // status / revealed when the parent re-renders with an identical src wrapped
+  // in a new entry object (decorate() rebuilds the object every render). Both
+  // useEffects below use this to short-circuit redundant work.
+  const lastLoadedSrc = useRef(null);
 
   useEffect(() => {
+    // Fix 1: identity check on src. If the prop equals the source we already
+    // verified, skip the reset entirely — keeps `status: "ready"` and
+    // `revealed: true` stable across decorate()-induced re-renders.
+    if (src === lastLoadedSrc.current) return;
     setActiveSrc(src || fallbackSrc || null);
     setStatus(src || fallbackSrc ? "loading" : "error");
     setRevealed(false);
@@ -460,9 +469,20 @@ function TriptychImage({ src, fallbackSrc, alt, placeholderFontSize = 11, onErro
 
   useEffect(() => {
     if (!activeSrc) { setStatus("error"); return; }
+    // Fix 2: if activeSrc is the same one we already loaded, jump straight to
+    // ready without firing a fresh Image probe. Covers the case where the
+    // first useEffect re-fires (e.g., fallbackSrc changed) but activeSrc
+    // is still the value we previously loaded.
+    if (activeSrc === lastLoadedSrc.current) {
+      setStatus("ready");
+      return;
+    }
     setStatus("loading");
     const img = new Image();
-    img.onload = () => setStatus("ready");
+    img.onload = () => {
+      lastLoadedSrc.current = activeSrc;
+      setStatus("ready");
+    };
     img.onerror = () => {
       // First failure: switch to the fallback if we haven't tried it yet.
       if (fallbackSrc && activeSrc !== fallbackSrc) {
@@ -499,20 +519,41 @@ function TriptychImage({ src, fallbackSrc, alt, placeholderFontSize = 11, onErro
     );
   }
 
+  // Fix 3: render the triptych as three <img> tags (not CSS background-image).
+  // Safari silently fails to paint `background-image: url(<huge data URL>)`
+  // once the data URL exceeds ~32 KB — the Image() probe above reports onload
+  // fine but the CSS background stays blank. <img> handles large data URLs
+  // reliably. Each panel is a third of the source image, achieved by an inner
+  // <img> sized 300% × 100% with a per-panel left offset, mirroring the
+  // original `backgroundSize: 300% 100%` + `backgroundPosition` math.
   return (
     <div role="img" aria-label={alt}
       style={{ display: "flex", width: "100%", aspectRatio: "1560 / 680", overflow: "hidden", background: SURFACE_BG }}>
       {[0, 1, 2].map((i) => (
         <div key={i} style={{
           flex: 1,
-          backgroundImage: `url(${activeSrc})`,
-          backgroundSize: "300% 100%",
-          backgroundPosition: `${i * 50}% 50%`,
+          position: "relative",
+          overflow: "hidden",
           opacity: revealed ? 1 : 0,
           transform: revealed ? "translateX(0)" : "translateX(20px)",
           transition: `opacity 400ms ease-out ${i * 150}ms, transform 400ms ease-out ${i * 150}ms`,
           willChange: "opacity, transform",
-        }} />
+        }}>
+          <img
+            src={activeSrc}
+            alt=""
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              top: 0,
+              left: `${-i * 100}%`,
+              width: "300%",
+              height: "100%",
+              display: "block",
+              pointerEvents: "none",
+            }}
+          />
+        </div>
       ))}
     </div>
   );
