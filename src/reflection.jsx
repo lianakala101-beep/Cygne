@@ -743,6 +743,15 @@ function Reflection({ reflections = [], onAddReflection, onReplaceReflections, p
     .join("|");
   const sorted = [...reflections].sort((a, b) => new Date(b.date) - new Date(a.date));
 
+  // Render-time diagnostic — logs what the Reflection screen actually receives
+  // from App.jsx so we can confirm the new entry made it into props, and what
+  // shape it has (path/url/inline). Pinned here rather than inside the memo
+  // because the memo only runs when fingerprint changes; a render-time log
+  // catches every re-render including ones where the prop reference changed
+  // but content didn't.
+  console.log("[Cygne reflection] render | reflections.length:", reflections.length,
+    "| ids:", reflections.map(r => `${r.id}@W${r.weekNumber}/${r.date?.slice(0,10)}[${r.path?"p":""}${r.url?"u":""}${r.inline?"i":""}]`).join(" | "));
+
   // Does this ISO week already have a captured reflection?
   // Use ISO week-year (not calendar year) for the year comparison so the
   // ISO week 53 boundary doesn't false-match across calendar years.
@@ -787,7 +796,14 @@ function Reflection({ reflections = [], onAddReflection, onReplaceReflections, p
       cursor.setUTCDate(cursor.getUTCDate() + 7);
     }
 
-    return items.reverse();
+    const reversed = items.reverse();
+    console.log("[Cygne reflection] galleryItems built |",
+      "entries:", reversed.filter(x => x.type === "entry").length,
+      "| placeholders:", reversed.filter(x => x.type === "placeholder").length,
+      "| weeks:", reversed.map(x => x.type === "entry"
+        ? `W${x.data.weekNumber}/${x.data.id.slice(-6)}`
+        : `W${x.weekNum}(p)`).join(" | "));
+    return reversed;
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reflectionsFingerprint]);
   // Lock is scoped strictly to (ISO week, ISO week-year). Past-week
