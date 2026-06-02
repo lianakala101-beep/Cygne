@@ -784,9 +784,24 @@ function Reflection({ reflections = [], onAddReflection, onReplaceReflections, p
 
     const items = [];
     const cursor = new Date(startMon);
+    // Compute the ISO week of a UTC-midnight cursor using UTC getters
+    // throughout. The shared `isoWeekNumber`/`isoWeekYear` helpers in
+    // utils.jsx read LOCAL getters (date.getFullYear/getMonth/getDate),
+    // which gives the wrong week when called on a UTC-midnight cursor in
+    // any timezone west of UTC — UTC midnight Monday is Sunday evening
+    // locally, so the cursor reads as one week earlier. Symptom: the
+    // walk's bookends were shifted earlier by one week, the just-captured
+    // current-week entry never matched any cursor iteration, and the
+    // gallery never rendered the freshest reflection.
+    const utcISOWeek = (d) => {
+      const t = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+      const day = t.getUTCDay() || 7;
+      t.setUTCDate(t.getUTCDate() + 4 - day);
+      const yearStart = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
+      return [Math.ceil(((t - yearStart) / 86400000 + 1) / 7), t.getUTCFullYear()];
+    };
     while (cursor <= curMon) {
-      const wn = isoWeekNumber(cursor);
-      const wy = isoWeekYear(cursor);
+      const [wn, wy] = utcISOWeek(cursor);
       const key = `${wy}-W${wn}`;
       if (byWeek[key]) {
         items.push({ type: "entry", data: byWeek[key] });
