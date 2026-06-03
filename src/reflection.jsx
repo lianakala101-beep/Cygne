@@ -499,13 +499,21 @@ function TriptychImage({ src, fallbackSrc, alt, placeholderFontSize = 11, onErro
     );
   }
 
+  // Slicing strategy: object-fit: cover scales the source (1560×680, ratio 2.29)
+  // to fill each panel (1:1.31 ratio) without distortion, with the wide edges
+  // cropped off. object-position then picks WHICH horizontal third stays
+  // visible — 0% pins the left edge (panel 0 shows the leftmost third), 50%
+  // centers (middle), 100% pins the right edge (rightmost). This replaces the
+  // previous `width: 300%, left: -i*100%` absolute-positioning math, which
+  // resolved to width: 0 in some browsers because percentage sizes on
+  // absolutely positioned children of flex items can compute against an
+  // indefinite containing-block size.
   return (
     <div role="img" aria-label={alt}
       style={{ display: "flex", width: "100%", aspectRatio: "1560 / 680", overflow: "hidden", background: SURFACE_BG }}>
-      {[0, 1, 2].map((i) => (
+      {[0, 50, 100].map((objX, i) => (
         <div key={i} style={{
           flex: 1,
-          position: "relative",
           overflow: "hidden",
           opacity: status === "ready" ? 1 : 0,
           transform: status === "ready" ? "translateX(0)" : "translateX(20px)",
@@ -519,11 +527,10 @@ function TriptychImage({ src, fallbackSrc, alt, placeholderFontSize = 11, onErro
             onLoad={i === 0 ? handleLoad : undefined}
             onError={i === 0 ? handleError : undefined}
             style={{
-              position: "absolute",
-              top: 0,
-              left: `${-i * 100}%`,
-              width: "300%",
+              width: "100%",
               height: "100%",
+              objectFit: "cover",
+              objectPosition: `${objX}% center`,
               display: "block",
               pointerEvents: "none",
             }}
@@ -736,6 +743,15 @@ function Reflection({ reflections = [], onAddReflection, onReplaceReflections, p
     .join("|");
   const sorted = [...reflections].sort((a, b) => new Date(b.date) - new Date(a.date));
 
+  // Render-time diagnostic — logs what the Reflection screen actually receives
+  // from App.jsx so we can confirm the new entry made it into props, and what
+  // shape it has (path/url/inline). Pinned here rather than inside the memo
+  // because the memo only runs when fingerprint changes; a render-time log
+  // catches every re-render including ones where the prop reference changed
+  // but content didn't.
+  console.log("[Cygne reflection] render | reflections.length:", reflections.length,
+    "| ids:", reflections.map(r => `${r.id}@W${r.weekNumber}/${r.date?.slice(0,10)}[${r.path?"p":""}${r.url?"u":""}${r.inline?"i":""}]`).join(" | "));
+
   // Does this ISO week already have a captured reflection?
   // Use ISO week-year (not calendar year) for the year comparison so the
   // ISO week 53 boundary doesn't false-match across calendar years.
@@ -768,9 +784,24 @@ function Reflection({ reflections = [], onAddReflection, onReplaceReflections, p
 
     const items = [];
     const cursor = new Date(startMon);
+    // Compute the ISO week of a UTC-midnight cursor using UTC getters
+    // throughout. The shared `isoWeekNumber`/`isoWeekYear` helpers in
+    // utils.jsx read LOCAL getters (date.getFullYear/getMonth/getDate),
+    // which gives the wrong week when called on a UTC-midnight cursor in
+    // any timezone west of UTC — UTC midnight Monday is Sunday evening
+    // locally, so the cursor reads as one week earlier. Symptom: the
+    // walk's bookends were shifted earlier by one week, the just-captured
+    // current-week entry never matched any cursor iteration, and the
+    // gallery never rendered the freshest reflection.
+    const utcISOWeek = (d) => {
+      const t = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+      const day = t.getUTCDay() || 7;
+      t.setUTCDate(t.getUTCDate() + 4 - day);
+      const yearStart = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
+      return [Math.ceil(((t - yearStart) / 86400000 + 1) / 7), t.getUTCFullYear()];
+    };
     while (cursor <= curMon) {
-      const wn = isoWeekNumber(cursor);
-      const wy = isoWeekYear(cursor);
+      const [wn, wy] = utcISOWeek(cursor);
       const key = `${wy}-W${wn}`;
       if (byWeek[key]) {
         items.push({ type: "entry", data: byWeek[key] });
@@ -780,7 +811,14 @@ function Reflection({ reflections = [], onAddReflection, onReplaceReflections, p
       cursor.setUTCDate(cursor.getUTCDate() + 7);
     }
 
-    return items.reverse();
+    const reversed = items.reverse();
+    console.log("[Cygne reflection] galleryItems built |",
+      "entries:", reversed.filter(x => x.type === "entry").length,
+      "| placeholders:", reversed.filter(x => x.type === "placeholder").length,
+      "| weeks:", reversed.map(x => x.type === "entry"
+        ? `W${x.data.weekNumber}/${x.data.id.slice(-6)}`
+        : `W${x.weekNum}(p)`).join(" | "));
+    return reversed;
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reflectionsFingerprint]);
   // Lock is scoped strictly to (ISO week, ISO week-year). Past-week
