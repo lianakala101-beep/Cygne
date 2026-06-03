@@ -829,6 +829,72 @@ export default function App() {
     }
   };
 
+  // -- Introduce Slowly: auto-enrollment backfill ----------------------------
+  // A product enters the Introduce Slowly list only when it's `inRoutine` AND
+  // has a `routineStartDate` AND matches a ramp-eligible active (Toning Pad
+  // category, or an ingredient in RAMP_ACTIVES — see the primaryRamp filter
+  // in progress.jsx). `toggleRoutine` sets routineStartDate when turning a
+  // product ON, but products that became inRoutine via other paths (vanity
+  // bulk-add, onboarding, modal save with inRoutine preset, or just predating
+  // the routineStartDate field) end up inRoutine: true with NO start date —
+  // ramp-eligible but invisible on the Introduce Slowly card.
+  //
+  // This effect catches those: any ramp-eligible product that is inRoutine
+  // (true or undefined) but missing routineStartDate gets enrolled with
+  // today's date and an "auto_enrolled" rampLog entry. Once routineStartDate
+  // is set the guard `!p.routineStartDate` is false on subsequent runs, so
+  // this is naturally one-time per product. Manual enrollment via
+  // toggleRoutine is untouched.
+  useEffect(() => {
+    if (authSession && !profileLoaded.current) return;
+    if (!Array.isArray(products) || products.length === 0) return;
+
+    const today = new Date().toISOString().split("T")[0];
+    const nowIso = new Date().toISOString();
+    const userId = authSession?.user?.id || null;
+    const newEntries = [];
+    let changed = false;
+
+    const updatedProducts = products.map(p => {
+      if (!p) return p;
+      if (p.inRoutine === false) return p;
+      if (p.routineStartDate) return p;
+      // Same activeKey detection used everywhere else (recordRampAction,
+      // auto-graduate, primaryRamp). Toning Pad is category-based; everything
+      // else is ingredient-based via detectActives matching RAMP_ACTIVES.
+      const activeKey = p.category === "Toning Pad"
+        ? "toning pad"
+        : RAMP_ACTIVES.find(a => detectActives(p.ingredients || [])[a]);
+      if (!activeKey) return p;
+      changed = true;
+      newEntries.push({
+        userId,
+        productId: p.id,
+        week: 1,
+        status: "auto_enrolled",
+        timestamp: nowIso,
+      });
+      return { ...p, routineStartDate: today, rampWeek: 1, rampHeld: false };
+    });
+
+    if (!changed) return;
+
+    const newLog = [...rampLog, ...newEntries];
+    setProducts(updatedProducts);
+    setRampLog(newLog);
+    console.log(
+      "[Cygne] auto-enrolled", newEntries.length,
+      "ramp product" + (newEntries.length === 1 ? "" : "s") + " to Introduce Slowly:",
+      newEntries.map(e => ({ productId: e.productId })),
+    );
+    if (authSession) {
+      supabase.auth.updateUser({ data: { products: updatedProducts, rampLog: newLog } })
+        .then(() => console.log("[Cygne] auto-enroll saved to Supabase — entries:", newLog.length))
+        .catch(e => console.error("[Cygne] auto-enroll save failed:", e));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [products, authSession]);
+
   // -- Introduce Slowly: auto-graduation safety net ---------------------------
   // If a ramping product is more than 2 weeks past its schedule's max week, the
   // user never tapped "Skin Handled It" on the final week — graduate it for
