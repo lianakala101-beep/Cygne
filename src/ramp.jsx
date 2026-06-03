@@ -246,22 +246,6 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, on
     onAdvance(product.id);
   };
 
-  // Verify calendar-based progression at render time.
-  useEffect(() => {
-    if (product?.routineStartDate) {
-      // eslint-disable-next-line no-console
-      console.log("[Cygne ramp]", {
-        productId: product.id,
-        productName: product.name,
-        routineStartDate: product.routineStartDate,
-        daysSinceStart: daysBetweenLocal(product.routineStartDate),
-        currentWeek: weekNumber,
-        phase: phase.name,
-        isHeld,
-      });
-    }
-  }, [product?.id, product?.routineStartDate, weekNumber]);
-
   // Auto-dismiss the contextual follow-up: 3 seconds, or on next scroll.
   useEffect(() => {
     if (!justActioned) return;
@@ -282,7 +266,7 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, on
         <div style={{ flex: 1 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5, flexWrap: "wrap" }}>
             <span style={{ fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 400, letterSpacing: "0.14em", textTransform: "uppercase", color: schedule.color, background: `${schedule.color}18`, padding: "2px 8px", borderRadius: 20 }}>{schedule.label}</span>
-            <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", color: isHeld ? "#8b7355" : "var(--clay)", opacity: 0.7 }}>Week {weekNumber} · {isHeld ? "Holding" : phase.name}</span>
+            <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", color: isHeld ? "#8b7355" : "var(--clay)", opacity: 0.7 }}>Week {weekNumber} of {maxWeek} · {isHeld ? "Holding" : phase.name}</span>
           </div>
           <p style={{ fontFamily: "var(--font-body)", fontSize: 13, fontWeight: 400, color: "var(--parchment)", margin: "0 0 2px" }}>{product.name}</p>
           <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: schedule.color, margin: 0, letterSpacing: "0.04em" }}>{phase.frequency}</p>
@@ -403,8 +387,8 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, on
           padding: "0 24px",
         }}>
           <div style={{
-            background: "#2a3a2b",
-            color: "#e8e0c8",
+            background: "var(--color-inky-moss)",
+            color: "var(--color-ivory-shadow)",
             border: "1px solid rgba(232,224,200,0.16)",
             borderRadius: 18,
             padding: "34px 28px 26px",
@@ -414,7 +398,7 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, on
             <p style={{
               fontFamily: "var(--font-display)",
               fontSize: 18, fontWeight: 400, letterSpacing: "0.02em", lineHeight: 1.5,
-              color: "#e8e0c8",
+              color: "var(--color-ivory-shadow)",
               margin: "0 0 22px",
               whiteSpace: "pre-line",
             }}>
@@ -424,7 +408,7 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, on
               style={{
                 padding: "12px 24px",
                 background: "rgba(45,61,43,0.22)",
-                color: "#e8e0c8",
+                color: "var(--color-ivory-shadow)",
                 border: "1px solid rgba(232,224,200,0.28)",
                 borderRadius: 10,
                 fontFamily: "var(--font-body)",
