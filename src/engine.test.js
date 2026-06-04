@@ -50,6 +50,24 @@ describe("detectActives", () => {
   it("matches substrings (e.g. 'l-ascorbic acid' matches 'ascorbic acid')", () => {
     expect(detectActives(["l-ascorbic acid"])["vitamin C"]).toBe(true);
   });
+
+  it("detects AHA from the bare 'aha' label common on K-beauty labels", () => {
+    expect(detectActives(["aha"]).AHA).toBe(true);
+    expect(detectActives(["AHA complex"]).AHA).toBe(true);
+    expect(detectActives(["Alpha Hydroxy Acid"]).AHA).toBe(true);
+  });
+
+  it("detects BHA from the bare 'bha' label common on K-beauty labels", () => {
+    expect(detectActives(["bha"]).BHA).toBe(true);
+    expect(detectActives(["BHA blend"]).BHA).toBe(true);
+    expect(detectActives(["Beta Hydroxy Acid"]).BHA).toBe(true);
+  });
+
+  it("detects both AHA and BHA from a combined 'aha/bha' label", () => {
+    const a = detectActives(["AHA", "BHA"]);
+    expect(a.AHA).toBe(true);
+    expect(a.BHA).toBe(true);
+  });
 });
 
 describe("detectActivesFromProduct", () => {
