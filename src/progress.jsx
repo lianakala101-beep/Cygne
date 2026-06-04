@@ -58,19 +58,12 @@ function CheckInModal({ onSubmit, onClose }) {
   const [breakout, setBreakout] = useState(false);
   const [breakoutZones, setBreakoutZones] = useState([]);
   const [tight, setTight] = useState(false);
-  // idle → rippling (600ms) → closing (300ms) → onSubmit fires
-  const [submitState, setSubmitState] = useState("idle");
 
   const toggleZone = (z) => setBreakoutZones(prev => prev.includes(z) ? prev.filter(x => x !== z) : [...prev, z]);
 
   const handleSubmit = () => {
-    if (submitState !== "idle") return;
     const data = { irritation, breakout, breakoutZones: breakout ? breakoutZones : [], tight, date: new Date().toISOString() };
-    setSubmitState("rippling");
-    setTimeout(() => {
-      setSubmitState("closing");
-      setTimeout(() => onSubmit(data), 300);
-    }, 600);
+    onSubmit(data);
   };
 
   return (
@@ -80,8 +73,6 @@ function CheckInModal({ onSubmit, onClose }) {
         background: "var(--ink)", width: "100%", maxWidth: 520,
         borderRadius: "20px 20px 0 0", padding: "30px 24px 52px",
         border: "1px solid var(--border)", borderBottom: "none",
-        transformOrigin: "center bottom",
-        animation: submitState === "closing" ? "checkInClose 300ms ease-in forwards" : "none",
       }}>
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
@@ -100,7 +91,7 @@ function CheckInModal({ onSubmit, onClose }) {
             <div style={{ display: "flex", gap: 8 }}>
               {q.opts.map((opt, i) => (
                 <button key={opt} onClick={() => q.set(opt)}
-                  style={{ flex: 1, padding: "11px 0", borderRadius: 8, border: `1px solid ${q.val === opt ? "#2d3d2b" : "var(--border)"}`, background: q.val === opt ? "rgba(45,61,43,0.12)" : "transparent", color: q.val === opt ? "#2d3d2b" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, cursor: "pointer", letterSpacing: "0.06em", transition: "all 0.18s" }}>
+                  style={{ flex: 1, padding: "11px 0", borderRadius: 8, border: `1px solid ${q.val === opt ? "#2d3d2b" : "rgba(250,249,244,0.4)"}`, background: q.val === opt ? "rgba(45,61,43,0.12)" : "transparent", color: q.val === opt ? "#2d3d2b" : "rgba(255,255,255,0.7)", fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, cursor: "pointer", letterSpacing: "0.06em", transition: "all 0.18s" }}>
                   {q.labels[i]}
                 </button>
               ))}
@@ -114,7 +105,7 @@ function CheckInModal({ onSubmit, onClose }) {
           <div style={{ display: "flex", gap: 8 }}>
             {[false, true].map(opt => (
               <button key={String(opt)} onClick={() => { setBreakout(opt); if (!opt) setBreakoutZones([]); }}
-                style={{ flex: 1, padding: "11px 0", borderRadius: 8, border: `1px solid ${breakout === opt ? "#2d3d2b" : "var(--border)"}`, background: breakout === opt ? "rgba(45,61,43,0.12)" : "transparent", color: breakout === opt ? "#2d3d2b" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, cursor: "pointer", letterSpacing: "0.06em", transition: "all 0.18s" }}>
+                style={{ flex: 1, padding: "11px 0", borderRadius: 8, border: `1px solid ${breakout === opt ? "#2d3d2b" : "rgba(250,249,244,0.4)"}`, background: breakout === opt ? "rgba(45,61,43,0.12)" : "transparent", color: breakout === opt ? "#2d3d2b" : "rgba(255,255,255,0.7)", fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, cursor: "pointer", letterSpacing: "0.06em", transition: "all 0.18s" }}>
                 {opt ? "Yes" : "No"}
               </button>
             ))}
@@ -193,44 +184,25 @@ function CheckInModal({ onSubmit, onClose }) {
           <div style={{ display: "flex", gap: 8 }}>
             {[false, true].map(opt => (
               <button key={String(opt)} onClick={() => setTight(opt)}
-                style={{ flex: 1, padding: "11px 0", borderRadius: 8, border: `1px solid ${tight === opt ? "#2d3d2b" : "var(--border)"}`, background: tight === opt ? "rgba(45,61,43,0.12)" : "transparent", color: tight === opt ? "#2d3d2b" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, cursor: "pointer", letterSpacing: "0.06em", transition: "all 0.18s" }}>
+                style={{ flex: 1, padding: "11px 0", borderRadius: 8, border: `1px solid ${tight === opt ? "#2d3d2b" : "rgba(250,249,244,0.4)"}`, background: tight === opt ? "rgba(45,61,43,0.12)" : "transparent", color: tight === opt ? "#2d3d2b" : "rgba(255,255,255,0.7)", fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, cursor: "pointer", letterSpacing: "0.06em", transition: "all 0.18s" }}>
                 {opt ? "Yes" : "No"}
               </button>
             ))}
           </div>
         </div>
 
-        <button onClick={handleSubmit} disabled={submitState !== "idle"}
+        <button onClick={handleSubmit}
+          onMouseDown={e => { e.currentTarget.style.opacity = "0.7"; }}
+          onMouseUp={e => { e.currentTarget.style.opacity = "1"; }}
+          onMouseLeave={e => { e.currentTarget.style.opacity = "1"; }}
           style={{
-            position: "relative",
             width: "100%", marginTop: 8, padding: "15px 0",
             background: "transparent", color: "var(--color-ivory, #faf9f4)", border: "1px solid var(--color-ivory, #faf9f4)", borderRadius: 8,
             fontFamily: "var(--font-display)", fontSize: 12, fontWeight: 700,
             letterSpacing: "0.15em", textTransform: "uppercase",
-            cursor: submitState === "idle" ? "pointer" : "default",
-            overflow: "visible",
+            cursor: "pointer",
           }}>
-          {submitState === "rippling" && (
-            <>
-              <span aria-hidden="true" style={{
-                position: "absolute", inset: 0,
-                borderRadius: 8,
-                border: "1.5px solid rgba(210,200,170,0.5)",
-                pointerEvents: "none",
-                transformOrigin: "center",
-                animation: "checkInRing 600ms ease-out forwards",
-              }} />
-              <span aria-hidden="true" style={{
-                position: "absolute", inset: 0,
-                borderRadius: 8,
-                border: "1.5px solid rgba(210,200,170,0.5)",
-                pointerEvents: "none",
-                transformOrigin: "center",
-                animation: "checkInRing 600ms ease-out 300ms forwards",
-              }} />
-            </>
-          )}
-          <span style={{ position: "relative" }}>Submit Check-In</span>
+          Submit Check-In
         </button>
       </div>
     </div>
