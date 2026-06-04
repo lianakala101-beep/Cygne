@@ -18,18 +18,20 @@ const MONTHS = ["January","February","March","April","May","June","July","August
 // the recap never reads as broken.
 
 function narrateSkin({ journalsM, checkInsM }) {
-  const total = journalsM.length;
-  const conditions = journalsM.reduce((acc, j) => { if (j.condition) acc[j.condition] = (acc[j.condition] || 0) + 1; return acc; }, {});
+  const jm = Array.isArray(journalsM) ? journalsM : [];
+  const cm = Array.isArray(checkInsM) ? checkInsM : [];
+  const total = jm.length;
+  const conditions = jm.reduce((acc, j) => { if (j?.condition) acc[j.condition] = (acc[j.condition] || 0) + 1; return acc; }, {});
   const positive = (conditions.glowing || 0) + (conditions.good || 0);
   const tough    = (conditions.rough   || 0) + (conditions.dull || 0);
-  const irritation = checkInsM.filter(c => c.irritation && c.irritation !== "none").length;
-  const breakouts  = checkInsM.filter(c => c.breakout).length;
+  const irritation = cm.filter(c => c?.irritation && c.irritation !== "none").length;
+  const breakouts  = cm.filter(c => c?.breakout).length;
 
-  if (total === 0 && checkInsM.length === 0) {
+  if (total === 0 && cm.length === 0) {
     return "A quiet month — nothing logged. The recap fills in as you check in or jot a journal entry.";
   }
   const parts = [];
-  parts.push(`You logged ${total} journal ${total === 1 ? "entry" : "entries"}${checkInsM.length ? ` and ${checkInsM.length} check-${checkInsM.length === 1 ? "in" : "ins"}` : ""}.`);
+  parts.push(`You logged ${total} journal ${total === 1 ? "entry" : "entries"}${cm.length ? ` and ${cm.length} check-${cm.length === 1 ? "in" : "ins"}` : ""}.`);
   if (positive && positive > tough) {
     parts.push(`Skin trended luminous — ${positive} ${positive === 1 ? "day" : "days"} logged as good or glowing.`);
   } else if (tough && tough >= positive) {
@@ -43,13 +45,21 @@ function narrateSkin({ journalsM, checkInsM }) {
 }
 
 function narrateTelling({ journalsM, checkInsM }) {
+  const jm = Array.isArray(journalsM) ? journalsM : [];
+  const cm = Array.isArray(checkInsM) ? checkInsM : [];
   const zoneCounts = {};
-  checkInsM.forEach(c => (c.breakoutZones || []).forEach(z => { zoneCounts[z] = (zoneCounts[z] || 0) + 1; }));
+  cm.forEach(c => {
+    // Defensive: stored breakoutZones could be a string, null, or undefined
+    // (legacy / pre-migration shapes). Coerce non-arrays to [] so .forEach
+    // never throws on TypeError "is not a function" — the original crash.
+    const zones = Array.isArray(c?.breakoutZones) ? c.breakoutZones : [];
+    zones.forEach(z => { if (z) zoneCounts[z] = (zoneCounts[z] || 0) + 1; });
+  });
   const top = Object.entries(zoneCounts).sort((a, b) => b[1] - a[1])[0];
 
-  const poorSleep = journalsM.filter(j => j.sleep === "poor").length;
-  const highStress = journalsM.filter(j => j.stress === "high").length;
-  const irritated = checkInsM.filter(c => c.irritation && c.irritation !== "none").length;
+  const poorSleep = jm.filter(j => j?.sleep === "poor").length;
+  const highStress = jm.filter(j => j?.stress === "high").length;
+  const irritated = cm.filter(c => c?.irritation && c.irritation !== "none").length;
 
   const parts = [];
   if (top && top[1] >= 2) {
@@ -71,15 +81,17 @@ function narrateTelling({ journalsM, checkInsM }) {
 }
 
 function narrateRitual({ products, treatmentsM }) {
-  const inRoutine = products.filter(p => p.inRoutine !== false);
-  const ramping = products.filter(p => p.routineStartDate && (p.rampWeek || 1) > 0 && p.inRoutine !== false);
+  const pp = Array.isArray(products) ? products : [];
+  const tm = Array.isArray(treatmentsM) ? treatmentsM : [];
+  const inRoutine = pp.filter(p => p?.inRoutine !== false);
+  const ramping = pp.filter(p => p?.routineStartDate && p?.inRoutine !== false);
   const parts = [];
-  parts.push(`Your ritual carried ${inRoutine.length} ${inRoutine.length === 1 ? "product" : "products"} this month${inRoutine.length === 0 ? "." : "."}`);
+  parts.push(`Your ritual carried ${inRoutine.length} ${inRoutine.length === 1 ? "product" : "products"} this month.`);
   if (ramping.length) {
     parts.push(`${ramping.length} ${ramping.length === 1 ? "active was" : "actives were"} in their introduction window.`);
   }
-  if (treatmentsM.length) {
-    const labels = treatmentsM.map(t => t.label || t.typeId).filter(Boolean);
+  if (tm.length) {
+    const labels = tm.map(t => t?.label || t?.typeId).filter(Boolean);
     parts.push(`Treatments logged: ${labels.join(", ")}.`);
   } else {
     parts.push("No professional treatments logged.");
@@ -88,10 +100,11 @@ function narrateRitual({ products, treatmentsM }) {
 }
 
 function narrateVanity({ products }) {
-  const conflicts = detectConflicts(products);
-  const spending = calcSpending(products);
-  const total = products.length;
-  const inRoutine = products.filter(p => p.inRoutine !== false).length;
+  const pp = Array.isArray(products) ? products : [];
+  const conflicts = detectConflicts(pp);
+  const spending = calcSpending(pp);
+  const total = pp.length;
+  const inRoutine = pp.filter(p => p?.inRoutine !== false).length;
   const benched = total - inRoutine;
   const parts = [];
   parts.push(`Your vanity holds ${total} ${total === 1 ? "product" : "products"}${benched ? ` (${inRoutine} active, ${benched} on the bench)` : ""}.`);
@@ -183,7 +196,7 @@ function Section({ label, body, rootRef, divider = true }) {
         transform: revealed ? "translateY(0)" : "translateY(14px)",
         transition: "opacity 700ms ease, transform 700ms ease",
         padding: "26px 0",
-        borderBottom: divider ? "1px solid rgba(45,61,43,0.12)" : "none",
+        borderBottom: divider ? "1px solid rgba(250,249,244,0.12)" : "none",
       }}
     >
       <p style={{
@@ -204,12 +217,16 @@ function Section({ label, body, rootRef, divider = true }) {
 // ─── Calendar + zone helpers ──────────────────────────────────────────────────
 const DOW = ["M", "T", "W", "T", "F", "S", "S"];
 
+// Condition dot palette — lifted to be readable on the dark inky-moss
+// canvas. Glowing/good lean ivory (the most positive marker), okay sits at
+// a muted ivory, and dull/rough keep their bronze tone but slightly brighter
+// so the warm hue still reads through the canvas dim.
 const CONDITION_DOT = {
-  glowing: "#2d3d2b",
-  good:    "#2d3d2b",
-  okay:    "#5a5a5a",
-  dull:    "#8b7355",
-  rough:   "#8b7355",
+  glowing: "#faf9f4",
+  good:    "rgba(250,249,244,0.7)",
+  okay:    "rgba(250,249,244,0.45)",
+  dull:    "#b89878",
+  rough:   "#b89878",
 };
 
 const dayKey = (d) => {
@@ -310,10 +327,13 @@ export function MonthlyRecap({
     const breakouts  = checkInsM.filter(c => c?.breakout).length;
 
     const zoneCounts = {};
-    checkInsM.forEach(c => (c?.breakoutZones || []).forEach(z => {
-      if (!z) return;
-      zoneCounts[z] = (zoneCounts[z] || 0) + 1;
-    }));
+    checkInsM.forEach(c => {
+      const zones = Array.isArray(c?.breakoutZones) ? c.breakoutZones : [];
+      zones.forEach(z => {
+        if (!z) return;
+        zoneCounts[z] = (zoneCounts[z] || 0) + 1;
+      });
+    });
     const topZones = Object.entries(zoneCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
 
     return {
@@ -349,13 +369,26 @@ export function MonthlyRecap({
 
   const isEmpty = data.activeDays === 0 && data.monthReflections.length === 0 && data.monthTreatments.length === 0;
 
-  const sections = useMemo(() => ([
-    { label: "Your skin this month",       body: narrateSkin(data) },
-    { label: "What your skin is telling you", body: narrateTelling(data) },
-    { label: "Your ritual",                body: narrateRitual({ products, treatmentsM: data.treatmentsM }) },
-    { label: "Your vanity",                body: narrateVanity({ products }) },
-    { label: "Looking ahead",              body: narrateAhead({ user, view }) },
-  ]), [data, products, user, view]);
+  // safeNarrate: each section's body is computed inside a try/catch so a
+  // single malformed entry (legacy data shape, unexpected null, etc.) in one
+  // narrative source can't take down the whole component. Failures fall
+  // through to a quiet placeholder string and are logged for diagnosis.
+  const sections = useMemo(() => {
+    const safe = (label, fn) => {
+      try { return fn(); }
+      catch (e) {
+        console.error(`[MonthlyRecap] narrate failed for "${label}":`, e?.message ?? e);
+        return "—";
+      }
+    };
+    return [
+      { label: "Your skin this month",          body: safe("skin", () => narrateSkin(data)) },
+      { label: "What your skin is telling you", body: safe("telling", () => narrateTelling(data)) },
+      { label: "Your ritual",                   body: safe("ritual", () => narrateRitual({ products, treatmentsM: data.treatmentsM })) },
+      { label: "Your vanity",                   body: safe("vanity", () => narrateVanity({ products })) },
+      { label: "Looking ahead",                 body: safe("ahead", () => narrateAhead({ user, view })) },
+    ];
+  }, [data, products, user, view]);
 
   // ESC closes the overlay
   useEffect(() => {
@@ -369,11 +402,11 @@ export function MonthlyRecap({
       ref={scrollRef}
       style={{
         position: "fixed", inset: 0, zIndex: 200,
-        background: IVORY,
+        background: INKY,
         backgroundImage: GRAIN,
         overflowY: "auto",
         WebkitOverflowScrolling: "touch",
-        color: INK,
+        color: IVORY,
       }}
     >
       {/* Close × */}
@@ -383,10 +416,10 @@ export function MonthlyRecap({
         style={{
           position: "fixed", top: 18, left: 22, zIndex: 1,
           background: "none", border: "none", cursor: "pointer",
-          color: PEBBLE, fontSize: 22, lineHeight: 1, padding: 6,
+          color: IVORY, fontSize: 22, lineHeight: 1, padding: 6,
           fontFamily: "var(--font-display)",
+          opacity: 0.75,
         }}
-        aria-label="Close"
       >×</button>
 
       <div style={{ maxWidth: 540, margin: "0 auto", padding: "60px 28px 44px" }}>
@@ -395,7 +428,7 @@ export function MonthlyRecap({
           <h1 style={{
             fontFamily: "var(--font-signature)",
             fontSize: 36, fontWeight: 400, letterSpacing: "0.01em",
-            color: INKY, margin: 0, lineHeight: 1.1,
+            color: IVORY, margin: 0, lineHeight: 1.1,
           }}>
             {view.monthLabel}
           </h1>
@@ -434,7 +467,8 @@ export function MonthlyRecap({
             style={{
               width: 80, height: "auto", display: "block",
               margin: "0 auto 14px",
-              filter: "brightness(0.45) contrast(1.3) saturate(0.65)",
+              // Force the logo white so it reads against the dark canvas.
+              filter: "brightness(0) invert(1)",
               opacity: 0.85,
             }}
           />
@@ -484,20 +518,20 @@ export function MonthlyRecap({
               if (!d) return <div key={`b-${i}`} />;
               const cell = data.byDay[dayKey(new Date(view.year, view.month, d))];
               const cond = bestCondition(cell?.journal);
-              const dot = cond ? CONDITION_DOT[cond] : (cell?.checkIns.length ? "rgba(45,61,43,0.4)" : null);
+              const dot = cond ? CONDITION_DOT[cond] : (cell?.checkIns.length ? "rgba(250,249,244,0.4)" : null);
               const todayCell = isToday(d);
               return (
                 <div key={d} style={{
                   aspectRatio: "1 / 1",
                   display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-                  background: todayCell ? "rgba(45,61,43,0.06)" : "transparent",
-                  border: todayCell ? "1px solid rgba(45,61,43,0.30)" : "1px solid transparent",
+                  background: todayCell ? "rgba(250,249,244,0.06)" : "transparent",
+                  border: todayCell ? "1px solid rgba(250,249,244,0.30)" : "1px solid transparent",
                   borderRadius: 6,
                   position: "relative",
                 }}>
                   <span style={{
                     fontFamily: "var(--font-body)", fontSize: 10,
-                    color: cell?.journal || cell?.checkIns.length ? INK : PEBBLE,
+                    color: IVORY,
                     opacity: cell?.journal || cell?.checkIns.length ? 1 : 0.55,
                     lineHeight: 1,
                   }}>{d}</span>
@@ -538,7 +572,7 @@ export function MonthlyRecap({
                     padding: "6px 0", borderBottom: "1px solid rgba(250,249,244,0.08)",
                   }}>
                     <span style={{
-                      fontFamily: "var(--font-body)", fontSize: 12, color: INK,
+                      fontFamily: "var(--font-body)", fontSize: 12, color: IVORY,
                     }}>{zoneLabelDisplay(zone)}</span>
                     <span style={{
                       fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400,
@@ -578,7 +612,7 @@ function Stat({ label, value }) {
     <div style={{ textAlign: "center" }}>
       <div style={{
         fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 28,
-        color: INKY, lineHeight: 1, marginBottom: 4,
+        color: IVORY, lineHeight: 1, marginBottom: 4,
       }}>{value}</div>
       <div style={{
         fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em",
@@ -592,7 +626,7 @@ function FooterCount({ label, value }) {
   return (
     <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
       <span style={{
-        fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 14, color: INKY, lineHeight: 1,
+        fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 14, color: IVORY, lineHeight: 1,
       }}>{value}</span>
       <span style={{
         fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.12em",
