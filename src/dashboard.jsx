@@ -189,21 +189,23 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         <div style={{ marginBottom: 20 }}>
           <SwanSongCard currentSession={currentSession} asPopup={false} user={user} predictions={swanSensePredictions} dailyLine={swanDailyLine} dailyLoading={swanLoading} dailyFailed={swanFailed} variant="ivory-flat" />
         </div>
-        <div style={{ textAlign: "right", marginBottom: 24 }}>
-          <button
-            onClick={() => { setRecapOffset(0); setRecapOpen(true); }}
-            style={{
-              background: "none", border: "none", padding: 0, cursor: "pointer",
-              fontFamily: "var(--font-body)",
-              fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase",
-              color: "var(--color-ivory, #faf9f4)",
-              opacity: 0.65,
-              fontWeight: 400,
-            }}
-          >
-            {recapMonthLabel} in review →
-          </button>
-        </div>
+        {_now.getDate() >= 14 && (
+          <div style={{ textAlign: "right", marginBottom: 24 }}>
+            <button
+              onClick={() => { setRecapOffset(0); setRecapOpen(true); }}
+              style={{
+                background: "none", border: "none", padding: 0, cursor: "pointer",
+                fontFamily: "var(--font-body)",
+                fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase",
+                color: "var(--color-ivory, #faf9f4)",
+                opacity: 0.65,
+                fontWeight: 400,
+              }}
+            >
+              {recapMonthLabel} in review →
+            </button>
+          </div>
+        )}
 
         {/* Begin Your Ritual — editorial line item: rules top + bottom, label
             left, arrow right. No box. */}
