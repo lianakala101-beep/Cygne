@@ -435,6 +435,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             treatments={treatments}
             products={products}
             user={user}
+            cycleDay={currentCycleDay}
             onClose={() => setRecapOpen(false)}
           />
         )}
