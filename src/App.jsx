@@ -275,14 +275,44 @@ export default function App() {
       if (meta.completedSteps) {
         setCompletedSteps(meta.completedSteps);
       }
-      // Restore journals from Supabase (cloud takes priority over localStorage)
-      if (meta.journals && Array.isArray(meta.journals)) {
-        setJournals(meta.journals);
-      }
-      // Restore check-ins from Supabase
-      if (meta.checkIns && Array.isArray(meta.checkIns)) {
-        setCheckIns(meta.checkIns);
-      }
+      // Restore journals + check-ins from Supabase. Phase 1 of the
+      // metadata-migration moved both of these out of user_metadata and into
+      // their own per-collection tables (check_ins, journals — see
+      // supabase/migrations/20260605000000_create_checkins_journals_tables.sql).
+      // localStorage still primes the React state instantly via
+      // useLocalStorage; these reads override it once the table query
+      // resolves. Fire-and-forget so the rest of loadUserProfile doesn't
+      // block on the DB roundtrip.
+      (async () => {
+        const { data: jRows, error: jErr } = await supabase
+          .from("journals").select("data").eq("user_id", authUser.id);
+        if (jErr) {
+          console.error("[Cygne] journals load failed:", jErr.message);
+          return;
+        }
+        if (Array.isArray(jRows)) {
+          const next = jRows.map(r => r.data).filter(Boolean);
+          // Sort by date asc to match the existing setJournals call sites'
+          // expected ordering (progress.jsx sorts on insert too).
+          next.sort((a, b) => String(a?.date || "").localeCompare(String(b?.date || "")));
+          setJournals(next);
+        }
+      })();
+      (async () => {
+        const { data: cRows, error: cErr } = await supabase
+          .from("check_ins").select("data").eq("user_id", authUser.id);
+        if (cErr) {
+          console.error("[Cygne] check_ins load failed:", cErr.message);
+          return;
+        }
+        if (Array.isArray(cRows)) {
+          const next = cRows.map(r => r.data).filter(Boolean);
+          // Check-ins were stored in append order; preserve that by sorting
+          // ascending on `date` (full ISO timestamp).
+          next.sort((a, b) => String(a?.date || "").localeCompare(String(b?.date || "")));
+          setCheckIns(next);
+        }
+      })();
       // Restore treatments from Supabase
       if (meta.treatments && Array.isArray(meta.treatments)) {
         setTreatments(meta.treatments);
@@ -395,16 +425,42 @@ export default function App() {
   };
 
   // -- Sync journals to Supabase when they change ----------------------------
+  // Writes to the `journals` table (Phase 1 metadata migration). client_id is
+  // the row's `date` (YYYY-MM-DD); the journal flow already de-dupes by date,
+  // so upsert overwriting on (user_id, client_id) matches existing semantics.
+  // Note: this is upsert-only — a row removed from local state will not be
+  // deleted from the table. The journal UI never deletes today, so this is
+  // safe for now; a future change can layer in a delete pass if needed.
   useEffect(() => {
     if (!profileLoaded.current || !authSession) return;
-    supabase.auth.updateUser({ data: { journals } }).catch(() => {});
-  }, [journals]);
+    if (!Array.isArray(journals) || journals.length === 0) return;
+    const userId = authSession.user.id;
+    const rows = journals
+      .filter(j => j && j.date)
+      .map(j => ({ user_id: userId, client_id: String(j.date), data: j }));
+    if (rows.length === 0) return;
+    supabase.from("journals").upsert(rows, { onConflict: "user_id,client_id" })
+      .then(({ error }) => {
+        if (error) console.error("[Cygne] journals upsert failed:", error.message);
+      });
+  }, [journals, authSession]);
 
   // -- Sync check-ins to Supabase when they change ---------------------------
+  // Writes to the `check_ins` table. client_id is the row's `date` (full ISO
+  // timestamp) — unique per check-in by construction.
   useEffect(() => {
     if (!profileLoaded.current || !authSession) return;
-    supabase.auth.updateUser({ data: { checkIns } }).catch(() => {});
-  }, [checkIns]);
+    if (!Array.isArray(checkIns) || checkIns.length === 0) return;
+    const userId = authSession.user.id;
+    const rows = checkIns
+      .filter(c => c && c.date)
+      .map(c => ({ user_id: userId, client_id: String(c.date), data: c }));
+    if (rows.length === 0) return;
+    supabase.from("check_ins").upsert(rows, { onConflict: "user_id,client_id" })
+      .then(({ error }) => {
+        if (error) console.error("[Cygne] check_ins upsert failed:", error.message);
+      });
+  }, [checkIns, authSession]);
 
   // -- Sync completed steps to Supabase when they change ---------------------
   useEffect(() => {
