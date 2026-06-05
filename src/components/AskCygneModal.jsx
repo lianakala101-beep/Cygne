@@ -86,10 +86,13 @@ export function AskCygneModal({
         // Forward whatever context the caller supplied. Pre-built string
         // takes precedence on the server; raw arrays/skinProfile are used
         // to build context server-side when no string is passed.
+        //
+        // Note: journals + checkIns are NOT sent — Phase 1 of the metadata
+        // migration moved both into per-collection tables that ask-cygne
+        // reads directly via the service-role client. See PR description
+        // for the migration plan.
         context,
         products,
-        journals,
-        checkIns,
         triggerLog,
         skinType: user?.skinType,
         concerns: user?.concerns,

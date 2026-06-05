@@ -23,10 +23,22 @@ function setCors(res) {
 
 // Convert client-side state into a single context paragraph for the prompt.
 // All inputs are optional — return what we can describe, fall back politely.
-function buildContextFromBody(body) {
+// `tables` carries server-fetched collections that have been migrated out of
+// the request body. As of Phase 1 (PR migrating check_ins + journals), the
+// client no longer sends body.checkIns / body.journals; we read both from
+// their per-collection tables and pass them in here. Falls back to body
+// fields so older clients sending the legacy shape still produce a sane
+// context until they update.
+function buildContextFromBody(body, tables = {}) {
   if (typeof body.context === "string" && body.context.trim()) {
     return body.context.trim();
   }
+  const journals = Array.isArray(tables.journals) ? tables.journals
+                 : Array.isArray(body.journals)   ? body.journals
+                 : [];
+  const checkIns = Array.isArray(tables.checkIns) ? tables.checkIns
+                 : Array.isArray(body.checkIns)   ? body.checkIns
+                 : [];
 
   const parts = [];
   const skinType = body.skinType || body.user?.skinType;
@@ -57,11 +69,11 @@ function buildContextFromBody(body) {
     }
   }
 
-  if (Array.isArray(body.journals) && body.journals.length) {
-    const recent = body.journals.slice(-7);
-    const conditions = recent.map((j) => j.condition).filter(Boolean);
-    const sleepPoor = recent.filter((j) => j.sleep === "poor").length;
-    const stressHigh = recent.filter((j) => j.stress === "high").length;
+  if (journals.length) {
+    const recent = journals.slice(-7);
+    const conditions = recent.map((j) => j?.condition).filter(Boolean);
+    const sleepPoor = recent.filter((j) => j?.sleep === "poor").length;
+    const stressHigh = recent.filter((j) => j?.stress === "high").length;
     const journalBits = [];
     if (conditions.length) journalBits.push(`recent skin: ${conditions.join(", ")}`);
     if (sleepPoor)         journalBits.push(`${sleepPoor} poor-sleep night${sleepPoor === 1 ? "" : "s"}`);
@@ -69,12 +81,12 @@ function buildContextFromBody(body) {
     if (journalBits.length) parts.push(`Last week — ${journalBits.join("; ")}.`);
   }
 
-  if (Array.isArray(body.checkIns) && body.checkIns.length) {
-    const recent = body.checkIns.slice(-5);
-    const irritated = recent.filter((c) => c.irritation && c.irritation !== "none").length;
-    const breakouts = recent.filter((c) => c.breakout).length;
+  if (checkIns.length) {
+    const recent = checkIns.slice(-5);
+    const irritated = recent.filter((c) => c?.irritation && c.irritation !== "none").length;
+    const breakouts = recent.filter((c) => c?.breakout).length;
     // Breakout locations live on the check-in (breakoutZones), not the journal.
-    const zones = [...new Set(recent.flatMap((c) => c.breakoutZones || []))];
+    const zones = [...new Set(recent.flatMap((c) => Array.isArray(c?.breakoutZones) ? c.breakoutZones : []))];
     const checkBits = [];
     if (irritated) checkBits.push(`${irritated} irritation flag${irritated === 1 ? "" : "s"}`);
     if (breakouts) checkBits.push(`${breakouts} breakout day${breakouts === 1 ? "" : "s"}`);
@@ -282,7 +294,6 @@ export default async function handler(req, res) {
       "| sessionId:", sessionId,
       "| question chars:", q.length,
       "| products:", Array.isArray(body.products) ? body.products.length : 0,
-      "| journals:", Array.isArray(body.journals) ? body.journals.length : 0,
     );
 
     // ── A. CACHE CHECK ────────────────────────────────────────────────────────
@@ -315,11 +326,26 @@ export default async function handler(req, res) {
       .eq("user_id", userId)
       .gte("created_at", todayStart.toISOString());
 
-    const [{ count }, recentReflections, rampLog] = await Promise.all([
+    // Phase 1 metadata migration: check-ins and journals now live in their
+    // own tables. Pull the most recent 14 of each so the prompt context
+    // window matches what we used to take from body.journals.slice(-7) /
+    // body.checkIns.slice(-5). DESC + reverse → chronological (asc) order,
+    // which is what the existing slice(-N) logic in buildContextFromBody
+    // expects (it takes the tail as "most recent").
+    const checkInsPromise = db.from("check_ins").select("data")
+      .eq("user_id", userId).order("created_at", { ascending: false }).limit(14);
+    const journalsPromise = db.from("journals").select("data")
+      .eq("user_id", userId).order("created_at", { ascending: false }).limit(14);
+
+    const [{ count }, recentReflections, rampLog, { data: checkInsRows }, { data: journalsRows }] = await Promise.all([
       usagePromise,
       withTimeout(fetchRecentReflections(db, userId, 5), 3000, [], "reflections fetch"),
       withTimeout(fetchRampLog(db, userId), 3000, [], "rampLog fetch"),
+      checkInsPromise,
+      journalsPromise,
     ]);
+    const checkInsFromTable = (checkInsRows || []).map(r => r.data).filter(Boolean).reverse();
+    const journalsFromTable = (journalsRows || []).map(r => r.data).filter(Boolean).reverse();
 
     if ((count ?? 0) >= 3) {
       // Return 200 with a soft-error payload so the client surfaces the body.
@@ -330,7 +356,10 @@ export default async function handler(req, res) {
       });
     }
 
-    const contextSummary = buildContextFromBody(body);
+    const contextSummary = buildContextFromBody(body, {
+      checkIns: checkInsFromTable,
+      journals: journalsFromTable,
+    });
     const reflectionsBlock = formatReflections(recentReflections);
     const introduceSlowlyBlock = formatIntroduceSlowly(body.products, rampLog);
     const systemPrompt = `${SYSTEM_PROMPT_BASE}\n\nUSER CONTEXT:\n${contextSummary}${reflectionsBlock ? `\n\n${reflectionsBlock}` : ""}${introduceSlowlyBlock ? `\n\n${introduceSlowlyBlock}` : ""}`;
