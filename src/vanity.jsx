@@ -4,30 +4,6 @@ import { detectActives, analyzeShelf, calcSpending } from "./engine.js";
 import { AskCygneModal } from "./components/AskCygneModal.jsx";
 import { assessRoutineFit, DEFER_TAG_CONFIG } from "./modals.jsx";
 import { ProductModal } from "./productmodal.jsx";
-import { RAMP_SCHEDULES, RAMP_ACTIVES, getRampWeek } from "./ramp.jsx";
-import { daysBetweenLocal } from "./utils.jsx";
-
-// A product is owed a check-in when:
-//   1. It's in an Introduce Slowly schedule (rampWeek + a matching active),
-//   2. The user is at least 3 days into the current week (so we have real
-//      observation data to ask about, and don't nag on the day they added it),
-//   3. rampLog has no entry for (productId, currentWeek). A "backing_off"
-//      action counts as a check-in too, since both statuses write entries.
-function getRampCheckInDue(product, rampLog = []) {
-  if (!product?.rampWeek || !product?.routineStartDate) return null;
-  const activeKey = product.category === "Toning Pad"
-    ? "toning pad"
-    : RAMP_ACTIVES.find(a => detectActives(product.ingredients || [])[a]);
-  if (!activeKey || !RAMP_SCHEDULES[activeKey]) return null;
-  const days = daysBetweenLocal(product.routineStartDate);
-  if (days < 3) return null;
-  const currentWeek = getRampWeek(product);
-  const dayInWeek = days % 7;
-  if (dayInWeek < 3) return null;
-  const checkedIn = rampLog.some(e => e?.productId === product.id && e?.week === currentWeek);
-  if (checkedIn) return null;
-  return { week: currentWeek };
-}
 
 
 // Warm near-ivory product card on the dark inky-moss canvas — the
@@ -514,7 +490,7 @@ function ClearAllButton({ onClearAll }) {
   );
 }
 
-function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearAll, onSession, waitingRoom = [], onAddFromWaiting, onDismissWaiting, checkIns = [], user = {}, journals = [], rampLog = [], onAdvanceRamp, onHoldRamp }) {
+function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearAll, onSession, waitingRoom = [], onAddFromWaiting, onDismissWaiting, checkIns = [], user = {}, journals = [] }) {
   const [view, setView] = useState("shelf");
   const [filter, setFilter] = useState("All");
   const [askState, setAskState] = useState(null); // { question, context } | null
@@ -523,12 +499,6 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearAll,
   const cats = ["All", ...new Set(products.map(p => p.category))];
   const filtered = filter === "All" ? products : products.filter(p => p.category === filter);
   const insights = buildInsights(products, activeMap);
-  const rampCheckIns = products
-    .map(p => {
-      const due = getRampCheckInDue(p, rampLog);
-      return due ? { product: p, week: due.week } : null;
-    })
-    .filter(Boolean);
 
   return (
     <div>
@@ -576,74 +546,6 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearAll,
                 {filtered.length} of {products.length} product{products.length !== 1 ? "s" : ""}
               </p>
 
-              {rampCheckIns.length > 0 && (onAdvanceRamp || onHoldRamp) && (
-                <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 18 }}>
-                  {rampCheckIns.map(({ product: p, week }) => (
-                    <div key={p.id} style={{
-                      background: "rgba(250, 249, 244, 0.92)",
-                      border: "1px solid rgba(45,61,43,0.22)",
-                      borderRadius: 8,
-                      padding: "16px 18px",
-                    }}>
-                      <p style={{
-                        fontFamily: "var(--font-body)",
-                        fontSize: 9, fontWeight: 400, letterSpacing: "0.18em", textTransform: "uppercase",
-                        color: "var(--color-ivory)",
-                        margin: "0 0 8px",
-                        opacity: 0.75,
-                      }}>
-                        Introduce slowly · week {week}
-                      </p>
-                      <p style={{
-                        fontFamily: "var(--font-body)",
-                        fontSize: 15, fontWeight: 400, letterSpacing: "0.02em",
-                        color: "var(--color-ivory)",
-                        margin: "0 0 4px",
-                      }}>
-                        {p.name}
-                      </p>
-                      <p style={{
-                        fontFamily: "var(--font-body)",
-                        fontSize: 12, color: "rgba(250,249,244,0.6)",
-                        margin: "0 0 14px", lineHeight: 1.65,
-                      }}>
-                        How has your skin been responding this week?
-                      </p>
-                      <div style={{ display: "flex", gap: 8 }}>
-                        <button
-                          onClick={() => onAdvanceRamp?.(p.id)}
-                          style={{
-                            flex: 1, padding: "10px 0",
-                            background: "transparent",
-                            border: "1px solid rgba(45,61,43,0.45)",
-                            borderRadius: 8,
-                            fontFamily: "var(--font-display)",
-                            fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase",
-                            color: "var(--color-ivory)",
-                            cursor: "pointer",
-                          }}>
-                          Skin handled it
-                        </button>
-                        <button
-                          onClick={() => onHoldRamp?.(p.id)}
-                          style={{
-                            flex: 1, padding: "10px 0",
-                            background: "transparent",
-                            border: "1px solid rgba(45,61,43,0.25)",
-                            borderRadius: 8,
-                            fontFamily: "var(--font-display)",
-                            fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase",
-                            color: "var(--color-ivory)",
-                            opacity: 0.8,
-                            cursor: "pointer",
-                          }}>
-                          Backing off
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
                 {filtered.map(p => <GlassProductCard key={p.id} product={p} onEdit={onEdit} onDelete={onDelete} onToggleRoutine={onToggleRoutine} onSession={onSession} user={user} onAskCygne={(q, ctx) => setAskState({ question: q, context: ctx })} />)}
                 <button onClick={onAdd} style={{ ...GLASS_CARD, background: "rgba(250,249,244,0.25)", border: "1px dashed rgba(192,192,192,0.4)", cursor: "pointer", aspectRatio: "1 / 1", alignItems: "center", justifyContent: "center", gap: 8 }}>
