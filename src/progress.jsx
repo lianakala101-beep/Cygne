@@ -1898,4 +1898,4 @@ function LocationManager({ locationData, setLocationData, locationDenied, setLoc
   );
 }
 
-export { Progress, CheckInModal, LocationManager, getTreatmentPhase, TreatmentRecoveryCard, getCyclePhase, getActivePauseState };
+export { Progress, CheckInModal, SkinJournalModal, LocationManager, getTreatmentPhase, TreatmentRecoveryCard, getCyclePhase, getActivePauseState };
