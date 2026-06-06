@@ -5,7 +5,7 @@ import { FREQUENCIES } from "./constants.js";
 import { buildRecommendations, buildRefinements } from "./intelligence.jsx";
 import { RoutineStep } from "./ritual.jsx";
 import { RecommendationCard } from "./intelligence.jsx";
-import { CheckInModal } from "./progress.jsx";
+import { SkinJournalModal } from "./progress.jsx";
 import { getCyclePhase, getActivePauseState } from "./progress.jsx";
 import { getNextUseLabel } from "./constants.js";
 import { getSeason } from "./seasonal.jsx";
@@ -192,7 +192,7 @@ function BreathText({ text, style }) {
   );
 }
 
-function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false, journals = [], checkIns = [], setCheckIns = () => {}, completedSteps: completedStepsProp, setCompletedSteps: setCompletedStepsProp, onUpdateUser, onAddProduct, onEditProduct, treatments = [] }) {
+function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false, journals = [], setJournals = () => {}, checkIns = [], completedSteps: completedStepsProp, setCompletedSteps: setCompletedStepsProp, onUpdateUser, onAddProduct, onEditProduct, treatments = [] }) {
   // Pause actives that are still under recovery from a logged treatment.
   // These products disappear from today's ritual and surface in Introduce
   // Slowly instead so users aren't told to apply retinol while they're
@@ -278,11 +278,16 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
     } catch { setCompletedSteps([]); }
   }, [sessionKey]);
 
-  const [showRitualCheckIn, setShowRitualCheckIn] = useState(false);
-  // CheckInModal stores `date` as a full ISO timestamp, so normalize to the
-  // YYYY-MM-DD prefix before comparing — without this the "Ritual complete"
-  // banner never auto-dismisses after the user submits a check-in.
-  const todayCheckedIn = checkIns.some(c => typeof c?.date === "string" && c.date.split("T")[0] === today);
+  const [showSkinJournal, setShowSkinJournal] = useState(false);
+  // The post-ritual prompt now opens the skin journal ("How is your skin
+  // today?") rather than the weekly check-in (irritation / breakouts /
+  // tightness). Journal entries are keyed by YYYY-MM-DD, so a direct
+  // string compare works — and once the user has logged today's journal
+  // the "Ritual complete" banner auto-dismisses.
+  //
+  // The weekly check-in flow still exists, but lives in the Progress tab;
+  // it is no longer triggered by daily ritual completion.
+  const todayJournaled = journals.some(j => j?.date === today);
   const [hintVisible, setHintVisible] = useState(() => !localStorage.getItem("ritual_hint_dismissed"));
 
   const isStepChecked = (id) => completedSteps.includes(id);
@@ -417,27 +422,36 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
             </div>
           </div>
         : <div style={{ padding: "32px 0 16px" }}><div style={{ display: "flex", alignItems: "flex-start", gap: 9, marginBottom: 8 }}><span style={{ color: "var(--clay)", flexShrink: 0, marginTop: 4, display: "inline-flex" }}><SwanIcon size={16} /></span><p style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 400, letterSpacing: "0.05em", color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>Your ritual is waiting. Add products to your vanity and they'll appear here.</p></div></div>}
-      {allDone && steps.length > 0 && !todayCheckedIn && (
+      {allDone && steps.length > 0 && !todayJournaled && (
         <div style={{ margin: "16px 0", padding: "18px 18px", background: "rgba(250,249,244,0.10)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 8 }}>
           <div style={{ textAlign: "center", marginBottom: 14 }}>
             <p style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 400, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--parchment)", margin: "0 0 2px" }}>Ritual complete.</p>
             <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0 }}>
-              {`Your ${sessionLabel.toLowerCase()} ritual is done — how did your skin feel today?`}
+              {`Your ${sessionLabel.toLowerCase()} ritual is done — how is your skin today?`}
             </p>
           </div>
-          <button onClick={() => setShowRitualCheckIn(true)}
+          <button onClick={() => setShowSkinJournal(true)}
             style={{ width: "100%", padding: "14px 40px", background: "transparent", border: "1.5px solid rgba(250,249,244,0.5)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 400, color: "var(--color-ivory)", cursor: "pointer", letterSpacing: "0.2em", textTransform: "uppercase", transition: "all 0.3s ease" }}
             onMouseEnter={e => { e.currentTarget.style.background = "var(--color-inky-moss)"; e.currentTarget.style.color = "var(--color-ivory)"; }}
             onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--color-inky-moss)"; }}>
-            RITUAL COMPLETE
+            Log today's journal
           </button>
         </div>
       )}
 
-      {showRitualCheckIn && (
-        <CheckInModal
-          onSubmit={data => { setCheckIns(p => [...p, data]); setShowRitualCheckIn(false); }}
-          onClose={() => setShowRitualCheckIn(false)}
+      {showSkinJournal && (
+        <SkinJournalModal
+          existing={journals.find(j => j?.date === today) || null}
+          onSubmit={data => {
+            // De-dupe by date — matches the existing journal flow in
+            // progress.jsx so editing today's entry overwrites cleanly.
+            setJournals(prev => {
+              const filtered = prev.filter(j => j?.date !== data.date);
+              return [...filtered, data].sort((a, b) => String(a.date).localeCompare(String(b.date)));
+            });
+            setShowSkinJournal(false);
+          }}
+          onClose={() => setShowSkinJournal(false)}
         />
       )}
 

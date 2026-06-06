@@ -1204,8 +1204,8 @@ export default function App() {
           cycleDay={getCurrentCycleDay(user)}
           isFlightMode={false}
           journals={journals}
+          setJournals={setJournals}
           checkIns={checkIns}
-          setCheckIns={setCheckIns}
           completedSteps={completedSteps}
           setCompletedSteps={setCompletedSteps}
           onUpdateUser={updateUser}
