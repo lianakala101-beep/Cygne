@@ -122,6 +122,36 @@ export default async function handler(req, res) {
       }
     }
 
+    // ── 5b. Delete products rows (Phase 2 migration) ──────────────────────
+    let productsDeleted = 0;
+    {
+      const { count, error } = await db
+        .from("products")
+        .delete({ count: "exact" })
+        .eq("user_id", userId);
+      if (error) {
+        console.error("[delete-account] products delete failed:", error.message);
+      } else {
+        productsDeleted = count ?? 0;
+        console.log("[delete-account] deleted", productsDeleted, "products rows");
+      }
+    }
+
+    // ── 5c. Delete ramp_log rows (Phase 2 migration) ──────────────────────
+    let rampLogDeleted = 0;
+    {
+      const { count, error } = await db
+        .from("ramp_log")
+        .delete({ count: "exact" })
+        .eq("user_id", userId);
+      if (error) {
+        console.error("[delete-account] ramp_log delete failed:", error.message);
+      } else {
+        rampLogDeleted = count ?? 0;
+        console.log("[delete-account] deleted", rampLogDeleted, "ramp_log rows");
+      }
+    }
+
     // ── 6. Delete every file under reflections/<userId>/ ──────────────────
     // Pagination: Supabase storage list() caps at ~1000 per call. A user
     // could in principle have more reflections, so loop until we get a
@@ -175,15 +205,22 @@ export default async function handler(req, res) {
       return res.status(502).json({
         error: "Account deletion failed at the final step",
         detail: deleteErr.message,
-        partial: { check_ins: checkInsDeleted, journals: journalsDeleted, storage: storageDeleted },
+        partial: { check_ins: checkInsDeleted, journals: journalsDeleted, products: productsDeleted, ramp_log: rampLogDeleted, storage: storageDeleted },
       });
     }
 
-    console.log("[delete-account] complete | userId:", userId, "| check_ins:", checkInsDeleted, "| journals:", journalsDeleted, "| storage:", storageDeleted);
+    console.log(
+      "[delete-account] complete | userId:", userId,
+      "| check_ins:", checkInsDeleted,
+      "| journals:", journalsDeleted,
+      "| products:", productsDeleted,
+      "| ramp_log:", rampLogDeleted,
+      "| storage:", storageDeleted,
+    );
 
     return res.status(200).json({
       success: true,
-      deleted: { check_ins: checkInsDeleted, journals: journalsDeleted, storage: storageDeleted },
+      deleted: { check_ins: checkInsDeleted, journals: journalsDeleted, products: productsDeleted, ramp_log: rampLogDeleted, storage: storageDeleted },
     });
 
   } catch (err) {
