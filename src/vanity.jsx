@@ -81,14 +81,16 @@ function CategoryGlyph({ category }) {
         </svg>
       );
     case "Prescription":
-      // Apothecary vial with stopper
+      // Rx symbol — capital R with a small kick-slash through the leg,
+      // the universal apothecary mark. Path data from the brief, scaled
+      // from a 24-unit grid into the 100-unit viewBox the rest of the
+      // glyphs use so stroke weight stays visually consistent.
       return (
         <svg {...props}>
-          <path d="M 42 10 L 58 10 L 58 18 L 42 18 Z" />
-          <line x1="42" y1="18" x2="36" y2="32" />
-          <line x1="58" y1="18" x2="64" y2="32" />
-          <path d="M 36 32 L 36 84 Q 36 92 44 92 L 56 92 Q 64 92 64 84 L 64 32 Z" />
-          <line x1="40" y1="62" x2="60" y2="62" />
+          <path d="M 20 10 h 30 a 20 20 0 0 1 0 40 H 20 V 10 z" />
+          <line x1="20" y1="50" x2="20" y2="90" />
+          <line x1="50" y1="50" x2="80" y2="90" />
+          <line x1="65" y1="70" x2="80" y2="55" />
         </svg>
       );
     case "SPF":
