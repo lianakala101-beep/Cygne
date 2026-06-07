@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState, useEffect } from "react";
-import { Icon, Section, SwanIcon } from "./components.jsx";
+import { Icon, Section } from "./components.jsx";
 import { analyzeShelf, detectConflicts, buildRoutine, calcSpending, getCurrentSession } from "./engine.js";
 import { getSwanSensePredictions } from "./swansense.jsx";
 import { SwanSongCard, FlightModeModal } from "./ritual.jsx";
@@ -106,8 +106,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         ];
         return (
           <div>
-            <div style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: 28 }}>
-              <span style={{ color: "var(--clay)", flexShrink: 0, marginTop: 6, display: "inline-flex" }}><SwanIcon size={18} /></span>
+            <div style={{ marginBottom: 28 }}>
               <p style={{ fontFamily: "var(--font-body)", fontSize: 14, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>
                 Your ritual lives here. Let's build it around you.
               </p>
@@ -153,8 +152,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           ];
           return (
             <div style={{ marginBottom: 24, background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "16px 18px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-                <span style={{ color: "var(--clay)", display: "inline-flex" }}><SwanIcon size={14} /></span>
+              <div style={{ marginBottom: 14 }}>
                 <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)", margin: 0 }}>Getting started</p>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>

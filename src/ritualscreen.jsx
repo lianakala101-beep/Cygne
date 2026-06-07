@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Icon, Section, SwanIcon } from "./components.jsx";
+import { Icon, Section } from "./components.jsx";
 import { detectActives, analyzeShelf, buildRoutine, detectConflicts, isScheduledToday, applyPhilosophy } from "./engine.js";
 import { FREQUENCIES } from "./constants.js";
 import { buildRecommendations, buildRefinements } from "./intelligence.jsx";
@@ -421,7 +421,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
               />)}
             </div>
           </div>
-        : <div style={{ padding: "32px 0 16px" }}><div style={{ display: "flex", alignItems: "flex-start", gap: 9, marginBottom: 8 }}><span style={{ color: "var(--clay)", flexShrink: 0, marginTop: 4, display: "inline-flex" }}><SwanIcon size={16} /></span><p style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 400, letterSpacing: "0.05em", color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>Your ritual is waiting. Add products to your vanity and they'll appear here.</p></div></div>}
+        : <div style={{ padding: "32px 0 16px" }}><p style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 400, letterSpacing: "0.05em", color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>Your ritual is waiting. Add products to your vanity and they'll appear here.</p></div>}
       {allDone && steps.length > 0 && !todayJournaled && (
         <div style={{ margin: "16px 0", padding: "18px 18px", background: "rgba(250,249,244,0.10)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 8 }}>
           <div style={{ textAlign: "center", marginBottom: 14 }}>
