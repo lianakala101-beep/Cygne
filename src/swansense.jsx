@@ -466,7 +466,6 @@ function SwanSenseCard({ products, checkIns = [], user = {}, locationData = null
   return (
     <div style={{ marginBottom: 20 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-        <span style={{ color: "var(--clay)", display: "inline-flex" }}><SwanIcon size={16} /></span>
         <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)" }}>Swan Sense</span>
         <div style={{ flex: 1, height: 1, background: "var(--border)", marginLeft: 4 }} />
         <button onClick={() => setDismissed(true)} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", opacity: 0.4, padding: 4 }}><Icon name="x" size={12} /></button>
