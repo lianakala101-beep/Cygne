@@ -2,6 +2,7 @@ import { LocationManager } from "./progress.jsx";
 import { useState, useRef } from "react";
 import { Icon, Section } from "./components.jsx";
 import { calcSpending } from "./engine.js";
+import { supabase, invokeEdgeFunction } from "./supabase.js";
 
 const SKIN_TYPES = ["Dry", "Oily", "Combination", "Sensitive", "Normal"];
 const SKIN_CONCERNS = ["Acne", "Hyperpigmentation", "Redness", "Fine lines", "Texture", "Dehydration", "Dullness", "Sensitivity"];
@@ -726,6 +727,39 @@ function ProfileSheet({ user, products, locationData, setLocationData, locationD
     birthMonth: user?.birthMonth || "",
     birthDay: user?.birthDay || "",
   });
+  // Account-deletion modal state — kept here so the trigger button and the
+  // modal can share the loading / error states without prop-drilling.
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState(null);
+  const canDelete = deleteConfirmText === "DELETE" && !deleting;
+
+  const handleConfirmDelete = async () => {
+    if (!canDelete) return;
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      // Resolve userId from the live session rather than the user prop:
+      // the prop may not carry id, and getSession is non-network anyway.
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user?.id) {
+        throw new Error("Not signed in.");
+      }
+      const result = await invokeEdgeFunction("delete-account", { userId: session.user.id });
+      if (!result?.success) {
+        throw new Error(result?.error || "Deletion failed.");
+      }
+      // Success — close modal, then let onLogout do the local cleanup
+      // (signs out, clears React state, sends app back to login screen).
+      setShowDeleteModal(false);
+      await onLogout();
+    } catch (e) {
+      console.error("[Cygne] delete account failed:", e?.message ?? e);
+      setDeleteError(e?.message || "Deletion failed. Please try again.");
+      setDeleting(false);
+    }
+  };
 
   const saveAccount = () => {
     onUpdateUser({ ...user, ...accountDraft });
@@ -855,6 +889,158 @@ function ProfileSheet({ user, products, locationData, setLocationData, locationD
           <button onClick={onLogout}
             style={{ width: "100%", padding: "13px 0", background: "transparent", color: "var(--color-ivory, #faf9f4)", border: "1.5px solid rgba(250,249,244,0.5)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 700, letterSpacing: "0.22em", textTransform: "uppercase", cursor: "pointer", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" }}>
             Sign Out
+          </button>
+
+          {/* Delete account — low-emphasis text-link beneath Sign Out so it's
+              findable but never the user's first read. The actual irreversible
+              action lives behind the modal's type-to-confirm gate. */}
+          <button onClick={() => {
+              setDeleteConfirmText("");
+              setDeleteError(null);
+              setShowDeleteModal(true);
+            }}
+            style={{ width: "100%", marginTop: 18, padding: "10px 0", background: "transparent", color: "rgba(255,255,255,0.4)", border: "none", fontFamily: "var(--font-body)", fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", cursor: "pointer", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent", textDecoration: "underline", textUnderlineOffset: 4 }}>
+            Delete Account
+          </button>
+        </div>
+      </div>
+
+      {showDeleteModal && (
+        <DeleteAccountModal
+          confirmText={deleteConfirmText}
+          setConfirmText={setDeleteConfirmText}
+          deleting={deleting}
+          error={deleteError}
+          canDelete={canDelete}
+          onCancel={() => { if (!deleting) setShowDeleteModal(false); }}
+          onConfirm={handleConfirmDelete}
+        />
+      )}
+    </div>
+  );
+}
+
+// --- DELETE ACCOUNT MODAL ----------------------------------------------------
+// Two-button confirm with a type-to-confirm gate. "DELETE PERMANENTLY" stays
+// disabled until the user types the literal word "DELETE" — same uppercase
+// match the prompt asks for, no whitespace tolerance, no fuzzy match. The
+// modal sits above ProfileSheet's own backdrop with a slightly darker layer
+// so the destructive UI reads as more weighty than the rest of the sheet.
+function DeleteAccountModal({ confirmText, setConfirmText, deleting, error, canDelete, onCancel, onConfirm }) {
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 500, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 24px" }}>
+      <div style={{ position: "absolute", inset: 0, background: "rgba(8,10,9,0.7)", backdropFilter: "blur(14px)" }} onClick={onCancel} />
+      <div onClick={e => e.stopPropagation()}
+        style={{
+          position: "relative", zIndex: 1,
+          width: "100%", maxWidth: 360,
+          background: "var(--color-inky-moss, #2d3d2b)",
+          border: "1px solid rgba(232,224,200,0.18)",
+          padding: "30px 26px 24px",
+        }}>
+        <p style={{
+          fontFamily: "var(--font-display)",
+          fontSize: 12, fontWeight: 700, letterSpacing: "0.22em", textTransform: "uppercase",
+          color: "var(--color-ivory, #faf9f4)",
+          margin: "0 0 18px", textAlign: "center",
+        }}>
+          Delete Account
+        </p>
+        <p style={{
+          fontFamily: "var(--font-body)",
+          fontSize: 13, fontWeight: 400, lineHeight: 1.6, letterSpacing: "0.01em",
+          color: "rgba(255,255,255,0.85)",
+          margin: "0 0 22px", textAlign: "center",
+        }}>
+          This will permanently delete your account, all skin data, routine history, photos, and journal entries. This cannot be undone.
+        </p>
+
+        <p style={{
+          fontFamily: "var(--font-body)",
+          fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase",
+          color: "rgba(255,255,255,0.55)",
+          margin: "0 0 8px",
+        }}>
+          Type DELETE to confirm
+        </p>
+        <input
+          type="text"
+          value={confirmText}
+          onChange={e => setConfirmText(e.target.value)}
+          disabled={deleting}
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="characters"
+          spellCheck={false}
+          aria-label="Type DELETE to confirm"
+          style={{
+            width: "100%", boxSizing: "border-box",
+            background: "rgba(8,10,9,0.4)",
+            border: "1px solid rgba(232,224,200,0.28)",
+            borderRadius: 0,
+            padding: "12px 14px",
+            fontFamily: "var(--font-body)", fontSize: 13,
+            letterSpacing: "0.18em",
+            color: "var(--color-ivory, #faf9f4)",
+            caretColor: "var(--color-ivory, #faf9f4)",
+            outline: "none",
+            WebkitAppearance: "none", appearance: "none",
+            WebkitTapHighlightColor: "transparent",
+            opacity: deleting ? 0.5 : 1,
+          }}
+        />
+
+        {error && (
+          <p style={{
+            fontFamily: "var(--font-body)",
+            fontSize: 11, color: "#d8a98a",
+            margin: "12px 0 0", textAlign: "center", lineHeight: 1.5,
+          }}>
+            {error}
+          </p>
+        )}
+
+        <div style={{ display: "flex", gap: 10, marginTop: 22 }}>
+          <button onClick={onCancel} disabled={deleting}
+            style={{
+              flex: 1, padding: "12px 0",
+              background: "transparent",
+              border: "1px solid rgba(232,224,200,0.32)",
+              borderRadius: 0,
+              fontFamily: "var(--font-display)",
+              fontSize: 11, fontWeight: 700,
+              letterSpacing: "0.2em", textTransform: "uppercase",
+              color: "var(--color-ivory, #faf9f4)",
+              cursor: deleting ? "default" : "pointer",
+              WebkitAppearance: "none", appearance: "none",
+              WebkitTapHighlightColor: "transparent",
+              opacity: deleting ? 0.5 : 1,
+            }}>
+            Cancel
+          </button>
+          <button onClick={onConfirm} disabled={!canDelete}
+            onMouseDown={e => { if (canDelete) e.currentTarget.style.opacity = "0.75"; }}
+            onMouseUp={e => { if (canDelete) e.currentTarget.style.opacity = "1"; }}
+            onMouseLeave={e => { if (canDelete) e.currentTarget.style.opacity = "1"; }}
+            style={{
+              flex: 1, padding: "12px 0",
+              // Destructive bronze tint — same accent used elsewhere in the
+              // codebase for warning / remove states (#8b7355) but with a
+              // slightly brighter base so it reads as the high-emphasis
+              // action against the dark inky-moss panel.
+              background: "rgba(166, 110, 70, 0.18)",
+              border: "1px solid rgba(196, 130, 90, 0.55)",
+              borderRadius: 0,
+              fontFamily: "var(--font-display)",
+              fontSize: 11, fontWeight: 700,
+              letterSpacing: "0.2em", textTransform: "uppercase",
+              color: canDelete ? "#e8c7a8" : "rgba(232,199,168,0.45)",
+              cursor: canDelete ? "pointer" : "not-allowed",
+              opacity: canDelete ? 1 : 0.55,
+              WebkitAppearance: "none", appearance: "none",
+              WebkitTapHighlightColor: "transparent",
+            }}>
+            {deleting ? "Deleting…" : "Delete Permanently"}
           </button>
         </div>
       </div>
