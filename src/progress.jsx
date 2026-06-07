@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Icon, Section } from "./components.jsx";
+import { Icon, Section, ErrorBoundary } from "./components.jsx";
 import { detectActives, detectActivesFromProduct, analyzeShelf, detectConflicts, buildRoutine, hasSPFCoverage } from "./engine.js";
 import { getAutoSession } from "./productmodal.jsx";
 import { RAMP_SCHEDULES, RAMP_ACTIVES, IntroduceSlowlyCard, getRampWeek } from "./ramp.jsx";
@@ -401,7 +401,8 @@ function getCyclePhase(day) {
   return CYCLE_PHASES.find(p => day >= p.days[0] && day <= p.days[1]) || CYCLE_PHASES[3];
 }
 
-function CycleTracker({ products, activeMap, cycleDay: cycledayProp = 14, onSetCycleDay, user = {}, onUpdateUser = () => {} }) {
+function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycledayProp = 14, onSetCycleDay, user = {}, onUpdateUser = () => {} }) {
+  const products = Array.isArray(productsProp) ? productsProp : [];
   const enabled = user.cycleTrackingEnabled || false;
   // Compute cycle day dynamically from cycleStartDate (LOCAL date, not UTC)
   const computedDay = getCurrentCycleDay(user) || cycledayProp || 14;
@@ -801,7 +802,8 @@ function AddTreatmentModal({ onSave, onClose }) {
   );
 }
 
-function TreatmentRecoveryCard({ treatment, products, activeMap, onDismiss, onResetDate }) {
+function TreatmentRecoveryCard({ treatment, products: productsProp = [], activeMap, onDismiss, onResetDate }) {
+  const products = Array.isArray(productsProp) ? productsProp : [];
   const [confirmReset, setConfirmReset] = useState(false);
   const result = getTreatmentPhase(treatment);
   if (!result || !result.phase) return null;
@@ -929,7 +931,9 @@ function TreatmentRecoveryCard({ treatment, products, activeMap, onDismiss, onRe
   );
 }
 
-function TreatmentSection({ treatments, saveTreatment, removeTreatment, updateTreatmentDate = () => {}, products, activeMap }) {
+function TreatmentSection({ treatments: treatmentsProp = [], saveTreatment, removeTreatment, updateTreatmentDate = () => {}, products: productsProp = [], activeMap }) {
+  const treatments = Array.isArray(treatmentsProp) ? treatmentsProp : [];
+  const products   = Array.isArray(productsProp)   ? productsProp   : [];
   const [addOpen, setAddOpen] = useState(false);
   const activeTreatments = treatments.filter(t => {
     const r = getTreatmentPhase(t);
@@ -1155,7 +1159,9 @@ function buildBodyShelfAdvice(zones, products, activeMap) {
   return { gaps, doubles };
 }
 
-function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => {}, triggerLog = [], setTriggerLog = () => {} }) {
+function BodyAcneTracker({ products: productsProp = [], activeMap, user = {}, onUpdateUser = () => {}, triggerLog: triggerLogProp = [], setTriggerLog = () => {} }) {
+  const products   = Array.isArray(productsProp)   ? productsProp   : [];
+  const triggerLog = Array.isArray(triggerLogProp) ? triggerLogProp : [];
   const enabled = user.bodyAcneEnabled || false;
   const zones = user.bodyAcneZones || [];
   const [showTriggerModal, setShowTriggerModal] = useState(false);
@@ -1451,7 +1457,8 @@ function BodyAcneTracker({ products, activeMap, user = {}, onUpdateUser = () => 
   );
 }
 
-function JournalFullView({ journals, onClose, onEditToday }) {
+function JournalFullView({ journals: journalsProp = [], onClose, onEditToday }) {
+  const journals = Array.isArray(journalsProp) ? journalsProp : [];
   const today = new Date().toISOString().split("T")[0];
   const sorted = [...journals].sort((a, b) => b.date.localeCompare(a.date));
 
@@ -1546,7 +1553,19 @@ function getProductSession(product) {
   return getAutoSession(product).session;
 }
 
-function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatments, saveTreatment, removeTreatment, updateTreatmentDate = () => {}, user = {}, onAdvanceRamp, onHoldRamp, onResetRampStart = () => {}, journals = [], setJournals = () => {}, onUpdateUser = () => {}, reflections = [], triggerLog = [], setTriggerLog = () => {} }) {
+function ProgressInner({ products: productsProp, checkIns: checkInsProp, setCheckIns, treatments: treatmentsProp = [], setTreatments, saveTreatment, removeTreatment, updateTreatmentDate = () => {}, user = {}, onAdvanceRamp, onHoldRamp, onResetRampStart = () => {}, journals: journalsProp = [], setJournals = () => {}, onUpdateUser = () => {}, reflections: reflectionsProp = [], triggerLog: triggerLogProp = [], setTriggerLog = () => {} }) {
+  // Defensive coercion for every collection prop. The `= []` destructure
+  // defaults only catch `undefined`; explicit nulls or unexpected
+  // non-array values (e.g. during the brief window between auth landing
+  // and the Phase 1/2 table reads resolving) would still crash the first
+  // .map / .filter / .length downstream. Coerce once here so everything
+  // beyond this line can iterate without a guard.
+  const products    = Array.isArray(productsProp)    ? productsProp    : [];
+  const checkIns    = Array.isArray(checkInsProp)    ? checkInsProp    : [];
+  const treatments  = Array.isArray(treatmentsProp)  ? treatmentsProp  : [];
+  const journals    = Array.isArray(journalsProp)    ? journalsProp    : [];
+  const reflections = Array.isArray(reflectionsProp) ? reflectionsProp : [];
+  const triggerLog  = Array.isArray(triggerLogProp)  ? triggerLogProp  : [];
   const [showCheckIn, setShowCheckIn] = useState(false);
   const [showJournal, setShowJournal] = useState(false);
   const [askCygneQuestion, setAskCygneQuestion] = useState(null);
@@ -1898,6 +1917,18 @@ function LocationManager({ locationData, setLocationData, locationDenied, setLoc
         />
       )}
     </div>
+  );
+}
+
+// Wrap the screen-level Progress export in an ErrorBoundary so a render
+// crash inside its (large) component tree degrades to the in-app fallback
+// instead of unmounting React. Sub-exports (CheckInModal, SkinJournalModal,
+// helpers) are left as-is — their own callers can wrap if needed.
+function Progress(props) {
+  return (
+    <ErrorBoundary>
+      <ProgressInner {...props} />
+    </ErrorBoundary>
   );
 }
 

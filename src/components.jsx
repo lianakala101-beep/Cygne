@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, Component } from "react";
 
 const Icon = ({ name, size = 20 }) => {
   const d = {
@@ -210,4 +210,74 @@ function SwanIcon({ size = 18, color = "currentColor", outlineOnly = false }) {
 // --- SPLASH SCREEN -----------------------------------------------------------
 
 
-export { Icon, Pill, Section, FlagCard, SwanIcon };
+// --- ERROR BOUNDARY ----------------------------------------------------------
+// Generic class-based error boundary. Wrap any subtree that could throw at
+// render time — typically the screen-level exports from profile.jsx /
+// progress.jsx / dashboard.jsx etc. — so a single bad data shape produces a
+// graceful in-app fallback instead of unmounting React to a white screen.
+//
+// The fallback intentionally matches the rest of the app's chrome (inky-moss
+// canvas, ivory Fungis Heavy headline, outlined button). A "Refresh" button
+// is the user's escape hatch; we don't bother with a "try again in place"
+// because the most common cause is a stale React state branch that a full
+// page reload re-derives correctly.
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error, info) {
+    // eslint-disable-next-line no-console
+    console.error(
+      "[Cygne] ErrorBoundary caught:",
+      error?.message ?? error,
+      info?.componentStack ?? "",
+    );
+  }
+  render() {
+    if (!this.state.hasError) return this.props.children;
+    return (
+      <div style={{
+        minHeight: "100vh",
+        background: "var(--color-inky-moss, #2d3d2b)",
+        color: "var(--color-ivory, #faf9f4)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        padding: "60px 28px", textAlign: "center",
+      }}>
+        <div style={{ maxWidth: 360 }}>
+          <p style={{
+            fontFamily: "var(--font-display)",
+            fontSize: 14, fontWeight: 700, letterSpacing: "0.22em",
+            textTransform: "uppercase", margin: "0 0 14px", opacity: 0.85,
+          }}>Something interrupted us</p>
+          <p style={{
+            fontFamily: "var(--font-body)",
+            fontSize: 13, lineHeight: 1.7, margin: "0 0 24px",
+            color: "rgba(250,249,244,0.75)",
+          }}>This page hit an error. Try refreshing the app — your data is safe.</p>
+          <button onClick={() => window.location.reload()}
+            style={{
+              padding: "12px 22px",
+              background: "transparent",
+              color: "var(--color-ivory, #faf9f4)",
+              border: "1px solid rgba(250,249,244,0.5)",
+              borderRadius: 0,
+              fontFamily: "var(--font-display)",
+              fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase",
+              cursor: "pointer",
+              WebkitAppearance: "none", appearance: "none",
+              WebkitTapHighlightColor: "transparent",
+            }}>
+            Refresh
+          </button>
+        </div>
+      </div>
+    );
+  }
+}
+
+
+export { Icon, Pill, Section, FlagCard, SwanIcon, ErrorBoundary };
