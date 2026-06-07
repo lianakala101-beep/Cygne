@@ -59,13 +59,19 @@ function withTimeout(promise, timeoutMs, fallback, label) {
 }
 
 async function fetchRampLog(db, userId) {
+  // Phase 2 metadata migration: rampLog now lives in the ramp_log table
+  // (see supabase/migrations/20260606000000_*). Service role bypasses RLS,
+  // so this select works without any auth.uid() context.
   try {
-    const { data, error } = await db.auth.admin.getUserById(userId);
-    if (error || !data?.user) return [];
-    const log = data.user.user_metadata?.rampLog;
-    return Array.isArray(log) ? log : [];
+    const { data, error } = await db
+      .from("ramp_log").select("data").eq("user_id", userId);
+    if (error) {
+      console.error("[monthly-recap] ramp_log fetch failed:", error.message);
+      return [];
+    }
+    return (data || []).map(r => r.data).filter(Boolean);
   } catch (e) {
-    console.error("[monthly-recap] rampLog fetch failed:", e?.message ?? e);
+    console.error("[monthly-recap] rampLog fetch threw:", e?.message ?? e);
     return [];
   }
 }

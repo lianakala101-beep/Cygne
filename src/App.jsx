@@ -325,15 +325,41 @@ export default function App() {
       if (meta.locationDenied) {
         setLocationDenied(true);
       }
-      // Restore products (vanity shelf) from Supabase — but fall back to
-      // existing localStorage state if cloud hasn't been populated yet,
-      // so pre-migration users don't see an empty vanity.
-      if (meta.products && Array.isArray(meta.products)) {
-        setProducts(meta.products);
-      }
-      if (meta.rampLog && Array.isArray(meta.rampLog)) {
-        setRampLog(meta.rampLog);
-      }
+      // Restore products + rampLog from Supabase. Phase 2 of the
+      // metadata-migration moved both of these out of user_metadata and
+      // into their own per-collection tables (products, ramp_log — see
+      // supabase/migrations/20260606000000_create_products_ramplog_tables.sql).
+      // Fire-and-forget so the rest of loadUserProfile doesn't block on
+      // the DB roundtrip; useLocalStorage already seeded the React state
+      // instantly, the table reads override once they resolve.
+      (async () => {
+        const { data: pRows, error: pErr } = await supabase
+          .from("products").select("data").eq("user_id", authUser.id);
+        if (pErr) {
+          console.error("[Cygne] products load failed:", pErr.message);
+          return;
+        }
+        if (Array.isArray(pRows)) {
+          const next = pRows.map(r => r.data).filter(Boolean);
+          setProducts(next);
+        }
+      })();
+      (async () => {
+        const { data: rRows, error: rErr } = await supabase
+          .from("ramp_log").select("data").eq("user_id", authUser.id);
+        if (rErr) {
+          console.error("[Cygne] ramp_log load failed:", rErr.message);
+          return;
+        }
+        if (Array.isArray(rRows)) {
+          const next = rRows.map(r => r.data).filter(Boolean);
+          // rampLog has historically been kept in ascending timestamp
+          // order; sort ascending so any code that reads e.g. .slice(-N)
+          // gets the most recent entries.
+          next.sort((a, b) => String(a?.timestamp || "").localeCompare(String(b?.timestamp || "")));
+          setRampLog(next);
+        }
+      })();
       if (meta.triggerLog && Array.isArray(meta.triggerLog)) {
         setTriggerLog(meta.triggerLog);
       }
@@ -498,16 +524,60 @@ export default function App() {
   }, [notifDismissed]);
 
   // -- Sync products (vanity shelf) to Supabase -------------------------------
+  // Writes to the `products` table (Phase 2 metadata migration). client_id is
+  // `p.id` (Date.now() string or uuid). Upsert handles add + edit; a second
+  // pass deletes rows whose client_id is no longer in local state, so a
+  // product removed from the vanity (via Shelf's delete UI) doesn't linger
+  // in the table forever. Order matters: upsert first, then diff + delete,
+  // so a mid-flight crash leaves the table in a superset state rather than
+  // wiping live data.
   useEffect(() => {
     if (!profileLoaded.current || !authSession) return;
-    supabase.auth.updateUser({ data: { products } }).catch(() => {});
-  }, [products]);
+    const userId = authSession.user.id;
+    const rows = (Array.isArray(products) ? products : [])
+      .filter(p => p && p.id != null)
+      .map(p => ({ user_id: userId, client_id: String(p.id), data: p }));
+    (async () => {
+      if (rows.length > 0) {
+        const { error } = await supabase.from("products")
+          .upsert(rows, { onConflict: "user_id,client_id" });
+        if (error) console.error("[Cygne] products upsert failed:", error.message);
+      }
+      const localIds = new Set(rows.map(r => r.client_id));
+      const { data: tableRows, error: selErr } = await supabase
+        .from("products").select("client_id").eq("user_id", userId);
+      if (selErr) {
+        console.error("[Cygne] products stale-diff fetch failed:", selErr.message);
+        return;
+      }
+      const staleIds = (tableRows || []).map(r => r.client_id).filter(id => !localIds.has(id));
+      if (staleIds.length > 0) {
+        const { error: delErr } = await supabase.from("products")
+          .delete().eq("user_id", userId).in("client_id", staleIds);
+        if (delErr) console.error("[Cygne] products stale-delete failed:", delErr.message);
+      }
+    })();
+  }, [products, authSession]);
 
   // -- Sync ramp log (Skin Handled It / Backing Off history) to Supabase -----
+  // Writes to the `ramp_log` table. client_id is `${productId}_${timestamp}`
+  // — timestamp alone isn't unique (auto-graduate / auto-enroll can emit
+  // many entries in one tick all sharing the same nowIso). Append-only by
+  // design; no stale-row cleanup pass since rampLog is an audit trail and
+  // entries should never disappear.
   useEffect(() => {
     if (!profileLoaded.current || !authSession) return;
-    supabase.auth.updateUser({ data: { rampLog } }).catch(e => console.error("[Cygne] rampLog sync failed:", e));
-  }, [rampLog]);
+    if (!Array.isArray(rampLog) || rampLog.length === 0) return;
+    const userId = authSession.user.id;
+    const rows = rampLog
+      .filter(e => e && e.productId && e.timestamp)
+      .map(e => ({ user_id: userId, client_id: `${e.productId}_${e.timestamp}`, data: e }));
+    if (rows.length === 0) return;
+    supabase.from("ramp_log").upsert(rows, { onConflict: "user_id,client_id" })
+      .then(({ error }) => {
+        if (error) console.error("[Cygne] ramp_log upsert failed:", error.message);
+      });
+  }, [rampLog, authSession]);
 
   // -- Sync trigger + symptom log (body-acne "What happened today?") ---------
   useEffect(() => {
@@ -851,13 +921,10 @@ export default function App() {
     setProducts(updatedProducts);
     setRampLog(updatedLog);
 
+    // Persistence: the products + rampLog sync useEffects above (table-
+    // backed since Phase 2) fire on these setState calls and handle the
+    // upserts themselves. No inline updateUser needed.
     console.log("[Cygne ramp action]", entry);
-
-    if (authSession) {
-      supabase.auth.updateUser({ data: { products: updatedProducts, rampLog: updatedLog } })
-        .then(() => console.log("[Cygne] ramp action saved to Supabase — entries:", updatedLog.length))
-        .catch(e => console.error("[Cygne] ramp action save failed:", e));
-    }
   };
 
   const advanceRamp = (id) => recordRampAction(id, "handled");
@@ -878,11 +945,8 @@ export default function App() {
     );
     setProducts(updated);
     console.log("[Cygne ramp reset]", { productId: id, newStart: iso });
-    if (authSession) {
-      supabase.auth.updateUser({ data: { products: updated } })
-        .then(() => console.log("[Cygne] ramp reset saved to Supabase"))
-        .catch(e => console.error("[Cygne] ramp reset save failed:", e));
-    }
+    // The products sync useEffect (table-backed since Phase 2) picks up
+    // the setProducts above and handles persistence — no inline save.
   };
 
   // -- Introduce Slowly: auto-enrollment backfill ----------------------------
@@ -943,11 +1007,9 @@ export default function App() {
       "ramp product" + (newEntries.length === 1 ? "" : "s") + " to Introduce Slowly:",
       newEntries.map(e => ({ productId: e.productId })),
     );
-    if (authSession) {
-      supabase.auth.updateUser({ data: { products: updatedProducts, rampLog: newLog } })
-        .then(() => console.log("[Cygne] auto-enroll saved to Supabase — entries:", newLog.length))
-        .catch(e => console.error("[Cygne] auto-enroll save failed:", e));
-    }
+    // Persistence: the products + rampLog sync useEffects pick up the
+    // setProducts / setRampLog above and write to their tables — no
+    // inline updateUser since Phase 2 of the metadata migration.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [products, authSession]);
 
@@ -1005,11 +1067,9 @@ export default function App() {
       "ramp product" + (newEntries.length === 1 ? "" : "s") + ":",
       newEntries.map(e => ({ productId: e.productId, week: e.week })),
     );
-    if (authSession) {
-      supabase.auth.updateUser({ data: { products: updatedProducts, rampLog: newLog } })
-        .then(() => console.log("[Cygne] auto-graduate saved to Supabase — entries:", newLog.length))
-        .catch(e => console.error("[Cygne] auto-graduate save failed:", e));
-    }
+    // Persistence: the products + rampLog sync useEffects pick up the
+    // setProducts / setRampLog above and write to their tables — no
+    // inline updateUser since Phase 2 of the metadata migration.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkIns, authSession]);
 
