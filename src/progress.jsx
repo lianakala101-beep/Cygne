@@ -1816,6 +1816,20 @@ function Progress({ products, checkIns, setCheckIns, treatments = [], setTreatme
           onEditToday={() => { setJournalFullView(false); setShowJournal(true); }}
         />
       )}
+
+      {/* AskCygne modal lives inside Progress because askCygneQuestion is
+          local state declared at the top of this function. It used to be
+          orphaned inside LocationManager's render — which compiles fine
+          but throws `ReferenceError: askCygneQuestion is not defined`
+          the moment LocationManager is mounted standalone (e.g. from
+          ProfileSheet, which imports LocationManager separately). */}
+      {askCygneQuestion && (
+        <AskCygneModal
+          initialQuestion={askCygneQuestion.q}
+          context={askCygneQuestion.ctx}
+          onClose={() => setAskCygneQuestion(null)}
+        />
+      )}
     </div>
   );
 }
@@ -1890,13 +1904,6 @@ function LocationManager({ locationData, setLocationData, locationDenied, setLoc
         {loading ? "Requesting..." : locationDenied ? "Try Again" : "Enable Location"}
       </button>
       {error && <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "#8b7355", margin: "10px 0 0" }}>{error}</p>}
-      {askCygneQuestion && (
-        <AskCygneModal
-          initialQuestion={askCygneQuestion.q}
-          context={askCygneQuestion.ctx}
-          onClose={() => setAskCygneQuestion(null)}
-        />
-      )}
     </div>
   );
 }
