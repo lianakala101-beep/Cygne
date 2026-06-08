@@ -1,14 +1,19 @@
 import { LocationManager } from "./progress.jsx";
 import { useState, useRef } from "react";
-import { Icon, Section } from "./components.jsx";
+import { Icon, Section, ErrorBoundary } from "./components.jsx";
 import { calcSpending } from "./engine.js";
 import { supabase, invokeEdgeFunction } from "./supabase.js";
 
 const SKIN_TYPES = ["Dry", "Oily", "Combination", "Sensitive", "Normal"];
 const SKIN_CONCERNS = ["Acne", "Hyperpigmentation", "Redness", "Fine lines", "Texture", "Dehydration", "Dullness", "Sensitivity"];
 
-function Profile({ user, products, onLogout, locationData, setLocationData, locationDenied, setLocationDenied }) {
-  const spending = calcSpending(products);
+function ProfileInner({ user, products, onLogout, locationData, setLocationData, locationDenied, setLocationDenied }) {
+  // Defensive: a freshly-onboarded user can have undefined or non-array
+  // collection props in the brief window before App.jsx's table reads
+  // resolve. Coerce to [] so calcSpending + every .map / .length below
+  // operates on a real array even if the upstream sent us a null.
+  const safeProducts = Array.isArray(products) ? products : [];
+  const spending = calcSpending(safeProducts);
   return (
     <div>
       <div style={{ marginBottom: 32 }}>
@@ -49,7 +54,7 @@ function Profile({ user, products, onLogout, locationData, setLocationData, loca
       )}
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 32 }}>
-        {[["Products", products.length], ["Categories", new Set(products.map(p => p.category)).size], ["Value", `$${spending.total.toFixed(0)}`]].map(([l, v]) => (
+        {[["Products", safeProducts.length], ["Categories", new Set(safeProducts.map(p => p?.category).filter(Boolean)).size], ["Value", `$${spending.total.toFixed(0)}`]].map(([l, v]) => (
           <div key={l} style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "18px 12px", textAlign: "center" }}>
             <p style={{ fontFamily: "var(--font-body)", fontSize: 24, fontWeight: 200, color: "var(--color-ivory, #faf9f4)", margin: "0 0 4px", letterSpacing: "-0.02em" }}>{v}</p>
             <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(255,255,255,0.6)", margin: 0 }}>{l}</p>
@@ -718,7 +723,11 @@ function SkinHistory({ user, onUpdateUser }) {
   );
 }
 
-function ProfileSheet({ user, products, locationData, setLocationData, locationDenied, setLocationDenied, onUpdateUser, onLogout, onClose }) {
+function ProfileSheetInner({ user, products, locationData, setLocationData, locationDenied, setLocationDenied, onUpdateUser, onLogout, onClose }) {
+  // Same defensive coercion as Profile — see note there. ProfileSheet
+  // reads products.length + products.reduce in the stats row at the
+  // bottom; both would crash on a non-array.
+  const safeProducts = Array.isArray(products) ? products : [];
   const [editingAccount, setEditingAccount] = useState(false);
   const [accountDraft, setAccountDraft] = useState({
     name: user?.name || "",
@@ -861,7 +870,7 @@ function ProfileSheet({ user, products, locationData, setLocationData, locationD
           </div>
           {/* Stats */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 24 }}>
-            {[["Products", products.length], ["Value", `$${products.reduce((s, p) => s + (p.price || 0), 0).toFixed(0)}`], ["Age Bracket", user?.skinAgeBracket || "—"]].map(([l, v]) => (
+            {[["Products", safeProducts.length], ["Value", `$${safeProducts.reduce((s, p) => s + (p?.price || 0), 0).toFixed(0)}`], ["Age Bracket", user?.skinAgeBracket || "—"]].map(([l, v]) => (
               <div key={l} style={{ background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 8, padding: "14px 10px", textAlign: "center" }}>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: 18, fontWeight: 200, color: "var(--color-ivory, #faf9f4)", margin: "0 0 3px", letterSpacing: "-0.02em" }}>{v}</p>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(255,255,255,0.6)", margin: 0 }}>{l}</p>
@@ -1049,5 +1058,25 @@ function DeleteAccountModal({ confirmText, setConfirmText, deleting, error, canD
 }
 
 // --- SWAN WELCOME SCREEN -----------------------------------------------------
+
+// Wrap the screen-level exports in an ErrorBoundary so a render crash
+// (e.g. malformed user_metadata for a new user) lands on the in-app
+// "Something interrupted us" fallback rather than an unmounted white
+// React tree. The boundary is a class component and lives in
+// components.jsx; see the comment there for the fallback markup.
+function Profile(props) {
+  return (
+    <ErrorBoundary>
+      <ProfileInner {...props} />
+    </ErrorBoundary>
+  );
+}
+function ProfileSheet(props) {
+  return (
+    <ErrorBoundary>
+      <ProfileSheetInner {...props} />
+    </ErrorBoundary>
+  );
+}
 
 export { ProfileSheet };
