@@ -393,7 +393,7 @@ function getDayIndex() {
   return Math.floor(now.getTime() / 86400000);
 }
 
-const NO_DATA_LINE = "Log a few check-ins and I'll have something for you soon.";
+const NO_DATA_LINE = "Log your first check-in — Swan Sense activates once Cygne knows your skin.";
 
 // Split the SwanSense insight into lines (prefers explicit line breaks,
 // falls back to sentence boundaries) and stagger a fadeInLine animation

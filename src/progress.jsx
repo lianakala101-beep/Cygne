@@ -1781,8 +1781,8 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
               })
             ) : (
               <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "18px 18px 16px" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: 0, lineHeight: 1.6, opacity: 0.75 }}>
-                  No actives in ramp-up right now.
+                <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: 0, lineHeight: 1.65, opacity: 0.75 }}>
+                  Nothing in ramp-up yet. Add a retinol, AHA, BHA, vitamin C, or toning pad to your vanity and Cygne will walk you through its introduction here.
                 </p>
               </div>
             )}
