@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Icon, SwanIcon } from "./components.jsx";
+import { Icon } from "./components.jsx";
 
 /** Compress an image file to JPEG, max 1080px on longest side, keeps output well under 1MB */
 export async function compressImage(file, maxDim = 1080, quality = 0.82) {
@@ -59,25 +59,32 @@ export async function compressImageBlob(file, maxWidth = 1080, quality = 0.82) {
 function SwanWelcomeScreen({ user, onDone }) {
   const name = user?.name && user.name !== "Friend" ? user.name.split(" ")[0] : null;
   return (
-    <div style={{ position: "fixed", inset: 0, background: "var(--color-ivory)", display: "flex", flexDirection: "column", alignItems: "flex-start", justifyContent: "space-between", padding: "72px 36px 64px", zIndex: 500 }}>
+    <div style={{ position: "fixed", inset: 0, background: "var(--color-inky-moss, #2d3d2b)", display: "flex", flexDirection: "column", alignItems: "flex-start", justifyContent: "space-between", padding: "72px 36px 64px", zIndex: 500 }}>
       <div>
-        <div style={{ marginBottom: 32, color: "var(--color-inky-moss, #2d3d2b)" }}><SwanIcon size={56} /></div>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", margin: "0 0 14px" }}>
+        {/* Cygne logo — forced white via brightness(0) invert(1) so the
+            PNG paints against the dark inky-moss canvas. Replaces the
+            previous standalone SwanIcon brand mark. */}
+        <img
+          src="/cygne-logo.png"
+          alt="Cygne"
+          style={{ height: 48, width: "auto", display: "block", marginBottom: 24, filter: "brightness(0) invert(1)" }}
+        />
+        <p style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(255, 255, 255, 0.6)", margin: "0 0 14px" }}>
           {name ? "Welcome, " + name + "." : "Welcome."}
         </p>
-        <h1 style={{ fontFamily: "var(--font-display)", fontSize: 38, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-ink, #1c1c1a)", margin: "0 0 20px", lineHeight: 1.2 }}>
+        <h1 style={{ fontFamily: "var(--font-display)", fontSize: 38, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 20px", lineHeight: 1.2 }}>
           Your ritual starts here.
         </h1>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "var(--color-inky-moss, #2d3d2b)", lineHeight: 1.7, maxWidth: 320 }}>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "rgba(255, 255, 255, 0.6)", lineHeight: 1.7, maxWidth: 320 }}>
           Add the products already on your shelf. Cygne will build your ritual, sequence your steps, and start learning your skin.
         </p>
       </div>
       <div style={{ width: "100%" }}>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--color-inky-moss, #2d3d2b)", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 16, textAlign: "center" }}>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "rgba(255, 255, 255, 0.4)", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 16, textAlign: "center" }}>
           Takes about 2 minutes
         </p>
         <button onClick={onDone}
-          style={{ width: "100%", padding: "15px 0", background: "transparent", border: "1.5px solid var(--color-inky-moss, #2d3d2b)", borderRadius: 10, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, fontFamily: "var(--font-display)", fontSize: 12, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)", cursor: "pointer" }}>
+          style={{ width: "100%", padding: "15px 0", background: "transparent", border: "1px solid var(--color-ivory, #faf9f4)", borderRadius: 8, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, fontFamily: "var(--font-display)", fontSize: 12, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", cursor: "pointer" }}>
           Add my products <Icon name="arrow-right" size={14} />
         </button>
       </div>
