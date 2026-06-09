@@ -144,48 +144,40 @@ export function MonthlyRecap({
         color: IVORY,
       }}
     >
-      {/* Close × */}
+      {/* Close × — top-right per brief, helper-alpha ivory */}
       <button
         onClick={onClose}
         aria-label="Close"
         style={{
-          position: "fixed", top: 18, left: 22, zIndex: 1,
+          position: "fixed", top: 18, right: 22, zIndex: 1,
           background: "none", border: "none", cursor: "pointer",
-          color: IVORY, fontSize: 22, lineHeight: 1, padding: 6,
+          color: "rgba(255,255,255,0.6)", fontSize: 22, lineHeight: 1, padding: 6,
           fontFamily: "var(--font-display)",
-          opacity: 0.75,
         }}
       >×</button>
 
       <div style={{ maxWidth: 540, margin: "0 auto", padding: "60px 28px 60px", textAlign: "center" }}>
 
-        {/* Cygne logo (top) */}
-        <img
-          src="/cygne-logo.png"
-          alt="Cygne"
-          style={{
-            width: 60, height: "auto",
-            margin: "0 auto 18px", display: "block",
-            filter: "brightness(0) invert(1)",
-            opacity: 0.85,
-          }}
-        />
-
-        {/* Header — month + year, signature script */}
+        {/* Header — "[MONTH] IN REVIEW" in uppercase Fungis Heavy at 0.15em
+            tracking. Single line, ivory on the inky-moss canvas. The
+            previous version used the signature script for the month name
+            plus a tiny "{year} · IN REVIEW" eyebrow; the brief asks for
+            the header itself to carry the "IN REVIEW" treatment. */}
         <h1 style={{
-          fontFamily: "var(--font-signature)",
-          fontSize: 42, fontWeight: 400, letterSpacing: "0.01em",
-          color: IVORY, margin: 0, lineHeight: 1.05,
+          fontFamily: "var(--font-display)",
+          fontSize: 20, fontWeight: 700, letterSpacing: "0.15em",
+          textTransform: "uppercase", color: IVORY,
+          margin: 0, lineHeight: 1.2,
         }}>
-          {monthLabel}
+          {monthLabel} in Review
         </h1>
         <p style={{
           fontFamily: "var(--font-body)",
-          fontSize: 11, fontWeight: 400, letterSpacing: "0.22em",
-          textTransform: "uppercase", color: IVORY,
-          margin: "8px 0 0", opacity: 0.65,
+          fontSize: 10, fontWeight: 400, letterSpacing: "0.22em",
+          textTransform: "uppercase", color: "rgba(255,255,255,0.4)",
+          margin: "6px 0 0",
         }}>
-          {year} · In Review
+          {year}
         </p>
 
         {/* Occasion line — only when the user has set a real upcoming event */}
@@ -213,19 +205,19 @@ export function MonthlyRecap({
             <p style={{
               fontFamily: "var(--font-body)",
               fontSize: 12, letterSpacing: "0.22em", textTransform: "uppercase",
-              color: IVORY, opacity: 0.55, margin: 0,
+              color: "rgba(255,255,255,0.6)", margin: 0,
             }}>
-              Composing your month…
+              Gathering your month…
             </p>
           )}
 
           {!loading && failed && (
             <p style={{
               fontFamily: "var(--font-body)",
-              fontSize: 14, color: IVORY, opacity: 0.7,
+              fontSize: 14, color: "rgba(255,255,255,0.6)",
               margin: 0, lineHeight: 1.7,
             }}>
-              The recap couldn't load just now. Check back in a moment.
+              Your recap will be ready soon.
             </p>
           )}
 
@@ -251,13 +243,27 @@ export function MonthlyRecap({
 
         {/* Closing signature */}
         <p style={{
-          fontFamily: "var(--font-body)",
-          fontSize: 11, fontWeight: 400, letterSpacing: "0.22em",
+          fontFamily: "var(--font-display)",
+          fontSize: 11, fontWeight: 700, letterSpacing: "0.15em",
           textTransform: "uppercase", color: IVORY,
-          margin: "0 0 12px", opacity: 0.7,
+          margin: "0 0 18px", opacity: 0.8,
         }}>
           Built around you.
         </p>
+
+        {/* Cygne logo as the closing element — moved here from the top per
+            the brief. Forced white via brightness(0) invert(1) so the PNG
+            paints against the dark canvas. */}
+        <img
+          src="/cygne-logo.png"
+          alt="Cygne"
+          style={{
+            width: 60, height: "auto",
+            margin: "0 auto", display: "block",
+            filter: "brightness(0) invert(1)",
+            opacity: 0.85,
+          }}
+        />
       </div>
     </div>
   );
