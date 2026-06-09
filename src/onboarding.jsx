@@ -110,14 +110,17 @@ function OnboardingScreen({ onComplete, setLocationData }) {
     transition: "opacity 0.26s ease, transform 0.26s ease",
   };
 
-  // Shared pill selector
+  // Shared pill selector — ivory tones on the dark canvas. Active state
+  // brightens the border to full ivory and uses a low-alpha ivory fill so
+  // the selection reads without changing text color (text stays ivory in
+  // both states; weight bumps to 700 when selected).
   const PillSelect = ({ options, selected, onToggle, single = false }) => (
     <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
       {options.map(opt => {
         const active = single ? selected === opt : selected.includes(opt);
         return (
           <button key={opt} onClick={() => onToggle(opt)}
-            style={{ padding: "10px 18px", borderRadius: 24, border: `1px solid ${active ? "var(--color-inky-moss, #2d3d2b)" : "rgba(45,61,43,0.35)"}`, background: active ? "rgba(45,61,43,0.12)" : "transparent", color: "var(--color-ivory, #faf9f4)", fontFamily: "var(--font-body)", fontSize: 12, fontWeight: active ? 700 : 400, cursor: "pointer", transition: "all 0.18s", letterSpacing: "0.02em" }}>
+            style={{ padding: "10px 18px", borderRadius: 24, border: `1px solid ${active ? "var(--color-ivory, #faf9f4)" : "rgba(250,249,244,0.25)"}`, background: active ? "rgba(250,249,244,0.12)" : "transparent", color: "var(--color-ivory, #faf9f4)", fontFamily: "var(--font-body)", fontSize: 12, fontWeight: active ? 700 : 400, cursor: "pointer", transition: "all 0.18s", letterSpacing: "0.02em" }}>
             {opt}
           </button>
         );
@@ -152,9 +155,9 @@ function OnboardingScreen({ onComplete, setLocationData }) {
         </div>
       </div>
       {skinAge && (
-        <div style={{ marginTop: 20, padding: "13px 16px", background: "rgba(250,249,244,0.08)", border: "1px solid rgba(45,61,43,0.25)", borderRadius: 12 }}>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 5px" }}>{skinAge.bracket}</p>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-ivory, #faf9f4)", margin: 0, lineHeight: 1.65 }}>{skinAge.note}</p>
+        <div style={{ marginTop: 20, padding: "13px 16px", background: "rgba(250,249,244,0.08)", border: "1px solid rgba(250,249,244,0.25)", borderRadius: 8 }}>
+          <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(255, 255, 255, 0.6)", margin: "0 0 5px" }}>{skinAge.bracket}</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "rgba(255, 255, 255, 0.6)", margin: 0, lineHeight: 1.65 }}>{skinAge.note}</p>
         </div>
       )}
     </div>,
@@ -204,24 +207,22 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       <p style={obSub}>Cygne uses local humidity, UV index, and temperature to adjust your daily ritual advice. Your location is never shared.</p>
       <div style={{ marginTop: 32 }}>
         {locationSet ? (
-          <div style={{ padding: "16px 18px", background: "rgba(45,61,43,0.1)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 14 }}>
+          <div style={{ padding: "16px 18px", background: "rgba(250,249,244,0.08)", border: "1px solid rgba(250,249,244,0.25)", borderRadius: 8 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#2d3d2b" }} />
+              <div style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--color-ivory, #faf9f4)" }} />
               <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "var(--color-ivory, #faf9f4)", margin: 0, fontWeight: 400 }}>Location enabled</p>
             </div>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-ivory, #faf9f4)", margin: "6px 0 0" }}>Your environment data will appear on the home screen.</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "rgba(255, 255, 255, 0.6)", margin: "6px 0 0" }}>Your environment data will appear on the home screen.</p>
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <button onClick={requestLocation}
-              style={{ display: "flex", alignItems: "center", gap: 8, padding: "13px 20px", background: "transparent", border: "1.5px solid rgba(250,249,244,0.5)", borderRadius: 12, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 400, color: "var(--color-ivory, #faf9f4)", cursor: "pointer", letterSpacing: "0.08em", transition: "all 0.2s" }}
-              onMouseEnter={e => e.currentTarget.style.background = "rgba(45,61,43,0.18)"}
-              onMouseLeave={e => e.currentTarget.style.background = "rgba(250,249,244,0.08)"}>
+              style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "13px 20px", background: "transparent", border: "1px solid var(--color-ivory, #faf9f4)", borderRadius: 8, fontFamily: "var(--font-display)", fontSize: 12, fontWeight: 700, color: "var(--color-ivory, #faf9f4)", cursor: "pointer", letterSpacing: "0.15em", textTransform: "uppercase" }}>
               <Icon name="target" size={14} />
               {locationLoading ? "Requesting..." : "Enable Location"}
             </button>
             <button onClick={() => advance(1)}
-              style={{ background: "none", border: "none", fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-ivory, #faf9f4)", cursor: "pointer", padding: "8px 0", letterSpacing: "0.06em" }}>
+              style={{ background: "none", border: "none", fontFamily: "var(--font-body)", fontSize: 12, color: "rgba(255, 255, 255, 0.6)", cursor: "pointer", padding: "8px 0", letterSpacing: "0.06em" }}>
               Skip for now
             </button>
           </div>
@@ -248,9 +249,9 @@ function OnboardingScreen({ onComplete, setLocationData }) {
           return (
             <button key={d} onClick={() => setResetDay(d)}
               style={{
-                padding: "14px 0", borderRadius: 12,
-                border: `1px solid ${active ? "var(--color-inky-moss, #2d3d2b)" : "rgba(45,61,43,0.35)"}`,
-                background: active ? "rgba(45,61,43,0.12)" : "transparent",
+                padding: "14px 0", borderRadius: 8,
+                border: `1px solid ${active ? "var(--color-ivory, #faf9f4)" : "rgba(250,249,244,0.25)"}`,
+                background: active ? "rgba(250,249,244,0.12)" : "transparent",
                 color: "var(--color-ivory, #faf9f4)",
                 fontFamily: "var(--font-body)", fontSize: 12,
                 fontWeight: active ? 700 : 400, letterSpacing: "0.08em",
@@ -311,7 +312,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
             onChange={e => setOccasionDate(e.target.value)}
             style={inputSt}
           />
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-ivory, #faf9f4)", margin: "8px 0 0", lineHeight: 1.55 }}>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "rgba(255, 255, 255, 0.6)", margin: "8px 0 0", lineHeight: 1.55 }}>
             Cygne will pace your ritual toward this date — holding new actives in the final four weeks, leaning into hydration as it approaches.
           </p>
         </div>
@@ -424,16 +425,17 @@ function OnboardingScreen({ onComplete, setLocationData }) {
     </div>,
 
     // 16 — All set
-    <div key="done" style={{ ...slideStyle, position: "fixed", inset: 0, background: "var(--color-ivory)", display: "flex", flexDirection: "column", justifyContent: "space-between", overflow: "hidden" }}>
+    <div key="done" style={{ ...slideStyle, position: "fixed", inset: 0, background: "var(--color-inky-moss, #2d3d2b)", display: "flex", flexDirection: "column", justifyContent: "space-between", overflow: "hidden" }}>
 
-      {/* Top — logo + welcome, matching splash layout */}
+      {/* Top — logo + welcome, matching splash layout. Logo forced white
+          via brightness(0) invert(1) so it reads against the dark canvas. */}
       <div style={{ padding: "72px 36px 0" }}>
         <img
           src="/cygne-logo.png"
           alt="Cygne"
-          style={{ height: 170, width: "auto", display: "block", opacity: 1, filter: "none" }}
+          style={{ height: 170, width: "auto", display: "block", opacity: 1, filter: "brightness(0) invert(1)" }}
         />
-        <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 11, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "6px 0 0 130px", lineHeight: 1 }}>built around you</p>
+        <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 11, letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(255, 255, 255, 0.6)", margin: "6px 0 0 130px", lineHeight: 1 }}>built around you</p>
       </div>
 
       {/* Bottom — welcome message + skin age + Enter button */}
@@ -441,17 +443,15 @@ function OnboardingScreen({ onComplete, setLocationData }) {
         <p style={{ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 8px", lineHeight: 1.2 }}>
           {name ? `Welcome, ${name}.` : "Welcome."}
         </p>
-        <p style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 400, letterSpacing: "0.12em", color: "var(--color-ivory, #faf9f4)", margin: "0 0 24px" }}>Your ritual begins.</p>
+        <p style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 400, letterSpacing: "0.12em", color: "rgba(255, 255, 255, 0.6)", margin: "0 0 24px" }}>Your ritual begins.</p>
         {skinAge && (
-          <div style={{ padding: "12px 16px", background: "rgba(45,61,43,0.06)", border: "1px solid rgba(45,61,43,0.18)", borderRadius: 12, marginBottom: 28, width: "100%" }}>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 5px" }}>{skinAge.bracket}</p>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-ivory, #faf9f4)", margin: 0, lineHeight: 1.7 }}>{skinAge.note}</p>
+          <div style={{ padding: "12px 16px", background: "rgba(250,249,244,0.08)", border: "1px solid rgba(250,249,244,0.25)", borderRadius: 8, marginBottom: 28, width: "100%" }}>
+            <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 9, letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(255, 255, 255, 0.6)", margin: "0 0 5px" }}>{skinAge.bracket}</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "rgba(255, 255, 255, 0.6)", margin: 0, lineHeight: 1.7 }}>{skinAge.note}</p>
           </div>
         )}
         <button onClick={handleComplete}
-          style={{ width: "100%", padding: "15px 0", background: "transparent", color: "var(--color-ivory, #faf9f4)", border: "1.5px solid rgba(250,249,244,0.5)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", cursor: "pointer", transition: "background 0.2s, color 0.2s" }}
-          onMouseEnter={e => { e.currentTarget.style.background = "var(--color-inky-moss, #2d3d2b)"; e.currentTarget.style.color = "var(--color-ivory, #faf9f4)"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--color-inky-moss, #2d3d2b)"; }}>
+          style={{ width: "100%", padding: "15px 0", background: "transparent", color: "var(--color-ivory, #faf9f4)", border: "1px solid var(--color-ivory, #faf9f4)", borderRadius: 8, fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", cursor: "pointer" }}>
           Enter Cygne
         </button>
       </div>
@@ -480,16 +480,13 @@ function OnboardingScreen({ onComplete, setLocationData }) {
 
   return (
 
-        <div style={{ minHeight: "100vh", background: "var(--color-ivory, #faf9f4)", color: "var(--color-ivory, #faf9f4)", display: "flex", flexDirection: "column", padding: "0 24px 40px", position: "relative", overflow: "hidden" }}>
-      {/* Background blobs */}
-      <div style={{ position: "absolute", top: "-20%", right: "-15%", width: 500, height: 500, borderRadius: "60% 40% 55% 45%", background: "rgba(45,61,43,0.05)", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", bottom: "-25%", left: "-10%", width: 440, height: 440, borderRadius: "45% 55% 40% 60%", background: "rgba(45,61,43,0.04)", pointerEvents: "none" }} />
-
-      {/* Progress bar */}
+        <div style={{ minHeight: "100vh", background: "var(--color-inky-moss, #2d3d2b)", color: "var(--color-ivory, #faf9f4)", display: "flex", flexDirection: "column", padding: "0 24px 40px", position: "relative", overflow: "hidden" }}>
+      {/* Progress bar — track + fill both on ivory tones so they read
+          against the dark inky-moss canvas. */}
       {step < TOTAL_STEPS - 1 && (
-        <div style={{ position: "sticky", top: 0, zIndex: 10, paddingTop: 52, paddingBottom: 16, background: "var(--color-ivory, #faf9f4)" }}>
-          <div style={{ height: 1.5, background: "rgba(45,61,43,0.15)", borderRadius: 2, overflow: "hidden" }}>
-            <div style={{ height: "100%", width: `${progress}%`, background: "var(--color-inky-moss, #2d3d2b)", borderRadius: 2, transition: "width 0.4s ease" }} />
+        <div style={{ position: "sticky", top: 0, zIndex: 10, paddingTop: 52, paddingBottom: 16, background: "var(--color-inky-moss, #2d3d2b)" }}>
+          <div style={{ height: 1.5, background: "rgba(250,249,244,0.15)", borderRadius: 2, overflow: "hidden" }}>
+            <div style={{ height: "100%", width: `${progress}%`, background: "var(--color-ivory, #faf9f4)", borderRadius: 2, transition: "width 0.4s ease" }} />
           </div>
         </div>
       )}
@@ -507,15 +504,18 @@ function OnboardingScreen({ onComplete, setLocationData }) {
         {steps[step]}
       </div>
 
-      {/* Steps 0–4: Continue with canAdvance check + optional Skip */}
+      {/* Steps 0–4: Continue with canAdvance check + optional Skip.
+          Continue is the brief's "ivory outlined" pattern — Fungis Heavy,
+          0.15em tracking, 1px ivory border. Sticky bar inherits the dark
+          canvas so the button sits flush against it. */}
       {step >= 0 && step < 5 && (
-        <div style={{ position: "sticky", bottom: 0, background: "var(--color-ivory, #faf9f4)", padding: "16px 24px 32px", marginTop: "auto" }}>
+        <div style={{ position: "sticky", bottom: 0, background: "var(--color-inky-moss, #2d3d2b)", padding: "16px 24px 32px", marginTop: "auto" }}>
           <button onClick={() => canAdvance[step] && advance(1)}
-            style={{ width: "100%", padding: "14px 0", background: "transparent", color: "var(--color-ivory, #faf9f4)", border: "1.5px solid rgba(250,249,244,0.5)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: canAdvance[step] ? "pointer" : "default", transition: "background 0.2s, color 0.2s", opacity: canAdvance[step] ? 1 : 0.6 }}>
+            style={{ width: "100%", padding: "14px 0", background: "transparent", color: "var(--color-ivory, #faf9f4)", border: "1px solid var(--color-ivory, #faf9f4)", borderRadius: 8, fontFamily: "var(--font-display)", fontSize: 12, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", cursor: canAdvance[step] ? "pointer" : "default", opacity: canAdvance[step] ? 1 : 0.45 }}>
             Continue
           </button>
           {step === 3 || step === 4 ? (
-            <button onClick={() => advance(1)} style={{ width: "100%", marginTop: 10, background: "none", border: "none", fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-ivory, #faf9f4)", cursor: "pointer", padding: "8px 0", letterSpacing: "0.06em" }}>Skip</button>
+            <button onClick={() => advance(1)} style={{ width: "100%", marginTop: 10, background: "none", border: "none", fontFamily: "var(--font-body)", fontSize: 12, color: "rgba(255, 255, 255, 0.6)", cursor: "pointer", padding: "8px 0", letterSpacing: "0.06em" }}>Skip</button>
           ) : null}
         </div>
       )}
@@ -523,16 +523,16 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       {step === 5 && (
         <div style={{ maxWidth: 420, width: "100%", margin: "24px auto 0" }}>
           <button onClick={() => advance(1)}
-            style={{ width: "100%", padding: "14px 0", background: "transparent", color: "var(--color-ivory, #faf9f4)", border: "1.5px solid rgba(250,249,244,0.5)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer", transition: "background 0.2s, color 0.2s" }}>
+            style={{ width: "100%", padding: "14px 0", background: "transparent", color: "var(--color-ivory, #faf9f4)", border: "1px solid var(--color-ivory, #faf9f4)", borderRadius: 8, fontFamily: "var(--font-display)", fontSize: 12, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", cursor: "pointer" }}>
             Continue
           </button>
         </div>
       )}
       {/* Steps 6–15: sticky Continue (reset day + all new profile screens) */}
       {step >= 6 && step < TOTAL_STEPS - 1 && (
-        <div style={{ position: "sticky", bottom: 0, background: "var(--color-ivory, #faf9f4)", padding: "16px 24px 32px", marginTop: "auto" }}>
+        <div style={{ position: "sticky", bottom: 0, background: "var(--color-inky-moss, #2d3d2b)", padding: "16px 24px 32px", marginTop: "auto" }}>
           <button onClick={() => advance(1)}
-            style={{ width: "100%", padding: "14px 0", background: "transparent", color: "var(--color-ivory, #faf9f4)", border: "1.5px solid rgba(250,249,244,0.5)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer", transition: "background 0.2s, color 0.2s" }}>
+            style={{ width: "100%", padding: "14px 0", background: "transparent", color: "var(--color-ivory, #faf9f4)", border: "1px solid var(--color-ivory, #faf9f4)", borderRadius: 8, fontFamily: "var(--font-display)", fontSize: 12, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", cursor: "pointer" }}>
             Continue
           </button>
         </div>
@@ -541,12 +541,15 @@ function OnboardingScreen({ onComplete, setLocationData }) {
   );
 }
 
-// Onboarding text styles
-const obEyebrow = { fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 10px" };
+// Onboarding text styles — dark inky-moss canvas, ivory text. Eyebrow + sub
+// drop to rgba(255,255,255,0.6) so the heading carries primary emphasis;
+// input fields read as low-alpha ivory wells so they're visible on the dark
+// background without competing with the heading.
+const obEyebrow = { fontFamily: "var(--font-display)", fontSize: 9, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(255, 255, 255, 0.6)", margin: "0 0 10px" };
 const obHeading = { fontFamily: "var(--font-display)", fontSize: 28, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 12px", lineHeight: 1.2 };
-const obSub = { fontFamily: "var(--font-body)", fontSize: 13, color: "var(--color-ivory, #faf9f4)", margin: 0, lineHeight: 1.7 };
-const inputSt = { width: "100%", padding: "12px 16px", background: "#ffffff", border: "1px solid rgba(45,61,43,0.25)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 14, color: "var(--color-ivory, #faf9f4)", outline: "none" };
-const labelSt = { fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", display: "block", marginBottom: 6 };
+const obSub = { fontFamily: "var(--font-body)", fontSize: 13, color: "rgba(255, 255, 255, 0.6)", margin: 0, lineHeight: 1.7 };
+const inputSt = { width: "100%", padding: "12px 16px", background: "rgba(250,249,244,0.08)", border: "1px solid rgba(250,249,244,0.25)", borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 14, color: "var(--color-ivory, #faf9f4)", outline: "none", boxSizing: "border-box" };
+const labelSt = { fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(255, 255, 255, 0.6)", display: "block", marginBottom: 6 };
 
 
 export { OnboardingScreen };
