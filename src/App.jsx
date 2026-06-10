@@ -11,6 +11,7 @@ import { SwanWelcomeScreen, useLocalStorage, getCurrentCycleDay, daysBetweenLoca
 import { WeekendNudgeCard } from "./weekend.jsx";
 import { SeasonalNudgeCard } from "./seasonal.jsx";
 import { supabase } from "./supabase.js";
+import { API_BASE_URL } from "./config.js";
 
 // Code-split: gated by user action or onboarding state, so their chunks load
 // on demand rather than blocking initial paint.
@@ -663,7 +664,7 @@ export default function App() {
       const payloadBytes = JSON.stringify(payload).length;
       console.log("[Cygne] save-reflection-metadata attempt | reflections payload bytes:", payloadBytes, "| entries:", payload.length);
       try {
-        const res = await fetch("/api/save-reflection-metadata", {
+        const res = await fetch(`${API_BASE_URL}/api/save-reflection-metadata`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -705,7 +706,7 @@ export default function App() {
     const payload = stripInlineForCloud(reflections);
     const payloadBytes = JSON.stringify(payload).length;
     console.log("[Cygne] belt-and-suspenders save-reflection-metadata | reflections payload bytes:", payloadBytes, "| entries:", payload.length);
-    fetch("/api/save-reflection-metadata", {
+    fetch(`${API_BASE_URL}/api/save-reflection-metadata`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

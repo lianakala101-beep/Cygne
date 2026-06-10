@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { API_BASE_URL } from "./config.js";
 
 export const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "https://mxcefgbaaylddnyxrnao.supabase.co";
 export const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14Y2VmZ2JhYXlsZGRueXhybmFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzY5NzIsImV4cCI6MjA4OTYxMjk3Mn0.OlxfQmisO9qwde7hbp7-R5pfO8ZJ0cak4s7kw06Sqlk";
@@ -87,7 +88,7 @@ export async function invokeEdgeFunction(functionName, body) {
   // still forward the session token for parity / future use.
   let res;
   try {
-    res = await fetch(`/api/${functionName}`, {
+    res = await fetch(`${API_BASE_URL}/api/${functionName}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
