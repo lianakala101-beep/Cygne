@@ -4,3 +4,15 @@ dist/
 .env
 .env.local
 supabase/.temp/
+
+# Capacitor / iOS — commit the project files, ignore build outputs and the
+# local dist mirror. The web bundle synced into the iOS project
+# (ios/App/App/public) is a build artifact — `npx cap sync ios` regenerates
+# it from dist/ before every Xcode build, so there's no need to track it.
+ios/App/App/public/
+ios/App/build/
+ios/App/Pods/
+ios/App/App.xcworkspace/xcuserdata/
+ios/DerivedData/
+*.xcuserstate
+xcuserdata/

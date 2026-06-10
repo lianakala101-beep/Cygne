@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "./components.jsx";
 import { supabase } from "./supabase.js";
+import { API_BASE_URL } from "./config.js";
 import { getSwanSensePredictions } from "./swansense.jsx";
 import { compressImageBlob, isoWeekNumber, isoWeekYear } from "./utils.jsx";
 
@@ -191,7 +192,7 @@ async function uploadTriptych(userId, entryId, dataUrl) {
       console.error("[Cygne reflection] no session at upload time — falling back to inline");
       return { path: null, url: null, inline: dataUrl };
     }
-    const res = await fetch("/api/upload-reflection", {
+    const res = await fetch(`${API_BASE_URL}/api/upload-reflection`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -232,7 +233,7 @@ async function refreshSignedUrl(path) {
       console.error("[Cygne reflection] refresh signed URL — no session, cannot sign for", path);
       return null;
     }
-    const res = await fetch("/api/sign-reflection", {
+    const res = await fetch(`${API_BASE_URL}/api/sign-reflection`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
