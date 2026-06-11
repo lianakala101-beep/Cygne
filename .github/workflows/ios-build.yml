@@ -55,12 +55,15 @@ jobs:
       - name: Install Fastlane
         run: gem install fastlane
 
-      # Authenticates with App Store Connect via the App Store Connect API
-      # key triplet (key ID + issuer ID + key content), runs Match-style code
-      # signing, archives the App scheme, and uploads to TestFlight.
+      # Authenticates with App Store Connect via the API key triplet,
+      # pulls the signing cert + provisioning profile from the Match repo
+      # (decrypted with MATCH_PASSWORD), archives the App scheme, and
+      # uploads to TestFlight.
       - name: Build and submit via Fastlane
         run: fastlane ios beta
         env:
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}

@@ -13,14 +13,17 @@ platform :ios do
       is_key_content_base64: false
     )
 
-    # Sync the distribution cert + provisioning profile via Match. First
-    # CI run needs a Match git repo + MATCH_PASSWORD configured; see PR
-    # description for the setup notes. readonly: false lets Match create
-    # the cert/profile on a fresh project; flip to true after first run
-    # so accidental re-creation can't burn an Apple cert slot.
+    # Sync the distribution cert + provisioning profile via Match. Reads
+    # from the encrypted git repo at MATCH_GIT_URL (decrypted with
+    # MATCH_PASSWORD — both injected by the workflow's env block). First
+    # CI run will populate the repo because readonly: false; FLIP TO
+    # readonly: true AFTER the first successful run so a future workflow
+    # change can't accidentally regenerate the cert and revoke the
+    # existing one.
     sync_code_signing(
       type: "appstore",
       app_identifier: "com.cygne.app",
+      git_url: ENV["MATCH_GIT_URL"],
       api_key: api_key,
       readonly: false
     )
