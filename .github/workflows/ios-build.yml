@@ -1,0 +1,66 @@
+name: iOS Build & Submit
+
+# Manual-trigger only — keeps TestFlight/App Store submissions intentional
+# rather than firing on every push to main. Run from the Actions tab:
+# select this workflow, click "Run workflow", choose whether to submit to
+# TestFlight (default yes).
+on:
+  workflow_dispatch:
+    inputs:
+      submit_to_testflight:
+        description: 'Submit to TestFlight?'
+        required: true
+        default: 'true'
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Vite build — VITE_API_BASE_URL pins /api/* fetches to the production
+      # origin (https://cygne.skin) since the WKWebView loads from
+      # capacitor://localhost and has no current origin to resolve relative
+      # paths against. Web build (Vercel) leaves this unset and keeps using
+      # relative paths.
+      - name: Build Vite app
+        run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_API_BASE_URL: https://cygne.skin
+
+      - name: Install Capacitor CLI
+        run: npm install -g @capacitor/cli
+
+      # Copies dist/ into ios/App/App/public/ (which is .gitignore'd) and
+      # refreshes any installed Capacitor plugins.
+      - name: Sync Capacitor
+        run: npx cap sync ios
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+
+      - name: Install Fastlane
+        run: gem install fastlane
+
+      # Authenticates with App Store Connect via the App Store Connect API
+      # key triplet (key ID + issuer ID + key content), runs Match-style code
+      # signing, archives the App scheme, and uploads to TestFlight.
+      - name: Build and submit via Fastlane
+        run: fastlane ios beta
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
