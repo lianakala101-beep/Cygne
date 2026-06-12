@@ -186,6 +186,34 @@ export default function App() {
 
   // Track whether initial load from Supabase is done (prevents overwriting cloud data with empty localStorage)
   const profileLoaded = useRef(false);
+  // Per-collection load flags. Each one flips to true ONLY after that
+  // collection's table-load IIFE in loadUserProfile resolves (success or
+  // error). The matching sync useEffects below gate on these so they
+  // never run against the localStorage default `[]` and wipe / overwrite
+  // server data during the loading race.
+  // PRODUCTS specifically: the sync effect runs upsert + a stale-row
+  // delete pass. Without this flag, an effect run fired by the initial
+  // localStorage `[]` would compute `staleIds = every server row` and
+  // wipe the table. This is the launch-blocking data-integrity bug.
+  // RAMP_LOG is upsert-only with a length-0 short-circuit, so the
+  // failure mode is less severe (no wipe), but applying the same flag
+  // keeps the pattern symmetric and prevents a future stale-diff
+  // addition from regressing.
+  const productsLoaded = useRef(false);
+  const rampLogLoaded = useRef(false);
+  // user-sync debounce + change detection. The belt-and-suspenders
+  // useEffect below fires supabase.auth.updateUser({...}) whenever the
+  // `user` React state changes, including the initial setUser inside
+  // loadUserProfile that just READ user_metadata. Each updateUser goes
+  // through the Supabase auth client's `navigator.locks` acquire,
+  // contending with any other tab / session and surfacing as
+  // `AbortError: Lock was stolen by another request`. lastUserSyncRef
+  // is the serialized profile data last sent to Supabase — equality
+  // skips the write, so a re-render with the same data doesn't fire
+  // the lock. The timer batches bursts of setUser calls into a single
+  // updateUser after 1.5s of quiet.
+  const lastUserSyncRef = useRef(null);
+  const userSyncTimerRef = useRef(null);
 
   // -- Check Supabase session on mount ----------------------------------------
   useEffect(() => {
@@ -207,6 +235,17 @@ export default function App() {
         setUser(null);
         setNeedsOnboarding(false);
         profileLoaded.current = false;
+        // Reset the per-collection load + sync flags too so the next
+        // sign-in's table-load IIFEs can flip them fresh, and any
+        // pending user-sync debounce timer is dropped so it doesn't
+        // fire against the now-signed-out session.
+        productsLoaded.current = false;
+        rampLogLoaded.current = false;
+        lastUserSyncRef.current = null;
+        if (userSyncTimerRef.current) {
+          clearTimeout(userSyncTimerRef.current);
+          userSyncTimerRef.current = null;
+        }
         // Clear all local caches so the next sign-in doesn't inherit stale data
         setProducts([]);
         setJournals([]);
@@ -231,7 +270,7 @@ export default function App() {
   const loadUserProfile = (authUser) => {
     const meta = authUser?.user_metadata;
     if (meta?.onboarding_complete) {
-      setUser({
+      const initialUserData = {
         name: meta.name || "Friend",
         email: authUser.email,
         birthYear: meta.birthYear || null,
@@ -263,7 +302,19 @@ export default function App() {
         // consistency, routine philosophy, climate, environment, travel,
         // fragrance sensitivity, ingredients to avoid)
         skinProfile: meta.skinProfile || null,
-      });
+      };
+      // Prime the user-sync change-detection ref with the same data
+      // we're about to set on state. The user-sync useEffect compares
+      // each new render's serialized profileData to this; matching
+      // means "nothing actually changed since the last write to
+      // Supabase" and skips the updateUser call. Without priming,
+      // every fresh load would trigger one redundant write back to
+      // user_metadata with the SAME values we just read — and each
+      // write goes through navigator.locks, contending with any
+      // other tab.
+      const { email: _e, cycleDay: _c, ...initialProfileData } = initialUserData;
+      lastUserSyncRef.current = JSON.stringify(initialProfileData);
+      setUser(initialUserData);
       // Restore notification state
       if (meta.notifEnabled || meta.amReminderEnabled || meta.pmReminderEnabled) {
         setNotifPermission("granted");
@@ -334,31 +385,43 @@ export default function App() {
       // the DB roundtrip; useLocalStorage already seeded the React state
       // instantly, the table reads override once they resolve.
       (async () => {
-        const { data: pRows, error: pErr } = await supabase
-          .from("products").select("data").eq("user_id", authUser.id);
-        if (pErr) {
-          console.error("[Cygne] products load failed:", pErr.message);
-          return;
-        }
-        if (Array.isArray(pRows)) {
-          const next = pRows.map(r => r.data).filter(Boolean);
-          setProducts(next);
+        try {
+          const { data: pRows, error: pErr } = await supabase
+            .from("products").select("data").eq("user_id", authUser.id);
+          if (pErr) {
+            console.error("[Cygne] products load failed:", pErr.message);
+            return;
+          }
+          if (Array.isArray(pRows)) {
+            const next = pRows.map(r => r.data).filter(Boolean);
+            setProducts(next);
+          }
+        } finally {
+          // Flip the gate AFTER the load resolves (success or error) —
+          // before this line, the products sync useEffect is a no-op,
+          // so the localStorage-default empty array can't trigger the
+          // stale-diff delete pass and wipe the table.
+          productsLoaded.current = true;
         }
       })();
       (async () => {
-        const { data: rRows, error: rErr } = await supabase
-          .from("ramp_log").select("data").eq("user_id", authUser.id);
-        if (rErr) {
-          console.error("[Cygne] ramp_log load failed:", rErr.message);
-          return;
-        }
-        if (Array.isArray(rRows)) {
-          const next = rRows.map(r => r.data).filter(Boolean);
-          // rampLog has historically been kept in ascending timestamp
-          // order; sort ascending so any code that reads e.g. .slice(-N)
-          // gets the most recent entries.
-          next.sort((a, b) => String(a?.timestamp || "").localeCompare(String(b?.timestamp || "")));
-          setRampLog(next);
+        try {
+          const { data: rRows, error: rErr } = await supabase
+            .from("ramp_log").select("data").eq("user_id", authUser.id);
+          if (rErr) {
+            console.error("[Cygne] ramp_log load failed:", rErr.message);
+            return;
+          }
+          if (Array.isArray(rRows)) {
+            const next = rRows.map(r => r.data).filter(Boolean);
+            // rampLog has historically been kept in ascending timestamp
+            // order; sort ascending so any code that reads e.g. .slice(-N)
+            // gets the most recent entries.
+            next.sort((a, b) => String(a?.timestamp || "").localeCompare(String(b?.timestamp || "")));
+            setRampLog(next);
+          }
+        } finally {
+          rampLogLoaded.current = true;
         }
       })();
       if (meta.triggerLog && Array.isArray(meta.triggerLog)) {
@@ -534,6 +597,14 @@ export default function App() {
   // wiping live data.
   useEffect(() => {
     if (!profileLoaded.current || !authSession) return;
+    // Don't run upsert + stale-diff until the initial table load has
+    // resolved. Without this gate, the first React render after auth
+    // lands fires this effect with `products = []` (the localStorage
+    // default), the upsert branch skips because rows is empty, but the
+    // stale-diff select returns every server row → every row is computed
+    // as "stale" → .delete().in("client_id", staleIds) wipes the table.
+    // The launch-blocking data-integrity bug.
+    if (!productsLoaded.current) return;
     const userId = authSession.user.id;
     const rows = (Array.isArray(products) ? products : [])
       .filter(p => p && p.id != null)
@@ -568,6 +639,12 @@ export default function App() {
   // entries should never disappear.
   useEffect(() => {
     if (!profileLoaded.current || !authSession) return;
+    // Symmetric guard with products. ramp_log is upsert-only with no
+    // delete pass, so this isn't strictly a data-loss gate today —
+    // it's a "don't redundantly re-upsert localStorage state before
+    // the server set has come in" guard. Cheap insurance against a
+    // future stale-diff addition silently regressing the wipe.
+    if (!rampLogLoaded.current) return;
     if (!Array.isArray(rampLog) || rampLog.length === 0) return;
     const userId = authSession.user.id;
     const rows = rampLog
@@ -776,9 +853,43 @@ export default function App() {
   useEffect(() => {
     if (!profileLoaded.current || !authSession || !user) return;
     const { email, cycleDay, ...profileData } = user;
-    supabase.auth.updateUser({ data: { ...profileData, onboarding_complete: true } })
-      .catch(e => console.error("[Cygne] user sync failed:", e));
-  }, [user]);
+    // Change detection: every render serializes the profile fields that
+    // would actually be written and compares to the last value the sync
+    // effect successfully scheduled. Identical → bail without touching
+    // the auth lock. The initial setUser inside loadUserProfile primes
+    // lastUserSyncRef with this same serialization, so the first
+    // effect run after sign-in is a no-op rather than a redundant
+    // updateUser of values we just READ from user_metadata.
+    const serialized = JSON.stringify(profileData);
+    if (serialized === lastUserSyncRef.current) return;
+
+    // Debounce: bursts of setUser calls (e.g. a settings page that
+    // updates several fields back-to-back) collapse into one
+    // updateUser. The 1.5s window is generous enough that typical
+    // UI flows finish before the timer fires but tight enough that
+    // users perceive the write as immediate. Each new run cancels
+    // the pending timer and schedules a fresh one; lastUserSyncRef
+    // is updated INSIDE the timer callback so that if the write
+    // ultimately fails (lock contention, network), the next render
+    // still re-attempts rather than silently treating the unwritten
+    // state as synced.
+    if (userSyncTimerRef.current) clearTimeout(userSyncTimerRef.current);
+    userSyncTimerRef.current = setTimeout(() => {
+      lastUserSyncRef.current = serialized;
+      userSyncTimerRef.current = null;
+      supabase.auth.updateUser({ data: { ...profileData, onboarding_complete: true } })
+        .catch(e => console.error("[Cygne] user sync failed:", e));
+    }, 1500);
+
+    return () => {
+      // Component unmount / dep change: drop the pending sync. The
+      // next render will schedule its own.
+      if (userSyncTimerRef.current) {
+        clearTimeout(userSyncTimerRef.current);
+        userSyncTimerRef.current = null;
+      }
+    };
+  }, [user, authSession]);
 
   // Save profile to Supabase user_metadata
   const saveUserProfile = async (profileData) => {
