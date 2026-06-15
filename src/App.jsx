@@ -588,47 +588,43 @@ export default function App() {
   }, [notifDismissed]);
 
   // -- Sync products (vanity shelf) to Supabase -------------------------------
-  // Writes to the `products` table (Phase 2 metadata migration). client_id is
-  // `p.id` (Date.now() string or uuid). Upsert handles add + edit; a second
-  // pass deletes rows whose client_id is no longer in local state, so a
-  // product removed from the vanity (via Shelf's delete UI) doesn't linger
-  // in the table forever. Order matters: upsert first, then diff + delete,
-  // so a mid-flight crash leaves the table in a superset state rather than
-  // wiping live data.
+  // Writes to the `products` table. UPSERT-ONLY since the previous
+  // stale-diff/delete pattern caused real data loss — when local state
+  // started as [] (cleared localStorage, fresh device, anything that
+  // raced the table load) the diff classified every server-side row as
+  // "stale" and deleted them all. The productsLoaded gate below was a
+  // belt-and-suspenders patch; this rewrite removes the wipe vector at
+  // the source.
+  //
+  // Deletions are now handled at the exact moment the user removes a
+  // product — see the `onDelete` callback on the <Shelf> mount further
+  // down, which directly calls supabase.from('products').delete() for
+  // the specific client_id. The sync effect here only ever ADDS or
+  // UPDATES rows; it can never delete.
+  //
+  // Trade-off: if a user is offline at delete time, the explicit delete
+  // fails silently and the row stays in the table. On next online
+  // load, the deleted product reappears in their vanity. This is a
+  // single-product regression vs. the data-loss bug it replaces (which
+  // could wipe 10+ products at once). Acceptable for launch.
+  // TODO: queue offline deletes for retry — track post-launch.
   useEffect(() => {
     if (!profileLoaded.current || !authSession) return;
-    // Don't run upsert + stale-diff until the initial table load has
-    // resolved. Without this gate, the first React render after auth
-    // lands fires this effect with `products = []` (the localStorage
-    // default), the upsert branch skips because rows is empty, but the
-    // stale-diff select returns every server row → every row is computed
-    // as "stale" → .delete().in("client_id", staleIds) wipes the table.
-    // The launch-blocking data-integrity bug.
+    // productsLoaded gate stays as belt-and-suspenders; without the
+    // stale-diff/delete pass, the worst this guards against is an
+    // extra redundant upsert of the localStorage-seeded set before
+    // the server set has resolved. Cheap insurance.
     if (!productsLoaded.current) return;
+    if (!Array.isArray(products) || products.length === 0) return;
     const userId = authSession.user.id;
-    const rows = (Array.isArray(products) ? products : [])
+    const rows = products
       .filter(p => p && p.id != null)
       .map(p => ({ user_id: userId, client_id: String(p.id), data: p }));
-    (async () => {
-      if (rows.length > 0) {
-        const { error } = await supabase.from("products")
-          .upsert(rows, { onConflict: "user_id,client_id" });
+    if (rows.length === 0) return;
+    supabase.from("products").upsert(rows, { onConflict: "user_id,client_id" })
+      .then(({ error }) => {
         if (error) console.error("[Cygne] products upsert failed:", error.message);
-      }
-      const localIds = new Set(rows.map(r => r.client_id));
-      const { data: tableRows, error: selErr } = await supabase
-        .from("products").select("client_id").eq("user_id", userId);
-      if (selErr) {
-        console.error("[Cygne] products stale-diff fetch failed:", selErr.message);
-        return;
-      }
-      const staleIds = (tableRows || []).map(r => r.client_id).filter(id => !localIds.has(id));
-      if (staleIds.length > 0) {
-        const { error: delErr } = await supabase.from("products")
-          .delete().eq("user_id", userId).in("client_id", staleIds);
-        if (delErr) console.error("[Cygne] products stale-delete failed:", delErr.message);
-      }
-    })();
+      });
   }, [products, authSession]);
 
   // -- Sync ramp log (Skin Handled It / Backing Off history) to Supabase -----
@@ -1391,9 +1387,38 @@ export default function App() {
         {tab === "shelf" && <Shelf
           products={products}
           onEdit={p => setModal(p)}
-          onDelete={id => setProducts(prev => prev.filter(x => x.id !== id))}
+          // Explicit per-row server delete at the exact moment of user
+          // intent. The products sync useEffect is now upsert-only and
+          // CANNOT delete rows on its own (was the source of the
+          // wipe-everything race). Local state update fires first for
+          // instant UI; the server delete races in the background.
+          // If the server delete fails (offline, network), the row
+          // stays in the table and the deleted product will reappear
+          // on next table-load.
+          // TODO: queue offline deletes for retry — track post-launch.
+          onDelete={async (id) => {
+            setProducts(prev => prev.filter(x => x.id !== id));
+            if (authSession) {
+              const { error } = await supabase.from("products")
+                .delete()
+                .eq("user_id", authSession.user.id)
+                .eq("client_id", String(id));
+              if (error) console.error("[Cygne] product delete failed:", error.message);
+            }
+          }}
           onAdd={() => setModal({ brand: "", name: "", category: "Serum", price: "", ingredients: "" })}
           onToggleRoutine={toggleRoutine}
+          // DEV-ONLY / DANGEROUS — wipes all products from local state
+          // WITHOUT clearing the server table. The matching button
+          // (ClearAllButton in vanity.jsx) is hard-gated behind
+          // `false && <ClearAllButton .../>` at vanity.jsx:511 and is
+          // NOT reachable from any production UI path. If you ever
+          // remove that `false &&` gate, this handler must ALSO call
+          // supabase.from("products").delete().eq("user_id", userId)
+          // to wipe the server table, otherwise the user will see all
+          // their products reappear on the next table-load. Better:
+          // delete this handler + button entirely before launch and
+          // re-add intentionally if needed.
           onClearAll={() => setProducts([])}
           onSession={(id, session) => setProducts(prev => prev.map(p => p.id === id ? { ...p, session } : p))}
           waitingRoom={waitingRoom}
