@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase, invokeEdgeFunction } from "../supabase.js";
+import { getAskCygneAccess } from "../utils.jsx";
 
 // Daily question limit — three per local day. Keyed by date so the count
 // persists across reloads and resets automatically when the date rolls
@@ -130,6 +131,25 @@ export function AskCygneModal({
     if (initialQuestion && !reached) ask(initialQuestion);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Belt-and-suspenders age gate. The three UI entry points (dashboard
+  // line, vanity ⋯ menu, FaceHeatMap zone drawer) all check
+  // getAskCygneAccess(user) before rendering the trigger, so this modal
+  // shouldn't open for an underage user via normal navigation. Defense
+  // in depth in case a stale state / deep link / future caller forgets
+  // the entry-point gate: refuse to render the AI chat surface for any
+  // user we can confirm is under 17. ("unknown" is allowed through here
+  // since the entry-point gate already shows the "add your birth year"
+  // prompt in place of the trigger; if a caller somehow opens the modal
+  // without going through that prompt, we still let them through so the
+  // missing-birth-year case doesn't manifest as a silent no-op.
+  //
+  // Placed AFTER all hooks (useState x5 + useEffect above) so React's
+  // rules-of-hooks aren't violated — every render calls the same hooks
+  // in the same order; only the JSX return diverges.
+  if (getAskCygneAccess(user) === "underage") {
+    return null;
+  }
 
   return (
     <div

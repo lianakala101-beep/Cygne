@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { FACE_ZONES, FACE_ZONE_LABELS, FACE_ZONE_IDS } from "./FaceZoneSelector.jsx";
 import { AskCygneModal } from "./AskCygneModal.jsx";
+import { getAskCygneAccess } from "../utils.jsx";
 
 const PERIODS = [
   { key: 7,  label: "7 DAYS"   },
@@ -369,6 +370,7 @@ function ZoneInsightDrawer({ zoneId, checkIns, products, user, onClose, onAskCyg
           )}
         </div>
 
+        {getAskCygneAccess(user) === "available" && (
         <button
           onClick={onAskCygne}
           style={{
@@ -384,6 +386,7 @@ function ZoneInsightDrawer({ zoneId, checkIns, products, user, onClose, onAskCyg
         >
           ASK CYGNE ABOUT THIS ZONE →
         </button>
+        )}
       </div>
     </div>
   );
