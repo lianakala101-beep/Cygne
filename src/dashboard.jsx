@@ -100,9 +100,9 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
       {/* -- Empty state ------------------------------------------------- */}
       {products.length === 0 && (() => {
         const emptySteps = [
-          { icon: "box", label: "Add your products", sub: "Search by name or scan a photo - Cygne builds your ritual from what you already have.", action: () => setTab("shelf"), cta: "Go to Vanity" },
-          { icon: "swan", label: "Swan Sense wakes up", sub: "Once your vanity is set, Cygne starts predicting - cycle windows, active streaks, barrier warnings.", action: null, cta: null },
-          { icon: "book", label: "Log your first journal entry", sub: "Sleep, stress, skin condition. Takes 10 seconds and makes every prediction smarter.", action: () => setTab("progress"), cta: "Go to Progress" },
+          { label: "Add your products", sub: "Search by name or scan a photo - Cygne builds your ritual from what you already have.", action: () => setTab("shelf"), cta: "Go to Vanity" },
+          { label: "Swan Sense wakes up", sub: "Once your vanity is set, Cygne starts predicting - cycle windows, active streaks, barrier warnings.", action: null, cta: null },
+          { label: "Log your first journal entry", sub: "Sleep, stress, skin condition. Takes 10 seconds and makes every prediction smarter.", action: () => setTab("progress"), cta: "Go to Progress" },
         ];
         return (
           <div>
@@ -114,10 +114,24 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
               {emptySteps.map((s, i) => (
                 <div key={i} style={{ display: "flex", gap: 14, padding: "16px 18px", background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8 }}>
-                  <span style={{ color: "var(--clay)", flexShrink: 0, marginTop: 2, display: "inline-flex" }}><Icon name={s.icon} size={18} /></span>
+                  {/* Step numeral sits where the icon used to be. Fungis
+                      Heavy, helper-alpha ivory — large enough to read as
+                      structural numbering without competing with the
+                      step label for emphasis. */}
+                  <span style={{
+                    fontFamily: "var(--font-display)",
+                    fontSize: 28, fontWeight: 700, letterSpacing: "0.04em",
+                    color: "rgba(255,255,255,0.4)",
+                    lineHeight: 1,
+                    flexShrink: 0,
+                    minWidth: 36,
+                    alignSelf: "flex-start",
+                    marginTop: 2,
+                  }}>
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
                   <div style={{ flex: 1 }}>
-                    <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.5 }}>Step {i + 1}</span>
-                    <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 13, fontWeight: 400, color: "var(--parchment)", margin: "4px 0", lineHeight: 1.3 }}>{s.label}</p>
+                    <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 13, fontWeight: 400, color: "var(--parchment)", margin: "0 0 4px", lineHeight: 1.3 }}>{s.label}</p>
                     <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--clay)", margin: s.cta ? "0 0 10px" : 0, lineHeight: 1.6 }}>{s.sub}</p>
                     {s.cta && (
                       <button onClick={s.action} style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "var(--font-body), sans-serif", fontSize: 11, fontWeight: 400, color: "#6e8a72", background: "rgba(122,144,112,0.1)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 20, padding: "6px 14px", cursor: "pointer" }}>
@@ -128,10 +142,6 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
                 </div>
               ))}
             </div>
-            <button onClick={() => setTab("shelf")}
-              style={{ width: "100%", padding: "16px 0", background: "var(--cta)", border: "1px solid rgba(122,144,112,0.35)", borderRadius: 8, fontFamily: "var(--font-body), sans-serif", fontSize: 13, fontWeight: 400, color: "var(--parchment)", cursor: "pointer", letterSpacing: "0.04em", marginBottom: 10 }}>
-              Add your first product
-            </button>
           </div>
         );
       })()}
