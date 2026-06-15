@@ -8,7 +8,7 @@ import { useWeather } from "./environment.jsx";
 import { WeekendNudgeCard } from "./weekend.jsx";
 import { SeasonalNudgeCard } from "./seasonal.jsx";
 import { getTreatmentPhase, TreatmentRecoveryCard, getCyclePhase } from "./progress.jsx";
-import { getCurrentCycleDay, daysBetweenLocal } from "./utils.jsx";
+import { getCurrentCycleDay, daysBetweenLocal, getAskCygneAccess } from "./utils.jsx";
 import { AskCygneButton } from "./AskCygne.jsx";
 import { useSwanSenseDaily } from "./hooks/useSwanSenseDaily.js";
 
@@ -238,25 +238,55 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         </button>
 
         {/* Ask Cygne — second editorial line item, stacks directly under
-            Begin Your Ritual sharing its bottom rule. */}
-        <button
-          onClick={() => askCygne("", "")}
-          style={{
-            display: "flex", width: "100%", alignItems: "center", justifyContent: "space-between",
-            padding: "18px 0", marginTop: -1, marginBottom: 16,
-            background: "transparent", border: "none",
-            borderTop: "1px solid rgba(250,249,244,0.25)",
-            borderBottom: "1px solid rgba(250,249,244,0.25)",
-            cursor: "pointer",
-            WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
-          }}>
-          <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 16, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)" }}>
-            Ask Cygne
-          </span>
-          <span style={{ color: "var(--color-ivory, #faf9f4)", display: "inline-flex" }}>
-            <Icon name="arrow-right" size={16} />
-          </span>
-        </button>
+            Begin Your Ritual sharing its bottom rule. Age-gated: hidden
+            for under-17 (see utils.jsx:getAskCygneAccess); shows a
+            "fill in your birth year" prompt when birthYear is missing.
+            The conservative-estimate fallback (Jan 1 if no month/day)
+            and the dynamic recompute on every render are both in the
+            helper, so this site is just a switch on the returned
+            state. */}
+        {(() => {
+          const askAccess = getAskCygneAccess(user);
+          if (askAccess === "underage") return null;
+          if (askAccess === "unknown") {
+            return (
+              <div style={{
+                width: "100%", padding: "18px 0", marginTop: -1, marginBottom: 16,
+                borderTop: "1px solid rgba(250,249,244,0.25)",
+                borderBottom: "1px solid rgba(250,249,244,0.25)",
+              }}>
+                <p style={{
+                  fontFamily: "var(--font-body)",
+                  fontSize: 12, letterSpacing: "0.06em", lineHeight: 1.6,
+                  color: "rgba(255,255,255,0.6)",
+                  margin: 0,
+                }}>
+                  Add your birth year in Profile to unlock Ask Cygne.
+                </p>
+              </div>
+            );
+          }
+          return (
+            <button
+              onClick={() => askCygne("", "")}
+              style={{
+                display: "flex", width: "100%", alignItems: "center", justifyContent: "space-between",
+                padding: "18px 0", marginTop: -1, marginBottom: 16,
+                background: "transparent", border: "none",
+                borderTop: "1px solid rgba(250,249,244,0.25)",
+                borderBottom: "1px solid rgba(250,249,244,0.25)",
+                cursor: "pointer",
+                WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
+              }}>
+              <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 16, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)" }}>
+                Ask Cygne
+              </span>
+              <span style={{ color: "var(--color-ivory, #faf9f4)", display: "inline-flex" }}>
+                <Icon name="arrow-right" size={16} />
+              </span>
+            </button>
+          );
+        })()}
 
         {/* Irreconcilable conflicts — quiet ivory one-liner */}
         {irreconcilable.length > 0 && products.length > 0 && (

@@ -183,4 +183,50 @@ function isoWeekYear(d) {
   return dt.getUTCFullYear();
 }
 
-export { SwanWelcomeScreen, useLocalStorage, daysBetweenLocal, getCurrentCycleDay, getTreatmentElapsed, toLocalMidnight, isoWeekNumber, isoWeekYear };
+// Age gate for Ask Cygne (the AI chat feature). Reads the birth fields
+// onboarding writes onto the `user` object (birthYear / birthMonth /
+// birthDay; the brief refers to skinProfile.birthYear but the actual
+// storage path is user.birthYear). Returns one of three states the UI
+// can branch on:
+//
+//   'available' — user is 17+; show every Ask Cygne entry point as usual
+//   'underage'  — user is < 17; hide every Ask Cygne entry point entirely
+//                 (per brief: "not even a locked/disabled state")
+//   'unknown'   — birthYear missing or unparsable; show a "Add your birth
+//                 year in Profile to unlock Ask Cygne" prompt in place of
+//                 the primary entry point. Fail-closed (no AI access
+//                 until they fill it in).
+//
+// Age is recomputed on every call — no caching — so a user whose birthday
+// passes while signed in flips from 16 → 17 on next render (the brief
+// calls this out explicitly as the desired natural behavior).
+//
+// If birthMonth/birthDay are missing, fall back to (1, 1) per brief:
+// "otherwise assume Jan 1 for a conservative estimate". That treats the
+// birthday as having already happened this year for any sign-in after
+// Jan 1, giving the user the benefit of the doubt rather than blocking
+// late-year-birthday 17s through most of the year.
+const ASK_CYGNE_MIN_AGE = 17;
+
+function getAskCygneAccess(user) {
+  if (!user) return "unknown";
+  const yearStr = user.birthYear;
+  if (yearStr === null || yearStr === undefined || yearStr === "") return "unknown";
+  const y = parseInt(yearStr, 10);
+  if (!Number.isFinite(y) || y < 1900 || y > 9999) return "unknown";
+  const m = user.birthMonth ? parseInt(user.birthMonth, 10) : 1;
+  const d = user.birthDay ? parseInt(user.birthDay, 10) : 1;
+  const mm = Number.isFinite(m) && m >= 1 && m <= 12 ? m : 1;
+  const dd = Number.isFinite(d) && d >= 1 && d <= 31 ? d : 1;
+  const today = new Date();
+  let age = today.getFullYear() - y;
+  const todayM = today.getMonth() + 1;
+  const todayD = today.getDate();
+  // Subtract one if their birthday hasn't passed yet this calendar year.
+  if (todayM < mm || (todayM === mm && todayD < dd)) {
+    age -= 1;
+  }
+  return age >= ASK_CYGNE_MIN_AGE ? "available" : "underage";
+}
+
+export { SwanWelcomeScreen, useLocalStorage, daysBetweenLocal, getCurrentCycleDay, getTreatmentElapsed, toLocalMidnight, isoWeekNumber, isoWeekYear, getAskCygneAccess };

@@ -4,6 +4,7 @@ import { detectActives, analyzeShelf, calcSpending } from "./engine.js";
 import { AskCygneModal } from "./components/AskCygneModal.jsx";
 import { assessRoutineFit, DEFER_TAG_CONFIG } from "./modals.jsx";
 import { ProductModal } from "./productmodal.jsx";
+import { getAskCygneAccess } from "./utils.jsx";
 
 
 // Warm near-ivory product card on the dark inky-moss canvas — the
@@ -212,7 +213,7 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
                 <button onClick={() => { setMenuOpen(false); onToggleRoutine(product.id); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#1c1c1a", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "left" }}>
                   <Icon name="sparkle" size={12} /><span>{inRoutine ? "Remove from ritual" : "Add to ritual"}</span>
                 </button>
-                {onAskCygne && (
+                {onAskCygne && getAskCygneAccess(user) === "available" && (
                   <button
                     onClick={() => {
                       setMenuOpen(false);
