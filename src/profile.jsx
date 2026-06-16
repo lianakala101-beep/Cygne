@@ -911,6 +911,25 @@ function ProfileSheetInner({ user, products, locationData, setLocationData, loca
             style={{ width: "100%", marginTop: 18, padding: "10px 0", background: "transparent", color: "rgba(255,255,255,0.4)", border: "none", fontFamily: "var(--font-body)", fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", cursor: "pointer", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent", textDecoration: "underline", textUnderlineOffset: 4 }}>
             Delete Account
           </button>
+
+          {/* Legal links — Privacy Policy + Terms of Service. Lower emphasis
+              than Delete Account (no underline, smaller letter-spacing) so
+              they sit quietly at the very bottom of the sheet. Both open
+              the static pages served from public/ at cygne.skin/privacy and
+              cygne.skin/terms (vercel.json cleanUrls: true drops the .html).
+              target="_blank" so the in-app context isn't lost when reading
+              long-form legal copy. */}
+          <p style={{ marginTop: 14, textAlign: "center", fontFamily: "var(--font-body)", fontSize: 11, color: "rgba(255,255,255,0.4)" }}>
+            <a href="/privacy" target="_blank" rel="noopener noreferrer"
+              style={{ color: "rgba(255,255,255,0.4)", textDecoration: "none" }}>
+              Privacy Policy
+            </a>
+            <span style={{ margin: "0 8px" }}>&middot;</span>
+            <a href="/terms" target="_blank" rel="noopener noreferrer"
+              style={{ color: "rgba(255,255,255,0.4)", textDecoration: "none" }}>
+              Terms of Service
+            </a>
+          </p>
         </div>
       </div>
 
