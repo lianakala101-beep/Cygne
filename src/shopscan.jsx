@@ -3,6 +3,7 @@ import { Icon } from "./components.jsx";
 import { analyzeShelf, detectActives } from "./engine.js";
 import { invokeEdgeFunction } from "./supabase.js";
 import { compressImage } from "./utils.jsx";
+import { RAPID_ACTION_MODEL } from "./config.js";
 
 // Visually hidden but DOM-present input style. iOS Safari silently drops
 // programmatic .click() on display:none / visibility:hidden file inputs (the
@@ -60,7 +61,7 @@ function ShopScanModal({ products, user = {}, onClose }) {
 
       console.log("[Cygne shopscan] 4. calling rapid-action...");
       const respData = await invokeEdgeFunction("rapid-action", {
-        model: "claude-sonnet-4-20250514",
+        model: RAPID_ACTION_MODEL,
         max_tokens: 1500,
         messages: [{
           role: "user",

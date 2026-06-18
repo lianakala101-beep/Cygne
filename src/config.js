@@ -21,3 +21,8 @@
 // `${API_BASE_URL}/api/foo` doesn't double up.
 const raw = (import.meta.env.VITE_API_BASE_URL || "").trim();
 export const API_BASE_URL = raw.endsWith("/") ? raw.slice(0, -1) : raw;
+
+// Anthropic model ID used by /api/rapid-action callers (product/label vision).
+// Centralized here so all three call sites stay in sync — a date-suffixed
+// variant like "claude-sonnet-4-20250514" 404s; the canonical alias is bare.
+export const RAPID_ACTION_MODEL = "claude-sonnet-4-6";
