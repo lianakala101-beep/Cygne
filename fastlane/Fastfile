@@ -31,7 +31,8 @@ platform :ios do
     build_app(
       scheme: "App",
       project: "ios/App/App.xcodeproj",
-      export_method: "app-store"
+      export_method: "app-store",
+      xcargs: "DEVELOPMENT_TEAM=RYA5L58WXG CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY='Apple Distribution' PROVISIONING_PROFILE_SPECIFIER='match AppStore com.cygne.app'"
     )
 
     # Skip the post-upload "wait for processing" loop — saves ~10 minutes
