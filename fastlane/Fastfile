@@ -30,7 +30,7 @@ platform :ios do
     # export as an app-store-signed .ipa.
     build_app(
       scheme: "App",
-      workspace: "ios/App/App.xcworkspace",
+      project: "ios/App/App.xcodeproj",
       export_method: "app-store"
     )
 
