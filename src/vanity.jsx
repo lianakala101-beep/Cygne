@@ -29,7 +29,7 @@ function CategoryGlyph({ category }) {
     viewBox: "0 0 100 100",
     fill: "none",
     stroke: "currentColor",
-    strokeWidth: 1.5,
+    strokeWidth: 1.25,
     strokeLinecap: "round",
     strokeLinejoin: "round",
     style: { width: "100%", height: "100%", display: "block" },
@@ -189,7 +189,7 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
             ? <img src={product.imageUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
             : (
               <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10 }}>
-                <div style={{ width: 48, height: 48, color: "#5a5a5a", pointerEvents: "none" }}>
+                <div style={{ width: 60, height: 60, color: "#5a5a5a", pointerEvents: "none" }}>
                   <CategoryGlyph category={product.category} />
                 </div>
                 <span style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: "#5a5a5a", opacity: 0.75 }}>
@@ -244,12 +244,16 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
           </div>
         </div>
 
-        {/* Text content — 0 top padding (image bleeds to edge), 12px sides + bottom */}
-        <div style={{ padding: "10px 12px 12px" }}>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 13, fontWeight: 400, letterSpacing: "0.04em", color: "#1c1c1a", margin: "0 0 3px", lineHeight: 1.3 }}>{product.name}</p>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "#5a5a5a", margin: 0, letterSpacing: "0.03em" }}>{product.brand}</p>
+        {/* Text content — brand eyebrow → Fungis Heavy product name → muted
+            supporting details, all flush left. Mirrors the Reflection tab's
+            small-caps eyebrow + display-weight title hierarchy. */}
+        <div style={{ padding: "10px 12px 12px", textAlign: "left" }}>
+          {product.brand && (
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 400, letterSpacing: "0.1em", textTransform: "uppercase", color: "#5a5a5a", margin: "0 0 4px" }}>{product.brand}</p>
+          )}
+          <p style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 700, letterSpacing: "0.02em", color: "#1c1c1a", margin: 0, lineHeight: 1.25 }}>{product.name}</p>
           {product.price > 0 && (
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#5a5a5a", margin: "5px 0 0", fontWeight: 300, letterSpacing: "0.01em" }}>${(product.price || 0).toFixed(0)}</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, letterSpacing: "0.02em", color: "#5a5a5a", margin: "6px 0 0" }}>${(product.price || 0).toFixed(0)}</p>
           )}
         </div>
       </div>
