@@ -15,6 +15,13 @@ on:
 jobs:
   build:
     runs-on: macos-latest
+    # DEVELOPER_DIR pins every xcodebuild invocation in the job — including
+    # the ones Fastlane shells out to internally — to Xcode 26.5. Confirmed
+    # present at /Applications/Xcode_26.5.app on the macos-latest image in
+    # a prior run log. Setting it here is preferred over `xcode-select` so
+    # the choice can't drift mid-job.
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.5.app/Contents/Developer
     steps:
       - uses: actions/checkout@v4
 
@@ -54,12 +61,6 @@ jobs:
 
       - name: Install Fastlane
         run: gem install fastlane
-
-      # macos-latest defaults to an older Xcode (15.x at the time of writing);
-      # pin to the newest installed Xcode so Swift Package Manager resolves the
-      # Capacitor sources cleanly. Confirmed present in a prior run log.
-      - name: Select Xcode 26
-        run: sudo xcode-select -s /Applications/Xcode_26.5.app
 
       # Authenticates with App Store Connect via the App Store Connect API
       # key triplet (key ID + issuer ID + key content), runs Match-style code
