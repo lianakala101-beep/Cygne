@@ -3,6 +3,19 @@ default_platform(:ios)
 platform :ios do
   desc "Build and upload to TestFlight"
   lane :beta do
+    # Create a dedicated CI keychain unlocked for the lane's lifetime so
+    # codesign doesn't stall on a UI prompt when it imports the dist cert
+    # or signs frameworks. Reuses MATCH_PASSWORD as the keychain password
+    # to avoid threading yet another secret through the workflow.
+    create_keychain(
+      name: "ci_keychain",
+      password: ENV["MATCH_PASSWORD"],
+      default_keychain: true,
+      unlock: true,
+      timeout: 3600,
+      lock_when_sleeps: false
+    )
+
     # Authenticate to App Store Connect via the API key triplet exposed
     # by the CI workflow. is_key_content_base64 is false because the
     # secret stores the raw .p8 contents (the brief specified this).
@@ -18,12 +31,16 @@ platform :ios do
     # description for the setup notes. readonly: false lets Match create
     # the cert/profile on a fresh project; flip to true after first run
     # so accidental re-creation can't burn an Apple cert slot.
+    # keychain_name/keychain_password point Match at the CI keychain
+    # created above so the cert import doesn't block on a prompt.
     sync_code_signing(
       type: "appstore",
       app_identifier: "com.cygne.app",
       git_url: "https://#{ENV["MATCH_GITHUB_TOKEN"]}@github.com/lianakala101-beep/cygne-certificates.git",
       api_key: api_key,
-      readonly: false
+      readonly: false,
+      keychain_name: "ci_keychain",
+      keychain_password: ENV["MATCH_PASSWORD"]
     )
 
     # Archive the App scheme out of the Capacitor-generated workspace and
