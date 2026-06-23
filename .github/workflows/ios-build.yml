@@ -55,6 +55,12 @@ jobs:
       - name: Install Fastlane
         run: gem install fastlane
 
+      # macos-latest defaults to an older Xcode (15.x at the time of writing);
+      # pin to the newest installed Xcode so Swift Package Manager resolves the
+      # Capacitor sources cleanly. Confirmed present in a prior run log.
+      - name: Select Xcode 26
+        run: sudo xcode-select -s /Applications/Xcode_26.5.app
+
       # Authenticates with App Store Connect via the App Store Connect API
       # key triplet (key ID + issuer ID + key content), runs Match-style code
       # signing, archives the App scheme, and uploads to TestFlight.
