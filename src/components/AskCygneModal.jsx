@@ -37,6 +37,20 @@ function writeDailyCount(n) {
   try { localStorage.setItem(todayKey(), String(n)); } catch { /* quota */ }
 }
 
+// First-open medical/AI disclaimer — shown once per device, then suppressed
+// via this localStorage key. Stored as the literal string "true" so future
+// readers don't need to JSON.parse anything.
+const DISCLAIMER_SEEN_KEY = "cygne_askcygne_disclaimer_seen";
+
+function readDisclaimerSeen() {
+  try { return localStorage.getItem(DISCLAIMER_SEEN_KEY) === "true"; }
+  catch { return false; }
+}
+
+function writeDisclaimerSeen() {
+  try { localStorage.setItem(DISCLAIMER_SEEN_KEY, "true"); } catch { /* quota */ }
+}
+
 /**
  * Bottom-sheet Ask Cygne overlay. Posts the question + caller-supplied
  * context (either a pre-built string or raw products/journals/checkIns
@@ -61,7 +75,15 @@ export function AskCygneModal({
   const [answer, setAnswer] = useState("");
   const [error, setError] = useState(null);
   const [count, setCount] = useState(readDailyCount);
+  // First-open AI/medical disclaimer. Seeded from localStorage so returning
+  // users skip it; new users see it before the chat surface renders.
+  const [disclaimerSeen, setDisclaimerSeen] = useState(readDisclaimerSeen);
   const reached = count >= DAILY_LIMIT;
+
+  const dismissDisclaimer = () => {
+    writeDisclaimerSeen();
+    setDisclaimerSeen(true);
+  };
 
   const ask = async (q) => {
     if (!q.trim()) return;
@@ -126,11 +148,14 @@ export function AskCygneModal({
     }
   };
 
-  // Auto-ask if we were given a seed question — but never when at the limit.
+  // Auto-ask if we were given a seed question — but never when at the limit,
+  // and never before the disclaimer is acknowledged. Depending on
+  // disclaimerSeen lets the effect re-fire the moment the user taps "Got it"
+  // on first open, so a deep-linked seeded question still auto-asks then.
   useEffect(() => {
-    if (initialQuestion && !reached) ask(initialQuestion);
+    if (initialQuestion && !reached && disclaimerSeen) ask(initialQuestion);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [disclaimerSeen]);
 
   // Belt-and-suspenders age gate. The three UI entry points (dashboard
   // line, vanity ⋯ menu, FaceHeatMap zone drawer) all check
@@ -149,6 +174,84 @@ export function AskCygneModal({
   // in the same order; only the JSX return diverges.
   if (getAskCygneAccess(user) === "underage") {
     return null;
+  }
+
+  // First-open disclaimer — replaces the chat surface entirely until the
+  // user acknowledges. Backdrop click is intentionally NOT wired so the
+  // medical/AI note can't be dismissed without an explicit tap.
+  if (!disclaimerSeen) {
+    return (
+      <div
+        style={{
+          position: "fixed", inset: 0, zIndex: 300,
+          background: "rgba(0,0,0,0.7)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          padding: "0 24px",
+        }}
+      >
+        <div
+          style={{
+            width: "100%", maxWidth: 440,
+            background: "var(--color-inky-moss, #2d3d2b)",
+            border: "1px solid rgba(250,249,244,0.25)",
+            borderRadius: 12,
+            padding: "32px 28px 28px",
+            color: "var(--color-ivory, #faf9f4)",
+            textAlign: "center",
+          }}
+        >
+          <img
+            src="/cygne-logo.png"
+            alt=""
+            style={{
+              height: 40, width: "auto", display: "block",
+              margin: "0 auto 22px",
+              filter: "brightness(0) invert(1)", opacity: 0.95,
+            }}
+          />
+          <h2 style={{
+            fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
+            fontWeight: 700, fontSize: 13, letterSpacing: "0.15em",
+            textTransform: "uppercase",
+            color: "var(--color-ivory, #faf9f4)",
+            margin: "0 0 18px",
+            lineHeight: 1.4,
+          }}>
+            A note before we begin
+          </h2>
+          <p style={{
+            fontFamily: "var(--font-body, 'Fungis Normal', sans-serif)",
+            fontSize: 13, lineHeight: 1.65,
+            color: "rgba(255,255,255,0.7)",
+            margin: "0 0 26px",
+          }}>
+            Ask Cygne is an AI assistant for informational purposes only. It
+            is not a substitute for professional dermatological or medical
+            advice. Always consult a licensed healthcare provider before
+            making changes to your skincare routine.
+          </p>
+          <button
+            onClick={dismissDisclaimer}
+            style={{
+              width: "100%",
+              padding: "14px 0",
+              background: "transparent",
+              border: "1.5px solid rgba(250,249,244,0.5)",
+              color: "var(--color-ivory, #faf9f4)",
+              borderRadius: 0,
+              fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
+              fontWeight: 700, fontSize: 11, letterSpacing: "0.24em",
+              textTransform: "uppercase",
+              cursor: "pointer",
+              WebkitAppearance: "none", appearance: "none",
+              WebkitTapHighlightColor: "transparent",
+            }}
+          >
+            Got it
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
