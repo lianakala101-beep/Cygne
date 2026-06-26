@@ -407,8 +407,15 @@ function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycled
   // Compute cycle day dynamically from cycleStartDate (LOCAL date, not UTC)
   const computedDay = getCurrentCycleDay(user) || cycledayProp || 14;
   const cycleDay = computedDay;
+  const cycleLen = Math.max(21, Math.min(45, parseInt(user.cycleLength, 10) || 28));
+  // Period is "running long" once the day count passes the user's chosen
+  // cycle length — we show a quiet normalizing note in that case rather
+  // than capping or auto-wrapping the day display.
+  const runningLong = cycleDay > cycleLen;
   const [editing, setEditing] = useState(false);
   const [inputVal, setInputVal] = useState(String(computedDay));
+  const [editingLength, setEditingLength] = useState(false);
+  const [lengthInputVal, setLengthInputVal] = useState(String(cycleLen));
 
   const hasRetinol = !!(activeMap["retinol"]?.length);
   const hasAHA = !!(activeMap["AHA"]?.length);
@@ -419,12 +426,18 @@ function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycled
   const advice = phase.activeAdvice(hasRetinol, hasAHA, hasBHA);
 
   const handleSetDay = () => {
-    const d = Math.max(1, Math.min(35, parseInt(inputVal) || 1));
+    const d = Math.max(1, Math.min(45, parseInt(inputVal) || 1));
     // Store cycle start date at LOCAL midnight so it advances at local midnight
     const now = new Date();
     const startLocal = new Date(now.getFullYear(), now.getMonth(), now.getDate() - (d - 1));
     onUpdateUser({ ...user, cycleStartDate: startLocal.toISOString(), cycleDay: d });
     setEditing(false);
+  };
+
+  const handleSetLength = () => {
+    const len = Math.max(21, Math.min(45, parseInt(lengthInputVal, 10) || 28));
+    onUpdateUser({ ...user, cycleLength: len });
+    setEditingLength(false);
   };
 
   if (!enabled) {
@@ -472,7 +485,7 @@ function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycled
             {editing ? (
               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                 <input
-                  type="number" min="1" max="35"
+                  type="number" min="1" max="45"
                   value={inputVal}
                   onChange={e => setInputVal(e.target.value)}
                   onKeyDown={e => e.key === "Enter" && handleSetDay()}
@@ -494,6 +507,15 @@ function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycled
         {/* Phase description */}
         <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 13, letterSpacing: "0.02em", color: "var(--color-ivory, #faf9f4)", margin: "0 0 14px", lineHeight: 1.6 }}>{phase.description}</p>
 
+        {/* Quiet "running long" note — shown only when the current day has
+            passed the user's chosen cycle length, normalizing a late period
+            rather than capping or resetting the day count. */}
+        {runningLong && (
+          <p style={{ fontFamily: "var(--font-body)", fontStyle: "italic", fontSize: 12, letterSpacing: "0.02em", color: "rgba(250,249,244,0.6)", margin: "0 0 14px", lineHeight: 1.55 }}>
+            Your cycle is running long — this is normal.
+          </p>
+        )}
+
         {/* Nudge */}
         <div style={{ padding: "12px 14px", background: "rgba(0,0,0,0.15)", borderRadius: 8, marginBottom: 0 }}>
           <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 13, letterSpacing: "0.02em", color: "var(--color-ivory, #faf9f4)", margin: 0, lineHeight: 1.6 }}>{phase.nudge}</p>
@@ -504,6 +526,32 @@ function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycled
       <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "14px 16px" }}>
         <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 8px" }}>Your Vanity This Week</p>
         <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 13, letterSpacing: "0.02em", color: "var(--color-ivory, #faf9f4)", margin: "0 0 12px", lineHeight: 1.6 }}>{advice}</p>
+
+        {/* Cycle length setting — accepts 21–45 days. Defaults to 28 when
+            unset. Used by the "running long" note above and (via
+            user.cycleLength) by FaceHeatMap's phase-tally lookback. */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+          <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)" }}>Cycle length</span>
+          {editingLength ? (
+            <>
+              <input
+                type="number" min="21" max="45"
+                value={lengthInputVal}
+                onChange={e => setLengthInputVal(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && handleSetLength()}
+                style={{ width: 52, padding: "3px 8px", background: "var(--ink)", border: "1px solid rgba(250,249,244,0.25)", borderRadius: 6, color: "var(--parchment)", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "center", outline: "none" }}
+                autoFocus
+              />
+              <button onClick={handleSetLength} style={{ padding: "3px 10px", background: "transparent", border: "1px solid var(--color-ivory, #faf9f4)", borderRadius: 6, color: "var(--color-ivory, #faf9f4)", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 9, cursor: "pointer", letterSpacing: "0.15em", textTransform: "uppercase" }}>Set</button>
+            </>
+          ) : (
+            <button onClick={() => { setLengthInputVal(String(cycleLen)); setEditingLength(true); }}
+              style={{ background: "none", border: "none", padding: 0, cursor: "pointer", fontFamily: "var(--font-body)", fontSize: 12, letterSpacing: "0.04em", color: "var(--color-ivory, #faf9f4)", textDecoration: "underline", textDecorationColor: "rgba(250,249,244,0.35)", textUnderlineOffset: 3 }}>
+              {cycleLen} days
+            </button>
+          )}
+        </div>
+
         <button onClick={() => setEnabled(false)}
           style={{ background: "none", border: "none", padding: 0, cursor: "pointer", fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.45, transition: "opacity 0.2s" }}
           onMouseEnter={e => e.currentTarget.style.opacity = "0.75"}

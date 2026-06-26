@@ -134,7 +134,11 @@ function daysBetweenLocal(startIso, nowDate = new Date()) {
   return Math.floor((nowMs - startMs) / 86400000);
 }
 // Current cycle day from user.cycleStartDate. Parsed as LOCAL date.
-// Day 1 = cycle start date; wraps every 28 days.
+// Day 1 = cycle start date. No auto-wrap — when a period runs late the
+// day count keeps climbing past user.cycleLength, capped at 45 so the
+// input/display can't run away. The user explicitly resets (set day 1 →
+// new cycleStartDate) when their next period actually starts. The
+// CycleTracker UI surfaces a "running long" note once day > cycleLength.
 function getCurrentCycleDay(user) {
   if (!user) return null;
   if (user.cycleStartDate) {
@@ -145,7 +149,7 @@ function getCurrentCycleDay(user) {
     const todayLocal = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     const diffDays = Math.floor((todayLocal.getTime() - startLocal.getTime()) / (1000 * 60 * 60 * 24));
     const rawDay = diffDays + 1;
-    const day = ((rawDay - 1) % 28 + 28) % 28 + 1;
+    const day = Math.min(Math.max(rawDay, 1), 45);
     // eslint-disable-next-line no-console
     console.log("[Cygne cycle]", {
       cycleStartDate: user.cycleStartDate,
@@ -153,7 +157,7 @@ function getCurrentCycleDay(user) {
       todayLocal: todayLocal.toString(),
       diffDays,
       rawDay,
-      wrappedDay: day,
+      resolvedDay: day,
     });
     return day;
   }

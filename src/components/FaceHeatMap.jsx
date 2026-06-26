@@ -252,7 +252,7 @@ function ZoneInsightDrawer({ zoneId, checkIns, products, user, onClose, onAskCyg
   const phaseTally = {};
   if (cycleStart) {
     for (const f of flareEntries) {
-      const day = cycleDayForDate(f.date.split("T")[0], cycleStart);
+      const day = cycleDayForDate(f.date.split("T")[0], cycleStart, user?.cycleLength || 28);
       const phase = phaseForDay(day);
       if (phase) phaseTally[phase] = (phaseTally[phase] || 0) + 1;
     }
