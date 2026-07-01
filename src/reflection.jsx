@@ -24,7 +24,7 @@ const CURSIVE    = "var(--font-display)";
 const SANS       = "var(--font-body)";
 
 const ANGLES = [
-  { key: "front", label: "Front", hint: "Face the lens. Chin level, shoulders soft." },
+  { key: "front", label: "Front", hint: "Position your skin. Keep consistent framing each week." },
   { key: "left",  label: "Tilt Left",  hint: "Turn your head gently to the left." },
   { key: "right", label: "Tilt Right", hint: "Turn your head gently to the right." },
 ];
