@@ -394,7 +394,18 @@ export default function App() {
           }
           if (Array.isArray(pRows)) {
             const next = pRows.map(r => r.data).filter(Boolean);
-            setProducts(next);
+            // Only overwrite local state when the server has something to
+            // say — an empty server response should NOT clobber optimistic
+            // local products that haven't been upserted yet (e.g. a new
+            // user who added products before the sync effect could fire,
+            // or any interleaving with a second tab / auth refresh). If the
+            // server truly is empty and local is empty too, the assignment
+            // is a no-op; if local has items, we keep them and let the next
+            // sync effect tick upsert them.
+            setProducts(prev => {
+              if (next.length > 0) return next;
+              return Array.isArray(prev) && prev.length > 0 ? prev : next;
+            });
           }
         } finally {
           // Flip the gate AFTER the load resolves (success or error) —
@@ -418,7 +429,13 @@ export default function App() {
             // order; sort ascending so any code that reads e.g. .slice(-N)
             // gets the most recent entries.
             next.sort((a, b) => String(a?.timestamp || "").localeCompare(String(b?.timestamp || "")));
-            setRampLog(next);
+            // Same non-clobber guard as products above — an empty server
+            // response should not wipe locally-appended ramp entries that
+            // haven't been upserted yet.
+            setRampLog(prev => {
+              if (next.length > 0) return next;
+              return Array.isArray(prev) && prev.length > 0 ? prev : next;
+            });
           }
         } finally {
           rampLogLoaded.current = true;
@@ -925,6 +942,19 @@ export default function App() {
     setProducts([]);
     setFirstRun(true);
     setNeedsOnboarding(false);
+    // Flip the load gates for a first-session new user. loadUserProfile is
+    // never called on this path (handleAuth branched to setNeedsOnboarding
+    // for a signup with onboarding_complete === false), so profileLoaded /
+    // productsLoaded / rampLogLoaded would otherwise stay false forever
+    // and every sync effect in the file — including the products upsert —
+    // would silently no-op. The server-side tables are empty for a brand
+    // new user, so treating "loaded" as true here is accurate: local state
+    // IS the source of truth at this instant. Without this, products the
+    // user adds after onboarding live only in localStorage until any
+    // subsequent loadUserProfile call reads back [] and wipes them.
+    profileLoaded.current = true;
+    productsLoaded.current = true;
+    rampLogLoaded.current = true;
     await saveUserProfile(userData);
   };
 
