@@ -94,7 +94,10 @@ export function detectActivesFromProduct(product) {
   if (/\baha\b|glycolic|lactic|mandelic/i.test(name) && !actives.AHA) actives.AHA = true;
   if (/\bbha\b|salicylic/i.test(name) && !actives.BHA) actives.BHA = true;
   if (/\bpha\b|gluconolactone|lactobionic|polyhydroxy/i.test(name) && !actives.PHA) actives.PHA = true;
-  if (/retinol|retinaldehyde|tretinoin/i.test(name) && !actives.retinol) actives.retinol = true;
+  // Kept in sync with ACTIVE_RULES.retinol.keywords in constants.js. The
+  // `retin(ol|al|oid|yl|oic)` group covers the retinol/retinal/retinoid/
+  // retinyl/retinoic-acid family in one alternation.
+  if (/retin(ol|al|oid|yl|oic)|tretinoin|adapalene|granactive|hydroxypinacolone/i.test(name) && !actives.retinol) actives.retinol = true;
   if (/benzoyl peroxide|\bbpo\b/i.test(name) && !actives["benzoyl peroxide"]) actives["benzoyl peroxide"] = true;
   return actives;
 }
