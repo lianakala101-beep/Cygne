@@ -57,7 +57,18 @@ const LAYER_ORDER = {
 const layerIndex = (cat) => LAYER_ORDER[cat.replace(" ", "_")] ?? 6;
 
 const ACTIVE_RULES = {
-  retinol:           { keywords: ["retinol", "retinyl palmitate", "tretinoin", "retinaldehyde", "bakuchiol"], pmOnly: true },
+  // Clinical-safety detection list. Any true retinoid must land on this
+  // key so the PM-only session lock in getLockedSession/getAutoSession
+  // fires and the non-daily frequency default (alternating / 2-3x) is
+  // suggested — retinoids degrade in UV and are cumulative on the skin
+  // barrier, so an AM-daily default is actively harmful. Keep in sync
+  // with the name-based fallback in engine.js detectActivesFromProduct
+  // and the server-side ingredient normalization in api/ask-cygne.js +
+  // api/swan-sense-daily.js. bakuchiol is a plant-based retinol
+  // alternative that isn't photosensitive, but we keep it under the
+  // same key so its scheduling defaults match — conservative rather
+  // than clinically strict.
+  retinol:           { keywords: ["retinol", "retinal", "retinaldehyde", "retinyl palmitate", "retinoid", "retinoic acid", "tretinoin", "adapalene", "granactive retinoid", "hydroxypinacolone retinoate", "bakuchiol"], pmOnly: true },
   niacinamide:       { keywords: ["niacinamide", "nicotinamide"], pmOnly: false },
   "vitamin C":       { keywords: ["ascorbic acid", "l-ascorbic acid", "ascorbyl glucoside", "sodium ascorbyl phosphate", "magnesium ascorbyl phosphate", "ascorbyl tetraisopalmitate"], pmOnly: false },
   AHA:               { keywords: ["glycolic acid", "lactic acid", "mandelic acid", "malic acid", "tartaric acid", "alpha hydroxy acid", "aha"], pmOnly: true, dailyPadSafe: true },
