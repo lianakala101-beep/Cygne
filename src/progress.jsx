@@ -59,6 +59,21 @@ function CheckInModal({ onSubmit, onClose }) {
   const [breakoutZones, setBreakoutZones] = useState([]);
   const [tight, setTight] = useState(false);
 
+  // Body-scroll lock. The modal is a fixed-position sheet, so without this
+  // the page behind it still scrolls when the user drags on the backdrop or
+  // near the modal edges — especially disorienting on the mobile browser
+  // where the address bar collapses. Snapshot the previous overflow value
+  // and restore it on unmount instead of hardcoding "" so any ancestor
+  // that was managing body scroll (nested modal, drawer) gets its state
+  // back exactly.
+  useEffect(() => {
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, []);
+
   const toggleZone = (z) => setBreakoutZones(prev => prev.includes(z) ? prev.filter(x => x !== z) : [...prev, z]);
 
   const handleSubmit = () => {
