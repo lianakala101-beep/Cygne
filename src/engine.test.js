@@ -279,33 +279,47 @@ describe("detectConflicts", () => {
     expect(out.length).toBe(0);
   });
 
-  it("suppresses a conflict when all involved products are alternating", () => {
+  it("still flags a same-session conflict when both products are alternating, marking it intermittent", () => {
+    // Prior behaviour suppressed the flag entirely because both were
+    // "spaced." But two products on alternating nights that started on
+    // the same day layer on every one of those alternating nights, so
+    // the shared-night risk is real. Surface the flag; mark intermittent.
     const products = [
-      p({ id: "r", ingredients: ["retinol"], frequency: "alternating" }),
-      p({ id: "a", ingredients: ["glycolic acid"], frequency: "alternating" }),
+      p({ id: "r", ingredients: ["retinol"], frequency: "alternating", session: "pm" }),
+      p({ id: "a", ingredients: ["glycolic acid"], frequency: "alternating", session: "pm" }),
     ];
     const out = detectConflicts(products);
-    expect(out.length).toBe(0);
+    const c = out.find(x => x.pair.includes("retinol") && x.pair.includes("AHA"));
+    expect(c).toBeDefined();
+    expect(c.intermittent).toBe(true);
+    expect(c.reason).toMatch(/nights you use both/);
   });
 
-  it("suppresses a conflict when even one product is on a non-daily schedule", () => {
-    // Retinol daily + glycolic weekly: the weekly product is intentionally
-    // spaced by the user, so the routine is already handling it.
+  it("flags a same-session conflict when only one product is non-daily, marking intermittent", () => {
+    // Retinol daily + AHA weekly in the same session: on the weekly AHA
+    // night the two still layer. Under-warning on a barrier-damaging
+    // combo is worse than a soft over-warn.
     const products = [
       p({ id: "r", ingredients: ["retinol"], frequency: "daily", session: "pm" }),
       p({ id: "a", ingredients: ["glycolic acid"], frequency: "weekly", session: "pm" }),
     ];
     const out = detectConflicts(products);
-    expect(out.length).toBe(0);
+    const c = out.find(x => x.pair.includes("retinol") && x.pair.includes("AHA"));
+    expect(c).toBeDefined();
+    expect(c.intermittent).toBe(true);
+    expect(c.reason).toMatch(/nights you use both/);
   });
 
-  it("flags a same-session conflict when both products are daily", () => {
+  it("flags a same-session conflict when both products are daily, without the intermittent note", () => {
     const products = [
       p({ id: "r", ingredients: ["retinol"], frequency: "daily", session: "pm" }),
       p({ id: "a", ingredients: ["glycolic acid"], frequency: "daily", session: "pm" }),
     ];
     const out = detectConflicts(products);
-    expect(out.length).toBeGreaterThan(0);
+    const c = out.find(x => x.pair.includes("retinol") && x.pair.includes("AHA"));
+    expect(c).toBeDefined();
+    expect(c.intermittent).toBe(false);
+    expect(c.reason).not.toMatch(/nights you use both/);
   });
 });
 
