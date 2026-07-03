@@ -179,7 +179,10 @@ function getSuggestedFrequency(product, user = {}) {
   if (cat === "Toning Pad") {
     if (isSensitive)
       return { id: "2-3x", reason: "Start at 2-3x per week — sensitive skin needs time to adjust." };
-    return { id: "daily", reason: "Toning pads can be used daily — back off if you notice tightness." };
+    // Toning pads concentrate exposure to salicylic/glycolic in a delivery
+    // matrix — daily use on unacclimated skin can over-strip. Match the
+    // retinol/AHA-serum acclimation pattern rather than defaulting to daily.
+    return { id: "2-3x", reason: "Start at 2-3x per week and build tolerance — daily pad use can over-strip on unacclimated skin." };
   }
 
   // --- Oil ---
@@ -215,7 +218,12 @@ function getSuggestedFrequency(product, user = {}) {
   if (actives.includes("BHA")) {
     if (isSensitive)
       return { id: "2-3x", reason: "BHA on sensitive skin — 2-3 times per week to start." };
-    return { id: "daily", reason: "BHA is generally gentle enough for daily use — reduce if irritated." };
+    // AHA already defaults to 2-3x for non-sensitive users; BHA was the
+    // outlier defaulting to daily. Salicylic acid at OTC concentrations
+    // is tolerable daily on acclimated skin, but starting daily out of
+    // the gate risks barrier disruption before the user knows how their
+    // skin reacts. Match AHA and let the user step up after ramp.
+    return { id: "2-3x", reason: "Start at 2-3x per week — daily BHA is safe once tolerated but can dry unacclimated skin." };
   }
 
   // --- Benzoyl peroxide ---
