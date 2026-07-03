@@ -97,6 +97,14 @@ const CONFLICT_RULES = [
   { pair: ["retinol", "BHA"],               severity: "warning", reason: "Retinol + BHA is too active at once. Rotate to different nights." },
   { pair: ["retinol", "PHA"],               severity: "caution", reason: "PHA is gentler than AHA/BHA but still exfoliating. Alternate evenings with retinol to avoid stacking." },
   { pair: ["vitamin C", "niacinamide"],     severity: "caution", reason: "At high concentrations these may reduce each other's efficacy. Apply with a gap, or use on alternating days." },
+  // Both sit around pH 3–4 and are acid-forward — stacking on the same
+  // application can compound acidity, sting a compromised barrier, and
+  // reduce the antioxidant benefit of Vitamin C. Auto-scheduling already
+  // routes VitC to AM and AHA to PM in most cases (so detectConflicts'
+  // shares-session gate self-suppresses this rule for the default setup);
+  // the caution surfaces only when the user has manually forced both into
+  // the same session, which is the shape where the harm actually lands.
+  { pair: ["AHA", "vitamin C"],             severity: "caution", reason: "Both are acid-forward — layering on the same application can sting a compromised barrier and reduce Vitamin C's antioxidant benefit. Best split: Vitamin C AM, AHA PM." },
   { pair: ["AHA", "BHA"],                   severity: "caution", reason: "Daily AHA + BHA risks chronic over-exfoliation. Alternate days or use one per session." },
   { pair: ["AHA", "PHA"],                   severity: "caution", reason: "Layering PHA on top of AHA compounds exfoliation. Use one per session." },
   { pair: ["BHA", "PHA"],                   severity: "caution", reason: "Layering PHA on top of BHA compounds exfoliation. Use one per session." },
