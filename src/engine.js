@@ -175,6 +175,24 @@ function analyzeShelf(products) {
   for (const [active, prods] of Object.entries(activeMap)) {
     if (prods.length > 1 && !["hyaluronic acid", "ceramides"].includes(active)) {
       if (active === "niacinamide" && prods.length <= 2) continue;
+      // Stacking two retinoids (retinol + tretinoin, adapalene + retinol,
+      // any true retinoid + bakuchiol under our conservative grouping)
+      // multiplies cumulative irritation and barrier compromise beyond
+      // what an "N products share this active" caution communicates. When
+      // any of the involved products are in-routine, upgrade to a hard
+      // warning with retinoid-specific copy pointing to the actual harm
+      // rather than the generic "you have duplicates" framing.
+      if (active === "retinol") {
+        const inRoutine = prods.filter(p => p?.inRoutine !== false);
+        if (inRoutine.length >= 2) {
+          flags.push({
+            severity: "warning",
+            label: `${inRoutine.length} retinoids in your ritual`,
+            detail: `Stacking retinoids multiplies irritation and barrier stress — even at different strengths. Keep one in your active ritual and rest the other. Involved: ${inRoutine.map(p => p.name).join(", ")}.`,
+          });
+          continue;
+        }
+      }
       flags.push({ severity: "caution", label: `${active} in ${prods.length} products`, detail: prods.map(p => p.name).join(", ") });
     }
   }
