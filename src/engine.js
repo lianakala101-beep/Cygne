@@ -152,14 +152,24 @@ function detectConflicts(products) {
     });
     if (!sharesSession) return acc;
 
-    // Suppress when any involved product is on a non-daily schedule.
-    // Alternating, 2-3x, weekly and as-needed all signal that the user
-    // is intentionally spacing the product — the routine is already
-    // handling the conflict and no further nudge is needed.
+    // Non-daily frequency (alternating / 2-3x / weekly / as-needed) means
+    // the products may only overlap on some nights — but even one shared
+    // night is enough for a barrier-damaging combo like retinol + AHA to
+    // land. Prior behaviour was to suppress the whole flag when any
+    // involved product was non-daily; that hid real risk from users who
+    // were technically "spacing" one active but layering the other on
+    // shared nights (e.g. retinol on alternating + AHA on daily → they
+    // stack every other PM). Under-warning here is worse than a soft
+    // over-warn, so surface the flag and append an intermittency note so
+    // the copy matches the shape of the risk. Pass `intermittent` through
+    // on the returned rule so consumers that render their own copy can
+    // still choose different phrasing.
     const anyNonDaily = [...pA, ...pB].some(p => p.frequency && p.frequency !== "daily");
-    if (anyNonDaily) return acc;
+    const reason = anyNonDaily
+      ? `${rule.reason} On nights you use both, the interaction still applies — the non-daily schedule only reduces how often it happens, not whether it happens.`
+      : rule.reason;
 
-    acc.push({ ...rule, productsA: pA, productsB: pB });
+    acc.push({ ...rule, reason, productsA: pA, productsB: pB, intermittent: anyNonDaily });
     return acc;
   }, []);
 }
