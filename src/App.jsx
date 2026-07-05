@@ -12,6 +12,37 @@ import { WeekendNudgeCard } from "./weekend.jsx";
 import { SeasonalNudgeCard } from "./seasonal.jsx";
 import { supabase } from "./supabase.js";
 import { API_BASE_URL } from "./config.js";
+import { Capacitor } from "@capacitor/core";
+import { Purchases, LOG_LEVEL } from "@revenuecat/purchases-capacitor";
+
+// RevenueCat platform detection. The Capacitor plugin ships iOS + Android
+// native bridges only; on the Vercel web build Capacitor.getPlatform()
+// returns "web" and every Purchases.* call would throw. Every RC call in
+// this file is gated behind `rcAvailable()` so the same source tree runs
+// unchanged in both targets.
+function rcAvailable() {
+  return Capacitor.isNativePlatform() && Capacitor.getPlatform() !== "web";
+}
+
+// Sync RevenueCat's subscriber identity to Supabase's user id when auth
+// changes. `logIn` associates any anonymous entitlement history the SDK
+// picked up before sign-in with the real account; `logOut` returns the
+// SDK to an anonymous ID so a sign-out doesn't leave the previous user's
+// premium status attached to whoever signs in next on the same device.
+// Best-effort — any RC error is logged and swallowed so a subscription
+// hiccup can't block Supabase auth from advancing.
+async function rcSyncIdentity(session) {
+  if (!rcAvailable()) return;
+  try {
+    if (session?.user?.id) {
+      await Purchases.logIn({ appUserID: session.user.id });
+    } else {
+      await Purchases.logOut();
+    }
+  } catch (e) {
+    console.error("[Cygne rc] identity sync failed:", e?.message ?? e);
+  }
+}
 
 // Code-split: gated by user action or onboarding state, so their chunks load
 // on demand rather than blocking initial paint.
@@ -215,6 +246,31 @@ export default function App() {
   const lastUserSyncRef = useRef(null);
   const userSyncTimerRef = useRef(null);
 
+  // -- Configure RevenueCat once on mount -------------------------------------
+  // Fires as early as possible so the SDK is ready by the time the auth
+  // effect (below) starts asking for logIn. RC internally queues calls
+  // that arrive before configure resolves, so we don't need to gate the
+  // auth effect on this promise. VITE_REVENUECAT_API_KEY is set per
+  // platform build (iOS key in the Capacitor build; unset in web).
+  // Missing key on native is a config error worth logging loudly; missing
+  // key on web is expected and stays silent.
+  useEffect(() => {
+    if (!rcAvailable()) return;
+    const apiKey = import.meta.env.VITE_REVENUECAT_API_KEY;
+    if (!apiKey) {
+      console.error("[Cygne rc] VITE_REVENUECAT_API_KEY is not set — subscription features will not work in this build");
+      return;
+    }
+    (async () => {
+      try {
+        await Purchases.setLogLevel({ level: LOG_LEVEL.DEBUG });
+        await Purchases.configure({ apiKey });
+      } catch (e) {
+        console.error("[Cygne rc] configure failed:", e?.message ?? e);
+      }
+    })();
+  }, []);
+
   // -- Check Supabase session on mount ----------------------------------------
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -223,6 +279,10 @@ export default function App() {
       if (session) {
         loadUserProfile(session.user);
       }
+      // Migrate any anonymous RC identity to the Supabase user id (or
+      // log out if there's no session). Runs on every mount so a
+      // returning user comes back with their entitlements attached.
+      rcSyncIdentity(session);
       setAuthLoading(false);
     }).catch((e) => {
       console.error("[Cygne] getSession failed:", e);
@@ -231,6 +291,10 @@ export default function App() {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setAuthSession(session);
+      // Keep RC identity in lockstep with Supabase's — sign-in migrates
+      // to the user id, sign-out drops back to an anonymous identity so
+      // premium status doesn't leak between accounts on shared devices.
+      rcSyncIdentity(session);
       if (!session) {
         setUser(null);
         setNeedsOnboarding(false);
