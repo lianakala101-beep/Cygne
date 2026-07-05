@@ -35,9 +35,19 @@ async function rcSyncIdentity(session) {
   if (!rcAvailable()) return;
   try {
     if (session?.user?.id) {
-      await Purchases.logIn({ appUserID: session.user.id });
+      // TEMP diagnostic — remove after next iOS build confirms the wire-up.
+      // Logs the userId we're about to hand to RC so we can verify against
+      // the Supabase auth id and the RC dashboard's subscriber list.
+      console.log("[Cygne rc] logIn with appUserID:", session.user.id);
+      const result = await Purchases.logIn({ appUserID: session.user.id });
+      console.log(
+        "[Cygne rc] logIn ok — created:", result?.created,
+        "| rc appUserID:", result?.customerInfo?.originalAppUserId,
+      );
     } else {
+      console.log("[Cygne rc] logOut (no session)");
       await Purchases.logOut();
+      console.log("[Cygne rc] logOut ok");
     }
   } catch (e) {
     console.error("[Cygne rc] identity sync failed:", e?.message ?? e);
@@ -261,10 +271,31 @@ export default function App() {
       console.error("[Cygne rc] VITE_REVENUECAT_API_KEY is not set — subscription features will not work in this build");
       return;
     }
+    // TEMP diagnostic — remove after next iOS build confirms the wire-up.
+    // Prints platform + a masked key preview so we can see:
+    //   (a) the guarded call actually ran on native
+    //   (b) the API key made it through the Vite env substitution
+    //   (c) configure resolved without throwing
+    // getCustomerInfo after configure is the strongest liveness signal —
+    // it proves the SDK is now able to talk to RC's servers.
+    const keyPreview = `${apiKey.slice(0, 6)}…${apiKey.slice(-4)} (${apiKey.length} chars)`;
+    console.log("[Cygne rc] configure start | platform:", Capacitor.getPlatform(), "| key:", keyPreview);
     (async () => {
       try {
         await Purchases.setLogLevel({ level: LOG_LEVEL.DEBUG });
         await Purchases.configure({ apiKey });
+        console.log("[Cygne rc] configure ok");
+        try {
+          const info = await Purchases.getCustomerInfo();
+          console.log(
+            "[Cygne rc] getCustomerInfo ok — appUserID:",
+            info?.customerInfo?.originalAppUserId,
+            "| active entitlements:",
+            Object.keys(info?.customerInfo?.entitlements?.active || {}),
+          );
+        } catch (e) {
+          console.error("[Cygne rc] getCustomerInfo after configure failed:", e?.message ?? e);
+        }
       } catch (e) {
         console.error("[Cygne rc] configure failed:", e?.message ?? e);
       }
