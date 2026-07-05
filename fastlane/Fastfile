@@ -43,13 +43,23 @@ platform :ios do
       keychain_password: ENV["MATCH_PASSWORD"]
     )
 
-    # Archive the App scheme out of the Capacitor-generated workspace and
-    # export as an app-store-signed .ipa.
+    # Archive the App scheme and export as an app-store-signed .ipa.
+    #
+    # Signing settings (DEVELOPMENT_TEAM, CODE_SIGN_STYLE=Manual,
+    # CODE_SIGN_IDENTITY, PROVISIONING_PROFILE_SPECIFIER) are already
+    # baked into project.pbxproj on both Debug and Release configs of
+    # the App target. Do NOT re-pass them via xcargs — xcargs are applied
+    # as GLOBAL command-line overrides by xcodebuild, so they cascade
+    # onto every SPM target in the graph (RevenueCat's internal
+    # RevenueCat_RevenueCat, PurchasesHybridCommon, etc.). Those are
+    # static libraries that don't sign at all, and Xcode 26 refuses to
+    # build a non-signable target with a manual profile forced on it —
+    # producing "RevenueCat_RevenueCat does not support provisioning
+    # profiles" errors that fail the archive.
     build_app(
       scheme: "App",
       project: "ios/App/App.xcodeproj",
-      export_method: "app-store",
-      xcargs: "DEVELOPMENT_TEAM=RYA5L58WXG CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY='Apple Distribution' PROVISIONING_PROFILE_SPECIFIER='match AppStore com.cygne.app'"
+      export_method: "app-store"
     )
 
     # Skip the post-upload "wait for processing" loop — saves ~10 minutes
