@@ -14,6 +14,14 @@ import { supabase } from "./supabase.js";
 import { API_BASE_URL } from "./config.js";
 import { Capacitor } from "@capacitor/core";
 import { Purchases, LOG_LEVEL } from "@revenuecat/purchases-capacitor";
+import { RC_KEY_LOOKS_VALID, rcKeyInvalidReason } from "./hooks/useSubscription.js";
+
+// Module-scope readiness flag. Flips to true after Purchases.configure()
+// resolves. All identity-sync + downstream getCustomerInfo calls guard on
+// this — if configure was skipped (bad key, missing key, web build) any
+// call would throw "Purchases not configured", so we short-circuit
+// silently instead.
+let rcReady = false;
 
 // RevenueCat platform detection. The Capacitor plugin ships iOS + Android
 // native bridges only; on the Vercel web build Capacitor.getPlatform()
@@ -30,9 +38,11 @@ function rcAvailable() {
 // SDK to an anonymous ID so a sign-out doesn't leave the previous user's
 // premium status attached to whoever signs in next on the same device.
 // Best-effort — any RC error is logged and swallowed so a subscription
-// hiccup can't block Supabase auth from advancing.
+// hiccup can't block Supabase auth from advancing. Also gated on rcReady
+// so we don't fire logIn/logOut when configure was skipped (bad or
+// missing key) — those calls would throw "Purchases not configured".
 async function rcSyncIdentity(session) {
-  if (!rcAvailable()) return;
+  if (!rcAvailable() || !rcReady) return;
   try {
     if (session?.user?.id) {
       await Purchases.logIn({ appUserID: session.user.id });
@@ -261,10 +271,21 @@ export default function App() {
       console.error("[Cygne rc] VITE_REVENUECAT_API_KEY is not set — subscription features will not work in this build");
       return;
     }
+    // Prefix check — refuse to configure with a Test Store key (or a
+    // key from the wrong platform). RC's SDK still starts with a bad
+    // key but emits a runtime warning and, in some launch paths, takes
+    // the app down. Catching it here disables subscription surfaces
+    // gracefully instead: rcReady stays false, so identity sync + hook
+    // calls silently short-circuit. Fix in the RC dashboard, not code.
+    if (!RC_KEY_LOOKS_VALID) {
+      console.error("[Cygne rc]", rcKeyInvalidReason());
+      return;
+    }
     (async () => {
       try {
         await Purchases.setLogLevel({ level: LOG_LEVEL.DEBUG });
         await Purchases.configure({ apiKey });
+        rcReady = true;
       } catch (e) {
         console.error("[Cygne rc] configure failed:", e?.message ?? e);
       }
