@@ -14,7 +14,8 @@ import { supabase } from "./supabase.js";
 import { API_BASE_URL } from "./config.js";
 import { Capacitor } from "@capacitor/core";
 import { Purchases, LOG_LEVEL } from "@revenuecat/purchases-capacitor";
-import { RC_KEY_LOOKS_VALID, rcKeyInvalidReason } from "./hooks/useSubscription.js";
+import { RC_KEY_LOOKS_VALID, rcKeyInvalidReason, usePremiumStatus, shouldShowPaywall } from "./hooks/useSubscription.js";
+import { PaywallScreen } from "./components/PaywallScreen.jsx";
 
 // Module-scope readiness flag. Flips to true after Purchases.configure()
 // resolves. All identity-sync + downstream getCustomerInfo calls guard on
@@ -224,6 +225,12 @@ export default function App() {
   const [triggerLog, setTriggerLog] = useLocalStorage("cygne_trigger_log", []);
   const [fitSheet, setFitSheet] = useState(null);
   const [reflections, setReflections] = useLocalStorage("cygne_reflections", []);
+
+  // RevenueCat premium + local trial state. Trial starts at account
+  // creation (auth.users.created_at) and lasts TRIAL_DAYS. The hook
+  // internally reads RC's active `premium` entitlement; combined with
+  // shouldShowPaywall() below, this drives the paywall gate.
+  const premiumStatus = usePremiumStatus(authSession?.user?.created_at);
 
   // Track whether initial load from Supabase is done (prevents overwriting cloud data with empty localStorage)
   const profileLoaded = useRef(false);
@@ -1323,6 +1330,22 @@ export default function App() {
       <Suspense fallback={<div style={{ minHeight: "100vh", background: "var(--color-ivory)" }} />}>
         <OnboardingScreen onComplete={handleOnboardingComplete} setLocationData={setLocationData} />
       </Suspense>
+    );
+  }
+
+  // -- Paywall gate (trial expired + no active premium entitlement) -----------
+  // Only fires when RC has definitively confirmed the user is not premium
+  // AND the local trial has ended (see shouldShowPaywall in
+  // hooks/useSubscription.js for the full posture — web builds, invalid
+  // RC keys, transient errors, and still-loading all pass through so a
+  // subscription-infrastructure blip can't strand every user).
+  if (shouldShowPaywall(premiumStatus)) {
+    return (
+      <PaywallScreen
+        trialExpired={true}
+        onUnlock={() => premiumStatus.refresh()}
+        onSignOut={handleLogout}
+      />
     );
   }
 
