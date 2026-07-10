@@ -17,7 +17,7 @@ import { Purchases } from "@revenuecat/purchases-capacitor";
 // Entitlement key configured in the RevenueCat dashboard for the paid tier.
 // Keep in sync with the dashboard — if you rename the entitlement there,
 // rename it here too. Everything premium in the app checks this one key.
-export const PREMIUM_ENTITLEMENT = "premium";
+export const PREMIUM_ENTITLEMENT = "Cygne Premium";
 
 // -------- API-key sanity check ------------------------------------------
 // RevenueCat mints multiple SDK API keys per project — production App
