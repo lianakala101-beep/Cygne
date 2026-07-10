@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!--
+		aps-environment enables Apple Push Notification service for the
+		app. `production` is the correct value for App Store and
+		TestFlight builds; Xcode swaps in `development` on debug builds
+		when the target device is running a debug-signed build. Match's
+		provisioning profile (com.cygne.app AppStore) must include the
+		"Push Notifications" capability for this to link at build time —
+		enable "Push Notifications" on the App ID in developer.apple.com
+		and re-run the workflow so Match refreshes the profile.
+	-->
+	<key>aps-environment</key>
+	<string>production</string>
+</dict>
+</plist>
