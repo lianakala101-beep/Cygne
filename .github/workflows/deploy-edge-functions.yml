@@ -17,7 +17,10 @@ jobs:
       - name: Install Supabase CLI
         uses: supabase/setup-cli@v1
         with:
-          version: latest
+          # Pinned rather than `latest` — the setup-cli action resolves
+          # `latest` via the GitHub API and hits anonymous-rate-limit
+          # errors on busy runners. Bump this when we want a new CLI.
+          version: 2.45.5
 
       # NOTE: supabase/config.toml is intentionally NOT removed anymore. With
       # the invalid [project] key gone, the CLI parses it cleanly and applies
