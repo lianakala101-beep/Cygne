@@ -80,10 +80,31 @@ export function PaywallScreen({ trialExpired, onUnlock, onSignOut }) {
   // .monthly and .annual for standard-identifier packages.
   useEffect(() => {
     (async () => {
+      // TEMP diagnostic — remove after we've traced the "Couldn't load
+      // subscription options" empty-offerings issue. Two logs bracket
+      // getOfferings(): the "start" line proves we reached the call at
+      // all, the "result" line dumps the raw shape (offerings.current
+      // may be null with a non-empty offerings.all, or the whole
+      // response may be empty). Any throw lands in the catch below and
+      // logs the error message + full object for RC error codes.
+      console.log("[Cygne paywall DIAG] getOfferings start");
       try {
         const result = await Purchases.getOfferings();
+        console.log(
+          "[Cygne paywall DIAG] getOfferings result | current identifier:",
+          result?.current?.identifier ?? null,
+          "| current package count:",
+          result?.current?.availablePackages?.length ?? 0,
+          "| all offering keys:",
+          result?.all ? Object.keys(result.all) : null,
+          "| full result:",
+          JSON.stringify(result),
+        );
         const current = result?.current;
         if (!current || !Array.isArray(current.availablePackages) || current.availablePackages.length === 0) {
+          console.warn(
+            "[Cygne paywall DIAG] no current offering or empty packages — check the RevenueCat dashboard for a `default` offering with attached products",
+          );
           setError("Subscription options aren't available right now. Please try again in a moment.");
           setLoading(false);
           return;
@@ -93,7 +114,13 @@ export function PaywallScreen({ trialExpired, onUnlock, onSignOut }) {
         const preferred = current.annual || current.monthly || current.availablePackages[0];
         setSelectedId(preferred?.identifier || null);
       } catch (e) {
-        console.error("[Cygne paywall] getOfferings failed:", e?.message ?? e);
+        console.error(
+          "[Cygne paywall DIAG] getOfferings threw:",
+          "| message:", e?.message ?? String(e),
+          "| code:", e?.code ?? null,
+          "| underlyingErrorMessage:", e?.underlyingErrorMessage ?? null,
+          "| full error:", e,
+        );
         setError("Couldn't load subscription options. Please check your connection and try again.");
       } finally {
         setLoading(false);
