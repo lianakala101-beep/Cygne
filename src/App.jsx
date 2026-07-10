@@ -14,6 +14,7 @@ import { supabase } from "./supabase.js";
 import { API_BASE_URL } from "./config.js";
 import { Capacitor } from "@capacitor/core";
 import { Purchases, LOG_LEVEL } from "@revenuecat/purchases-capacitor";
+import { PushNotifications } from "@capacitor/push-notifications";
 import { RC_KEY_LOOKS_VALID, rcKeyInvalidReason, usePremiumStatus, shouldShowPaywall } from "./hooks/useSubscription.js";
 import { PaywallScreen } from "./components/PaywallScreen.jsx";
 
@@ -31,6 +32,37 @@ let rcReady = false;
 // unchanged in both targets.
 function rcAvailable() {
   return Capacitor.isNativePlatform() && Capacitor.getPlatform() !== "web";
+}
+
+// -- Push notifications (Capacitor plugin) ----------------------------------
+// Same web-vs-native shape as the RC helpers above — every PushNotifications
+// call is guarded so the Vercel web build doesn't throw on the missing
+// native bridge. The permission request is called from two places:
+//   1. handleOnboardingComplete (new signup)
+//   2. loadUserProfile for a returning already-onboarded user
+// iOS shows the system dialog exactly once ever; subsequent requestPermissions
+// calls return the current status without re-prompting, so calling from both
+// sites is safe. registerPushRef gates it to one call per app mount so we
+// don't retry against a rejected permission every render.
+function pushAvailable() {
+  return Capacitor.isNativePlatform() && Capacitor.getPlatform() !== "web";
+}
+
+async function registerPushNotifications() {
+  if (!pushAvailable()) return;
+  try {
+    const permStatus = await PushNotifications.requestPermissions();
+    if (permStatus.receive === "granted") {
+      // register() triggers the native APNS registration flow; the
+      // "registration" listener (set up in the mount effect) receives
+      // the token and upserts it into device_tokens.
+      await PushNotifications.register();
+    } else {
+      console.log("[Cygne push] permission not granted:", permStatus.receive);
+    }
+  } catch (e) {
+    console.error("[Cygne push] permission request failed:", e?.message ?? e);
+  }
 }
 
 // Sync RevenueCat's subscriber identity to Supabase's user id when auth
@@ -235,6 +267,12 @@ export default function App() {
   const [daysSinceLastActive, setDaysSinceLastActive] = useState(null);
   const daysSinceComputedRef = useRef(false);
 
+  // Guards registerPushNotifications() to one call per app mount so a
+  // fast onboarding-complete → loadUserProfile re-render doesn't re-ask.
+  // The system dialog only shows once per install anyway, but avoiding
+  // the second requestPermissions() call means no wasted native round-trip.
+  const registerPushRef = useRef(false);
+
   // RevenueCat premium + local trial state. Trial starts at account
   // creation (auth.users.created_at) and lasts TRIAL_DAYS. The hook
   // internally reads RC's active `premium` entitlement; combined with
@@ -306,6 +344,66 @@ export default function App() {
         console.error("[Cygne rc] configure failed:", e?.message ?? e);
       }
     })();
+  }, []);
+
+  // -- Push notification listeners (mount once, live for app lifetime) --------
+  // Native listeners must be attached before we call PushNotifications.register()
+  // — otherwise APNS could hand back a token nobody's listening for. Setup runs
+  // ONCE on app mount (empty deps) and returns a cleanup that removes both
+  // handles. Everything guarded on pushAvailable() so Vercel web is a no-op.
+  useEffect(() => {
+    if (!pushAvailable()) return;
+    const handles = [];
+    let cancelled = false;
+    (async () => {
+      try {
+        const regHandle = await PushNotifications.addListener("registration", async (token) => {
+          try {
+            // Grab the freshest session inside the listener — reading a
+            // captured `authSession` from the outer scope would go stale
+            // if the user signed out between mount and token delivery.
+            const { data: { session } } = await supabase.auth.getSession();
+            const userId = session?.user?.id;
+            if (!userId) {
+              console.warn("[Cygne push] registration fired without a session — token dropped");
+              return;
+            }
+            const platform = Capacitor.getPlatform(); // "ios" | "android"
+            const nowIso = new Date().toISOString();
+            const { error } = await supabase.from("device_tokens").upsert(
+              {
+                user_id: userId,
+                token: token.value,
+                platform,
+                updated_at: nowIso,
+              },
+              { onConflict: "user_id,platform" },
+            );
+            if (error) {
+              console.error("[Cygne push] token upsert failed:", error.message);
+            } else {
+              console.log("[Cygne push] token registered | platform:", platform, "| preview:", token.value.slice(0, 12) + "…");
+            }
+          } catch (e) {
+            console.error("[Cygne push] registration handler threw:", e?.message ?? e);
+          }
+        });
+        if (cancelled) { regHandle.remove?.(); return; }
+        handles.push(regHandle);
+
+        const errHandle = await PushNotifications.addListener("registrationError", (error) => {
+          console.error("[Cygne push] registration error:", error);
+        });
+        if (cancelled) { errHandle.remove?.(); return; }
+        handles.push(errHandle);
+      } catch (e) {
+        console.error("[Cygne push] listener setup failed:", e?.message ?? e);
+      }
+    })();
+    return () => {
+      cancelled = true;
+      handles.forEach(h => { try { h.remove?.(); } catch { /* ignore */ } });
+    };
   }, []);
 
   // -- Check Supabase session on mount ----------------------------------------
@@ -602,6 +700,17 @@ export default function App() {
       }
       profileLoaded.current = true;
       setNeedsOnboarding(false);
+      // Push notifications — request permission for an already-onboarded
+      // returning user. The ref de-dupes against handleOnboardingComplete
+      // in the fresh-signup path so we never call requestPermissions()
+      // twice in one mount. iOS only shows the dialog once per install
+      // anyway; this path handles anyone whose onboarding predates this
+      // PR (they never got prompted) and re-registers the token on every
+      // launch after (so an APNS token rotation lands in device_tokens).
+      if (!registerPushRef.current) {
+        registerPushRef.current = true;
+        registerPushNotifications();
+      }
       console.log("[Cygne] profile restored from Supabase", {
         userId: authUser.id,
         products: (meta.products || []).length,
@@ -1081,6 +1190,14 @@ export default function App() {
     productsLoaded.current = true;
     rampLogLoaded.current = true;
     await saveUserProfile(userData);
+    // Push notifications — request permission at the earliest earned
+    // moment for a new signup. iOS shows the system dialog exactly once,
+    // so this and the returning-user path in loadUserProfile can both
+    // fire safely; the ref below de-dupes within a single session.
+    if (!registerPushRef.current) {
+      registerPushRef.current = true;
+      registerPushNotifications();
+    }
   };
 
   // -- Update user (also syncs to Supabase) -----------------------------------
