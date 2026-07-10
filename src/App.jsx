@@ -1161,6 +1161,40 @@ export default function App() {
 
   // -- Logout -----------------------------------------------------------------
   const handleLogout = async () => {
+    // Push cleanup MUST run before signOut(). The row-level delete
+    // policy on device_tokens requires auth.uid() = user_id, so a
+    // post-signOut delete would run against no session and be rejected
+    // — leaving a stale token that could receive the next signed-in
+    // user's push traffic on this device. Guarded on pushAvailable()
+    // so the Vercel web build stays a no-op. Errors are swallowed:
+    // sign-out must not be blocked by a push-plumbing hiccup, and any
+    // orphaned token is a minor cleanup task, not a data-loss bug.
+    if (pushAvailable() && authSession?.user?.id) {
+      const userId = authSession.user.id;
+      const platform = Capacitor.getPlatform(); // "ios" | "android"
+      try {
+        await PushNotifications.unregister();
+      } catch (e) {
+        console.error("[Cygne push] unregister failed:", e?.message ?? e);
+      }
+      try {
+        const { error } = await supabase
+          .from("device_tokens")
+          .delete()
+          .eq("user_id", userId)
+          .eq("platform", platform);
+        if (error) console.error("[Cygne push] token delete failed:", error.message);
+      } catch (e) {
+        console.error("[Cygne push] token delete threw:", e?.message ?? e);
+      }
+    }
+    // Reset the per-mount request guard so if a different user signs in
+    // on this device without a full app relaunch, the registration flow
+    // fires again for the new session. Without this, the ref would still
+    // be true from the outgoing user's sign-in and no token would land
+    // for the incoming user.
+    registerPushRef.current = false;
+
     await supabase.auth.signOut();
     setAuthSession(null);
     setUser(null);
