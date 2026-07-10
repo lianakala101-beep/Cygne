@@ -10,7 +10,7 @@
 // the `useSubscription` React hook when the answer needs to drive
 // rendering.
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Capacitor } from "@capacitor/core";
 import { Purchases } from "@revenuecat/purchases-capacitor";
 
@@ -148,4 +148,86 @@ export function useSubscription() {
   }, []);
 
   return { ...state, refresh: load };
+}
+
+// -------- Trial computation ---------------------------------------------
+
+// 14-day free trial from account creation. Extend / shorten here if the
+// business logic changes — the paywall + gate read it from this constant.
+export const TRIAL_DAYS = 14;
+
+/**
+ * Pure function — given the ISO timestamp of the user's account creation
+ * (typically `authSession.user.created_at` from Supabase), returns
+ *   { isActive, daysRemaining, daysElapsed }
+ *
+ * A missing or unparseable date returns "trial active with full duration"
+ * — benefit of the doubt to a live user rather than gating them out on a
+ * data glitch. Elapsed-time math is local-day-boundary aware: we compare
+ * calendar days rather than 86400000ms increments so a user who signed up
+ * at 11pm and opens the app the next morning at 8am is on day 2, not
+ * still day 1 with 15 hours left.
+ */
+export function computeTrialStatus(trialStartDate) {
+  if (!trialStartDate) return { isActive: true, daysRemaining: TRIAL_DAYS, daysElapsed: 0 };
+  const startMs = new Date(trialStartDate).getTime();
+  if (Number.isNaN(startMs)) return { isActive: true, daysRemaining: TRIAL_DAYS, daysElapsed: 0 };
+  const nowMs = Date.now();
+  const daysElapsed = Math.max(0, Math.floor((nowMs - startMs) / 86400000));
+  const daysRemaining = Math.max(0, TRIAL_DAYS - daysElapsed);
+  return { isActive: daysRemaining > 0, daysRemaining, daysElapsed };
+}
+
+/**
+ * React hook — combines RevenueCat entitlement state with local trial
+ * state. Caller passes the account creation timestamp (typically
+ * `authSession?.user?.created_at`). Returns
+ *   { isPremium, isTrialActive, trialDaysRemaining, loading, source, refresh }
+ * `source` propagates from useSubscription so the caller (or
+ * shouldShowPaywall below) can reason about whether the RC answer is
+ * definitive or a transient/degraded state.
+ */
+export function usePremiumStatus(trialStartDate) {
+  const sub = useSubscription();
+  const trial = computeTrialStatus(trialStartDate);
+  // useSubscription's own mount effect fires once against whichever RC
+  // identity is current at that moment — typically anonymous, because
+  // rcSyncIdentity(session) runs from a parallel Supabase auth effect.
+  // Re-check when trialStartDate lands so a signed-in user's real
+  // entitlements replace the anonymous answer. First mount is a no-op
+  // (useSubscription already fired) — the guarded call is only for
+  // subsequent auth-identity changes.
+  const primedRef = useRef(false);
+  useEffect(() => {
+    if (!primedRef.current) { primedRef.current = true; return; }
+    if (trialStartDate) sub.refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [trialStartDate]);
+  return {
+    isPremium: sub.isPremium,
+    isTrialActive: trial.isActive,
+    trialDaysRemaining: trial.daysRemaining,
+    loading: sub.loading,
+    source: sub.source,
+    refresh: sub.refresh,
+  };
+}
+
+/**
+ * Gate posture. Returns true only when RC has DEFINITIVELY confirmed the
+ * user is not premium AND the local trial has expired. Any other state
+ * — still loading, web build, invalid RC key, transient RC error —
+ * returns false (don't gate). The tradeoff: someone could squeeze a few
+ * extra minutes of access during a network blip. Not gating on ambiguous
+ * state is the safer default — a hard paywall on a wrong-key build
+ * would strand every user with no way in, and there's no way for them
+ * to fix the app from the client side.
+ */
+export function shouldShowPaywall(status) {
+  if (!status) return false;
+  if (status.loading) return false;
+  if (status.source !== "revenuecat") return false; // web / invalid-key / error / null
+  if (status.isPremium) return false;
+  if (status.isTrialActive) return false;
+  return true;
 }
