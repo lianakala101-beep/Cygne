@@ -19,6 +19,18 @@ function setCors(res) {
 
 function buildContext(body) {
   const parts = [];
+  // Return-gap signal — the client only forwards daysSinceLastActive
+  // when it's >= 7 (see src/hooks/useSwanSenseDaily.js). Feed it to the
+  // model as instruction, not raw data, so the line acknowledges the
+  // gap warmly instead of naming it. Guardrails baked in: no streak
+  // language, no missed-days framing, never guilt.
+  if (Number.isFinite(body.daysSinceLastActive) && body.daysSinceLastActive >= 7) {
+    parts.push(
+      `Return context: the user has been away from the app for ${body.daysSinceLastActive} days and is opening it again now. ` +
+      `Acknowledge the return gently in today's line — a soft "picking back up" or "easing back in" tone, one clause at most. ` +
+      `Never mention lost streaks, missed days, or broken progress. Never guilt or scold. If their skin data is thin as a result, keep the line seasonal/cycle-aware and future-facing rather than pointing at the gap.`
+    );
+  }
   if (body.skinType) parts.push(`Skin type: ${body.skinType}.`);
   if (Array.isArray(body.concerns) && body.concerns.length) {
     parts.push(`Concerns: ${body.concerns.join(", ")}.`);

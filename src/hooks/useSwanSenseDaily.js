@@ -38,7 +38,7 @@ function writeLocal(userId, line) {
  * The card consumer uses it to switch to a generic editorial fallback
  * instead of the "no data" hint.
  */
-export function useSwanSenseDaily({ user, products, journals, checkIns, triggerLog, cycleDay }) {
+export function useSwanSenseDaily({ user, products, journals, checkIns, triggerLog, cycleDay, daysSinceLastActive = null }) {
   const [line, setLine] = useState(() => readLocal(user?.id));
   const [loading, setLoading] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -90,6 +90,13 @@ export function useSwanSenseDaily({ user, products, journals, checkIns, triggerL
           concerns: user?.concerns,
           skinProfile: sanitizedSkinProfile,
           cycleDay,
+          // Only forward the gap when it's meaningful (7+ days). The
+          // server prompt only tunes on the ≥7 branch, so sending
+          // smaller values just adds prompt noise. null / undefined
+          // signals "no return-gap context" to the server.
+          daysSinceLastActive: typeof daysSinceLastActive === "number" && daysSinceLastActive >= 7
+            ? daysSinceLastActive
+            : null,
         });
         if (cancelled) return;
         if (data?.line) {
