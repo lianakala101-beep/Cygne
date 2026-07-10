@@ -226,6 +226,15 @@ export default function App() {
   const [fitSheet, setFitSheet] = useState(null);
   const [reflections, setReflections] = useLocalStorage("cygne_reflections", []);
 
+  // "Welcome back" gap detection. Computed ONCE from user_metadata.
+  // lastActiveDate at the start of the session, then we overwrite
+  // lastActiveDate with today's ISO so the NEXT session sees this
+  // session's opening as the last activity. Null = brand new user
+  // (no prior lastActiveDate) or a returning user under 24 hours, in
+  // which case the Dashboard renders the normal greeting.
+  const [daysSinceLastActive, setDaysSinceLastActive] = useState(null);
+  const daysSinceComputedRef = useRef(false);
+
   // RevenueCat premium + local trial state. Trial starts at account
   // creation (auth.users.created_at) and lasts TRIAL_DAYS. The hook
   // internally reads RC's active `premium` entitlement; combined with
@@ -394,7 +403,31 @@ export default function App() {
         // consistency, routine philosophy, climate, environment, travel,
         // fragrance sensitivity, ingredients to avoid)
         skinProfile: meta.skinProfile || null,
+        // Overwrite lastActiveDate with today so the NEXT session sees
+        // this session's opening as the reference point. The stored
+        // value is read into daysSinceLastActive below BEFORE we
+        // clobber it, so the current session's "welcome back" logic
+        // sees the original gap.
+        lastActiveDate: new Date().toISOString(),
       };
+      // Compute the return-gap once per app mount. Guarded by
+      // daysSinceComputedRef so a re-entry into loadUserProfile (auth
+      // refresh, token rotation) doesn't re-trigger the "welcome back"
+      // moment mid-session.
+      if (!daysSinceComputedRef.current) {
+        daysSinceComputedRef.current = true;
+        const prev = meta.lastActiveDate;
+        if (prev) {
+          const prevMs = new Date(prev).getTime();
+          if (Number.isFinite(prevMs)) {
+            const gap = Math.floor((Date.now() - prevMs) / 86400000);
+            // Clamp negatives to 0 so a clock skew doesn't leak weird
+            // messaging; leave positive values as-is so the Dashboard
+            // + swan-sense hook see the true gap.
+            setDaysSinceLastActive(Math.max(0, gap));
+          }
+        }
+      }
       // Prime the user-sync change-detection ref with the same data
       // we're about to set on state. The user-sync useEffect compares
       // each new render's serialized profileData to this; matching
@@ -1501,7 +1534,7 @@ export default function App() {
                 onDismiss={dismissReflectionPrompt}
               />
             )}
-            <Dashboard products={products} setTab={setTab} checkIns={checkIns} swanPopupDismissed={swanPopupDismissed} onDismissSwanPopup={dismissSwanPopup} treatments={treatments} locationData={locationData} user={{ ...(user || {}), id: authSession?.user?.id }} notifPermission={notifPermission} onRequestNotif={requestNotifications} notifDismissed={notifDismissed} onDismissNotif={() => setNotifDismissed(true)} journals={journals} setCheckIns={setCheckIns} triggerLog={triggerLog} />
+            <Dashboard products={products} setTab={setTab} checkIns={checkIns} swanPopupDismissed={swanPopupDismissed} onDismissSwanPopup={dismissSwanPopup} treatments={treatments} locationData={locationData} user={{ ...(user || {}), id: authSession?.user?.id }} notifPermission={notifPermission} onRequestNotif={requestNotifications} notifDismissed={notifDismissed} onDismissNotif={() => setNotifDismissed(true)} journals={journals} setCheckIns={setCheckIns} triggerLog={triggerLog} daysSinceLastActive={daysSinceLastActive} />
           </>
         )}
         {tab === "routine"   && <MyRoutine

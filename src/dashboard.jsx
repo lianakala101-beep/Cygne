@@ -19,7 +19,7 @@ const MonthlyRecap  = lazy(() => import("./components/MonthlyRecap.jsx").then(m 
 
 const RECAP_MONTH_NAMES = ["january","february","march","april","may","june","july","august","september","october","november","december"];
 
-function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSwanPopup, treatments, locationData, user, notifPermission, onRequestNotif, notifDismissed, onDismissNotif, journals, setCheckIns, triggerLog = [] }) {
+function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSwanPopup, treatments, locationData, user, notifPermission, onRequestNotif, notifDismissed, onDismissNotif, journals, setCheckIns, triggerLog = [], daysSinceLastActive = null }) {
   const conflicts = detectConflicts(products);
   // Surface only irreconcilable conflicts (the molecule-level deactivation
   // pairs flagged in constants.js). Everything else is handled silently
@@ -68,18 +68,28 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
     checkIns,
     triggerLog,
     cycleDay: currentCycleDay,
+    daysSinceLastActive,
   });
 
   return (
     <div>
-      {/* Hero — editorial greeting in ivory + Fungis Normal wide tracking */}
+      {/* Hero — editorial greeting in ivory + Fungis Normal wide tracking.
+          "Welcome back" copy replaces the empty-vanity welcome line for
+          3-6 day gaps (soft) and 7+ day gaps (longer, more supportive).
+          Under 3 days = normal greeting. Never mentions streaks or lost
+          progress — see task brief for tone requirements. */}
       {(() => {
         const h = new Date().getHours();
         const slot = h >= 5 && h < 12 ? "morning" : h >= 12 && h < 17 ? "afternoon" : "evening";
         const greeting = slot === "morning" ? "Good Morning" : slot === "afternoon" ? "Good Afternoon" : "Good Evening";
         const firstName = user?.name?.split(" ")[0] || "";
+        const gap = typeof daysSinceLastActive === "number" ? daysSinceLastActive : null;
+        const welcomeBackLine = gap == null ? null
+          : gap >= 7 ? "It's been a little while — your skin might be adjusting to changes in routine. Let's pick back up gently."
+          : gap >= 3 ? "Welcome back. Let's ease back into your ritual."
+          : null;
         return (
-          <div style={{ marginBottom: products.length === 0 ? 20 : 24 }}>
+          <div style={{ marginBottom: products.length === 0 || welcomeBackLine ? 20 : 24 }}>
             <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 500, fontSize: 32, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 6px", lineHeight: 1.05 }}>
               {greeting}{firstName ? "," : "."}
             </h1>
@@ -88,7 +98,11 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
                 {firstName}
               </p>
             )}
-            {products.length === 0 && (
+            {welcomeBackLine ? (
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 14, letterSpacing: "0.02em", color: "var(--color-ivory, #faf9f4)", opacity: 0.75, margin: "14px 0 0", lineHeight: 1.55, maxWidth: 360 }}>
+                {welcomeBackLine}
+              </p>
+            ) : products.length === 0 && (
               <p style={{ fontFamily: "var(--font-body)", fontSize: 14, letterSpacing: "0.04em", color: "var(--color-ivory, #faf9f4)", opacity: 0.7, margin: "10px 0 0", lineHeight: 1.5 }}>
                 Welcome.
               </p>
