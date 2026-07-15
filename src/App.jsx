@@ -15,7 +15,7 @@ import { API_BASE_URL } from "./config.js";
 import { Capacitor } from "@capacitor/core";
 import { Purchases, LOG_LEVEL } from "@revenuecat/purchases-capacitor";
 import { PushNotifications } from "@capacitor/push-notifications";
-import { RC_KEY_LOOKS_VALID, rcKeyInvalidReason, usePremiumStatus, shouldShowPaywall } from "./hooks/useSubscription.js";
+import { RC_KEY_LOOKS_VALID, rcKeyInvalidReason, usePremiumStatus, shouldShowPaywall, markRcReady } from "./hooks/useSubscription.js";
 import { PaywallScreen } from "./components/PaywallScreen.jsx";
 
 // Module-scope readiness flag. Flips to true after Purchases.configure()
@@ -333,6 +333,11 @@ export default function App() {
     // calls silently short-circuit. Fix in the RC dashboard, not code.
     if (!RC_KEY_LOOKS_VALID) {
       console.error("[Cygne rc]", rcKeyInvalidReason());
+      // Unblock any downstream checkPremiumStatus awaiter that would
+      // otherwise wait for configure and time out. It will short-circuit
+      // on RC_KEY_LOOKS_VALID before touching the SDK, but the promise
+      // still needs to resolve so the 5s timeout branch isn't hit.
+      markRcReady();
       return;
     }
     (async () => {
@@ -342,6 +347,12 @@ export default function App() {
         rcReady = true;
       } catch (e) {
         console.error("[Cygne rc] configure failed:", e?.message ?? e);
+      } finally {
+        // Unblock checkPremiumStatus awaiters whether configure succeeded
+        // or threw. Failure path leaves rcReady=false so downstream
+        // getCustomerInfo will still throw and be caught → source:"error".
+        // But the awaiter unblocks in <5s instead of timing out.
+        markRcReady();
       }
     })();
   }, []);
