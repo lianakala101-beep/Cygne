@@ -77,6 +77,29 @@ export function rcKeyInvalidReason() {
 
 export const RC_KEY_LOOKS_VALID = rcKeyInvalidReason() === null;
 
+// -------- Configure-readiness signal ------------------------------------
+// React fires effects in registration order, and this module's useSubscription
+// hook is registered BEFORE the RC configure effect in src/App.jsx. Without
+// this signal, useSubscription's mount effect would call
+// Purchases.getCustomerInfo() before Purchases.configure() has resolved,
+// which throws PURCHASES_NOT_CONFIGURED on the RC SDK. The error is caught
+// (source: "error") but the redundant call is wasteful and, on some RC SDK
+// versions, contributes to noisy launch logs.
+//
+// App.jsx calls markRcReady() from the configure effect's success + error
+// paths so downstream awaiters always unblock. A 5-second timeout inside
+// checkPremiumStatus below prevents a stuck-forever configure from
+// stalling the hook indefinitely.
+let _rcReadyResolve;
+const rcReadyPromise = new Promise(resolve => { _rcReadyResolve = resolve; });
+
+// Call exactly once from App.jsx after Purchases.configure() settles
+// (success or failure). Idempotent — subsequent calls are harmless no-ops
+// because a resolved promise stays resolved.
+export function markRcReady() {
+  _rcReadyResolve?.();
+}
+
 // Shape returned to callers. `source` distinguishes the reasons the answer
 // might be "not premium" so debug output is meaningful. `isPremium` is
 // always a plain boolean.
@@ -104,6 +127,21 @@ export async function checkPremiumStatus() {
   // caller render its disabled-gracefully UI.
   if (!RC_KEY_LOOKS_VALID) {
     return inactiveResult("invalid-key");
+  }
+  // Wait for App.jsx's configure effect to resolve before touching the
+  // SDK — otherwise React's effect ordering guarantees we'd throw
+  // PURCHASES_NOT_CONFIGURED on first mount. The 5s timeout is a
+  // liveness net: a truly stuck configure (network failure inside RC,
+  // never-firing effect on a broken build) resolves to "error" instead
+  // of hanging the hook forever, and the caller renders the app in
+  // non-premium mode.
+  const ready = await Promise.race([
+    rcReadyPromise.then(() => true),
+    new Promise(resolve => setTimeout(() => resolve(false), 5000)),
+  ]);
+  if (!ready) {
+    console.error("[Cygne subscription] RC configure did not resolve within 5s — skipping getCustomerInfo");
+    return inactiveResult("error");
   }
   try {
     const { customerInfo } = await Purchases.getCustomerInfo();
