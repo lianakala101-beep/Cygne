@@ -212,7 +212,7 @@ const STEP_REASONS = {
 
 function getStepReason(step) {
   const actives = Object.keys(detectActives(step.ingredients || []));
-  if (actives.includes("retinol"))     return "Applied last in the PM active layers. Photosensitive — breaks down in sunlight, so PM only.";
+  if (actives.includes("retinol"))     return "Applied before moisturiser in PM. Photosensitive — breaks down in sunlight, so PM only.";
   if (actives.includes("AHA"))         return "Applied before moisturiser in PM. AHAs increase UV sensitivity — always follow with SPF the next morning.";
   if (actives.includes("BHA"))         return "Applied before moisturiser. BHAs exfoliate inside the pore — PM use lets skin recover overnight.";
   if (actives.includes("vitamin C"))   return "Applied to clean skin before moisturiser in AM. Pairs with SPF to neutralise free radicals throughout the day.";

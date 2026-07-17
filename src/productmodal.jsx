@@ -752,4 +752,4 @@ function ProductModal({ product, onSave, onClose, user }) {
 
 // --- SESSION LOCKED BY INGREDIENTS -------------------------------------------
 
-export { RoutineFitSheet, ProductModal, ShelfLifeSection, getLockedSession, getAutoSession };
+export { RoutineFitSheet, ProductModal, ShelfLifeSection, getLockedSession, getAutoSession, getSuggestedFrequency };

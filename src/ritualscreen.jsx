@@ -4,6 +4,7 @@ import { detectActives, analyzeShelf, buildRoutine, detectConflicts, isScheduled
 import { FREQUENCIES } from "./constants.js";
 import { buildRecommendations, buildRefinements } from "./intelligence.jsx";
 import { RoutineStep } from "./ritual.jsx";
+import { getSuggestedFrequency } from "./productmodal.jsx";
 import { RecommendationCard } from "./intelligence.jsx";
 import { SkinJournalModal } from "./progress.jsx";
 import { getCyclePhase, getActivePauseState } from "./progress.jsx";
@@ -485,13 +486,25 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
           {periodic.map(p => {
             const nextLabel = getNextUseLabel(p);
             const freqLabel = FREQUENCIES.find(f => f.id === (p.frequency || (["Exfoliant","Mask"].includes(p.category) ? "2-3x" : "as-needed")))?.label || "Periodic";
+            // Surface the clinical rationale for the frequency so the user
+            // isn't left staring at "2-3× per week" with no context. Reads
+            // the same helper the ProductModal uses — recomputed at render
+            // time so it stays accurate if skin type or tretinoin status
+            // changes later. Shown regardless of whether the user's stored
+            // frequency matches the suggestion: the reason IS the case for
+            // this ingredient/category being non-daily, and reinforces it
+            // even when the user has chosen a different cadence.
+            const freqReason = getSuggestedFrequency(p, user)?.reason || null;
             return (
-              <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, marginBottom: 8 }}>
-                <div>
+              <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "13px 16px", background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, marginBottom: 8 }}>
+                <div style={{ flex: 1, marginRight: 12 }}>
                   <p style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 400, letterSpacing: "0.08em", color: "var(--parchment)", margin: "0 0 1px" }}>{p.name}</p>
                   <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0 }}>{p.brand} · {freqLabel}</p>
+                  {freqReason && (
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: "5px 0 0", lineHeight: 1.5, opacity: 0.7 }}>{freqReason}</p>
+                  )}
                 </div>
-                <span style={{ fontSize: 9, fontFamily: "var(--font-body)", fontWeight: 400, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)" }}>{nextLabel}</span>
+                <span style={{ fontSize: 9, fontFamily: "var(--font-body)", fontWeight: 400, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)", marginTop: 4, flexShrink: 0 }}>{nextLabel}</span>
               </div>
             );
           })}
