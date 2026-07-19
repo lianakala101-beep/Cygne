@@ -10,6 +10,45 @@ console.log("[Cygne] Supabase key prefix:", supabaseAnonKey.substring(0, 20) + "
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // ---------------------------------------------------------------------------
+// Client-side debug event logger
+//
+// Fire-and-forget writer to the debug_logs Supabase table. Complements
+// console.log() at diagnostic sites when a device console isn't
+// reachable (Safari Web Inspector unreliable on iOS; TestFlight builds
+// don't always attach). All errors are swallowed — a failed debug
+// write must never affect the caller's control flow. The user_id
+// column is looked up freshly from the current session rather than
+// captured from any outer scope, so a signed-out event lands with
+// user_id: null instead of trying to attribute it to whoever was last
+// signed in on this device.
+//
+// Usage:
+//   logDebugEvent("paywall.getOfferings.start");
+//   logDebugEvent("paywall.getOfferings.result", { current: "...", … });
+//   logDebugEvent("paywall.getOfferings.error", { message, code, … });
+//
+// Query in the SQL editor:
+//   select created_at, user_id, event, payload
+//   from debug_logs
+//   where event like 'paywall.%'
+//   order by created_at desc
+//   limit 100;
+export async function logDebugEvent(event, payload = null) {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    await supabase.from("debug_logs").insert({
+      user_id: session?.user?.id ?? null,
+      event: String(event).slice(0, 200),
+      payload: payload == null ? null : payload,
+    });
+  } catch (e) {
+    // Swallow. Emitting a console.error here would risk drowning out
+    // the diagnostic we're trying to capture in the first place; the
+    // caller has already logged the same info to the console.
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Per-function daily call cap (client-side, per device).
 //
 // rapid-action is a thin pass-through to Anthropic's Messages API with

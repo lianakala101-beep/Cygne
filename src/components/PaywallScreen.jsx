@@ -13,6 +13,7 @@
 import { useEffect, useState } from "react";
 import { Purchases } from "@revenuecat/purchases-capacitor";
 import { PREMIUM_ENTITLEMENT } from "../hooks/useSubscription.js";
+import { logDebugEvent } from "../supabase.js";
 
 const IVORY = "var(--color-ivory, #faf9f4)";
 const INKY_MOSS = "var(--color-inky-moss, #2d3d2b)";
@@ -88,23 +89,43 @@ export function PaywallScreen({ trialExpired, onUnlock, onSignOut }) {
       // response may be empty). Any throw lands in the catch below and
       // logs the error message + full object for RC error codes.
       console.log("[Cygne paywall DIAG] getOfferings start");
+      logDebugEvent("paywall.getOfferings.start");
       try {
         const result = await Purchases.getOfferings();
+        // Serialize the same info twice: once to the console (for
+        // reachable devices) and once to the debug_logs table (for
+        // triage when Web Inspector doesn't attach). The Supabase
+        // payload keeps the full raw shape so we can inspect the RC
+        // response tree from SQL without needing a repro.
+        const currentIdentifier = result?.current?.identifier ?? null;
+        const currentPackageCount = result?.current?.availablePackages?.length ?? 0;
+        const allOfferingKeys = result?.all ? Object.keys(result.all) : null;
         console.log(
           "[Cygne paywall DIAG] getOfferings result | current identifier:",
-          result?.current?.identifier ?? null,
+          currentIdentifier,
           "| current package count:",
-          result?.current?.availablePackages?.length ?? 0,
+          currentPackageCount,
           "| all offering keys:",
-          result?.all ? Object.keys(result.all) : null,
+          allOfferingKeys,
           "| full result:",
           JSON.stringify(result),
         );
+        logDebugEvent("paywall.getOfferings.result", {
+          currentIdentifier,
+          currentPackageCount,
+          allOfferingKeys,
+          fullResult: result,
+        });
         const current = result?.current;
         if (!current || !Array.isArray(current.availablePackages) || current.availablePackages.length === 0) {
           console.warn(
             "[Cygne paywall DIAG] no current offering or empty packages — check the RevenueCat dashboard for a `default` offering with attached products",
           );
+          logDebugEvent("paywall.getOfferings.empty", {
+            currentIdentifier,
+            currentPackageCount,
+            allOfferingKeys,
+          });
           setError("Subscription options aren't available right now. Please try again in a moment.");
           setLoading(false);
           return;
@@ -121,6 +142,15 @@ export function PaywallScreen({ trialExpired, onUnlock, onSignOut }) {
           "| underlyingErrorMessage:", e?.underlyingErrorMessage ?? null,
           "| full error:", e,
         );
+        // Native errors don't always serialize cleanly via jsonb —
+        // extract the shape we care about explicitly. The `fullError`
+        // string is a safety net for anything we haven't seen before.
+        logDebugEvent("paywall.getOfferings.error", {
+          message: e?.message ?? String(e),
+          code: e?.code ?? null,
+          underlyingErrorMessage: e?.underlyingErrorMessage ?? null,
+          fullError: String(e),
+        });
         setError("Couldn't load subscription options. Please check your connection and try again.");
       } finally {
         setLoading(false);
