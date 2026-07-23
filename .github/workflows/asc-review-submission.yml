@@ -21,6 +21,7 @@ on:
         type: choice
         options:
           - dry-run
+          - attach-group-versions
           - discard
           - submit
       submission_id:

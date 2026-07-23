@@ -110,6 +110,51 @@ if [[ "$MODE" == "submit" ]]; then
   exit 0
 fi
 
+# attach-group-versions mode: idempotently add a subscriptionGroupVersion
+# reviewSubmissionItem for every subscription group whose version is
+# reviewable. Apple requires this when the group has no prior approved
+# version — subscriptions can only be submitted alongside their group's
+# version in that case (STATE_ERROR.SUBSCRIPTION_SUBMISSION_REQUIRES_GROUP_VERSION).
+# Called separately from dry-run so re-runs don't attempt to duplicate the
+# already-attached appStoreVersion / subscriptionVersion items (Apple would 409).
+if [[ "$MODE" == "attach-group-versions" ]]; then
+  : "${SUBMISSION_ID_INPUT:?SUBMISSION_ID_INPUT required for attach-group-versions mode}"
+
+  # Need APP_ID to enumerate the groups.
+  api "GET apps?filter[bundleId]=com.cygne.app" \
+    GET "$API/v1/apps?filter%5BbundleId%5D=com.cygne.app"
+  APP_ID=$(echo "$RESP_BODY" | jq -r '.data[0].id // empty')
+  echo "[app] APP_ID=$APP_ID"
+
+  api "GET apps/$APP_ID/subscriptionGroups" \
+    GET "$API/v1/apps/$APP_ID/subscriptionGroups?limit=50"
+  GROUP_IDS=$(echo "$RESP_BODY" | jq -r '.data[].id')
+
+  for GID in $GROUP_IDS; do
+    api "GET subscriptionGroups/$GID/versions?filter[state]=PREPARE_FOR_SUBMISSION,READY_FOR_REVIEW" \
+      GET "$API/v1/subscriptionGroups/$GID/versions?filter%5Bstate%5D=PREPARE_FOR_SUBMISSION,READY_FOR_REVIEW&limit=5"
+    GROUP_VERSION_ID=$(echo "$RESP_BODY" | jq -r '.data[0].id // empty')
+    if [[ -z "$GROUP_VERSION_ID" ]]; then
+      echo "[group $GID] no reviewable subscriptionGroupVersion — skipping"
+      continue
+    fi
+    echo "[group $GID] subscriptionGroupVersion=$GROUP_VERSION_ID"
+    api "POST reviewSubmissionItems (subscriptionGroupVersion=$GROUP_VERSION_ID)" \
+      POST "$API/v1/reviewSubmissionItems" \
+      "{\"data\":{\"type\":\"reviewSubmissionItems\",\"relationships\":{\"reviewSubmission\":{\"data\":{\"type\":\"reviewSubmissions\",\"id\":\"$SUBMISSION_ID_INPUT\"}},\"subscriptionGroupVersion\":{\"data\":{\"type\":\"subscriptionGroupVersions\",\"id\":\"$GROUP_VERSION_ID\"}}}}}"
+  done
+
+  api "GET reviewSubmissions/$SUBMISSION_ID_INPUT?include=items" \
+    GET "$API/v1/reviewSubmissions/$SUBMISSION_ID_INPUT?include=items"
+
+  echo ""
+  echo "=========================================="
+  echo "GROUP VERSIONS ATTACHED. Container ready for submit."
+  echo "SUBMISSION_ID: $SUBMISSION_ID_INPUT"
+  echo "=========================================="
+  exit 0
+fi
+
 # discard mode: DELETE a container that's still in READY_FOR_REVIEW.
 if [[ "$MODE" == "discard" ]]; then
   : "${SUBMISSION_ID_INPUT:?SUBMISSION_ID_INPUT required for discard mode}"
@@ -123,7 +168,7 @@ if [[ "$MODE" == "discard" ]]; then
 fi
 
 if [[ "$MODE" != "dry-run" ]]; then
-  echo "MODE must be 'dry-run', 'discard', or 'submit' (got: $MODE)"
+  echo "MODE must be 'dry-run', 'attach-group-versions', 'discard', or 'submit' (got: $MODE)"
   exit 1
 fi
 
