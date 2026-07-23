@@ -1,0 +1,37 @@
+name: Ramp Check-in Reminder (daily cron)
+
+# Daily fire of the ramp-checkin-reminder edge function. Curls the
+# function URL with CRON_SECRET in Authorization; the function itself
+# handles the per-user iteration, dedup, and APNS delivery. Kept in
+# GitHub Actions rather than pg_cron because:
+#   - Doesn't require enabling the pg_cron extension on the Supabase
+#     project (needs admin) or granting cron.* schemas.
+#   - Reuses the same secrets pattern the rest of this repo uses.
+#   - Easy to disable or re-run manually from the Actions tab.
+#
+# Firing time: 15:00 UTC — morning in the US, mid-afternoon EU. Not
+# timezone-personalized; users in other regions get it at whatever
+# local time this maps to. Fine for MVP; refine when we have usage
+# data. See workflow_dispatch below to force a run outside the schedule.
+
+on:
+  schedule:
+    - cron: '0 15 * * *'
+  workflow_dispatch:
+
+jobs:
+  fire:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger ramp-checkin-reminder
+        env:
+          SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+          CRON_SECRET:         ${{ secrets.CRON_SECRET }}
+        run: |
+          # -f makes curl exit non-zero on HTTP >=400 so a bad status
+          # fails the workflow. -sS keeps output quiet on success but
+          # still surfaces errors. Print the body for diagnostics.
+          curl -fsS -X POST \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H "Content-Type: application/json" \
+            "https://${SUPABASE_PROJECT_ID}.supabase.co/functions/v1/ramp-checkin-reminder"
