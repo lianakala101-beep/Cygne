@@ -15,15 +15,16 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: 'dry-run (create + attach, no submit) OR submit (PATCH submitted=true)'
+        description: 'dry-run (create + attach; reuses submission_id if set) | discard (DELETE submission_id) | submit (PATCH submitted=true)'
         required: true
         default: 'dry-run'
         type: choice
         options:
           - dry-run
+          - discard
           - submit
       submission_id:
-        description: 'submit mode only: reviewSubmission ID from a prior dry-run'
+        description: 'Reused across modes. dry-run: skip create/version-attach and add subs to this container. discard: DELETE this container. submit: PATCH this container.'
         required: false
         default: ''
       version_string:

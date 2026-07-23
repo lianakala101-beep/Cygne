@@ -6,14 +6,27 @@
 # blocking us from attaching Cygne Premium's monthly/annual subscriptions
 # to v1.0.3's review submission.
 #
-# Two modes (set via $MODE):
+# Three modes (set via $MODE):
 #   dry-run  – creates a reviewSubmission container, attaches the app
 #              version + every READY_TO_SUBMIT subscription found, then
 #              prints the resulting state. Nothing is submitted; the
 #              container just sits in ASC waiting.
+#              If $SUBMISSION_ID_INPUT is set, reuses that container
+#              instead of creating a new one — skips app-version attach
+#              (assumed already done) and only attaches subscriptions.
+#              Used to salvage a partial run.
+#   discard  – DELETEs $SUBMISSION_ID_INPUT so a partial container can
+#              be thrown away and re-created from scratch. Safe as long
+#              as the container hasn't been submitted (state==READY_FOR_REVIEW).
 #   submit   – takes $SUBMISSION_ID_INPUT (from a prior dry-run) and
 #              PATCHes it with { submitted: true }. This is the
 #              irreversible step.
+#
+# Subscription attachment quirk: reviewSubmissionItems does NOT accept
+# a `subscription` relationship — it takes `subscriptionVersion`
+# (type `subscriptionVersions`). Each subscription has one or more
+# versions under /v1/subscriptions/{id}/versions; the reviewable one is
+# the version in PREPARE_FOR_SUBMISSION or READY_FOR_REVIEW state.
 #
 # Required env (workflow injects from GH secrets):
 #   ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_CONTENT (.p8 file contents)
@@ -97,8 +110,20 @@ if [[ "$MODE" == "submit" ]]; then
   exit 0
 fi
 
+# discard mode: DELETE a container that's still in READY_FOR_REVIEW.
+if [[ "$MODE" == "discard" ]]; then
+  : "${SUBMISSION_ID_INPUT:?SUBMISSION_ID_INPUT required for discard mode}"
+  echo "[discard] DELETE reviewSubmissions/$SUBMISSION_ID_INPUT"
+  api "DELETE reviewSubmissions/$SUBMISSION_ID_INPUT" \
+    DELETE "$API/v1/reviewSubmissions/$SUBMISSION_ID_INPUT"
+  echo "=========================================="
+  echo "DISCARDED $SUBMISSION_ID_INPUT"
+  echo "=========================================="
+  exit 0
+fi
+
 if [[ "$MODE" != "dry-run" ]]; then
-  echo "MODE must be 'dry-run' or 'submit' (got: $MODE)"
+  echo "MODE must be 'dry-run', 'discard', or 'submit' (got: $MODE)"
   exit 1
 fi
 
@@ -165,27 +190,51 @@ fi
 echo "[subs] READY_TO_SUBMIT ids:"
 echo "$READY_IDS" | sed 's/^/  - /'
 
-# Step 5: create reviewSubmission container
-api "POST reviewSubmissions" \
-  POST "$API/v1/reviewSubmissions" \
-  "{\"data\":{\"type\":\"reviewSubmissions\",\"attributes\":{\"platform\":\"IOS\"},\"relationships\":{\"app\":{\"data\":{\"type\":\"apps\",\"id\":\"$APP_ID\"}}}}}"
-SUBMISSION_ID=$(echo "$RESP_BODY" | jq -r '.data.id')
-if [[ -z "$SUBMISSION_ID" || "$SUBMISSION_ID" == "null" ]]; then
-  echo "!!! Failed to create reviewSubmission"
-  exit 1
-fi
-echo "[submission] SUBMISSION_ID=$SUBMISSION_ID"
+# Step 5: create reviewSubmission container (or reuse a prior partial run).
+if [[ -n "${SUBMISSION_ID_INPUT:-}" ]]; then
+  SUBMISSION_ID="$SUBMISSION_ID_INPUT"
+  echo "[reuse] SUBMISSION_ID=$SUBMISSION_ID — skipping container create + version attach (assumed already present)"
+  # Fetch existing items so the log shows what's already staged.
+  api "GET reviewSubmissions/$SUBMISSION_ID?include=items (current state)" \
+    GET "$API/v1/reviewSubmissions/$SUBMISSION_ID?include=items"
+else
+  api "POST reviewSubmissions" \
+    POST "$API/v1/reviewSubmissions" \
+    "{\"data\":{\"type\":\"reviewSubmissions\",\"attributes\":{\"platform\":\"IOS\"},\"relationships\":{\"app\":{\"data\":{\"type\":\"apps\",\"id\":\"$APP_ID\"}}}}}"
+  SUBMISSION_ID=$(echo "$RESP_BODY" | jq -r '.data.id')
+  if [[ -z "$SUBMISSION_ID" || "$SUBMISSION_ID" == "null" ]]; then
+    echo "!!! Failed to create reviewSubmission"
+    exit 1
+  fi
+  echo "[submission] SUBMISSION_ID=$SUBMISSION_ID"
 
-# Step 6: attach appStoreVersion
-api "POST reviewSubmissionItems (appStoreVersion=$VERSION_ID)" \
-  POST "$API/v1/reviewSubmissionItems" \
-  "{\"data\":{\"type\":\"reviewSubmissionItems\",\"relationships\":{\"reviewSubmission\":{\"data\":{\"type\":\"reviewSubmissions\",\"id\":\"$SUBMISSION_ID\"}},\"appStoreVersion\":{\"data\":{\"type\":\"appStoreVersions\",\"id\":\"$VERSION_ID\"}}}}}"
-
-# Step 7: attach each subscription
-for SID in $READY_IDS; do
-  api "POST reviewSubmissionItems (subscription=$SID)" \
+  # Step 6: attach appStoreVersion
+  api "POST reviewSubmissionItems (appStoreVersion=$VERSION_ID)" \
     POST "$API/v1/reviewSubmissionItems" \
-    "{\"data\":{\"type\":\"reviewSubmissionItems\",\"relationships\":{\"reviewSubmission\":{\"data\":{\"type\":\"reviewSubmissions\",\"id\":\"$SUBMISSION_ID\"}},\"subscription\":{\"data\":{\"type\":\"subscriptions\",\"id\":\"$SID\"}}}}}"
+    "{\"data\":{\"type\":\"reviewSubmissionItems\",\"relationships\":{\"reviewSubmission\":{\"data\":{\"type\":\"reviewSubmissions\",\"id\":\"$SUBMISSION_ID\"}},\"appStoreVersion\":{\"data\":{\"type\":\"appStoreVersions\",\"id\":\"$VERSION_ID\"}}}}}"
+fi
+
+# Step 7: for each ready subscription, look up its reviewable
+# subscriptionVersion (PREPARE_FOR_SUBMISSION / READY_FOR_REVIEW) and
+# attach THAT as a reviewSubmissionItem. reviewSubmissionItems accepts
+# `subscriptionVersion` (per Apple's OpenAPI schema); `subscription`
+# is not a valid relationship name here.
+ATTACHED_VERSION_IDS=""
+for SID in $READY_IDS; do
+  api "GET subscriptions/$SID/versions?filter[state]=PREPARE_FOR_SUBMISSION,READY_FOR_REVIEW" \
+    GET "$API/v1/subscriptions/$SID/versions?filter%5Bstate%5D=PREPARE_FOR_SUBMISSION,READY_FOR_REVIEW&limit=5"
+  SUB_VERSION_ID=$(echo "$RESP_BODY" | jq -r '.data[0].id // empty')
+  if [[ -z "$SUB_VERSION_ID" ]]; then
+    echo "!!! No reviewable subscriptionVersion for subscription $SID"
+    echo "    The subscription is READY_TO_SUBMIT but has no version in a submittable state."
+    echo "    Aborting; the container was left in place with what has been attached so far."
+    exit 1
+  fi
+  echo "[sub $SID] subscriptionVersion=$SUB_VERSION_ID"
+  api "POST reviewSubmissionItems (subscriptionVersion=$SUB_VERSION_ID for sub=$SID)" \
+    POST "$API/v1/reviewSubmissionItems" \
+    "{\"data\":{\"type\":\"reviewSubmissionItems\",\"relationships\":{\"reviewSubmission\":{\"data\":{\"type\":\"reviewSubmissions\",\"id\":\"$SUBMISSION_ID\"}},\"subscriptionVersion\":{\"data\":{\"type\":\"subscriptionVersions\",\"id\":\"$SUB_VERSION_ID\"}}}}}"
+  ATTACHED_VERSION_IDS+="  - subscription=$SID subscriptionVersion=$SUB_VERSION_ID"$'\n'
 done
 
 # Final state readback so the workflow log shows what's staged.
@@ -199,8 +248,8 @@ echo ""
 echo "SUBMISSION_ID: $SUBMISSION_ID"
 echo "APP_ID:        $APP_ID"
 echo "VERSION_ID:    $VERSION_ID"
-echo "SUBS ATTACHED:"
-echo "$READY_IDS" | sed 's/^/  - /'
+echo "SUBS ATTACHED (this run):"
+printf '%s' "$ATTACHED_VERSION_IDS"
 echo ""
 echo "To finalize (irreversible), re-run this workflow with:"
 echo "  mode          = submit"
