@@ -1,0 +1,58 @@
+name: ASC Review Submission (manual workaround)
+
+# Manual workaround for the ASC web UI bug where the "In-App Purchases
+# and Subscriptions" section fails to render on the version edit page.
+# Drives the reviewSubmissions/reviewSubmissionItems flow directly against
+# the App Store Connect API using the same key triplet Fastlane uses.
+#
+# Two-phase design: first run mode=dry-run to create the container,
+# attach the version + all READY_TO_SUBMIT subscriptions, and print
+# everything. Confirm the printed state, then run mode=submit with the
+# printed SUBMISSION_ID to PATCH { submitted: true }. That PATCH is the
+# only irreversible step.
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'dry-run (create + attach, no submit) OR submit (PATCH submitted=true)'
+        required: true
+        default: 'dry-run'
+        type: choice
+        options:
+          - dry-run
+          - submit
+      submission_id:
+        description: 'submit mode only: reviewSubmission ID from a prior dry-run'
+        required: false
+        default: ''
+      version_string:
+        description: 'App version to attach (e.g. 1.0.3)'
+        required: true
+        default: '1.0.3'
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+
+      - name: Install jwt + jq
+        run: |
+          gem install jwt --no-document
+          sudo apt-get -y install jq >/dev/null
+
+      - name: Drive ASC review submission
+        env:
+          ASC_KEY_ID:          ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          ASC_ISSUER_ID:       ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          ASC_KEY_CONTENT:     ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
+          MODE:                ${{ inputs.mode }}
+          SUBMISSION_ID_INPUT: ${{ inputs.submission_id }}
+          VERSION_STRING:      ${{ inputs.version_string }}
+        run: bash scripts/asc-review-submission.sh
