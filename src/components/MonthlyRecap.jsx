@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { invokeEdgeFunction } from "../supabase.js";
+import { SkinGoalsSection } from "./SkinGoalsSection.jsx";
 
 // Linen / paper noise — matches the rest of the app's editorial surfaces.
 const GRAIN = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='250' height='250' filter='url(%23g)' opacity='0.045'/%3E%3C/svg%3E\")";
@@ -67,6 +68,10 @@ export function MonthlyRecap({
   products = [],
   user = {},
   cycleDay = null,
+  skinGoals = [],
+  onMarkSkinGoalMet,
+  onAddSkinGoal,
+  onRemoveSkinGoal,
   onClose,
 }) {
   const { year, monthLabel } = resolveMonth(offset);
@@ -233,6 +238,16 @@ export function MonthlyRecap({
             </p>
           ))}
         </div>
+
+        {/* Skin-goal tracker — returns null if the user has no
+            active goals, so the recap reads unchanged for anyone
+            not tracking. */}
+        <SkinGoalsSection
+          goals={skinGoals}
+          onMarkMet={onMarkSkinGoalMet}
+          onAdd={onAddSkinGoal}
+          onRemove={onRemoveSkinGoal}
+        />
 
         {/* Silver divider before signoff */}
         <div style={{
