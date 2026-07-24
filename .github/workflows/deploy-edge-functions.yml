@@ -43,3 +43,6 @@ jobs:
 
       - name: Deploy swan-sense-reminder
         run: supabase functions deploy swan-sense-reminder --project-ref "$SUPABASE_PROJECT_ID" --no-verify-jwt
+
+      - name: Deploy cycle-phase-alert
+        run: supabase functions deploy cycle-phase-alert --project-ref "$SUPABASE_PROJECT_ID" --no-verify-jwt

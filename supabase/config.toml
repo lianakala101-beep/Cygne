@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.swan-sense-reminder]
 verify_jwt = false
+
+[functions.cycle-phase-alert]
+verify_jwt = false

@@ -56,3 +56,17 @@ jobs:
             -H "Authorization: Bearer $CRON_SECRET" \
             -H "Content-Type: application/json" \
             "https://${SUPABASE_PROJECT_ID}.supabase.co/functions/v1/swan-sense-reminder"
+
+      # Same posture as swan-sense — runs on prior failure. Its dedup
+      # is the cycle_phase_state comparison; re-runs on the same day
+      # naturally no-op because the phase won't have changed.
+      - name: Trigger cycle-phase-alert
+        if: always()
+        env:
+          SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+          CRON_SECRET:         ${{ secrets.CRON_SECRET }}
+        run: |
+          curl -fsS -X POST \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H "Content-Type: application/json" \
+            "https://${SUPABASE_PROJECT_ID}.supabase.co/functions/v1/cycle-phase-alert"

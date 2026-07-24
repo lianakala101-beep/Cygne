@@ -5,6 +5,7 @@ import { getAutoSession } from "./productmodal.jsx";
 import { RAMP_SCHEDULES, RAMP_ACTIVES, IntroduceSlowlyCard, getRampWeek } from "./ramp.jsx";
 import { RampCheckinCard } from "./components/RampCheckinCard.jsx";
 import { getCurrentCycleDay, getTreatmentElapsed, daysBetweenLocal } from "./utils.jsx";
+import { CYCLE_PHASES as CANONICAL_CYCLE_PHASES, getCyclePhase as getCanonicalCyclePhase } from "./lib/cycle.js";
 import { FaceHeatMap } from "./components/FaceHeatMap.jsx";
 import { AskCygneModal } from "./components/AskCygneModal.jsx";
 
@@ -353,25 +354,26 @@ function SkinJournalModal({ onSubmit, onClose, existing = null }) {
 
 // --- HORMONE CYCLE TRACKER ---------------------------------------------------
 
-const CYCLE_PHASES = [
-  {
-    name: "Menstrual",
-    days: [1, 5],
+// Presentation metadata for each cycle phase — keyed by the phase
+// name that comes back from getCyclePhase. Split from the canonical
+// name+days list (src/lib/cycle.js) so the edge function
+// cycle-phase-alert can share the phase math without dragging in
+// UI copy.
+const PHASE_META = {
+  Menstrual: {
     color: "#8b7355",
     bg: "rgba(139,115,85,0.08)",
     border: "rgba(139,115,85,0.25)",
     dot: "rgba(139,115,85,0.85)",
     description: "Estrogen and progesterone are at their lowest. The skin barrier is more permeable and reactive.",
     nudge: "Reduce active intensity this week. Prioritize ceramides, gentle cleansing, and occlusive hydration.",
-    activeAdvice: (hasRetinol, hasAHA, hasBHA) => {
+    activeAdvice: (hasRetinol, hasAHA, _hasBHA) => {
       if (hasRetinol) return "Consider resting your retinoid tonight — barrier recovery is slower during menstruation.";
       if (hasAHA) return "Lighten exfoliation frequency. Your skin is more sensitized this week.";
       return "Lean into barrier support. This is a recovery week.";
-    }
+    },
   },
-  {
-    name: "Follicular",
-    days: [6, 13],
+  Follicular: {
     color: "var(--color-ivory, #faf9f4)",
     bg: "rgba(250,249,244,0.08)",
     border: "rgba(45,61,43,0.25)",
@@ -383,38 +385,41 @@ const CYCLE_PHASES = [
       if (hasAHA || hasBHA) return "Exfoliation is well-tolerated this week. Maintain your current schedule.";
       if (hasRetinol) return "Skin is more resilient now. If tolerating well, this is a good week to hold frequency.";
       return "Skin is at good baseline. Your ritual should feel effective this week.";
-    }
+    },
   },
-  {
-    name: "Ovulatory",
-    days: [14, 16],
+  Ovulatory: {
     color: "#8b7355",
     bg: "rgba(139,115,85,0.08)",
     border: "rgba(139,115,85,0.25)",
     dot: "rgba(139,115,85,0.85)",
     description: "Estrogen peaks. Skin typically looks and feels its best — luminous and well-hydrated.",
     nudge: "Peak skin window. Your ritual is working optimally. No adjustments needed.",
-    activeAdvice: () => "Skin is at peak resilience. Continue your ritual as normal."
+    activeAdvice: () => "Skin is at peak resilience. Continue your ritual as normal.",
   },
-  {
-    name: "Luteal",
-    days: [17, 35],
+  Luteal: {
     color: "#8b7355",
     bg: "rgba(139,115,85,0.08)",
     border: "rgba(139,115,85,0.28)",
     dot: "rgba(139,115,85,0.85)",
     description: "Progesterone rises, increasing sebum production. Congestion and breakouts are more likely.",
     nudge: "Watch for congestion. BHA helps keep pores clear. Reduce heavy occlusives if skin feels clogged.",
-    activeAdvice: (hasRetinol, hasAHA, hasBHA) => {
+    activeAdvice: (hasRetinol, _hasAHA, hasBHA) => {
       if (hasBHA) return "Your BHA is well-suited to this phase. Prioritize it over heavier treatments if skin feels congested.";
       if (hasRetinol) return "Retinol supports cell turnover during this oilier phase. Maintain frequency if tolerating well.";
       return "Consider introducing a salicylic acid product to manage congestion during the luteal phase.";
-    }
+    },
   },
-];
+};
+
+// Compose the canonical phase list with local presentation metadata
+// so downstream render code can iterate a single decorated array as
+// it did before the extraction. Phase math (name + days + getCyclePhase)
+// is the single source of truth in src/lib/cycle.js.
+const CYCLE_PHASES = CANONICAL_CYCLE_PHASES.map(p => ({ ...p, ...PHASE_META[p.name] }));
 
 function getCyclePhase(day) {
-  return CYCLE_PHASES.find(p => day >= p.days[0] && day <= p.days[1]) || CYCLE_PHASES[3];
+  const base = getCanonicalCyclePhase(day);
+  return { ...base, ...PHASE_META[base.name] };
 }
 
 function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycledayProp = 14, onSetCycleDay, user = {}, onUpdateUser = () => {} }) {

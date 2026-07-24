@@ -429,6 +429,13 @@ export default function App() {
               setTab("dashboard");
               return;
             }
+            // cycle-phase-alert — same dashboard-first landing so the
+            // phase reveal (name + copy) shows in-app rather than in
+            // the notification body.
+            if (data.type === "cycle_phase") {
+              setTab("dashboard");
+              return;
+            }
             if (data.type !== "ramp_checkin") return;
             const productId = data.product_id;
             const weekNumber = Number(data.week_number);
