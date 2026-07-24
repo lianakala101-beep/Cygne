@@ -2,19 +2,12 @@ import { useMemo, useState } from "react";
 import { FACE_ZONES, FACE_ZONE_LABELS, FACE_ZONE_IDS } from "./FaceZoneSelector.jsx";
 import { AskCygneModal } from "./AskCygneModal.jsx";
 import { getAskCygneAccess } from "../utils.jsx";
+import { getCyclePhase } from "../lib/cycle.js";
 
 const PERIODS = [
   { key: 7,  label: "7 DAYS"   },
   { key: 30, label: "30 DAYS"  },
   { key: 90, label: "3 MONTHS" },
-];
-
-// Cycle phase windows mirror src/progress.jsx CYCLE_PHASES.
-const CYCLE_PHASES = [
-  { name: "Menstrual",  range: [1, 5]   },
-  { name: "Follicular", range: [6, 13]  },
-  { name: "Ovulatory",  range: [14, 16] },
-  { name: "Luteal",     range: [17, 35] },
 ];
 
 const PEBBLE = "var(--color-stone, #5a5a5a)";
@@ -79,7 +72,7 @@ function cycleDayForDate(dateStr, cycleStartDate, cycleLength = 28) {
 
 function phaseForDay(day) {
   if (day == null) return null;
-  return CYCLE_PHASES.find(p => day >= p.range[0] && day <= p.range[1])?.name || null;
+  return getCyclePhase(day).name;
 }
 
 function zoneLabelDisplay(id) {
