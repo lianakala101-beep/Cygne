@@ -1,9 +1,11 @@
-name: Ramp Check-in Reminder (daily cron)
+name: Daily Notifications (cron)
 
-# Daily fire of the ramp-checkin-reminder edge function. Curls the
-# function URL with CRON_SECRET in Authorization; the function itself
-# handles the per-user iteration, dedup, and APNS delivery. Kept in
-# GitHub Actions rather than pg_cron because:
+# Daily fire of the notification edge functions. One step per function
+# — each one curls the function URL with CRON_SECRET in Authorization
+# and lets the function handle per-user iteration, dedup, APNS
+# delivery, and dead-token purging.
+#
+# Kept in GitHub Actions rather than pg_cron because:
 #   - Doesn't require enabling the pg_cron extension on the Supabase
 #     project (needs admin) or granting cron.* schemas.
 #   - Reuses the same secrets pattern the rest of this repo uses.
@@ -13,6 +15,11 @@ name: Ramp Check-in Reminder (daily cron)
 # timezone-personalized; users in other regions get it at whatever
 # local time this maps to. Fine for MVP; refine when we have usage
 # data. See workflow_dispatch below to force a run outside the schedule.
+#
+# Steps run sequentially by default. A failure in the first function
+# (curl -f exits non-zero on HTTP >=400) fails the workflow but
+# doesn't prevent the second function from being retried on the next
+# schedule — its own dedup guard keeps that safe.
 
 on:
   schedule:
@@ -35,3 +42,17 @@ jobs:
             -H "Authorization: Bearer $CRON_SECRET" \
             -H "Content-Type: application/json" \
             "https://${SUPABASE_PROJECT_ID}.supabase.co/functions/v1/ramp-checkin-reminder"
+
+      # Runs even if the ramp step fails so a transient outage in one
+      # function doesn't block the other. Its dedup guard
+      # (swan_sense_sent) handles idempotency across retries.
+      - name: Trigger swan-sense-reminder
+        if: always()
+        env:
+          SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+          CRON_SECRET:         ${{ secrets.CRON_SECRET }}
+        run: |
+          curl -fsS -X POST \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H "Content-Type: application/json" \
+            "https://${SUPABASE_PROJECT_ID}.supabase.co/functions/v1/swan-sense-reminder"

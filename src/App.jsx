@@ -422,6 +422,13 @@ export default function App() {
         const tapHandle = await PushNotifications.addListener("pushNotificationActionPerformed", (action) => {
           try {
             const data = action?.notification?.data || {};
+            // swan-sense reminder — no per-user payload, just route to
+            // the dashboard where swan-sense-daily runs on mount and
+            // renders the day's insight.
+            if (data.type === "swan_sense") {
+              setTab("dashboard");
+              return;
+            }
             if (data.type !== "ramp_checkin") return;
             const productId = data.product_id;
             const weekNumber = Number(data.week_number);
