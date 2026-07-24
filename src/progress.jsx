@@ -3,6 +3,7 @@ import { Icon, Section, ErrorBoundary } from "./components.jsx";
 import { detectActives, detectActivesFromProduct, analyzeShelf, detectConflicts, buildRoutine, hasSPFCoverage } from "./engine.js";
 import { getAutoSession } from "./productmodal.jsx";
 import { RAMP_SCHEDULES, RAMP_ACTIVES, IntroduceSlowlyCard, getRampWeek } from "./ramp.jsx";
+import { RampCheckinCard } from "./components/RampCheckinCard.jsx";
 import { getCurrentCycleDay, getTreatmentElapsed, daysBetweenLocal } from "./utils.jsx";
 import { FaceHeatMap } from "./components/FaceHeatMap.jsx";
 import { AskCygneModal } from "./components/AskCygneModal.jsx";
@@ -1616,7 +1617,7 @@ function getProductSession(product) {
   return getAutoSession(product).session;
 }
 
-function ProgressInner({ products: productsProp, checkIns: checkInsProp, setCheckIns, treatments: treatmentsProp = [], setTreatments, saveTreatment, removeTreatment, updateTreatmentDate = () => {}, user = {}, onAdvanceRamp, onHoldRamp, onResetRampStart = () => {}, journals: journalsProp = [], setJournals = () => {}, onUpdateUser = () => {}, reflections: reflectionsProp = [], triggerLog: triggerLogProp = [], setTriggerLog = () => {} }) {
+function ProgressInner({ products: productsProp, checkIns: checkInsProp, setCheckIns, treatments: treatmentsProp = [], setTreatments, saveTreatment, removeTreatment, updateTreatmentDate = () => {}, user = {}, onAdvanceRamp, onHoldRamp, onResetRampStart = () => {}, onRampCheckin = async () => {}, journals: journalsProp = [], setJournals = () => {}, onUpdateUser = () => {}, reflections: reflectionsProp = [], triggerLog: triggerLogProp = [], setTriggerLog = () => {} }) {
   // Defensive coercion for every collection prop. The `= []` destructure
   // defaults only catch `undefined`; explicit nulls or unexpected
   // non-array values (e.g. during the brief window between auth landing
@@ -1830,16 +1831,28 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
                   : RAMP_ACTIVES.find(a => detectActives(p.ingredients || [])[a]);
                 const schedule = RAMP_SCHEDULES[activeKey];
                 if (!schedule) return null;
+                const weekNumber = getRampWeek(p);
+                // Nudge appears once per 7-day boundary; disappears
+                // for the rest of the week once the user submits.
+                const checkinDue = weekNumber > (p.lastCheckinWeek || 0);
                 return (
-                  <IntroduceSlowlyCard
-                    key={p.id}
-                    product={p}
-                    schedule={schedule}
-                    weekNumber={getRampWeek(p)}
-                    onAdvance={onAdvanceRamp}
-                    onHold={onHoldRamp}
-                    onResetStart={onResetRampStart}
-                  />
+                  <div key={p.id}>
+                    {checkinDue && (
+                      <RampCheckinCard
+                        productName={p.name}
+                        weekNumber={weekNumber}
+                        onSubmit={(responseState, note) => onRampCheckin(p.id, weekNumber, responseState, note)}
+                      />
+                    )}
+                    <IntroduceSlowlyCard
+                      product={p}
+                      schedule={schedule}
+                      weekNumber={weekNumber}
+                      onAdvance={onAdvanceRamp}
+                      onHold={onHoldRamp}
+                      onResetStart={onResetRampStart}
+                    />
+                  </div>
                 );
               })
             ) : (

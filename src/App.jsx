@@ -1355,6 +1355,54 @@ export default function App() {
   const advanceRamp = (id) => recordRampAction(id, "handled");
   const holdRamp = (id) => recordRampAction(id, "backing_off");
 
+  // Weekly Introduce Slowly check-in. Records the user's qualitative
+  // response to the current ramp week into the `ramp_checkins` table
+  // and bumps `product.lastCheckinWeek` on the client so the nudge
+  // clears until the next 7-day boundary. Unlike advance/hold, this
+  // does NOT touch routineStartDate or rampWeek — a check-in is a
+  // report on how the week felt, not a progression decision.
+  //
+  // Persistence: the direct supabase insert is required because RLS
+  // gates the row on auth.uid() = user_id, and there's no server-side
+  // upsert path for check-ins. The lastCheckinWeek update flows
+  // through the existing products sync useEffect once setProducts
+  // fires, same path advance/hold use.
+  const recordRampCheckin = async (id, weekNumber, responseState, note) => {
+    if (authSession && !profileLoaded.current) {
+      console.warn("[Cygne] ramp check-in blocked — profile not loaded yet");
+      return;
+    }
+    const userId = authSession?.user?.id;
+    if (!userId) {
+      console.warn("[Cygne] ramp check-in blocked — no session");
+      return;
+    }
+    const product = products.find(p => p.id === id);
+    if (!product) return;
+
+    const { error } = await supabase.from("ramp_checkins").insert({
+      user_id: userId,
+      product_id: id,
+      week_number: weekNumber,
+      response_state: responseState,
+      note: note || null,
+    });
+    if (error) {
+      // Unique-violation on (user_id, product_id, week_number) means
+      // this week was already logged — treat as success so the local
+      // lastCheckinWeek still bumps and the nudge clears.
+      if (error.code !== "23505") {
+        console.error("[Cygne ramp check-in] insert failed:", error);
+        throw new Error(error.message || "Check-in failed. Please try again.");
+      }
+    }
+
+    setProducts(products.map(p =>
+      p.id === id ? { ...p, lastCheckinWeek: Math.max(p.lastCheckinWeek || 0, weekNumber) } : p
+    ));
+    console.log("[Cygne ramp check-in]", { id, weekNumber, responseState });
+  };
+
   // Reset the routineStartDate on a ramping product so week progression
   // starts fresh from today. Used when a date got corrupted by earlier
   // bugs and the displayed week no longer matches reality.
@@ -1778,7 +1826,7 @@ export default function App() {
             />
           </Suspense>
         )}
-        {tab === "progress"  && <Progress products={products} checkIns={checkIns} setCheckIns={setCheckIns} treatments={treatments} setTreatments={setTreatments} saveTreatment={saveTreatment} removeTreatment={removeTreatment} updateTreatmentDate={updateTreatmentDate} user={user} onAdvanceRamp={advanceRamp} onHoldRamp={holdRamp} onResetRampStart={resetRampStartDate} journals={journals} setJournals={setJournals} onUpdateUser={updateUser} reflections={reflections} triggerLog={triggerLog} setTriggerLog={setTriggerLog} />}
+        {tab === "progress"  && <Progress products={products} checkIns={checkIns} setCheckIns={setCheckIns} treatments={treatments} setTreatments={setTreatments} saveTreatment={saveTreatment} removeTreatment={removeTreatment} updateTreatmentDate={updateTreatmentDate} user={user} onAdvanceRamp={advanceRamp} onHoldRamp={holdRamp} onResetRampStart={resetRampStartDate} onRampCheckin={recordRampCheckin} journals={journals} setJournals={setJournals} onUpdateUser={updateUser} reflections={reflections} triggerLog={triggerLog} setTriggerLog={setTriggerLog} />}
       </div>
 
       {/* Bottom nav — dark across every tab */}
