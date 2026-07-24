@@ -6,3 +6,11 @@ verify_jwt = false
 
 [functions.swan-sense-daily]
 verify_jwt = false
+
+# Ramp check-in reminder — fires daily via the ramp-checkin-cron
+# GitHub Actions workflow. JWT verification is off because the
+# scheduler hits it with a service-role token in Authorization; the
+# function itself further gates on CRON_SECRET to keep the URL from
+# being world-callable.
+[functions.ramp-checkin-reminder]
+verify_jwt = false

@@ -37,3 +37,6 @@ jobs:
 
       - name: Deploy rapid-action
         run: supabase functions deploy rapid-action --project-ref "$SUPABASE_PROJECT_ID" --no-verify-jwt
+
+      - name: Deploy ramp-checkin-reminder
+        run: supabase functions deploy ramp-checkin-reminder --project-ref "$SUPABASE_PROJECT_ID" --no-verify-jwt

@@ -17,6 +17,7 @@ import { Purchases, LOG_LEVEL } from "@revenuecat/purchases-capacitor";
 import { PushNotifications } from "@capacitor/push-notifications";
 import { RC_KEY_LOOKS_VALID, rcKeyInvalidReason, usePremiumStatus, shouldShowPaywall, markRcReady } from "./hooks/useSubscription.js";
 import { PaywallScreen } from "./components/PaywallScreen.jsx";
+import { RampCheckinModal } from "./components/RampCheckinModal.jsx";
 
 // Module-scope readiness flag. Flips to true after Purchases.configure()
 // resolves. All identity-sync + downstream getCustomerInfo calls guard on
@@ -203,6 +204,10 @@ export default function App() {
   const [notifPermission, setNotifPermission] = useState("default");
   const [notifDismissed, setNotifDismissed] = useLocalStorage("cygne_notifdismissed", false);
   const [tab, setTab] = useState("dashboard");
+  // Set by the pushNotificationActionPerformed listener when the user
+  // taps a ramp-checkin push. Shape: { productId: string, weekNumber: number }.
+  // Clearing this un-mounts RampCheckinModal.
+  const [rampCheckinDeepLink, setRampCheckinDeepLink] = useState(null);
   const [products, setProducts] = useLocalStorage("cygne_products", []);
   const [modal, setModal] = useState(null);
   const [checkIns, setCheckIns] = useLocalStorage("cygne_checkins", []);
@@ -407,6 +412,31 @@ export default function App() {
         });
         if (cancelled) { errHandle.remove?.(); return; }
         handles.push(errHandle);
+
+        // Deep-link handler for tapped notifications. Only ramp-checkin
+        // pushes carry actionable data right now; other types (empty
+        // notification.data, or types we haven't wired) fall through
+        // as a no-op — just closes the tray. Sends the user to the
+        // Progress tab so the RampCheckinCard is in a familiar context
+        // if they dismiss the modal without answering.
+        const tapHandle = await PushNotifications.addListener("pushNotificationActionPerformed", (action) => {
+          try {
+            const data = action?.notification?.data || {};
+            if (data.type !== "ramp_checkin") return;
+            const productId = data.product_id;
+            const weekNumber = Number(data.week_number);
+            if (!productId || !Number.isFinite(weekNumber) || weekNumber < 1) {
+              console.warn("[Cygne push] ramp_checkin tap missing product_id/week_number:", data);
+              return;
+            }
+            setTab("progress");
+            setRampCheckinDeepLink({ productId, weekNumber });
+          } catch (e) {
+            console.error("[Cygne push] tap handler threw:", e?.message ?? e);
+          }
+        });
+        if (cancelled) { tapHandle.remove?.(); return; }
+        handles.push(tapHandle);
       } catch (e) {
         console.error("[Cygne push] listener setup failed:", e?.message ?? e);
       }
@@ -1865,6 +1895,14 @@ export default function App() {
               setFitSheet(null);
             }}
             onClose={() => setFitSheet(null)}
+          />
+        )}
+        {rampCheckinDeepLink && (
+          <RampCheckinModal
+            products={products}
+            deepLink={rampCheckinDeepLink}
+            onSubmit={recordRampCheckin}
+            onClose={() => setRampCheckinDeepLink(null)}
           />
         )}
         {scanOpen && <ScanModal products={products} onAddToShelf={p => {
