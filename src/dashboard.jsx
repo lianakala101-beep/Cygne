@@ -19,7 +19,7 @@ const MonthlyRecap  = lazy(() => import("./components/MonthlyRecap.jsx").then(m 
 
 const RECAP_MONTH_NAMES = ["january","february","march","april","may","june","july","august","september","october","november","december"];
 
-function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSwanPopup, treatments, locationData, user, notifPermission, onRequestNotif, notifDismissed, onDismissNotif, journals, setCheckIns, triggerLog = [], daysSinceLastActive = null }) {
+function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSwanPopup, treatments, locationData, user, notifPermission, onRequestNotif, notifDismissed, onDismissNotif, journals, setCheckIns, triggerLog = [], daysSinceLastActive = null, skinGoals = [], onMarkSkinGoalMet, onAddSkinGoal, onRemoveSkinGoal }) {
   const conflicts = detectConflicts(products);
   // Surface only irreconcilable conflicts (the molecule-level deactivation
   // pairs flagged in constants.js). Everything else is handled silently
@@ -488,6 +488,10 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             products={products}
             user={user}
             cycleDay={currentCycleDay}
+            skinGoals={skinGoals}
+            onMarkSkinGoalMet={onMarkSkinGoalMet}
+            onAddSkinGoal={onAddSkinGoal}
+            onRemoveSkinGoal={onRemoveSkinGoal}
             onClose={() => setRecapOpen(false)}
           />
         )}

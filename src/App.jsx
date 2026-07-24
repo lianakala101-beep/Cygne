@@ -262,6 +262,12 @@ export default function App() {
   const [triggerLog, setTriggerLog] = useLocalStorage("cygne_trigger_log", []);
   const [fitSheet, setFitSheet] = useState(null);
   const [reflections, setReflections] = useLocalStorage("cygne_reflections", []);
+  // Skin-goal tracker rows from the skin_goals table — populated in
+  // loadUserProfile below. Kept as a plain useState (not
+  // useLocalStorage) because it's a small server-owned list that
+  // doesn't need offline seeding; MonthlyRecap can render null-safe
+  // while the fetch resolves.
+  const [skinGoals, setSkinGoals] = useState([]);
 
   // "Welcome back" gap detection. Computed ONCE from user_metadata.
   // lastActiveDate at the start of the session, then we overwrite
@@ -642,6 +648,22 @@ export default function App() {
           next.sort((a, b) => String(a?.date || "").localeCompare(String(b?.date || "")));
           setCheckIns(next);
         }
+      })();
+      // Skin-goal tracker rows — used by the MonthlyRecap goal-check
+      // step. Fire-and-forget alongside the other loads. Empty array
+      // is a valid signal (no active tracker goals; recap skips its
+      // goals section entirely).
+      (async () => {
+        const { data: gRows, error: gErr } = await supabase
+          .from("skin_goals")
+          .select("id, goal, status, started_at, met_at")
+          .eq("user_id", authUser.id)
+          .order("started_at", { ascending: true });
+        if (gErr) {
+          console.error("[Cygne] skin_goals load failed:", gErr.message);
+          return;
+        }
+        if (Array.isArray(gRows)) setSkinGoals(gRows);
       })();
       // Restore treatments from Supabase
       if (meta.treatments && Array.isArray(meta.treatments)) {
@@ -1447,6 +1469,65 @@ export default function App() {
     console.log("[Cygne ramp check-in]", { id, weekNumber, responseState });
   };
 
+  // Skin-goal tracker handlers. All three write directly to the
+  // skin_goals table (RLS gates on auth.uid() = user_id, no
+  // server-side path needed) and update local state on success.
+  // MonthlyRecap → SkinGoalsSection consumes these via prop drilling.
+  const markSkinGoalMet = async (id) => {
+    const userId = authSession?.user?.id;
+    if (!userId) return;
+    const nowIso = new Date().toISOString();
+    const { error } = await supabase
+      .from("skin_goals")
+      .update({ status: "met", met_at: nowIso })
+      .eq("id", id)
+      .eq("user_id", userId);
+    if (error) {
+      console.error("[Cygne skin-goal] mark-met failed:", error);
+      throw new Error(error.message || "Couldn't mark this goal met.");
+    }
+    setSkinGoals(prev => prev.map(g =>
+      g.id === id ? { ...g, status: "met", met_at: nowIso } : g
+    ));
+  };
+
+  const addSkinGoal = async (goalValue) => {
+    const userId = authSession?.user?.id;
+    if (!userId) return;
+    const { data, error } = await supabase
+      .from("skin_goals")
+      .insert({ user_id: userId, goal: goalValue, status: "active" })
+      .select("id, goal, status, started_at, met_at")
+      .single();
+    if (error) {
+      // 23505 = a row is already active for this (user, goal). Treat
+      // as a benign no-op — the section already shows it and the
+      // add-affordance filters that value out, so this should only
+      // happen on a race between two devices.
+      if (error.code !== "23505") {
+        console.error("[Cygne skin-goal] add failed:", error);
+        throw new Error(error.message || "Couldn't add that goal.");
+      }
+      return;
+    }
+    if (data) setSkinGoals(prev => [...prev, data]);
+  };
+
+  const removeSkinGoal = async (id) => {
+    const userId = authSession?.user?.id;
+    if (!userId) return;
+    const { error } = await supabase
+      .from("skin_goals")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", userId);
+    if (error) {
+      console.error("[Cygne skin-goal] remove failed:", error);
+      throw new Error(error.message || "Couldn't remove that goal.");
+    }
+    setSkinGoals(prev => prev.filter(g => g.id !== id));
+  };
+
   // Reset the routineStartDate on a ramping product so week progression
   // starts fresh from today. Used when a date got corrupted by earlier
   // bugs and the displayed week no longer matches reality.
@@ -1788,7 +1869,7 @@ export default function App() {
                 onDismiss={dismissReflectionPrompt}
               />
             )}
-            <Dashboard products={products} setTab={setTab} checkIns={checkIns} swanPopupDismissed={swanPopupDismissed} onDismissSwanPopup={dismissSwanPopup} treatments={treatments} locationData={locationData} user={{ ...(user || {}), id: authSession?.user?.id }} notifPermission={notifPermission} onRequestNotif={requestNotifications} notifDismissed={notifDismissed} onDismissNotif={() => setNotifDismissed(true)} journals={journals} setCheckIns={setCheckIns} triggerLog={triggerLog} daysSinceLastActive={daysSinceLastActive} />
+            <Dashboard products={products} setTab={setTab} checkIns={checkIns} swanPopupDismissed={swanPopupDismissed} onDismissSwanPopup={dismissSwanPopup} treatments={treatments} locationData={locationData} user={{ ...(user || {}), id: authSession?.user?.id }} notifPermission={notifPermission} onRequestNotif={requestNotifications} notifDismissed={notifDismissed} onDismissNotif={() => setNotifDismissed(true)} journals={journals} setCheckIns={setCheckIns} triggerLog={triggerLog} daysSinceLastActive={daysSinceLastActive} skinGoals={skinGoals} onMarkSkinGoalMet={markSkinGoalMet} onAddSkinGoal={addSkinGoal} onRemoveSkinGoal={removeSkinGoal} />
           </>
         )}
         {tab === "routine"   && <MyRoutine
