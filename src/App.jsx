@@ -1869,7 +1869,7 @@ export default function App() {
                 onDismiss={dismissReflectionPrompt}
               />
             )}
-            <Dashboard products={products} setTab={setTab} checkIns={checkIns} swanPopupDismissed={swanPopupDismissed} onDismissSwanPopup={dismissSwanPopup} treatments={treatments} locationData={locationData} user={{ ...(user || {}), id: authSession?.user?.id }} notifPermission={notifPermission} onRequestNotif={requestNotifications} notifDismissed={notifDismissed} onDismissNotif={() => setNotifDismissed(true)} journals={journals} setCheckIns={setCheckIns} triggerLog={triggerLog} daysSinceLastActive={daysSinceLastActive} skinGoals={skinGoals} onMarkSkinGoalMet={markSkinGoalMet} onAddSkinGoal={addSkinGoal} onRemoveSkinGoal={removeSkinGoal} />
+            <Dashboard products={products} setTab={setTab} checkIns={checkIns} swanPopupDismissed={swanPopupDismissed} onDismissSwanPopup={dismissSwanPopup} treatments={treatments} locationData={locationData} user={{ ...(user || {}), id: authSession?.user?.id }} notifPermission={notifPermission} onRequestNotif={requestNotifications} notifDismissed={notifDismissed} onDismissNotif={() => setNotifDismissed(true)} journals={journals} setCheckIns={setCheckIns} triggerLog={triggerLog} daysSinceLastActive={daysSinceLastActive} skinGoals={skinGoals} onMarkSkinGoalMet={markSkinGoalMet} onAddSkinGoal={addSkinGoal} onRemoveSkinGoal={removeSkinGoal} reflections={reflections} />
           </>
         )}
         {tab === "routine"   && <MyRoutine
