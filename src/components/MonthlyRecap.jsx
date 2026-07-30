@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { invokeEdgeFunction } from "../supabase.js";
+import { invokeEdgeFunction, supabase } from "../supabase.js";
 import { SkinGoalsSection } from "./SkinGoalsSection.jsx";
+import { getCyclePhaseNameForDate } from "../lib/cycle.js";
 
 // Linen / paper noise — matches the rest of the app's editorial surfaces.
 const GRAIN = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='250' height='250' filter='url(%23g)' opacity='0.045'/%3E%3C/svg%3E\")";
@@ -72,6 +73,7 @@ export function MonthlyRecap({
   onMarkSkinGoalMet,
   onAddSkinGoal,
   onRemoveSkinGoal,
+  reflections = [],
   onClose,
 }) {
   const { year, monthLabel } = resolveMonth(offset);
@@ -131,6 +133,106 @@ export function MonthlyRecap({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
+
+  // ─── Cycle-pattern insight ────────────────────────────────────────────────
+  //
+  // Optional second AI call — fires only when the user has enough
+  // tracked history for a cycle-phase pattern to be meaningful. The
+  // codebase has no cycle-history table (raw_user_meta_data holds
+  // only the *current* cycleStartDate + cycleLength), so "3 full
+  // tracked cycles" is proxied as:
+  //   1. Total tracked items (ramp_checkins + reflections) >= 10.
+  //      Without volume the LLM can't spot anything real.
+  //   2. Span from the earliest tracked item to now >= 3 * cycleLength.
+  //      Ensures temporal coverage across at least three phase
+  //      rotations.
+  // If either gate fails, the section is skipped entirely — no
+  // "not enough data yet" placeholder per spec.
+  const [insight, setInsight] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setInsight(null);
+    (async () => {
+      const userId = user?.id;
+      const cycleStartDate = user?.cycleStartDate;
+      const cycleLength = Math.max(21, Math.min(45, parseInt(user?.cycleLength, 10) || 28));
+      if (!userId || !cycleStartDate) return;
+
+      // Fetch every ramp_checkin for this user — small table, RLS
+      // scopes to the caller. All history is needed because the gate
+      // measures span from the earliest signal.
+      const { data: rows, error } = await supabase
+        .from("ramp_checkins")
+        .select("response_state, created_at")
+        .eq("user_id", userId);
+      if (cancelled) return;
+      if (error) {
+        console.warn("[MonthlyRecap] ramp_checkins fetch failed:", error.message);
+        return;
+      }
+      const checkins = rows || [];
+      const reflectionList = Array.isArray(reflections) ? reflections : [];
+
+      // Gate 1: minimum volume.
+      const totalItems = checkins.length + reflectionList.length;
+      if (totalItems < 10) return;
+
+      // Gate 2: minimum temporal span. Earliest across both sources.
+      const timestamps = [
+        ...checkins.map(c => c.created_at).filter(Boolean),
+        ...reflectionList.map(r => r?.date).filter(Boolean),
+      ];
+      if (timestamps.length === 0) return;
+      const earliestMs = timestamps.reduce((min, iso) => {
+        const t = new Date(iso).getTime();
+        return Number.isFinite(t) && t < min ? t : min;
+      }, Infinity);
+      if (!Number.isFinite(earliestMs)) return;
+      const spanDays = Math.floor((Date.now() - earliestMs) / 86400000);
+      if (spanDays < 3 * cycleLength) return;
+
+      // Group into per-phase counts. Any item whose phase can't be
+      // computed (bad timestamp, event before cycleStartDate) is
+      // silently dropped — those are noise for pattern-spotting.
+      const phaseCounts = {};
+      const bump = (phaseName, mutator) => {
+        if (!phaseCounts[phaseName]) {
+          phaseCounts[phaseName] = { rampStates: {}, reflections: 0 };
+        }
+        mutator(phaseCounts[phaseName]);
+      };
+      for (const c of checkins) {
+        const phase = getCyclePhaseNameForDate(cycleStartDate, cycleLength, c.created_at);
+        if (!phase || !c.response_state) continue;
+        bump(phase, (b) => { b.rampStates[c.response_state] = (b.rampStates[c.response_state] || 0) + 1; });
+      }
+      for (const r of reflectionList) {
+        const phase = getCyclePhaseNameForDate(cycleStartDate, cycleLength, r?.date);
+        if (!phase) continue;
+        bump(phase, (b) => { b.reflections++; });
+      }
+
+      // Hand aggregated counts to the LLM endpoint. Empty response
+      // (endpoint 502 / network error) leaves insight = null so the
+      // section stays hidden — matches the "surface only when the
+      // model returns a non-empty insight" branch of the spec.
+      try {
+        const data = await invokeEdgeFunction("cycle-pattern-insight", {
+          userId,
+          offset,
+          cycleLength,
+          cycleSpanDays: spanDays,
+          phaseCounts,
+        });
+        if (cancelled) return;
+        if (data?.insight) setInsight(data.insight);
+      } catch (e) {
+        console.warn("[MonthlyRecap] cycle-pattern-insight failed:", e?.message ?? e);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [offset, user?.id, user?.cycleStartDate, user?.cycleLength, reflections]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Split narrative on blank lines into paragraphs. The system prompt asks
   // for 3 paragraphs separated by \n\n; we render each as its own <p>.
@@ -238,6 +340,41 @@ export function MonthlyRecap({
             </p>
           ))}
         </div>
+
+        {/* Cycle-pattern insight — LLM-generated single-sentence
+            observation of any notable phase-correlated pattern in
+            the user's tracked reactions + reflections. Renders only
+            when the 3-cycle gate passed AND the endpoint returned
+            a non-empty insight. */}
+        {insight && (
+          <div style={{
+            margin: "0 auto 40px",
+            maxWidth: 420,
+            padding: "18px 20px",
+            background: "rgba(250,249,244,0.05)",
+            border: "1px solid rgba(250,249,244,0.16)",
+            borderRadius: 12,
+            textAlign: "center",
+          }}>
+            <p style={{
+              fontFamily: "var(--font-display)",
+              fontSize: 10, fontWeight: 700, letterSpacing: "0.18em",
+              textTransform: "uppercase", color: "rgba(255,255,255,0.55)",
+              margin: "0 0 10px",
+            }}>
+              Cycle Pattern
+            </p>
+            <p style={{
+              fontFamily: "var(--font-body)",
+              fontSize: 14, fontWeight: 400,
+              lineHeight: 1.6, letterSpacing: "0.01em",
+              color: IVORY,
+              margin: 0,
+            }}>
+              {insight}
+            </p>
+          </div>
+        )}
 
         {/* Skin-goal tracker — returns null if the user has no
             active goals, so the recap reads unchanged for anyone
