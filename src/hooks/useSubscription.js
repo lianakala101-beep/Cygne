@@ -161,9 +161,22 @@ export async function checkPremiumStatus() {
 /**
  * React hook — reads premium status once on mount and returns
  *   { isPremium, entitlement, customerInfo, loading, source, refresh }
- * `refresh()` re-fetches on demand (call after a purchase, restore, or
- * app resume). Safe to call from any React component; guards the same
- * way the one-shot helper does.
+ *
+ * `refresh(opts?)` re-fetches on demand (call after a purchase, restore,
+ * or app resume). Options:
+ *   { silent: true } — background refresh that does NOT flip loading:true
+ *     during the fetch. Use this when we already have an answer and are
+ *     just refining it (e.g. re-checking after RC identity switch from
+ *     anonymous to signed-in). Without this, downstream loading-gates
+ *     like shouldShowPaywall unmount the paywall for the duration of
+ *     the async fetch and remount it when the answer comes back —
+ *     visible to users as the paywall appearing twice in a row.
+ *   default (no opts) — sets loading:true, matching the initial-mount
+ *     shape. Right for user-initiated refreshes (post-purchase, restore)
+ *     where a "loading" state is meaningful.
+ *
+ * Safe to call from any React component; guards the same way the
+ * one-shot helper does.
  */
 export function useSubscription() {
   const [state, setState] = useState({
@@ -174,8 +187,8 @@ export function useSubscription() {
     source: null,
   });
 
-  const load = async () => {
-    setState(s => ({ ...s, loading: true }));
+  const load = async ({ silent = false } = {}) => {
+    if (!silent) setState(s => ({ ...s, loading: true }));
     const result = await checkPremiumStatus();
     setState({ ...result, loading: false });
   };
@@ -235,10 +248,17 @@ export function usePremiumStatus(trialStartDate) {
   // entitlements replace the anonymous answer. First mount is a no-op
   // (useSubscription already fired) — the guarded call is only for
   // subsequent auth-identity changes.
+  //
+  // silent:true so the refresh doesn't flip loading:true mid-fetch.
+  // Without silent, shouldShowPaywall's loading gate flickers the
+  // paywall off-and-back on the exact frame this identity swap
+  // resolves — visible to users as the paywall appearing twice in a
+  // row (first render on trial-expired computation, unmount during
+  // this refresh, remount when it resolves).
   const primedRef = useRef(false);
   useEffect(() => {
     if (!primedRef.current) { primedRef.current = true; return; }
-    if (trialStartDate) sub.refresh();
+    if (trialStartDate) sub.refresh({ silent: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trialStartDate]);
   return {
