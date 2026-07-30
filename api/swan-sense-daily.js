@@ -17,6 +17,44 @@ function setCors(res) {
   );
 }
 
+// Fitzpatrick self-report → LLM guidance line. Mirrors the helper
+// in api/monthly-recap.js — kept inline so this endpoint is
+// self-contained. Returns null when the user skipped the question
+// (null / undefined / out-of-range); missing = no reference at all,
+// no fallback assumption. Types IV-VI get a PIH-awareness clause
+// gated on "only when relevant."
+function fitzpatrickContextLine(fitzpatrickType) {
+  const n = Number(fitzpatrickType);
+  if (!Number.isInteger(n) || n < 1 || n > 6) return null;
+  const roman = ["I", "II", "III", "IV", "V", "VI"][n - 1];
+  const label = [
+    "Always burns, rarely tans",
+    "Burns easily, tans minimally",
+    "Sometimes burns, tans gradually",
+    "Rarely burns, tans easily",
+    "Very rarely burns, tans deeply",
+    "Never burns, always tans deeply",
+  ][n - 1];
+  if (n >= 4) {
+    return (
+      `Fitzpatrick self-report: ${roman} (${label}). Skin has more natural ` +
+      `pigment — may be more prone to post-inflammatory hyperpigmentation ` +
+      `(PIH) after breakouts, irritation, or aggressive actives. Reference ` +
+      `this ONLY if the user's context is relevant (visible breakouts, dark ` +
+      `spots, scarring, or a direct question); otherwise do not mention it. ` +
+      `When relevant, lean conservative on inflammation-prone actives ` +
+      `(retinoids, exfoliating acids) and use "may be more prone to" ` +
+      `framing — never absolute or diagnostic.`
+    );
+  }
+  return (
+    `Fitzpatrick self-report: ${roman} (${label}). Skin burns more easily ` +
+    `under sun exposure. When relevant to the user's context (SPF, outdoor ` +
+    `activity, sun damage), you may lean into daily SPF as high-priority. ` +
+    `Use "may be more prone to" framing — never absolute or diagnostic.`
+  );
+}
+
 function buildContext(body) {
   const parts = [];
   // Return-gap signal — the client only forwards daysSinceLastActive
@@ -56,6 +94,8 @@ function buildContext(body) {
     } else if (isNonEvent) {
       parts.push(`Focus: general skin health.`);
     }
+    const fitzLine = fitzpatrickContextLine(profile.fitzpatrick_type);
+    if (fitzLine) parts.push(fitzLine);
   }
   if (Array.isArray(body.products) && body.products.length) {
     const inRoutine = body.products.filter((p) => p?.inRoutine !== false);

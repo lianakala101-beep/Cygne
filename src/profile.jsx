@@ -3,6 +3,7 @@ import { useState, useRef } from "react";
 import { Icon, Section, ErrorBoundary } from "./components.jsx";
 import { calcSpending } from "./engine.js";
 import { supabase, invokeEdgeFunction } from "./supabase.js";
+import { FitzpatrickNote } from "./components/FitzpatrickNote.jsx";
 
 const SKIN_TYPES = ["Dry", "Oily", "Combination", "Sensitive", "Normal"];
 const SKIN_CONCERNS = ["Acne", "Hyperpigmentation", "Redness", "Fine lines", "Texture", "Dehydration", "Dullness", "Sensitivity"];
@@ -293,6 +294,19 @@ function IngredientProfile({ user, onUpdateUser }) {
 // user.concerns) — not inside user.skinProfile. They're listed here so the
 // editor renders them in a single unified accordion, but the save handler
 // routes them correctly. `top: true` flags the field as top-level.
+// Fitzpatrick self-report — options MUST stay in this order because
+// their index (+1) is the fitzpatrick_type integer stored on
+// skinProfile. Keep in sync with FITZPATRICK_OPTIONS in
+// src/onboarding.jsx (same six strings, same order).
+const FITZPATRICK_OPTIONS = [
+  "Always burns, rarely tans",
+  "Burns easily, tans minimally",
+  "Sometimes burns, tans gradually",
+  "Rarely burns, tans easily",
+  "Very rarely burns, tans deeply",
+  "Never burns, always tans deeply",
+];
+
 const SKIN_PROFILE_FIELDS = [
   { key: "skinType",           label: "Skin Type",           options: SKIN_TYPES,    top: true },
   { key: "concerns",           label: "Concerns",            options: SKIN_CONCERNS, top: true, multi: true },
@@ -304,6 +318,13 @@ const SKIN_PROFILE_FIELDS = [
   { key: "environment",        label: "Environment",         options: ["Indoors", "Outdoors", "Hybrid"] },
   { key: "travel",             label: "Travel",              options: ["Frequently", "Occasionally", "Rarely"] },
   { key: "fragrance",          label: "Fragrance Sensitivity", options: ["Yes — I avoid it", "Sometimes", "No"] },
+  // Sun-response question rendered as a stacked pill row of the six
+  // FITZPATRICK_OPTIONS. The draft stores the option STRING (matching
+  // the pill-toggle pattern of the other fields); save() below
+  // translates it back to the integer 1-6 before persisting to
+  // skinProfile.fitzpatrick_type. Empty string = user hasn't answered
+  // or has explicitly cleared it.
+  { key: "fitzpatrick",        label: "Sun Response",        options: FITZPATRICK_OPTIONS },
 ];
 
 function SkinProfileEditor({ user, onUpdateUser }) {
@@ -325,6 +346,11 @@ function SkinProfileEditor({ user, onUpdateUser }) {
     travel:            profile.travel || "",
     fragrance:         profile.fragrance || "",
     ingredientsToAvoid: profile.ingredientsToAvoid || "",
+    // fitzpatrick_type is stored as an int 1-6 (or null) on
+    // skinProfile. The editor's draft carries the option STRING so
+    // it plays with the toggle pattern of the other pills; save()
+    // translates back to the int.
+    fitzpatrick:       FITZPATRICK_OPTIONS[(profile.fitzpatrick_type || 0) - 1] || "",
   });
   const [draft, setDraft] = useState(buildDraft());
 
@@ -338,13 +364,19 @@ function SkinProfileEditor({ user, onUpdateUser }) {
   const startEditing = () => { setDraft(buildDraft()); setEditing(true); };
   const cancel = () => { setDraft(buildDraft()); setEditing(false); };
   const save = () => {
-    const { skinType, concerns, ...profileDraft } = draft;
+    const { skinType, concerns, fitzpatrick, ...profileDraft } = draft;
     const cleaned = { ...profileDraft, ingredientsToAvoid: (profileDraft.ingredientsToAvoid || "").trim() || null };
     // If the user moved to a non-event occasion, clear the date so downstream
     // logic (e.g. SwanSense's countdown gate) doesn't fire on stale data.
     if (cleaned.specialOccasion === "Just For Me" || cleaned.specialOccasion === "Not Right Now" || !cleaned.specialOccasion) {
       cleaned.occasionDate = "";
     }
+    // Translate the fitzpatrick option string back to its 1-6 int.
+    // Empty string (user cleared the selection) persists as null so
+    // downstream LLM buildContext lines omit any reference — no
+    // fallback assumption.
+    const fitzIdx = FITZPATRICK_OPTIONS.indexOf(fitzpatrick);
+    cleaned.fitzpatrick_type = fitzIdx >= 0 ? fitzIdx + 1 : null;
     onUpdateUser({ ...user, skinType, concerns, skinProfile: cleaned });
     setEditing(false);
   };
@@ -408,9 +440,11 @@ function SkinProfileEditor({ user, onUpdateUser }) {
           {SKIN_PROFILE_FIELDS.map(f => {
             const val = draft[f.key];
             const isEmpty = Array.isArray(val) ? val.length === 0 : !val;
-            // Hide fragrance row entirely when not set — the em-dash placeholder
-            // adds noise without information for users who haven't answered.
-            if (isEmpty && f.key === "fragrance") return null;
+            // Hide rows that carry no signal when unset — the em-dash
+            // placeholder adds noise. Applies to fragrance (existing)
+            // and fitzpatrick (new; sun-response is optional per spec
+            // and shouldn't imply a default).
+            if (isEmpty && (f.key === "fragrance" || f.key === "fitzpatrick")) return null;
             // Shorten any " — " descriptor values to just the headline part so
             // long philosophy labels ("Multi-Step — full ritual, I enjoy the
             // process") don't wrap awkwardly in the summary cell.
@@ -459,6 +493,15 @@ function SkinProfileEditor({ user, onUpdateUser }) {
                     min={new Date().toISOString().split("T")[0]}
                     style={editInputStyle} />
                 </div>
+              )}
+              {/* Educational note under the fitzpatrick row — mounts
+                  the first time the user picks a value, then stays
+                  hidden after they dismiss it (localStorage flag
+                  managed inside the component). Never mounts if the
+                  field is empty. `light` variant tones ink-on-ivory
+                  to sit on the ivory-shadow editor card. */}
+              {f.key === "fitzpatrick" && draft.fitzpatrick && (
+                <FitzpatrickNote variant="light" />
               )}
             </div>
           ))}

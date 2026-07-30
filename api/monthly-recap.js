@@ -103,6 +103,52 @@ function buildMonthSlice(body) {
   };
 }
 
+// Fitzpatrick self-report → LLM guidance line. Returns null when the
+// user skipped the question (null / undefined / out-of-range). Never
+// stamps a fallback assumption when unset — spec is explicit that
+// missing = no reference at all.
+//
+// Types I-III (fair): brief SPF-prioritization line, still soft-framed.
+// Types IV-VI (more pigment): PIH-awareness line — the LLM is told to
+// reference it ONLY when the user's context is relevant (visible
+// breakouts, dark spots, scarring, or a direct question), and always
+// with "may be more prone to" hedged framing, never diagnostic.
+//
+// Kept as a small file-local helper so this endpoint stays self-
+// contained; the same shape is mirrored inline in api/swan-sense-daily,
+// api/ask-cygne, and the two Supabase edge-function equivalents.
+function fitzpatrickContextLine(fitzpatrickType) {
+  const n = Number(fitzpatrickType);
+  if (!Number.isInteger(n) || n < 1 || n > 6) return null;
+  const roman = ["I", "II", "III", "IV", "V", "VI"][n - 1];
+  const label = [
+    "Always burns, rarely tans",
+    "Burns easily, tans minimally",
+    "Sometimes burns, tans gradually",
+    "Rarely burns, tans easily",
+    "Very rarely burns, tans deeply",
+    "Never burns, always tans deeply",
+  ][n - 1];
+  if (n >= 4) {
+    return (
+      `Fitzpatrick self-report: ${roman} (${label}). Skin has more natural ` +
+      `pigment — may be more prone to post-inflammatory hyperpigmentation ` +
+      `(PIH) after breakouts, irritation, or aggressive actives. Reference ` +
+      `this ONLY if the user's context is relevant (visible breakouts, dark ` +
+      `spots, scarring, or a direct question); otherwise do not mention it. ` +
+      `When relevant, lean conservative on inflammation-prone actives ` +
+      `(retinoids, exfoliating acids) and use "may be more prone to" ` +
+      `framing — never absolute or diagnostic.`
+    );
+  }
+  return (
+    `Fitzpatrick self-report: ${roman} (${label}). Skin burns more easily ` +
+    `under sun exposure. When relevant to the user's context (SPF, outdoor ` +
+    `activity, sun damage), you may lean into daily SPF as high-priority. ` +
+    `Use "may be more prone to" framing — never absolute or diagnostic.`
+  );
+}
+
 function buildContext(body, slice, rampLog) {
   const parts = [];
   parts.push(`Month under review: ${slice.monthName} ${slice.year}.`);
@@ -129,6 +175,8 @@ function buildContext(body, slice, rampLog) {
     } else if (isNonEvent) {
       parts.push(`Focus: general skin health.`);
     }
+    const fitzLine = fitzpatrickContextLine(profile.fitzpatrick_type);
+    if (fitzLine) parts.push(fitzLine);
   }
 
   // In-routine products (cap at 10 to keep the prompt lean).
