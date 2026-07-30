@@ -1,10 +1,24 @@
 import { useState, useRef, useEffect } from "react";
 import { Pill, Icon } from "./components.jsx";
+import { FitzpatrickNote } from "./components/FitzpatrickNote.jsx";
 
 
 const SKIN_TYPES = ["Dry", "Oily", "Combination", "Sensitive", "Normal"];
 const SKIN_CONCERNS = ["Acne", "Hyperpigmentation", "Redness", "Fine lines", "Texture", "Dehydration", "Dullness", "Sensitivity"];
 const KNOWN_ACTIVES = ["Retinol", "AHA", "BHA", "Vitamin C", "Niacinamide", "Peptides", "Hyaluronic Acid", "None yet"];
+
+// Fitzpatrick self-report — the six options map to fitzpatrick_type
+// values 1-6 by index. Copy is intentionally sun-response-based (not
+// race / ethnicity). Values persist to user.skinProfile.fitzpatrick_type;
+// null = user skipped or hasn't answered yet.
+const FITZPATRICK_OPTIONS = [
+  "Always burns, rarely tans",
+  "Burns easily, tans minimally",
+  "Sometimes burns, tans gradually",
+  "Rarely burns, tans easily",
+  "Very rarely burns, tans deeply",
+  "Never burns, always tans deeply",
+];
 
 function getSkinAgeContext(birthYear) {
   if (!birthYear) return null;
@@ -44,8 +58,11 @@ function OnboardingScreen({ onComplete, setLocationData }) {
   const [travel, setTravel] = useState("");
   const [fragrance, setFragrance] = useState("");
   const [ingredientsToAvoid, setIngredientsToAvoid] = useState("");
+  // Fitzpatrick self-report — null = unset / skipped, 1-6 = valid answer.
+  // Never required to advance onboarding; see canAdvance[] below.
+  const [fitzpatrickType, setFitzpatrickType] = useState(null);
 
-  const TOTAL_STEPS = 17;
+  const TOTAL_STEPS = 18;
 
   const advance = (n = 1) => {
     if (animating) return;
@@ -97,6 +114,10 @@ function OnboardingScreen({ onComplete, setLocationData }) {
         travel: travel || null,
         fragrance: fragrance || null,
         ingredientsToAvoid: ingredientsToAvoid.trim() || null,
+        // fitzpatrick_type — null when skipped, integer 1-6 otherwise.
+        // Consumers (LLM buildContext lines) MUST treat null as
+        // "unknown" and omit any reference; no fallback assumption.
+        fitzpatrick_type: fitzpatrickType || null,
       },
     });
   };
@@ -424,7 +445,55 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       </div>
     </div>,
 
-    // 16 — All set
+    // 16 — Fitzpatrick self-report (optional, skippable)
+    // Sun-response question — NOT race / ethnicity. Six options map
+    // 1:1 to fitzpatrick_type 1-6 by their position in
+    // FITZPATRICK_OPTIONS above. Stacked full-width rather than
+    // horizontal pills because the strings are long. Answer is
+    // optional at every level: canAdvance stays true, a visible
+    // "Skip" button sits below the sticky Continue, and skipping
+    // stores fitzpatrick_type: null so LLM buildContext lines omit
+    // any reference (no fallback assumption per spec).
+    <div key="fitzpatrick" style={slideStyle}>
+      <p style={obEyebrow}>Your skin's sun response</p>
+      <h2 style={obHeading}>How does your skin typically respond to sun exposure?</h2>
+      <p style={obSub}>This helps us tailor general skincare guidance to you — you can skip this or update it anytime in your profile.</p>
+      <div style={{ marginTop: 28, display: "flex", flexDirection: "column", gap: 8 }}>
+        {FITZPATRICK_OPTIONS.map((label, i) => {
+          const value = i + 1;
+          const active = fitzpatrickType === value;
+          return (
+            <button
+              key={value}
+              onClick={() => setFitzpatrickType(active ? null : value)}
+              style={{
+                padding: "14px 18px",
+                borderRadius: 8,
+                border: `1px solid ${active ? "var(--color-ivory, #faf9f4)" : "rgba(250,249,244,0.25)"}`,
+                background: active ? "rgba(250,249,244,0.12)" : "transparent",
+                color: "var(--color-ivory, #faf9f4)",
+                fontFamily: "var(--font-body)",
+                fontSize: 13,
+                fontWeight: active ? 700 : 400,
+                letterSpacing: "0.02em",
+                textAlign: "left",
+                cursor: "pointer",
+                transition: "all 0.18s",
+              }}
+            >
+              {label}
+            </button>
+          );
+        })}
+      </div>
+      {/* Educational note — mounts inline once a value is chosen.
+          Never appears if the user skips. FitzpatrickNote handles its
+          own dismissed-flag in localStorage so a second render (e.g.
+          re-entering profile) is a no-op after first dismissal. */}
+      {fitzpatrickType && <FitzpatrickNote variant="dark" />}
+    </div>,
+
+    // 17 — All set
     <div key="done" style={{ ...slideStyle, position: "fixed", inset: 0, background: "var(--color-inky-moss, #2d3d2b)", display: "flex", flexDirection: "column", justifyContent: "space-between", overflow: "hidden" }}>
 
       {/* Top — logo + welcome, matching splash layout. Logo forced white
@@ -475,7 +544,8 @@ function OnboardingScreen({ onComplete, setLocationData }) {
     true,                          // 13 — travel — optional
     true,                          // 14 — fragrance — optional
     true,                          // 15 — ingredients to avoid — optional
-    true,                          // 16 — all set
+    true,                          // 16 — fitzpatrick self-report — optional (explicit Skip below)
+    true,                          // 17 — all set
   ];
 
   return (
@@ -528,13 +598,23 @@ function OnboardingScreen({ onComplete, setLocationData }) {
           </button>
         </div>
       )}
-      {/* Steps 6–15: sticky Continue (reset day + all new profile screens) */}
+      {/* Steps 6–16: sticky Continue (reset day + all new profile screens
+          including the fitzpatrick self-report at step 16). Step 16
+          also renders an explicit "Skip" text button so the optional
+          nature of the sun-response question is unambiguous — matches
+          the Skip pattern already used on steps 3-4. */}
       {step >= 6 && step < TOTAL_STEPS - 1 && (
         <div style={{ position: "sticky", bottom: 0, background: "var(--color-inky-moss, #2d3d2b)", padding: "16px 24px 32px", marginTop: "auto" }}>
           <button onClick={() => advance(1)}
             style={{ width: "100%", padding: "14px 0", background: "transparent", color: "var(--color-ivory, #faf9f4)", border: "1px solid var(--color-ivory, #faf9f4)", borderRadius: 8, fontFamily: "var(--font-display)", fontSize: 12, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", cursor: "pointer" }}>
             Continue
           </button>
+          {step === 16 && (
+            <button onClick={() => { setFitzpatrickType(null); advance(1); }}
+              style={{ width: "100%", marginTop: 10, background: "none", border: "none", fontFamily: "var(--font-body)", fontSize: 12, color: "rgba(255, 255, 255, 0.6)", cursor: "pointer", padding: "8px 0", letterSpacing: "0.06em" }}>
+              Skip
+            </button>
+          )}
         </div>
       )}
     </div>
