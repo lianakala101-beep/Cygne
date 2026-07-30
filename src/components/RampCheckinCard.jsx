@@ -14,30 +14,29 @@
 import { useState } from "react";
 
 const RESPONSES = [
-  { key: "no_reaction",     label: "No reaction",     tone: "sage"  },
-  { key: "loving_it",       label: "Loving it",       tone: "sage"  },
-  { key: "mild_irritation", label: "Mild irritation", tone: "amber" },
-  { key: "breakout",        label: "Breakout",        tone: "amber" },
+  { key: "no_reaction",     label: "No reaction"     },
+  { key: "loving_it",       label: "Loving it"       },
+  { key: "mild_irritation", label: "Mild irritation" },
+  { key: "breakout",        label: "Breakout"        },
 ];
 
-// Border + background palette per tone, matching the on-track / back-off
-// pair inside IntroduceSlowlyCard so the visual language is consistent.
-const TONE_STYLES = {
-  sage: {
-    bg:            "rgba(45,61,43,0.10)",
-    bgHover:       "rgba(45,61,43,0.18)",
-    bgSelected:    "rgba(45,61,43,0.24)",
-    border:        "rgba(45,61,43,0.28)",
-    borderSelect:  "rgba(45,61,43,0.75)",
-    color:         "var(--sage, #2d3d2b)",
+// Single ivory-card treatment for every response — same background
+// used by the ritual-mode card in ritualscreen.jsx and the vanity
+// glass cards. Semantic coloring (sage/amber-by-meaning) is
+// deliberately removed; the label text carries the meaning. Selection
+// is conveyed by the border darkening from a whisper of ink to a
+// clear one, keeping layout stable (no border-width change).
+const BUTTON_STYLE = {
+  base: {
+    background: "rgba(250, 249, 244, 0.82)",
+    border:     "1px solid rgba(28, 28, 26, 0.18)",
+    color:      "#1c1c1a",
   },
-  amber: {
-    bg:            "rgba(139,115,85,0.08)",
-    bgHover:       "rgba(139,115,85,0.16)",
-    bgSelected:    "rgba(139,115,85,0.24)",
-    border:        "rgba(139,115,85,0.22)",
-    borderSelect:  "rgba(139,115,85,0.75)",
-    color:         "#8b7355",
+  hover: {
+    border: "1px solid rgba(28, 28, 26, 0.35)",
+  },
+  selected: {
+    border: "1px solid rgba(28, 28, 26, 0.70)",
   },
 };
 
@@ -89,10 +88,10 @@ export function RampCheckinCard({ productName, weekNumber, onSubmit, onDismiss }
         How did your skin respond this week?
       </p>
 
-      {/* Response grid: 2x2 */}
+      {/* Response grid: 2x2. Uniform ivory-card treatment for every
+          button — the label text carries the meaning, not the color. */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 12 }}>
         {RESPONSES.map(r => {
-          const tone = TONE_STYLES[r.tone];
           const isSelected = picked === r.key;
           return (
             <button
@@ -100,20 +99,20 @@ export function RampCheckinCard({ productName, weekNumber, onSubmit, onDismiss }
               onClick={() => setPicked(r.key)}
               style={{
                 padding: "10px 8px",
-                background: isSelected ? tone.bgSelected : tone.bg,
-                border: `1px solid ${isSelected ? tone.borderSelect : tone.border}`,
+                background: BUTTON_STYLE.base.background,
+                border: isSelected ? BUTTON_STYLE.selected.border : BUTTON_STYLE.base.border,
                 borderRadius: 10,
                 fontFamily: "var(--font-body)",
                 fontSize: 10,
                 fontWeight: 400,
-                letterSpacing: "0.10em",
+                letterSpacing: "0.14em",
                 textTransform: "uppercase",
-                color: tone.color,
+                color: BUTTON_STYLE.base.color,
                 cursor: "pointer",
-                transition: "all 0.18s",
+                transition: "border-color 0.18s",
               }}
-              onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = tone.bgHover; }}
-              onMouseLeave={e => { if (!isSelected) e.currentTarget.style.background = tone.bg; }}
+              onMouseEnter={e => { if (!isSelected) e.currentTarget.style.border = BUTTON_STYLE.hover.border; }}
+              onMouseLeave={e => { if (!isSelected) e.currentTarget.style.border = BUTTON_STYLE.base.border; }}
             >
               {r.label}
             </button>
