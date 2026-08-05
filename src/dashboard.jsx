@@ -99,11 +99,11 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
               </p>
             )}
             {welcomeBackLine ? (
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 14, letterSpacing: "0.02em", color: "var(--color-ivory, #faf9f4)", opacity: 0.75, margin: "14px 0 0", lineHeight: 1.55, maxWidth: 360 }}>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 14, letterSpacing: "0.02em", color: "#F4F3EF", margin: "14px 0 0", lineHeight: 1.55, maxWidth: 360 }}>
                 {welcomeBackLine}
               </p>
             ) : products.length === 0 && (
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 14, letterSpacing: "0.04em", color: "var(--color-ivory, #faf9f4)", opacity: 0.7, margin: "10px 0 0", lineHeight: 1.5 }}>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 14, letterSpacing: "0.04em", color: "#F4F3EF", margin: "10px 0 0", lineHeight: 1.5 }}>
                 Welcome.
               </p>
             )}
@@ -121,7 +121,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         return (
           <div>
             <div style={{ marginBottom: 28 }}>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 14, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 14, color: "#F4F3EF", margin: 0, lineHeight: 1.6 }}>
                 Your ritual lives here. Let's build it around you.
               </p>
             </div>
@@ -145,8 +145,8 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
                     {String(i + 1).padStart(2, "0")}
                   </span>
                   <div style={{ flex: 1 }}>
-                    <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 13, fontWeight: 400, color: "var(--parchment)", margin: "0 0 4px", lineHeight: 1.3 }}>{s.label}</p>
-                    <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--clay)", margin: s.cta ? "0 0 10px" : 0, lineHeight: 1.6 }}>{s.sub}</p>
+                    <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 13, fontWeight: 400, color: "#F4F3EF", margin: "0 0 4px", lineHeight: 1.3 }}>{s.label}</p>
+                    <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "#F4F3EF", opacity: 0.75, margin: s.cta ? "0 0 10px" : 0, lineHeight: 1.6 }}>{s.sub}</p>
                     {s.cta && (
                       <button onClick={s.action} style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "var(--font-body), sans-serif", fontSize: 11, fontWeight: 400, color: "#6e8a72", background: "rgba(122,144,112,0.1)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 20, padding: "6px 14px", cursor: "pointer" }}>
                         {s.cta} <Icon name="arrow-right" size={11} />
@@ -229,24 +229,26 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           </div>
         )}
 
-        {/* Begin Your Ritual — editorial line item: rules top + bottom, label
-            left, arrow right. No box. */}
+        {/* Begin Your Ritual — primary action, inverted from the rest of
+            the dark canvas: solid ivory block, inky-moss text, filled
+            corners. Reads as the clear "do this" on the screen without
+            adding a new color to the system (both tokens already used
+            elsewhere on ivory-shadow cards and edge fills). */}
         <button
           onClick={() => setTab("routine")}
           style={{
             display: "flex", width: "100%", alignItems: "center", justifyContent: "space-between",
-            padding: "18px 0", marginBottom: 0,
-            background: "transparent", border: "none",
-            borderTop: "1px solid rgba(250,249,244,0.25)",
-            borderBottom: "1px solid rgba(250,249,244,0.25)",
+            padding: "18px 22px", marginBottom: 12,
+            background: "var(--color-ivory, #faf9f4)", border: "none",
+            borderRadius: 8,
             cursor: "pointer",
             WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
           }}>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 12, fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 16, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)" }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 12, fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 16, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)" }}>
             <Icon name={currentSession === "am" ? "sun" : "moon"} size={14} />
             Begin Your Ritual
           </span>
-          <span style={{ color: "var(--color-ivory, #faf9f4)", display: "inline-flex" }}>
+          <span style={{ color: "var(--color-inky-moss, #2d3d2b)", display: "inline-flex" }}>
             <Icon name="arrow-right" size={16} />
           </span>
         </button>
@@ -265,7 +267,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           if (askAccess === "unknown") {
             return (
               <div style={{
-                width: "100%", padding: "18px 0", marginTop: -1, marginBottom: 16,
+                width: "100%", padding: "18px 0", marginBottom: 16,
                 borderTop: "1px solid rgba(250,249,244,0.25)",
                 borderBottom: "1px solid rgba(250,249,244,0.25)",
               }}>
@@ -285,7 +287,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
               onClick={() => askCygne("", "")}
               style={{
                 display: "flex", width: "100%", alignItems: "center", justifyContent: "space-between",
-                padding: "18px 0", marginTop: -1, marginBottom: 16,
+                padding: "18px 0", marginBottom: 16,
                 background: "transparent", border: "none",
                 borderTop: "1px solid rgba(250,249,244,0.25)",
                 borderBottom: "1px solid rgba(250,249,244,0.25)",
@@ -309,8 +311,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
               <p key={i} style={{
                 fontFamily: "var(--font-body)", fontSize: 12,
                 letterSpacing: "0.02em",
-                color: "var(--color-ivory, #faf9f4)",
-                opacity: 0.7,
+                color: "#F4F3EF",
                 lineHeight: 1.6,
                 margin: i === 0 ? 0 : "6px 0 0",
               }}>{c.reason}</p>
@@ -318,19 +319,50 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           </div>
         )}
 
-        {/* Travel Edit | Shop Scan — text links separated by a vertical rule.
-            marginBottom is intentionally generous so the action group reads
-            as visually complete before the seasonal context rows begin. */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 18, marginBottom: 60 }}>
+        {/* Travel Edit and Shop Scan — two individually-outlined pills.
+            The prior "|"-divided text links read as one string; giving
+            each its own soft rounded outline (1px low-opacity ivory
+            border, faint ivory fill) makes them tap-distinct without
+            introducing solid-button emphasis that would compete with
+            "Begin Your Ritual" above. Outline pattern matches the
+            existing style used on Enter Cygne / Continue in onboarding. */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 60 }}>
           <button
             onClick={() => setFlightOpen(true)}
-            style={{ background: "none", border: "none", padding: "6px 0", cursor: "pointer", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", opacity: 0.85, WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" }}>
+            style={{
+              background: "rgba(250,249,244,0.06)",
+              border: "1px solid rgba(250,249,244,0.35)",
+              borderRadius: 999,
+              padding: "10px 22px",
+              cursor: "pointer",
+              fontFamily: "var(--font-display)", fontWeight: 700,
+              fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase",
+              color: "var(--color-ivory, #faf9f4)",
+              WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
+              transition: "background 0.18s",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = "rgba(250,249,244,0.14)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "rgba(250,249,244,0.06)"; }}
+          >
             Travel Edit
           </button>
-          <span style={{ width: 1, height: 14, background: "rgba(250,249,244,0.3)", display: "inline-block" }} />
           <button
             onClick={() => setShopScanOpen(true)}
-            style={{ background: "none", border: "none", padding: "6px 0", cursor: "pointer", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", opacity: 0.85, WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" }}>
+            style={{
+              background: "rgba(250,249,244,0.06)",
+              border: "1px solid rgba(250,249,244,0.35)",
+              borderRadius: 999,
+              padding: "10px 22px",
+              cursor: "pointer",
+              fontFamily: "var(--font-display)", fontWeight: 700,
+              fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase",
+              color: "var(--color-ivory, #faf9f4)",
+              WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
+              transition: "background 0.18s",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = "rgba(250,249,244,0.14)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "rgba(250,249,244,0.06)"; }}
+          >
             Shop Scan
           </button>
         </div>

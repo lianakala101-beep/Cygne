@@ -12,10 +12,13 @@ export const getRitualLabel = (amCompleted = false) => {
   return getRitualPeriod(amCompleted) === 'AM' ? 'MORNING RITUAL' : 'EVENING RITUAL';
 };
 
-// Contextual time-of-day label used in ritual card headers and guidance text.
-export const getRitualTimeLabel = () => {
-  const hour = new Date().getHours();
-  if (hour >= 5 && hour < 12) return 'THIS MORNING';
-  if (hour >= 12 && hour < 17) return 'THIS AFTERNOON';
-  return 'TONIGHT';
+// Contextual time-of-day label used in ritual card headers and guidance
+// text. Deliberately derived from getRitualPeriod so it CANNOT disagree
+// with the ritual label — previously this returned a 3-way clock split
+// ("THIS MORNING" / "THIS AFTERNOON" / "TONIGHT") that could show
+// "THIS AFTERNOON" at 2pm while the card underneath read "EVENING
+// RITUAL", because getRitualPeriod flips at noon and after amCompleted.
+// Now both labels come from the same 2-phase split.
+export const getRitualTimeLabel = (amCompleted = false) => {
+  return getRitualPeriod(amCompleted) === 'AM' ? 'THIS MORNING' : 'THIS EVENING';
 };
