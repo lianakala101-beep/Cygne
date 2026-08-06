@@ -669,27 +669,66 @@ function FlightModeModal({ products, activeMap, onClose }) {
       >
       <div style={{ background: "var(--ink)", width: "100%", maxWidth: 520, borderRadius: "20px 20px 0 0", padding: "28px 24px 52px", maxHeight: "88vh", overflowY: "auto", border: "1px solid var(--border)", borderBottom: "none" }}>
 
-        {/* Header */}
+        {/* Header — eyebrow letter-spacing standardized to 0.15em to
+            match the section eyebrows below (and the "IN REVIEW"
+            treatment elsewhere). Text colors brightened to #F4F3EF so
+            the header reads crisply on the dark modal canvas. */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
           <div>
-            <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 5px" }}>Flight Day</p>
-            <h2 style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--parchment)", margin: 0, lineHeight: 1.2 }}>Your Ritual, Anywhere</h2>
+            <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 9, letterSpacing: "0.15em", textTransform: "uppercase", color: "#F4F3EF", opacity: 0.7, margin: "0 0 5px" }}>Flight Day</p>
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "#F4F3EF", margin: 0, lineHeight: 1.2 }}>Your Ritual, Anywhere</h2>
           </div>
           <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: 4 }}><Icon name="x" size={17} /></button>
         </div>
 
-        <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--clay)", margin: "0 0 22px", lineHeight: 1.6 }}>
+        <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "#F4F3EF", opacity: 0.85, margin: "0 0 22px", lineHeight: 1.6 }}>
           What to pack, what to skip, and how to land without losing your skin.
         </p>
 
-        {/* Tab toggle */}
-        <div style={{ display: "flex", background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: 3, marginBottom: 24 }}>
-          {[{ id: "edit", label: "Your Edit" }, { id: "tips", label: "Flight Tips" }].map(t => (
-            <button key={t.id} onClick={() => setTab(t.id)}
-              style={{ flex: 1, padding: "8px 0", borderRadius: 8, border: "none", background: tab === t.id ? "#6e8a72" : "transparent", color: tab === t.id ? "#0d0f0d" : "var(--clay)", fontFamily: "var(--font-body), sans-serif", fontSize: 10, fontWeight: 400, cursor: "pointer", letterSpacing: "0.12em", textTransform: "uppercase", transition: "all 0.18s" }}>
-              {t.label}
-            </button>
-          ))}
+        {/* Tab toggle — outlined segmented pill matching the
+            Morning/Evening toggle on the ritual tab. Two full-width
+            pills side by side, active filled at 0.14 ivory alpha /
+            inactive transparent, thin 0.28-alpha ivory border wrapping
+            the group with a same-alpha divider between them. Same
+            outline system as the Travel Edit / Shop Scan pills on the
+            dashboard so the three surfaces feel like one system. */}
+        <div
+          role="group"
+          aria-label="Travel edit tab"
+          style={{
+            display: "flex", alignItems: "stretch",
+            border: "1px solid rgba(250,249,244,0.28)",
+            borderRadius: 999, overflow: "hidden",
+            marginBottom: 24,
+          }}
+        >
+          {[{ id: "edit", label: "Your Edit" }, { id: "tips", label: "Flight Tips" }].map((t, i) => {
+            const active = tab === t.id;
+            return (
+              <button
+                key={t.id}
+                type="button"
+                aria-pressed={active}
+                onClick={() => setTab(t.id)}
+                style={{
+                  flex: 1,
+                  padding: "8px 0",
+                  background: active ? "rgba(250,249,244,0.14)" : "transparent",
+                  border: "none",
+                  borderLeft: i === 0 ? "none" : "1px solid rgba(250,249,244,0.28)",
+                  cursor: active ? "default" : "pointer",
+                  fontFamily: "var(--font-display)",
+                  fontSize: 10, fontWeight: 400,
+                  letterSpacing: "0.2em", textTransform: "uppercase",
+                  color: active ? "#F4F3EF" : "rgba(250,249,244,0.65)",
+                  WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
+                  transition: "background 0.18s, color 0.18s",
+                }}
+              >
+                {t.label}
+              </button>
+            );
+          })}
         </div>
 
         {/* YOUR EDIT tab */}
@@ -711,44 +750,49 @@ function FlightModeModal({ products, activeMap, onClose }) {
                 <div style={{ display: "flex", gap: 12, padding: "13px 16px", background: "rgba(139,115,85,0.07)", border: "1px solid rgba(139,115,85,0.22)", borderRadius: 8, marginBottom: 18 }}>
                   <span style={{ color: "#8b7355", flexShrink: 0, marginTop: 2, display: "inline-flex" }}><Icon name="plane" size={16} /></span>
                   <div>
-                    <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, fontWeight: 400, color: "var(--parchment)", margin: "0 0 3px" }}>Check your sizes before packing.</p>
-                    <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>
+                    <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 13, fontWeight: 700, letterSpacing: "0.02em", color: "#F4F3EF", margin: "0 0 4px", lineHeight: 1.35 }}>Check your sizes before packing.</p>
+                    <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "#F4F3EF", opacity: 0.85, margin: 0, lineHeight: 1.6 }}>
                       Your {listed} {unique.length === 1 ? "is" : "are"} often over 100ml. Decant into travel bottles or pick up minis — carry-on limit is 100ml per liquid.
                     </p>
                   </div>
                 </div>
               );
             })()}
-            {/* Pack these */}
+            {/* Pack these — accent dot + sage-color eyebrow retained;
+                letter-spacing standardized to 0.15em to match the rest
+                of the app's small-caps label register. Item title
+                weight bumped 400 → 700 and size 13 → 14 so the name
+                sits clearly above the reason line. */}
             {keep.length > 0 && (
               <div style={{ marginBottom: 20 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
                   <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#6e8a72" }} />
-                  <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#6e8a72" }}>Pack These</span>
+                  <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 9, letterSpacing: "0.15em", textTransform: "uppercase", color: "#6e8a72" }}>Pack These</span>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {keep.map((item, i) => (
                     <div key={i} style={{ padding: "13px 16px", background: "rgba(122,144,112,0.06)", border: "1px solid rgba(122,144,112,0.2)", borderRadius: 8 }}>
-                      <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 13, color: "var(--parchment)", margin: "0 0 3px", fontWeight: 400 }}>{item.name}</p>
-                      <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>{item.reason}</p>
+                      <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 14, fontWeight: 700, letterSpacing: "0.02em", color: "#F4F3EF", margin: "0 0 4px", lineHeight: 1.3 }}>{item.name}</p>
+                      <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "#F4F3EF", opacity: 0.75, margin: 0, lineHeight: 1.55 }}>{item.reason}</p>
                     </div>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Leave behind */}
+            {/* Leave behind — same treatment as Pack These, amber dot
+                + eyebrow retained. */}
             {skip.length > 0 && (
               <div style={{ marginBottom: 20 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
                   <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#8b7355" }} />
-                  <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#8b7355" }}>Leave Behind</span>
+                  <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 9, letterSpacing: "0.15em", textTransform: "uppercase", color: "#8b7355" }}>Leave Behind</span>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {skip.map((item, i) => (
                     <div key={i} style={{ padding: "13px 16px", background: "rgba(139,115,85,0.06)", border: "1px solid rgba(139,115,85,0.18)", borderRadius: 8 }}>
-                      <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 13, color: "var(--parchment)", margin: "0 0 3px", fontWeight: 400 }}>{item.name}</p>
-                      <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>{item.reason}</p>
+                      <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 14, fontWeight: 700, letterSpacing: "0.02em", color: "#F4F3EF", margin: "0 0 4px", lineHeight: 1.3 }}>{item.name}</p>
+                      <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "#F4F3EF", opacity: 0.75, margin: 0, lineHeight: 1.55 }}>{item.reason}</p>
                     </div>
                   ))}
                 </div>
@@ -756,7 +800,7 @@ function FlightModeModal({ products, activeMap, onClose }) {
             )}
 
             {keep.length === 0 && skip.length === 0 && (
-              <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 12, color: "var(--clay)", textAlign: "center", padding: "24px 0" }}>Add products to your vanity to generate your travel edit.</p>
+              <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 12, color: "#F4F3EF", opacity: 0.85, textAlign: "center", padding: "24px 0" }}>Add products to your vanity to generate your travel edit.</p>
             )}
           </div>
         )}
@@ -771,10 +815,13 @@ function FlightModeModal({ products, activeMap, onClose }) {
               </div>
             ))}
 
-            {/* Recovery note */}
+            {/* Recovery note — sits on a sage-tinted dark card, so
+                body text brightens to #F4F3EF like the rest of the
+                dark-canvas copy. Eyebrow letter-spacing standardized
+                to 0.15em. */}
             <div style={{ padding: "16px 18px", background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.25)", borderRadius: 8, marginTop: 4 }}>
-              <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "#6e8a72", margin: "0 0 6px" }}>Landing Day</p>
-              <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 12, color: "var(--clay)", margin: 0, lineHeight: 1.65 }}>
+              <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 9, letterSpacing: "0.15em", textTransform: "uppercase", color: "#6e8a72", margin: "0 0 6px" }}>Landing Day</p>
+              <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 12, color: "#F4F3EF", margin: 0, lineHeight: 1.65 }}>
                 Give your skin 24h to re-acclimate before reintroducing actives. Cleanse, moisturize, SPF. Nothing else the first night.
               </p>
             </div>
