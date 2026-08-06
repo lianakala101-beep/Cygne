@@ -157,49 +157,63 @@ function SeasonalNudgeCard({ products, activeMap, user, lineMode = false }) {
   const profileNudge = getProfileNudge(season, products, activeMap, user);
   const nudge = profileNudge || cfg.shelfNudge(products, activeMap);
 
-  // Editorial line treatment for the dark homepage canvas — no card chrome,
-  // just label + headline + thin ivory rule, with the body content
-  // revealing inline on tap.
+  // Editorial line treatment for the dark homepage canvas — no card
+  // chrome, just top/bottom hairline rules framing a season label +
+  // pull-quote headline, with the body content revealing inline on tap.
+  //
+  // Vertical padding is 32px top+bottom (up from 18px) so the season
+  // moment reads as a distinct pull-quote rather than a compressed
+  // line-item — matches the divider spacing the surrounding actions
+  // use once you count both button padding and the hero margin above.
+  //
+  // The headline itself flips to display-face uppercase with wide
+  // tracking so "Heat changes everything" reads as an editorial pull
+  // quote, not a subhead. The season label collapses to a small
+  // eyebrow above it so the visual weight lands on the headline.
   if (lineMode) {
     return (
-      <div style={{ borderTop: "1px solid rgba(250,249,244,0.25)", borderBottom: "1px solid rgba(250,249,244,0.25)", marginTop: -1, padding: "18px 0" }}>
+      <div style={{ borderTop: "1px solid rgba(250,249,244,0.25)", borderBottom: "1px solid rgba(250,249,244,0.25)", marginTop: -1, padding: "32px 0" }}>
         <button
           type="button"
           onClick={() => setOpen(o => !o)}
           aria-expanded={open}
           style={{
             display: "flex", width: "100%", textAlign: "center",
-            flexDirection: "column", gap: 8,
+            flexDirection: "column", gap: 14,
             background: "none", border: "none", padding: 0, cursor: "pointer",
             WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
             position: "relative",
           }}>
+          {/* Season eyebrow — dropped from body-heavy to helper-alpha
+              so the headline below carries the weight. */}
           <span style={{
-            fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 11,
-            letterSpacing: "0.22em", textTransform: "uppercase",
-            color: "var(--color-ivory, #faf9f4)",
+            fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 10,
+            letterSpacing: "0.28em", textTransform: "uppercase",
+            color: "#F4F3EF", opacity: 0.7,
             whiteSpace: "nowrap",
           }}>{cfg.label}</span>
+          {/* Pull-quote headline — display-face uppercase at editorial
+              scale, wide 0.14em tracking, allowed to wrap onto two
+              lines so long copy ("Heat changes everything") doesn't
+              get truncated with an ellipsis. */}
           <span style={{
             width: "100%",
-            fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 400,
-            letterSpacing: "0.04em",
-            color: "var(--color-ivory, #faf9f4)",
-            opacity: 0.85,
-            lineHeight: 1.4,
-            overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+            fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700,
+            letterSpacing: "0.14em", textTransform: "uppercase",
+            color: "#F4F3EF",
+            lineHeight: 1.25,
           }}>{cfg.headline}</span>
           <span style={{
             position: "absolute", right: 0, top: "50%", transform: `translateY(-50%) ${open ? "rotate(90deg)" : "none"}`,
-            color: "var(--color-ivory, #faf9f4)", opacity: 0.7,
+            color: "#F4F3EF", opacity: 0.6,
             transition: "transform 0.2s",
             display: "inline-flex",
           }}><Icon name="chevron" size={11} /></span>
         </button>
         {open && (
-          <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid rgba(250,249,244,0.18)", textAlign: "center" }}>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-ivory, #faf9f4)", opacity: 0.85, margin: "0 0 8px", lineHeight: 1.65 }}>{cfg.body}</p>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-ivory, #faf9f4)", opacity: 0.85, margin: 0, lineHeight: 1.65 }}>{nudge}</p>
+          <div style={{ marginTop: 20, paddingTop: 20, borderTop: "1px solid rgba(250,249,244,0.18)", textAlign: "center" }}>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "#F4F3EF", margin: "0 0 8px", lineHeight: 1.65 }}>{cfg.body}</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "#F4F3EF", margin: 0, lineHeight: 1.65 }}>{nudge}</p>
           </div>
         )}
       </div>

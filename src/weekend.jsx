@@ -74,50 +74,51 @@ function WeekendNudgeCard({ products, activeMap, lineMode = false }) {
   const advice = buildWeekendAdvice(phase, products, activeMap);
   const lines = [...advice.skip, ...advice.do];
 
-  // Editorial line treatment for the dark homepage canvas.
+  // Editorial line treatment for the dark homepage canvas — matches
+  // the seasonal card's line treatment so the two stack as a single
+  // editorial ribbon: 32px top+bottom padding, eyebrow-and-pull-quote
+  // typography, brightened ivory body copy.
   if (lineMode) {
     return (
-      <div style={{ borderTop: "1px solid rgba(250,249,244,0.25)", borderBottom: "1px solid rgba(250,249,244,0.25)", marginTop: -1, padding: "18px 0" }}>
+      <div style={{ borderTop: "1px solid rgba(250,249,244,0.25)", borderBottom: "1px solid rgba(250,249,244,0.25)", marginTop: -1, padding: "32px 0" }}>
         <button
           type="button"
           onClick={() => setOpen(o => !o)}
           aria-expanded={open}
           style={{
             display: "flex", width: "100%", textAlign: "center",
-            flexDirection: "column", gap: 8,
+            flexDirection: "column", gap: 14,
             background: "none", border: "none", padding: 0, cursor: "pointer",
             fontFamily: "var(--font-body)",
             WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
             position: "relative",
           }}>
           <span style={{
-            fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 11,
-            letterSpacing: "0.22em", textTransform: "uppercase",
-            color: "var(--color-ivory, #faf9f4)",
+            fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 10,
+            letterSpacing: "0.28em", textTransform: "uppercase",
+            color: "#F4F3EF", opacity: 0.7,
             whiteSpace: "nowrap",
           }}>{cfg.label}</span>
           <span style={{
             width: "100%",
-            fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 400,
-            letterSpacing: "0.04em",
-            color: "var(--color-ivory, #faf9f4)",
-            opacity: 0.85,
-            lineHeight: 1.4,
-            overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+            fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700,
+            letterSpacing: "0.14em", textTransform: "uppercase",
+            color: "#F4F3EF",
+            lineHeight: 1.25,
           }}>{cfg.headline}</span>
           <span style={{
             position: "absolute", right: 0, top: "50%", transform: `translateY(-50%) ${open ? "rotate(90deg)" : "none"}`,
-            color: "var(--color-ivory, #faf9f4)", opacity: 0.7,
+            color: "#F4F3EF", opacity: 0.6,
             transition: "transform 0.2s",
             display: "inline-flex",
           }}><Icon name="chevron" size={11} /></span>
         </button>
         {open && lines.length > 0 && (
-          <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid rgba(250,249,244,0.18)", textAlign: "center" }}>
+          <div style={{ marginTop: 20, paddingTop: 20, borderTop: "1px solid rgba(250,249,244,0.18)", textAlign: "center" }}>
             {lines.map((s, i) => (
               <p key={i} style={{
                 fontFamily: "var(--font-body)", fontSize: 12,
-                color: "var(--color-ivory, #faf9f4)", opacity: 0.85,
+                color: "#F4F3EF",
                 margin: i === lines.length - 1 ? 0 : "0 0 8px",
                 lineHeight: 1.65,
               }}>{s}</p>

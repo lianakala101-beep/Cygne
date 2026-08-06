@@ -311,12 +311,12 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
   const allDone = steps.length > 0 && steps.every(s => isStepChecked(s.id));
   const sessionLabel = session === "am" ? "Morning" : "Evening";
   const sessionIcon  = session === "am" ? "sun" : "moon";
-  // The context card pairs its icon with getRitualTimeLabel() (clock-
-  // based), so it must track that label rather than `session` — otherwise
-  // a manually-selected AM ritual in the evening renders a sun next to
-  // "tonight".
-  const timeOfDayLabel = getRitualTimeLabel();
-  const timeOfDayIcon  = timeOfDayLabel === "TONIGHT" ? "moon" : "sun";
+  // Time-of-day label is now derived from the same ritual period the
+  // card header uses (getRitualPeriod internally), so the eyebrow can
+  // never disagree with the "MORNING RITUAL" / "EVENING RITUAL"
+  // label directly below it. The icon flips to moon in the PM period.
+  const timeOfDayLabel = getRitualTimeLabel(amCompleted);
+  const timeOfDayIcon  = getRitualPeriod(amCompleted) === "AM" ? "sun" : "moon";
 
   const recs = buildRecommendations(products, activeMap, conflicts, user);
   const refinements = buildRefinements(products, activeMap, conflicts);
@@ -352,7 +352,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
           <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "#1c1c1a", margin: 0, lineHeight: 1.65 }}>{ritualMode.guidance}</p>
           {filteredOut.length > 0 && (
             <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid rgba(28,28,26,0.12)" }}>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "#5a5a5a", margin: "0 0 6px", letterSpacing: "0.06em" }}>{"Paused " + getRitualTimeLabel().toLowerCase()}</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "#5a5a5a", margin: "0 0 6px", letterSpacing: "0.06em" }}>{"Paused " + getRitualTimeLabel(amCompleted).toLowerCase()}</p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                 {filteredOut.map(p => (
                   <span key={p.id} style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(28,28,26,0.04)", border: "1px solid rgba(28,28,26,0.12)", fontFamily: "var(--font-body)", fontSize: 10, color: "#5a5a5a" }}>{p.name}</span>
@@ -384,11 +384,53 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
         <span style={{ fontFamily: "var(--font-body)", fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)" }}>{sessionLabel} Ritual</span>
         <span style={{ fontSize: 9, fontFamily: "var(--font-body)", fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", background: "rgba(45,61,43,0.14)", padding: "2px 8px", borderRadius: 20 }}>Now</span>
       </div>
-      <button
-        onClick={() => setManualPeriod(period === "AM" ? "PM" : "AM")}
-        style={{ background: "none", border: "none", padding: 0, margin: "0 0 20px 25px", cursor: "pointer", fontFamily: "var(--font-display)", fontSize: 9, fontWeight: 400, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(250,249,244,0.6)" }}>
-        Switch to {period === "AM" ? "Evening" : "Morning"}
-      </button>
+      {/* Session toggle — segmented Morning / Evening pills. Replaces
+          the earlier "Switch to Evening" text button which read as
+          plain copy against the dark canvas. Two pills side by side,
+          both always visible, with the active session filled and the
+          inactive outlined. Uppercase Fungis, low-opacity ivory
+          divider between them — matches the outline pattern used for
+          Travel Edit / Shop Scan on the dashboard. */}
+      <div
+        role="group"
+        aria-label="Ritual session"
+        style={{
+          display: "inline-flex", alignItems: "stretch",
+          margin: "0 0 20px 25px",
+          border: "1px solid rgba(250,249,244,0.28)",
+          borderRadius: 999, overflow: "hidden",
+        }}
+      >
+        {[
+          { key: "AM", label: "Morning" },
+          { key: "PM", label: "Evening" },
+        ].map((opt, i) => {
+          const active = period === opt.key;
+          return (
+            <button
+              key={opt.key}
+              type="button"
+              aria-pressed={active}
+              onClick={() => setManualPeriod(opt.key)}
+              style={{
+                padding: "6px 16px",
+                background: active ? "rgba(250,249,244,0.14)" : "transparent",
+                border: "none",
+                borderLeft: i === 0 ? "none" : "1px solid rgba(250,249,244,0.28)",
+                cursor: active ? "default" : "pointer",
+                fontFamily: "var(--font-display)",
+                fontSize: 10, fontWeight: 400,
+                letterSpacing: "0.2em", textTransform: "uppercase",
+                color: active ? "var(--color-ivory, #faf9f4)" : "rgba(250,249,244,0.65)",
+                WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
+                transition: "background 0.18s, color 0.18s",
+              }}
+            >
+              {opt.label}
+            </button>
+          );
+        })}
+      </div>
 
       {/* Steps */}
       {steps.length > 0
