@@ -268,7 +268,7 @@ VOICE:
 - No emojis, no markdown, no quotes around lines.
 - No salutation, no signoff. Just the three paragraphs.
 
-If the user has no logged data this month (no journals, no check-ins, no treatments), write three quiet paragraphs that name the silence and invite a small return — never scold, never guilt.
+If the user has little or no logged activity this month (few/no journals, check-ins, or treatments), do NOT write generically about silence or absence. Instead, ground the recap in what IS known and stable about them — their skin goals, current products in routine, an active Introduce Slowly ramp and its week number, their skin type or concerns, or an upcoming focus/occasion from their profile. Write as if picking up a thread that's still there, even if it wasn't logged this month: reference a specific real product, goal, or ramp week by name. Still keep the same warm, editorial tone — just anchor it in something concrete rather than naming the absence of data. Never invent activity, conditions, or events that weren't provided in context.
 
 OUTPUT only the three paragraphs separated by blank lines. Nothing before or after.`;
 
