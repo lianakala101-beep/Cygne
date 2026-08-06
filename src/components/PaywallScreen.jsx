@@ -163,10 +163,15 @@ export function PaywallScreen({ trialExpired, onUnlock, onSignOut }) {
   // (lifetime, custom) slots after in RC's own order.
   const monthly = offerings?.monthly || packages.find(p => p.identifier === "$rc_monthly");
   const annual = offerings?.annual || packages.find(p => p.identifier === "$rc_annual");
+  // Dedup by identifier, not by reference: offerings.monthly /
+  // offerings.annual can be separate object instances from the
+  // matching entries inside offerings.availablePackages, so a
+  // reference-based filter leaves the duplicates in and renders
+  // the same package twice.
   const orderedPackages = [
     monthly,
     annual,
-    ...packages.filter(p => p !== monthly && p !== annual),
+    ...packages.filter(p => p.identifier !== monthly?.identifier && p.identifier !== annual?.identifier),
   ].filter(Boolean);
   const savingsPct = annualSavingsPct(monthly, annual);
 
