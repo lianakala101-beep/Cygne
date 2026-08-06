@@ -10,7 +10,7 @@ import { Progress } from "./progress.jsx";
 import { SwanWelcomeScreen, useLocalStorage, getCurrentCycleDay, daysBetweenLocal, toLocalMidnight, isoWeekNumber, isoWeekYear } from "./utils.jsx";
 import { WeekendNudgeCard } from "./weekend.jsx";
 import { SeasonalNudgeCard } from "./seasonal.jsx";
-import { supabase } from "./supabase.js";
+import { supabase, logDebugEvent } from "./supabase.js";
 import { API_BASE_URL } from "./config.js";
 import { Capacitor } from "@capacitor/core";
 import { Purchases, LOG_LEVEL } from "@revenuecat/purchases-capacitor";
@@ -403,8 +403,10 @@ export default function App() {
             );
             if (error) {
               console.error("[Cygne push] token upsert failed:", error.message);
+              logDebugEvent("push.registration.upsertFailed", { message: error.message ?? String(error) });
             } else {
               console.log("[Cygne push] token registered | platform:", platform, "| preview:", token.value.slice(0, 12) + "…");
+              logDebugEvent("push.registration.success", { platform, tokenPreview: token.value.slice(0, 12) });
             }
           } catch (e) {
             console.error("[Cygne push] registration handler threw:", e?.message ?? e);
@@ -415,6 +417,7 @@ export default function App() {
 
         const errHandle = await PushNotifications.addListener("registrationError", (error) => {
           console.error("[Cygne push] registration error:", error);
+          logDebugEvent("push.registration.error", { message: error?.message ?? String(error), error });
         });
         if (cancelled) { errHandle.remove?.(); return; }
         handles.push(errHandle);
