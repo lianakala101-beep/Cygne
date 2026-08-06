@@ -1622,7 +1622,7 @@ function getProductSession(product) {
   return getAutoSession(product).session;
 }
 
-function ProgressInner({ products: productsProp, checkIns: checkInsProp, setCheckIns, treatments: treatmentsProp = [], setTreatments, saveTreatment, removeTreatment, updateTreatmentDate = () => {}, user = {}, onAdvanceRamp, onHoldRamp, onResetRampStart = () => {}, onRampCheckin = async () => {}, journals: journalsProp = [], setJournals = () => {}, onUpdateUser = () => {}, reflections: reflectionsProp = [], triggerLog: triggerLogProp = [], setTriggerLog = () => {} }) {
+function ProgressInner({ products: productsProp, checkIns: checkInsProp, setCheckIns, treatments: treatmentsProp = [], setTreatments, saveTreatment, removeTreatment, updateTreatmentDate = () => {}, user = {}, onAdvanceRamp, onHoldRamp, onResetRampStart = () => {}, onRampCheckinSave = async () => {}, onRampCheckinDone = () => {}, journals: journalsProp = [], setJournals = () => {}, onUpdateUser = () => {}, reflections: reflectionsProp = [], triggerLog: triggerLogProp = [], setTriggerLog = () => {} }) {
   // Defensive coercion for every collection prop. The `= []` destructure
   // defaults only catch `undefined`; explicit nulls or unexpected
   // non-array values (e.g. during the brief window between auth landing
@@ -1846,7 +1846,8 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
                       <RampCheckinCard
                         productName={p.name}
                         weekNumber={weekNumber}
-                        onSubmit={(responseState, note) => onRampCheckin(p.id, weekNumber, responseState, note)}
+                        onSave={(responseState, note) => onRampCheckinSave(p.id, weekNumber, responseState, note)}
+                        onDone={() => onRampCheckinDone(p.id, weekNumber)}
                       />
                     )}
                     <IntroduceSlowlyCard

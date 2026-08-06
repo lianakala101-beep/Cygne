@@ -16,7 +16,7 @@
 import { useEffect } from "react";
 import { RampCheckinCard } from "./RampCheckinCard.jsx";
 
-export function RampCheckinModal({ products, deepLink, onSubmit, onClose }) {
+export function RampCheckinModal({ products, deepLink, onSave, onDone, onClose }) {
   const product = deepLink ? products?.find((p) => p.id === deepLink.productId) : null;
 
   // Close silently if the tap referenced a product that's since been
@@ -59,8 +59,9 @@ export function RampCheckinModal({ products, deepLink, onSubmit, onClose }) {
         <RampCheckinCard
           productName={product.name}
           weekNumber={deepLink.weekNumber}
-          onSubmit={async (state, note) => {
-            await onSubmit(product.id, deepLink.weekNumber, state, note);
+          onSave={(state, note) => onSave(product.id, deepLink.weekNumber, state, note)}
+          onDone={() => {
+            onDone?.(product.id, deepLink.weekNumber);
             onClose?.();
           }}
           onDismiss={onClose}

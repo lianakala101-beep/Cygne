@@ -1421,30 +1421,40 @@ export default function App() {
   const advanceRamp = (id) => recordRampAction(id, "handled");
   const holdRamp = (id) => recordRampAction(id, "backing_off");
 
-  // Weekly Introduce Slowly check-in. Records the user's qualitative
-  // response to the current ramp week into the `ramp_checkins` table
-  // and bumps `product.lastCheckinWeek` on the client so the nudge
-  // clears until the next 7-day boundary. Unlike advance/hold, this
-  // does NOT touch routineStartDate or rampWeek — a check-in is a
-  // report on how the week felt, not a progression decision.
+  // Weekly Introduce Slowly check-in — split into two callbacks so
+  // the RampCheckinCard can orchestrate visible loading / saved /
+  // error UI between the insert and the dismiss:
   //
-  // Persistence: the direct supabase insert is required because RLS
-  // gates the row on auth.uid() = user_id, and there's no server-side
-  // upsert path for check-ins. The lastCheckinWeek update flows
-  // through the existing products sync useEffect once setProducts
-  // fires, same path advance/hold use.
-  const recordRampCheckin = async (id, weekNumber, responseState, note) => {
+  //   saveRampCheckin(id, week, state, note) → does the Supabase
+  //     insert only. Throws on non-benign errors so the card can
+  //     surface a retry message. Does NOT touch lastCheckinWeek.
+  //
+  //   dismissRampCheckin(id, week) → bumps lastCheckinWeek so the
+  //     inline nudge stops firing until next week's boundary. Called
+  //     by the card AFTER it has painted the success state.
+  //
+  // Kept as two functions because the previous monolithic callback
+  // set state (setProducts) inside the same await chain as the
+  // insert, which race-batched with the card's setSaved and swallowed
+  // the checkmark render. See src/components/RampCheckinCard.jsx for
+  // the timing detail.
+  //
+  // RLS: direct supabase insert is required because the ramp_checkins
+  // policy gates on auth.uid() = user_id and there's no server-side
+  // upsert path.
+
+  const saveRampCheckin = async (id, weekNumber, responseState, note) => {
     if (authSession && !profileLoaded.current) {
       console.warn("[Cygne] ramp check-in blocked — profile not loaded yet");
-      return;
+      throw new Error("Your profile is still loading. Please try again in a moment.");
     }
     const userId = authSession?.user?.id;
     if (!userId) {
       console.warn("[Cygne] ramp check-in blocked — no session");
-      return;
+      throw new Error("You need to be signed in to save a check-in.");
     }
     const product = products.find(p => p.id === id);
-    if (!product) return;
+    if (!product) throw new Error("Couldn't find that product on your shelf.");
 
     const { error } = await supabase.from("ramp_checkins").insert({
       user_id: userId,
@@ -1453,20 +1463,19 @@ export default function App() {
       response_state: responseState,
       note: note || null,
     });
-    if (error) {
-      // Unique-violation on (user_id, product_id, week_number) means
-      // this week was already logged — treat as success so the local
-      // lastCheckinWeek still bumps and the nudge clears.
-      if (error.code !== "23505") {
-        console.error("[Cygne ramp check-in] insert failed:", error);
-        throw new Error(error.message || "Check-in failed. Please try again.");
-      }
+    if (error && error.code !== "23505") {
+      // 23505 = unique violation (already logged this week) — treat
+      // as benign; the dismiss step will still clear the nudge.
+      console.error("[Cygne ramp check-in] insert failed:", error);
+      throw new Error(error.message || "Check-in failed. Please try again.");
     }
+    console.log("[Cygne ramp check-in]", { id, weekNumber, responseState });
+  };
 
+  const dismissRampCheckin = (id, weekNumber) => {
     setProducts(products.map(p =>
       p.id === id ? { ...p, lastCheckinWeek: Math.max(p.lastCheckinWeek || 0, weekNumber) } : p
     ));
-    console.log("[Cygne ramp check-in]", { id, weekNumber, responseState });
   };
 
   // Skin-goal tracker handlers. All three write directly to the
@@ -1951,7 +1960,7 @@ export default function App() {
             />
           </Suspense>
         )}
-        {tab === "progress"  && <Progress products={products} checkIns={checkIns} setCheckIns={setCheckIns} treatments={treatments} setTreatments={setTreatments} saveTreatment={saveTreatment} removeTreatment={removeTreatment} updateTreatmentDate={updateTreatmentDate} user={user} onAdvanceRamp={advanceRamp} onHoldRamp={holdRamp} onResetRampStart={resetRampStartDate} onRampCheckin={recordRampCheckin} journals={journals} setJournals={setJournals} onUpdateUser={updateUser} reflections={reflections} triggerLog={triggerLog} setTriggerLog={setTriggerLog} />}
+        {tab === "progress"  && <Progress products={products} checkIns={checkIns} setCheckIns={setCheckIns} treatments={treatments} setTreatments={setTreatments} saveTreatment={saveTreatment} removeTreatment={removeTreatment} updateTreatmentDate={updateTreatmentDate} user={user} onAdvanceRamp={advanceRamp} onHoldRamp={holdRamp} onResetRampStart={resetRampStartDate} onRampCheckinSave={saveRampCheckin} onRampCheckinDone={dismissRampCheckin} journals={journals} setJournals={setJournals} onUpdateUser={updateUser} reflections={reflections} triggerLog={triggerLog} setTriggerLog={setTriggerLog} />}
       </div>
 
       {/* Bottom nav — dark across every tab */}
@@ -1996,7 +2005,8 @@ export default function App() {
           <RampCheckinModal
             products={products}
             deepLink={rampCheckinDeepLink}
-            onSubmit={recordRampCheckin}
+            onSave={saveRampCheckin}
+            onDone={dismissRampCheckin}
             onClose={() => setRampCheckinDeepLink(null)}
           />
         )}
