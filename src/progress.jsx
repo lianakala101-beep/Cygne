@@ -1677,11 +1677,52 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
 
   const rampProducts = [...primaryRamp, ...reintroRamp];
 
-  const sectionLabel = (icon, text) => (
-    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-      <span style={{ color: "var(--color-ivory, #faf9f4)", display: "inline-flex" }}><Icon name={icon} size={13} /></span>
-      <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 14, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", lineHeight: 1.1 }}>{text}</span>
-      <div style={{ flex: 1, height: 1, background: "rgba(45,61,43,0.18)", marginLeft: 8 }} />
+  // Brutalist-editorial: bracketed number badge inside a thin outlined
+  // pill, tone-aware so it reads on both dark and ivory section bands.
+  // The number ( 0X ) IS the eyebrow; the section title sits beside it.
+  const numberBadge = (n, tone = "ivory") => {
+    const color = tone === "ivory" ? "var(--color-ivory, #faf9f4)" : "#1c1c1a";
+    const border = tone === "ivory" ? "rgba(250,249,244,0.38)" : "rgba(28,28,26,0.38)";
+    return (
+      <span style={{
+        display: "inline-flex", alignItems: "center",
+        padding: "3px 10px",
+        border: `1px solid ${border}`, borderRadius: 999,
+        fontFamily: "var(--font-display)",
+        fontSize: 10, fontWeight: 700, letterSpacing: "0.22em",
+        color, whiteSpace: "nowrap", lineHeight: 1,
+      }}>( {n} )</span>
+    );
+  };
+
+  const sectionHeader = (n, text, tone = "ivory") => {
+    const color = tone === "ivory" ? "var(--color-ivory, #faf9f4)" : "#1c1c1a";
+    const rule  = tone === "ivory" ? "rgba(250,249,244,0.20)" : "rgba(28,28,26,0.18)";
+    return (
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
+        {numberBadge(n, tone)}
+        <span style={{
+          fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 14,
+          letterSpacing: "0.15em", textTransform: "uppercase",
+          color, lineHeight: 1.1,
+        }}>{text}</span>
+        <div style={{ flex: 1, height: 1, background: rule, marginLeft: 4 }} />
+      </div>
+    );
+  };
+
+  // Full-bleed section wrapper. Alternates ivory / dark bands down the
+  // page so each numbered section reads as its own editorial panel.
+  // Uses negative horizontal margin to break the container's 22px inset.
+  const SectionShell = ({ n, text, tone = "dark", children, bottom = 28 }) => (
+    <div style={{
+      marginLeft: -22, marginRight: -22,
+      padding: "24px 22px 20px",
+      marginBottom: bottom,
+      background: tone === "ivory" ? "var(--color-ivory, #faf9f4)" : "transparent",
+    }}>
+      {sectionHeader(n, text, tone)}
+      {children}
     </div>
   );
 
@@ -1694,7 +1735,7 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
       </div>
 
       {/* -- Skin Journal ------------------------------------------------------ */}
-      {sectionLabel("book-open", "Your Journal")}
+      <SectionShell n="01" text="Your Journal" tone="dark">
       {(() => {
         const today = new Date().toISOString().split("T")[0];
         const todayEntry = journals.find(j => j.date === today);
@@ -1702,7 +1743,7 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
         const visiblePast = pastEntries.slice(0, 3);
         const cond = todayEntry ? SKIN_CONDITIONS.find(c => c.key === todayEntry.condition) : null;
         return (
-          <div style={{ marginBottom: 24 }}>
+          <div>
             {/* Today's featured card */}
             {!todayEntry ? (
               <button onClick={() => setShowJournal(true)}
@@ -1711,7 +1752,7 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
                   <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 4px" }}>Skin Journal</p>
                   <p style={{ fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 400, letterSpacing: "0.08em", color: "var(--parchment)", margin: 0 }}>How is your skin today?</p>
                 </div>
-                <span style={{ fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, color: "var(--color-ivory, #faf9f4)", letterSpacing: "0.06em" }}>+ Log</span>
+                <span aria-hidden="true" style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 400, color: "var(--color-ivory, #faf9f4)", lineHeight: 1 }}>→</span>
               </button>
             ) : (
               <div onClick={() => setShowJournal(true)}
@@ -1745,138 +1786,151 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
               );
             })}
 
-            {/* View all link */}
+            {/* View all link — arrow-only affordance, text left, arrow flush right */}
             {pastEntries.length > 0 && (
               <button onClick={() => setJournalFullView(true)}
-                style={{ width: "100%", padding: "9px 0", background: "var(--color-ivory-shadow)", border: "none", borderTop: "none", marginTop: -1, borderRadius: "0 0 10px 10px", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.08em", color: "var(--color-ivory, #faf9f4)" }}>
-                View all {journals.length} entries <Icon name="arrow-right" size={10} />
+                style={{ width: "100%", padding: "13px 18px", background: "var(--color-ivory-shadow)", border: "none", borderTop: "none", marginTop: -1, borderRadius: "0 0 10px 10px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)" }}>
+                <span>All {journals.length} entries</span>
+                <span aria-hidden="true" style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 400, lineHeight: 1 }}>→</span>
               </button>
             )}
           </div>
         );
       })()}
+      </SectionShell>
 
       {/* -- Ritual Check-in ---------------------------------------------------- */}
-      {sectionLabel("activity", "Ritual Check-in")}
+      <SectionShell n="02" text="Ritual Check-in" tone="ivory">
       {dueCheckin ? (
         <button onClick={() => setShowCheckIn(true)}
-          style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 20px", background: "rgba(45,61,43,0.09)", border: "1px solid rgba(45,61,43,0.28)", borderRadius: 8, marginBottom: 24, cursor: "pointer", textAlign: "left" }}>
+          style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 20px", background: "transparent", border: "1px solid rgba(28,28,26,0.30)", borderRadius: 8, cursor: "pointer", textAlign: "left" }}>
           <div>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 4px" }}>Ritual Check-in</p>
-            <p style={{ fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 400, letterSpacing: "0.08em", color: "var(--parchment)", margin: "0 0 4px", lineHeight: 1 }}>How did your skin respond?</p>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0 }}>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#5a5a5a", margin: "0 0 4px" }}>Ritual Check-in</p>
+            <p style={{ fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 400, letterSpacing: "0.08em", color: "#1c1c1a", margin: "0 0 4px", lineHeight: 1 }}>How did your skin respond?</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#5a5a5a", margin: 0 }}>
               {daysSince === null ? "Log your first check-in to start tracking." : "Last check-in " + daysSince + " day" + (daysSince !== 1 ? "s" : "") + " ago."}
             </p>
           </div>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, color: "var(--color-ivory, #faf9f4)", flexShrink: 0, marginLeft: 12 }}>Check in <Icon name="arrow-right" size={11} /></span>
+          <span aria-hidden="true" style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 400, color: "#1c1c1a", flexShrink: 0, marginLeft: 12, lineHeight: 1 }}>→</span>
         </button>
       ) : (
-        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "14px 18px", background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, marginBottom: 24 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "14px 18px", background: "transparent", border: "1px solid rgba(28,28,26,0.18)", borderRadius: 8 }}>
           <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#2d3d2b", flexShrink: 0 }} />
           <div style={{ flex: 1 }}>
-            <span style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--parchment)" }}>
+            <span style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "#1c1c1a" }}>
               Checked in {daysSince === 0 ? "today" : daysSince + " day" + (daysSince !== 1 ? "s" : "") + " ago"}
             </span>
             {lastCheckIn && lastCheckIn.irritation && lastCheckIn.irritation !== "none" && (
-              <span style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", marginLeft: 8, opacity: 0.7 }}>{lastCheckIn.irritation} irritation</span>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#5a5a5a", marginLeft: 8, opacity: 0.85 }}>{lastCheckIn.irritation} irritation</span>
             )}
           </div>
-          <button onClick={() => setShowCheckIn(true)} style={{ display: "inline-flex", alignItems: "center", gap: 5, fontFamily: "var(--font-display)", fontSize: 10, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", background: "none", border: "none", padding: 0, cursor: "pointer", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" }}>Update <Icon name="arrow-right" size={11} /></button>
+          <button onClick={() => setShowCheckIn(true)} aria-label="Update check-in" style={{ display: "inline-flex", alignItems: "center", fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 400, color: "#1c1c1a", background: "none", border: "none", padding: 0, cursor: "pointer", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent", lineHeight: 1 }}>→</button>
         </div>
       )}
+      </SectionShell>
 
-      {/* -- Inflammation Heat Map ------------------------------------------ */}
-      {sectionLabel("map-pin", "Inflammation Map")}
-      <div style={{ marginBottom: 28 }}>
+      {/* -- Inflammation Heat Map + Hero Consistency Number ---------------- */}
+      <SectionShell n="03" text="Inflammation Map" tone="dark">
+      <div style={{ marginBottom: consistencyPct !== null ? 24 : 0 }}>
         <FaceHeatMap checkIns={checkIns} onAskCygne={(q, ctx) => setAskCygneQuestion({ q, ctx })} />
       </div>
 
-      {/* -- Consistency score — only when there are check-ins ------------------ */}
+      {/* Hero number treatment — the ritual-health consistency score gets
+          a full display-size Fungis numeral, unboxed, so it reads as the
+          screen's editorial pivot rather than a stat inside a card. */}
       {consistencyPct !== null && (
-        <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "20px 20px", marginBottom: 24 }}>
-          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 10 }}>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-              <span style={{ fontFamily: "var(--font-body)", fontSize: 48, fontWeight: 200, color: "var(--parchment)", lineHeight: 1 }}>{consistencyPct}</span>
-              <span style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)" }}>ritual health</span>
-            </div>
-            <span style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", opacity: 0.6 }}>from {checkIns.length} check-in{checkIns.length !== 1 ? "s" : ""}</span>
+        <div style={{ paddingTop: 4 }}>
+          <div style={{ display: "flex", alignItems: "flex-end", gap: 14, marginBottom: 6 }}>
+            <span style={{
+              fontFamily: "var(--font-display)",
+              fontSize: 112, fontWeight: 700,
+              letterSpacing: "-0.02em",
+              color: "var(--color-ivory, #faf9f4)",
+              lineHeight: 0.92,
+            }}>{consistencyPct}</span>
+            <span style={{
+              fontFamily: "var(--font-display)", fontWeight: 700,
+              fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase",
+              color: "var(--color-ivory, #faf9f4)", opacity: 0.7,
+              paddingBottom: 12,
+            }}>Ritual<br />Health</span>
           </div>
-          <div style={{ height: 2, background: "rgba(255,255,255,0.05)", borderRadius: 2, marginBottom: 12, overflow: "hidden" }}>
-            <div style={{ width: consistencyPct + "%", height: "100%", background: consistencyPct >= 80 ? "#2d3d2b" : consistencyPct >= 60 ? "#8b7355" : "#8b7355", borderRadius: 2, transition: "width 0.6s ease" }} />
+          <div style={{ height: 1, background: "rgba(250,249,244,0.25)", marginBottom: 12 }}>
+            <div style={{ width: consistencyPct + "%", height: 1, background: "var(--color-ivory, #faf9f4)", transition: "width 0.6s ease" }} />
           </div>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 10 }}>
+            <span style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", opacity: 0.6 }}>From {checkIns.length} check-in{checkIns.length !== 1 ? "s" : ""}</span>
+          </div>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-ivory, #faf9f4)", opacity: 0.82, margin: 0, lineHeight: 1.65 }}>
             {consistencyPct >= 85 ? "Strong adherence — your ritual is building compounding benefit." :
              consistencyPct >= 70 ? "Mostly consistent. Fewer irritation days will improve this score." :
              "Irregularity detected. Consistent application is what drives visible results."}
           </p>
         </div>
       )}
+      </SectionShell>
 
       {/* -- Introduce Slowly (hidden during Acute recovery; empty state otherwise) */}
-      <div style={{ marginBottom: 28 }}>
-        {/acute/i.test(pausePhase?.label) ? (
-          <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 11, letterSpacing: "0.15em", color: "var(--color-ivory)", textAlign: "center", margin: "16px 0" }}>
-            Introduce Slowly is paused while you recover.
+      {/acute/i.test(pausePhase?.label) ? (
+        <SectionShell n="04" text="Introduce Slowly" tone="ivory">
+          <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 11, letterSpacing: "0.15em", color: "#5a5a5a", textAlign: "center", margin: "16px 0" }}>
+            Paused while you recover.
           </p>
-        ) : (
-          <>
-            {sectionLabel("leaf", "Introduce Slowly")}
-            {reintroActives.length > 0 && pauseTreatment && pausePhase && (
-              <div style={{ background: "rgba(250,249,244,0.08)", border: "1px solid rgba(45,61,43,0.25)", borderRadius: 8, padding: "12px 14px", marginBottom: 12 }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--sage)", margin: "0 0 4px" }}>Reintroducing after recovery</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>
-                  You're in the {pausePhase.label.toLowerCase()} phase. {reintroActives.join(", ")} can return — but build slowly from week 1 to avoid overwhelming skin that's still settling.
-                </p>
-              </div>
-            )}
-            {rampProducts.length > 0 ? (
-              rampProducts.map(p => {
-                const activeKey = p.category === "Toning Pad"
-                  ? "toning pad"
-                  : RAMP_ACTIVES.find(a => detectActives(p.ingredients || [])[a]);
-                const schedule = RAMP_SCHEDULES[activeKey];
-                if (!schedule) return null;
-                const weekNumber = getRampWeek(p);
-                // Nudge appears once per 7-day boundary; disappears
-                // for the rest of the week once the user submits.
-                const checkinDue = weekNumber > (p.lastCheckinWeek || 0);
-                return (
-                  <div key={p.id}>
-                    {checkinDue && (
-                      <RampCheckinCard
-                        productName={p.name}
-                        weekNumber={weekNumber}
-                        onSave={(responseState, note) => onRampCheckinSave(p.id, weekNumber, responseState, note)}
-                        onDone={() => onRampCheckinDone(p.id, weekNumber)}
-                      />
-                    )}
-                    <IntroduceSlowlyCard
-                      product={p}
-                      schedule={schedule}
+        </SectionShell>
+      ) : (
+        <SectionShell n="04" text="Introduce Slowly" tone="ivory">
+          {reintroActives.length > 0 && pauseTreatment && pausePhase && (
+            <div style={{ background: "transparent", border: "1px solid rgba(28,28,26,0.20)", borderRadius: 8, padding: "12px 14px", marginBottom: 12 }}>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: "#2d3d2b", margin: "0 0 4px" }}>Reintroducing after recovery</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#1c1c1a", margin: 0, lineHeight: 1.55 }}>
+                You're in the {pausePhase.label.toLowerCase()} phase. {reintroActives.join(", ")} can return — but build slowly from week 1 to avoid overwhelming skin that's still settling.
+              </p>
+            </div>
+          )}
+          {rampProducts.length > 0 ? (
+            rampProducts.map(p => {
+              const activeKey = p.category === "Toning Pad"
+                ? "toning pad"
+                : RAMP_ACTIVES.find(a => detectActives(p.ingredients || [])[a]);
+              const schedule = RAMP_SCHEDULES[activeKey];
+              if (!schedule) return null;
+              const weekNumber = getRampWeek(p);
+              const checkinDue = weekNumber > (p.lastCheckinWeek || 0);
+              return (
+                <div key={p.id}>
+                  {checkinDue && (
+                    <RampCheckinCard
+                      productName={p.name}
                       weekNumber={weekNumber}
-                      onAdvance={onAdvanceRamp}
-                      onHold={onHoldRamp}
-                      onResetStart={onResetRampStart}
+                      onSave={(responseState, note) => onRampCheckinSave(p.id, weekNumber, responseState, note)}
+                      onDone={() => onRampCheckinDone(p.id, weekNumber)}
                     />
-                  </div>
-                );
-              })
-            ) : (
-              <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "18px 18px 16px" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: 0, lineHeight: 1.65, opacity: 0.75 }}>
-                  Nothing in ramp-up yet. Add a retinol, AHA, BHA, vitamin C, or toning pad to your vanity and Cygne will walk you through its introduction here.
-                </p>
-              </div>
-            )}
-          </>
-        )}
-      </div>
+                  )}
+                  <IntroduceSlowlyCard
+                    product={p}
+                    schedule={schedule}
+                    weekNumber={weekNumber}
+                    onAdvance={onAdvanceRamp}
+                    onHold={onHoldRamp}
+                    onResetStart={onResetRampStart}
+                  />
+                </div>
+              );
+            })
+          ) : (
+            <div style={{ background: "transparent", border: "1px solid rgba(28,28,26,0.14)", borderRadius: 8, padding: "18px 18px 16px" }}>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "#5a5a5a", margin: 0, lineHeight: 1.65 }}>
+                Nothing in ramp-up yet. Add a retinol, AHA, BHA, vitamin C, or toning pad to your vanity and Cygne will walk you through its introduction here.
+              </p>
+            </div>
+          )}
+        </SectionShell>
+      )}
 
       {/* -- Treatments --------------------------------------------------------- */}
-      {sectionLabel("drop", "Treatments")}
-      <div style={{ marginBottom: 28 }}>
+      <SectionShell n="05" text="Treatments" tone="dark">
         <TreatmentSection treatments={treatments} saveTreatment={saveTreatment} removeTreatment={removeTreatment} updateTreatmentDate={updateTreatmentDate} products={products} activeMap={activeMap} />
-      </div>
+      </SectionShell>
 
       {/* -- Body Acne — owns its own collapsible header inside the tracker */}
       <div style={{ marginBottom: 28 }}>
@@ -1884,10 +1938,9 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
       </div>
 
       {/* -- Cycle Tracking ---------------------------------------------------- */}
-      {sectionLabel("activity", "Cycle Tracking")}
-      <div style={{ marginBottom: 28 }}>
+      <SectionShell n="06" text="Cycle Tracking" tone="ivory" bottom={20}>
         <CycleTracker products={products} activeMap={activeMap} cycleDay={user && user.cycleDay ? user.cycleDay : 14} onSetCycleDay={d => onUpdateUser && onUpdateUser({ ...user, cycleDay: d })} user={user} onUpdateUser={onUpdateUser} />
-      </div>
+      </SectionShell>
 
       {showCheckIn && (
         <CheckInModal

@@ -290,16 +290,28 @@ function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }
         WebkitTapHighlightColor: "transparent",
       }}
     >
-      <p style={{
-        fontFamily: "var(--font-body)",
-        fontSize: 10, fontWeight: 400,
-        letterSpacing: "0.28em", textTransform: "uppercase",
-        color: "var(--clay)",
-        margin: "0 0 6px",
-      }}>
-        Step {stepNum}
-        {!scheduled && <span style={{ marginLeft: 10, opacity: 0.75 }}>· Skipped today</span>}
-      </p>
+      {/* Bracketed number badge — thin outlined pill, ivory glyph on the
+          dark ritual canvas. Replaces the previous "Step 01" eyebrow so
+          the number itself becomes the anchor of the row. */}
+      <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "0 0 8px" }}>
+        <span style={{
+          display: "inline-flex", alignItems: "center",
+          padding: "3px 10px",
+          border: "1px solid rgba(250,249,244,0.38)",
+          borderRadius: 999,
+          fontFamily: "var(--font-display)",
+          fontSize: 10, fontWeight: 700, letterSpacing: "0.22em",
+          color: "var(--color-ivory, #faf9f4)",
+          whiteSpace: "nowrap", lineHeight: 1,
+        }}>( {stepNum} )</span>
+        {!scheduled && (
+          <span style={{
+            fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400,
+            letterSpacing: "0.18em", textTransform: "uppercase",
+            color: "var(--clay)", opacity: 0.75,
+          }}>Skipped today</span>
+        )}
+      </div>
 
       <h3 style={{
         fontFamily: "var(--font-display)",
