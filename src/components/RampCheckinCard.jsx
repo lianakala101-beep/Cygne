@@ -113,12 +113,28 @@ export function RampCheckinCard({ productName, weekNumber, onSave, onDone, onDis
       marginBottom: 12,
       padding: "14px 16px 16px",
     }}>
-      {/* Header */}
+      {/* Header — bracketed week number badge replaces the "Week N
+          check-in" eyebrow. The pill IS the eyebrow; the descriptor
+          "check-in" sits alongside as a small caps label. */}
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 10, marginBottom: 10 }}>
         <div style={{ minWidth: 0 }}>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 400, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--sage, #2d3d2b)", margin: "0 0 3px" }}>
-            Week {weekNumber} check-in
-          </p>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, margin: "0 0 6px" }}>
+            <span style={{
+              display: "inline-flex", alignItems: "center",
+              padding: "3px 10px",
+              border: "1px solid rgba(45,61,43,0.42)",
+              borderRadius: 999,
+              fontFamily: "var(--font-display)",
+              fontSize: 10, fontWeight: 700, letterSpacing: "0.22em",
+              color: "var(--sage, #2d3d2b)",
+              whiteSpace: "nowrap", lineHeight: 1,
+            }}>( WK {String(weekNumber).padStart(2, "0")} )</span>
+            <span style={{
+              fontFamily: "var(--font-display)", fontSize: 9, fontWeight: 700,
+              letterSpacing: "0.20em", textTransform: "uppercase",
+              color: "var(--sage, #2d3d2b)", opacity: 0.75,
+            }}>Check-in</span>
+          </div>
           <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "var(--parchment, var(--color-ivory))", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {productName}
           </p>
