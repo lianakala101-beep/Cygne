@@ -465,11 +465,15 @@ function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycled
 
   if (!enabled) {
     return (
-      <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "20px 20px", marginBottom: 28 }}>
+      <div style={{
+        padding: "20px 0",
+        borderTop: "1px solid rgba(28,28,26,0.25)",
+        borderBottom: "1px solid rgba(28,28,26,0.25)",
+      }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
           <span style={{ color: "var(--clay)", display: "inline-flex" }}><Icon name="moon" size={14} /></span>
           <span style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)" }}>Sync Your Ritual With Your Rhythm</span>
-          <span style={{ fontSize: 9, fontFamily: "var(--font-body)", color: "var(--clay)", background: "var(--color-ivory-shadow)", border: "none", padding: "2px 8px", borderRadius: 20, letterSpacing: "0.06em" }}>Optional</span>
+          <span style={{ fontSize: 9, fontFamily: "var(--font-body)", color: "var(--clay)", letterSpacing: "0.06em", fontStyle: "italic" }}>Optional</span>
         </div>
         <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: "0 0 16px", lineHeight: 1.65 }}>
           Your hormones shift every week. Your ritual should too. Enable this to receive phase-aware nudges drawn from what's already on your vanity.
@@ -485,12 +489,15 @@ function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycled
   }
 
   return (
-    <div style={{ marginBottom: 28 }}>
-      {/* Phase card */}
-      <div style={{ background: phase.bg, border: `1px solid ${phase.border}`, borderRadius: 8, padding: "20px 20px 18px", marginBottom: 10, position: "relative", overflow: "hidden" }}>
-
-        {/* Background phase arc */}
-        <div style={{ position: "absolute", top: -30, right: -30, width: 110, height: 110, borderRadius: "50%", border: `18px solid ${phase.dot}`, opacity: 0.06, pointerEvents: "none" }} />
+    <div style={{
+      padding: "20px 0 4px",
+      borderTop: "1px solid rgba(28,28,26,0.25)",
+      borderBottom: "1px solid rgba(28,28,26,0.25)",
+    }}>
+      {/* Phase block — editorial flat treatment. No bordered card, no
+          decorative arc; the phase-dot bullet + name + Phase caption
+          still identify the current phase. */}
+      <div style={{ marginBottom: 14 }}>
 
         {/* Header row */}
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 14 }}>
@@ -503,7 +510,7 @@ function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycled
             </div>
           </div>
 
-          {/* Day editor */}
+          {/* Day editor — button retains its border as a tap target */}
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
             {editing ? (
               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -512,15 +519,15 @@ function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycled
                   value={inputVal}
                   onChange={e => setInputVal(e.target.value)}
                   onKeyDown={e => e.key === "Enter" && handleSetDay()}
-                  style={{ width: 48, padding: "4px 8px", background: "var(--ink)", border: `1px solid ${phase.border}`, borderRadius: 6, color: "var(--parchment)", fontFamily: "var(--font-body)", fontSize: 13, textAlign: "center", outline: "none" }}
+                  style={{ width: 48, padding: "4px 8px", background: "transparent", border: "1px solid rgba(28,28,26,0.35)", borderRadius: 6, color: "#1c1c1a", fontFamily: "var(--font-body)", fontSize: 13, textAlign: "center", outline: "none" }}
                   autoFocus
                 />
                 <button onClick={handleSetDay} style={{ padding: "4px 10px", background: "transparent", border: "1px solid #1c1c1a", borderRadius: 6, color: "#1c1c1a", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 9, cursor: "pointer", letterSpacing: "0.15em", textTransform: "uppercase" }}>Set</button>
               </div>
             ) : (
               <button onClick={() => { setInputVal(String(cycleDay)); setEditing(true); }}
-                style={{ background: "rgba(28,28,26,0.06)", border: "none", borderRadius: 8, padding: "5px 10px", cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
-                <span style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 13, letterSpacing: "0.08em", color: "rgba(28,28,26,0.75)", lineHeight: 1.6 }}>Day {cycleDay}</span>
+                style={{ background: "transparent", border: "1px solid rgba(28,28,26,0.25)", borderRadius: 8, padding: "5px 10px", cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
+                <span style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 13, letterSpacing: "0.08em", color: "#1c1c1a", lineHeight: 1.6 }}>Day {cycleDay}</span>
               </button>
             )}
             <span style={{ fontFamily: "var(--font-body)", fontSize: 9, color: "rgba(28,28,26,0.65)", opacity: 0.85, letterSpacing: "0.04em" }}>{daysUntilNext}d in phase</span>
@@ -528,31 +535,26 @@ function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycled
         </div>
 
         {/* Phase description */}
-        <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 13, letterSpacing: "0.02em", color: "#1c1c1a", margin: "0 0 14px", lineHeight: 1.6 }}>{phase.description}</p>
+        <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 13, letterSpacing: "0.02em", color: "#1c1c1a", margin: "0 0 12px", lineHeight: 1.6 }}>{phase.description}</p>
 
-        {/* Quiet "running long" note — shown only when the current day has
-            passed the user's chosen cycle length, normalizing a late period
-            rather than capping or resetting the day count. */}
+        {/* Quiet "running long" note — italic, no chip */}
         {runningLong && (
-          <p style={{ fontFamily: "var(--font-body)", fontStyle: "italic", fontSize: 12, letterSpacing: "0.02em", color: "rgba(28,28,26,0.65)", margin: "0 0 14px", lineHeight: 1.55 }}>
+          <p style={{ fontFamily: "var(--font-body)", fontStyle: "italic", fontSize: 12, letterSpacing: "0.02em", color: "rgba(28,28,26,0.65)", margin: "0 0 12px", lineHeight: 1.55 }}>
             Your cycle is running long — this is normal.
           </p>
         )}
 
-        {/* Nudge */}
-        <div style={{ padding: "12px 14px", background: "rgba(28,28,26,0.06)", borderRadius: 8, marginBottom: 0 }}>
-          <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 13, letterSpacing: "0.02em", color: "#1c1c1a", margin: 0, lineHeight: 1.6 }}>{phase.nudge}</p>
-        </div>
+        {/* Nudge — plain body copy, no box. */}
+        <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 13, letterSpacing: "0.02em", color: "#1c1c1a", margin: 0, lineHeight: 1.6 }}>{phase.nudge}</p>
       </div>
 
-      {/* Shelf-specific advice */}
-      <div style={{ background: "rgba(28,28,26,0.04)", border: "none", borderRadius: 8, padding: "14px 16px" }}>
+      {/* Shelf-specific advice — separated from the phase block by a soft
+          rule. Container is flat; the eyebrow carries the section title. */}
+      <div style={{ paddingTop: 14, borderTop: "1px solid rgba(28,28,26,0.18)" }}>
         <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "rgba(28,28,26,0.65)", margin: "0 0 8px" }}>Your Vanity This Week</p>
         <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 13, letterSpacing: "0.02em", color: "#1c1c1a", margin: "0 0 12px", lineHeight: 1.6 }}>{advice}</p>
 
-        {/* Cycle length setting — accepts 21–45 days. Defaults to 28 when
-            unset. Used by the "running long" note above and (via
-            user.cycleLength) by FaceHeatMap's phase-tally lookback. */}
+        {/* Cycle length setting — accepts 21–45 days. */}
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
           <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(28,28,26,0.65)" }}>Cycle length</span>
           {editingLength ? (
@@ -562,7 +564,7 @@ function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycled
                 value={lengthInputVal}
                 onChange={e => setLengthInputVal(e.target.value)}
                 onKeyDown={e => e.key === "Enter" && handleSetLength()}
-                style={{ width: 52, padding: "3px 8px", background: "rgba(28,28,26,0.06)", border: "1px solid rgba(28,28,26,0.25)", borderRadius: 6, color: "#1c1c1a", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "center", outline: "none" }}
+                style={{ width: 52, padding: "3px 8px", background: "transparent", border: "1px solid rgba(28,28,26,0.35)", borderRadius: 6, color: "#1c1c1a", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "center", outline: "none" }}
                 autoFocus
               />
               <button onClick={handleSetLength} style={{ padding: "3px 10px", background: "transparent", border: "1px solid #1c1c1a", borderRadius: 6, color: "#1c1c1a", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 9, cursor: "pointer", letterSpacing: "0.15em", textTransform: "uppercase" }}>Set</button>
@@ -1810,9 +1812,23 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
 
       {/* -- Ritual Check-in ---------------------------------------------------- */}
       <SectionShell text="Ritual Check-in" tone="ivory">
+      {/* Editorial line-item treatment — no bordered box; content stacked
+          between hair rules, matching the dashboard's Ask Cygne row.
+          Divider color inverts the home page's ivory-alpha 25% to
+          ink-alpha 25% for readable contrast on the ivory band. */}
       {dueCheckin ? (
         <button onClick={() => setShowCheckIn(true)}
-          style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 20px", background: "transparent", border: "1px solid rgba(28,28,26,0.30)", borderRadius: 8, cursor: "pointer", textAlign: "left" }}>
+          style={{
+            width: "100%",
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            padding: "18px 0",
+            background: "transparent",
+            border: "none",
+            borderTop: "1px solid rgba(28,28,26,0.25)",
+            borderBottom: "1px solid rgba(28,28,26,0.25)",
+            cursor: "pointer", textAlign: "left",
+            WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
+          }}>
           <div>
             <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#5a5a5a", margin: "0 0 4px" }}>Ritual Check-in</p>
             <p style={{ fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 400, letterSpacing: "0.08em", color: "#1c1c1a", margin: "0 0 4px", lineHeight: 1 }}>How did your skin respond?</p>
@@ -1823,7 +1839,14 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
           <span aria-hidden="true" style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 400, color: "#1c1c1a", flexShrink: 0, marginLeft: 12, lineHeight: 1 }}>→</span>
         </button>
       ) : (
-        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "14px 18px", background: "transparent", border: "1px solid rgba(28,28,26,0.18)", borderRadius: 8 }}>
+        <div style={{
+          display: "flex", alignItems: "center", gap: 10,
+          padding: "14px 0",
+          background: "transparent",
+          border: "none",
+          borderTop: "1px solid rgba(28,28,26,0.25)",
+          borderBottom: "1px solid rgba(28,28,26,0.25)",
+        }}>
           <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#2d3d2b", flexShrink: 0 }} />
           <div style={{ flex: 1 }}>
             <span style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "#1c1c1a" }}>
@@ -1889,7 +1912,12 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
       ) : (
         <SectionShell text="Introduce Slowly" tone="ivory">
           {reintroActives.length > 0 && pauseTreatment && pausePhase && (
-            <div style={{ background: "transparent", border: "1px solid rgba(28,28,26,0.20)", borderRadius: 8, padding: "12px 14px", marginBottom: 12 }}>
+            <div style={{
+              padding: "14px 0",
+              borderTop: "1px solid rgba(28,28,26,0.25)",
+              borderBottom: "1px solid rgba(28,28,26,0.25)",
+              marginBottom: 8,
+            }}>
               <p style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: "#2d3d2b", margin: "0 0 4px" }}>Reintroducing after recovery</p>
               <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#1c1c1a", margin: 0, lineHeight: 1.55 }}>
                 You're in the {pausePhase.label.toLowerCase()} phase. {reintroActives.join(", ")} can return — but build slowly from week 1 to avoid overwhelming skin that's still settling.
@@ -1897,7 +1925,7 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
             </div>
           )}
           {rampProducts.length > 0 ? (
-            rampProducts.map(p => {
+            rampProducts.map((p, i) => {
               const activeKey = p.category === "Toning Pad"
                 ? "toning pad"
                 : RAMP_ACTIVES.find(a => detectActives(p.ingredients || [])[a]);
@@ -1907,24 +1935,29 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
               const checkinDue = weekNumber > (p.lastCheckinWeek || 0);
               // Single combined card per product — the check-in flow
               // renders inline inside IntroduceSlowlyCard when checkinDue
-              // is true. Was two stacked cards (RampCheckinCard on top,
-              // IntroduceSlowlyCard below) before the merge.
+              // is true. Card outer container was removed in the ivory
+              // flattening pass; each product now reads as an editorial
+              // section separated by hair rules from its neighbours.
               return (
-                <div key={p.id}>
-                  <IntroduceSlowlyCard
-                    product={p}
-                    schedule={schedule}
-                    weekNumber={weekNumber}
-                    onResetStart={onResetRampStart}
-                    checkinDue={checkinDue}
-                    onCheckinSave={(responseState, note) => onRampCheckinSave(p.id, weekNumber, responseState, note)}
-                    onCheckinDone={() => onRampCheckinDone(p.id, weekNumber)}
-                  />
-                </div>
+                <IntroduceSlowlyCard
+                  key={p.id}
+                  product={p}
+                  schedule={schedule}
+                  weekNumber={weekNumber}
+                  onResetStart={onResetRampStart}
+                  checkinDue={checkinDue}
+                  onCheckinSave={(responseState, note) => onRampCheckinSave(p.id, weekNumber, responseState, note)}
+                  onCheckinDone={() => onRampCheckinDone(p.id, weekNumber)}
+                  isLast={i === rampProducts.length - 1}
+                />
               );
             })
           ) : (
-            <div style={{ background: "transparent", border: "1px solid rgba(28,28,26,0.14)", borderRadius: 8, padding: "18px 18px 16px" }}>
+            <div style={{
+              padding: "16px 0",
+              borderTop: "1px solid rgba(28,28,26,0.25)",
+              borderBottom: "1px solid rgba(28,28,26,0.25)",
+            }}>
               <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "#5a5a5a", margin: 0, lineHeight: 1.65 }}>
                 Nothing in ramp-up yet. Add a retinol, AHA, BHA, vitamin C, or toning pad to your vanity and Cygne will walk you through its introduction here.
               </p>
