@@ -212,10 +212,47 @@ function formatStartedLabel(iso) {
   return `Started ${dt.toLocaleDateString("en-US", { month: "long", day: "numeric" })}`;
 }
 
-function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, onResetStart }) {
+// Introduce Slowly card — combined routine info + weekly check-in in
+// one card per product. Was previously two stacked cards (RampCheckinCard
+// on top, IntroduceSlowlyCard below). The check-in state + submit flow
+// is folded in here; RampCheckinCard the component is kept for the
+// push-notification deep-link modal but no longer rendered on the
+// Progress screen.
+//
+// Visual base is the moss-tinted RampCheckinCard treatment
+// (rgba(45,61,43,0.06) bg + 22% moss border, 14px radius) — chosen
+// over the schedule's warm-tan tint so every ramp card looks the same
+// regardless of ingredient. Ingredient identity still comes through
+// via the category chip and the phase-dot color.
+const RESPONSE_OPTIONS = [
+  { key: "no_reaction",     label: "No reaction"     },
+  { key: "loving_it",       label: "Loving it"       },
+  { key: "mild_irritation", label: "Mild irritation" },
+  { key: "breakout",        label: "Breakout"        },
+];
+
+const CHECKIN_SUCCESS_HOLD_MS = 900;
+
+function IntroduceSlowlyCard({
+  product,
+  schedule,
+  weekNumber: weekNumberProp,
+  onResetStart,
+  checkinDue = false,
+  onCheckinSave,
+  onCheckinDone,
+}) {
   const [expanded, setExpanded] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
   const [pickedDate, setPickedDate] = useState("");
+  // Check-in local state (was in the separate RampCheckinCard before the
+  // two cards were combined). Reset to idle after a successful save so
+  // next week's check-in starts fresh.
+  const [picked, setPicked] = useState(null);
+  const [note, setNote] = useState("");
+  const [checkinStatus, setCheckinStatus] = useState("idle"); // "idle" | "saving" | "saved" | "error"
+  const [checkinError, setCheckinError] = useState(null);
+
   const weekNumber = weekNumberProp ?? getRampWeek(product);
   const phase = getRampPhase(schedule, weekNumber);
   const phaseIndex = schedule.phases.findIndex(p => p.weeks.includes(Math.min(weekNumber, 12)));
@@ -223,47 +260,275 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, on
   const clampedPhaseIndex = Math.min(phaseIndex, schedule.phases.length - 1);
   const startedLabel = formatStartedLabel(product.routineStartDate);
   const maxWeek = Math.max(...schedule.phases[schedule.phases.length - 1].weeks);
-  // Manual "Skin handled it / Backing off" response buttons + graduation
-  // modal were removed — the RampCheckinCard is now the single per-week
-  // check-in surface. Progression stays calendar-driven (getRampWeek)
-  // and the graduation endpoint is handled by the auto-graduation safety
-  // net in App.jsx (fires two weeks past maxWeek).
+
+  const saving = checkinStatus === "saving";
+  const saved  = checkinStatus === "saved";
+  const weekPad = String(weekNumber).padStart(2, "0");
+  const showCheckin = checkinDue;
+
+  const submitCheckin = async () => {
+    if (!picked || saving || saved) return;
+    setCheckinStatus("saving");
+    setCheckinError(null);
+    try {
+      await onCheckinSave?.(picked, note.trim() || null);
+      setCheckinStatus("saved");
+      await new Promise(r => setTimeout(r, CHECKIN_SUCCESS_HOLD_MS));
+      onCheckinDone?.();
+      // Local reset so when this week's checkinDue flips to false and a
+      // future week re-enables it, the pill grid starts empty again.
+      setPicked(null);
+      setNote("");
+      setCheckinStatus("idle");
+    } catch (e) {
+      setCheckinStatus("error");
+      setCheckinError(e?.message || "Couldn't save your check-in. Please try again.");
+    }
+  };
 
   return (
-    <div style={{ background: schedule.colorBg, border: `1px solid ${schedule.colorBorder}`, borderRadius: 14, marginBottom: 12, overflow: "hidden" }}>
-
-      {/* Header */}
-      <div onClick={() => setExpanded(e => !e)} style={{ padding: "16px 18px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div style={{ flex: 1 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5, flexWrap: "wrap" }}>
-            <span style={{ fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 400, letterSpacing: "0.14em", textTransform: "uppercase", color: schedule.color, background: `${schedule.color}18`, padding: "2px 8px", borderRadius: 20 }}>{schedule.label}</span>
-            <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", color: isHeld ? "#8b7355" : "var(--clay)", opacity: 0.7 }}>Week {weekNumber} of {maxWeek} · {isHeld ? "Holding" : phase.name}</span>
-          </div>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 13, fontWeight: 400, color: "var(--parchment)", margin: "0 0 2px" }}>{product.name}</p>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: schedule.color, margin: 0, letterSpacing: "0.04em" }}>{phase.frequency}</p>
-          {startedLabel && (
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", margin: "4px 0 0", opacity: 0.6, letterSpacing: "0.04em" }}>{startedLabel}</p>
+    <div style={{
+      background: "rgba(45,61,43,0.06)",
+      border: "1px solid rgba(45,61,43,0.22)",
+      borderRadius: 14,
+      marginBottom: 12,
+      padding: "14px 16px 16px",
+    }}>
+      {/* Header row: WK badge (when check-in due) + expand chevron */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, marginBottom: 10 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0, flexWrap: "wrap" }}>
+          {showCheckin ? (
+            <>
+              <span style={{
+                display: "inline-flex", alignItems: "center",
+                padding: "3px 10px",
+                border: "1px solid rgba(45,61,43,0.42)",
+                borderRadius: 999,
+                fontFamily: "var(--font-display)",
+                fontSize: 10, fontWeight: 700, letterSpacing: "0.22em",
+                color: "var(--sage, #2d3d2b)",
+                whiteSpace: "nowrap", lineHeight: 1,
+              }}>( WK {weekPad} )</span>
+              <span style={{
+                fontFamily: "var(--font-display)", fontSize: 9, fontWeight: 700,
+                letterSpacing: "0.20em", textTransform: "uppercase",
+                color: "var(--sage, #2d3d2b)", opacity: 0.75,
+              }}>Check-in</span>
+            </>
+          ) : (
+            <span style={{
+              fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 400,
+              letterSpacing: "0.14em", textTransform: "uppercase",
+              color: schedule.color, background: `${schedule.color}18`,
+              padding: "2px 8px", borderRadius: 20,
+              whiteSpace: "nowrap",
+            }}>{schedule.label}</span>
           )}
         </div>
-
-        {/* Phase dots */}
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, marginLeft: 14, flexShrink: 0 }}>
-          {schedule.phases.map((p, i) => (
-            <div key={i} style={{ width: 5, height: 5, borderRadius: "50%", background: i <= clampedPhaseIndex ? schedule.color : "var(--border)", transition: "background 0.3s" }} />
-          ))}
-        </div>
-        <span style={{ color: "var(--clay)", opacity: 0.5, marginLeft: 10, display: "inline-block", transform: expanded ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>
+        <button
+          type="button"
+          onClick={() => setExpanded(e => !e)}
+          aria-expanded={expanded}
+          aria-label={expanded ? "Hide phase details" : "Show phase details"}
+          style={{
+            background: "none", border: "none", padding: 4, cursor: "pointer",
+            color: "var(--clay)", opacity: 0.65,
+            transform: expanded ? "rotate(90deg)" : "none",
+            transition: "transform 0.2s, opacity 0.2s",
+            display: "inline-flex", flexShrink: 0,
+            WebkitAppearance: "none", appearance: "none",
+            WebkitTapHighlightColor: "transparent",
+          }}>
           <Icon name="chevron" size={13} />
-        </span>
+        </button>
       </div>
 
-      {/* Expanded detail */}
-      {expanded && (
-        <div style={{ padding: "0 18px 18px", borderTop: `1px solid ${schedule.colorBorder}` }}>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: "14px 0 14px", lineHeight: 1.7 }}>{phase.instruction}</p>
+      {/* Product name — visual anchor */}
+      <p style={{
+        fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 400,
+        color: "var(--parchment)", margin: "0 0 8px",
+        lineHeight: 1.35,
+      }}>{product.name}</p>
 
-          {/* On track / Back off */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 16 }}>
+      {/* Routine metadata */}
+      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 6 }}>
+        {showCheckin && (
+          <span style={{
+            fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 400,
+            letterSpacing: "0.14em", textTransform: "uppercase",
+            color: schedule.color, background: `${schedule.color}18`,
+            padding: "2px 8px", borderRadius: 20,
+          }}>{schedule.label}</span>
+        )}
+        <span style={{
+          fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em",
+          textTransform: "uppercase",
+          color: isHeld ? "#8b7355" : "var(--clay)", opacity: 0.85,
+        }}>Week {weekNumber} of {maxWeek} · {isHeld ? "Holding" : phase.name}</span>
+      </div>
+
+      <p style={{
+        fontFamily: "var(--font-body)", fontSize: 11, color: schedule.color,
+        margin: 0, letterSpacing: "0.04em",
+      }}>{phase.frequency}</p>
+      {startedLabel && (
+        <p style={{
+          fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)",
+          margin: "3px 0 0", opacity: 0.7, letterSpacing: "0.04em",
+        }}>{startedLabel}</p>
+      )}
+
+      {/* Phase progress dots — small horizontal strip, one per phase */}
+      <div style={{ display: "flex", gap: 5, marginTop: 12 }}>
+        {schedule.phases.map((p, i) => (
+          <div key={i} style={{
+            width: 6, height: 6, borderRadius: "50%",
+            background: i <= clampedPhaseIndex ? schedule.color : "var(--border)",
+            transition: "background 0.3s",
+          }} />
+        ))}
+      </div>
+
+      {/* Held indicator — inline informational note when the ramp is on
+          hold. Kept visible without needing to expand so the state is
+          discoverable at a glance. */}
+      {isHeld && (
+        <div style={{
+          marginTop: 14, padding: "10px 12px",
+          background: "rgba(139,115,85,0.08)",
+          border: "1px solid rgba(139,115,85,0.22)",
+          borderRadius: 10, textAlign: "center",
+        }}>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, color: "#8b7355", margin: 0 }}>
+            Paused — repeat this week
+          </p>
+        </div>
+      )}
+
+      {/* Check-in section — inline when a new ramp week is due */}
+      {showCheckin && (
+        <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid rgba(45,61,43,0.15)" }}>
+          <p style={{
+            fontFamily: "var(--font-body)", fontSize: 11,
+            color: "var(--clay, var(--color-stone))", margin: "0 0 12px",
+            lineHeight: 1.55, opacity: 0.85,
+          }}>How did your skin respond this week?</p>
+
+          {/* Response grid — same ivory-pill treatment used by the
+              standalone RampCheckinCard so the modal + inline check-ins
+              stay visually consistent. */}
+          <div
+            aria-disabled={saving || saved}
+            style={{
+              display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 12,
+              opacity: (saving || saved) ? 0.55 : 1,
+              pointerEvents: (saving || saved) ? "none" : "auto",
+              transition: "opacity 0.18s",
+            }}
+          >
+            {RESPONSE_OPTIONS.map(r => {
+              const isSelected = picked === r.key;
+              return (
+                <button
+                  key={r.key}
+                  onClick={() => setPicked(r.key)}
+                  disabled={saving || saved}
+                  style={{
+                    padding: "10px 8px",
+                    background: "rgba(250, 249, 244, 0.82)",
+                    border: isSelected
+                      ? "1px solid rgba(28, 28, 26, 0.70)"
+                      : "1px solid rgba(28, 28, 26, 0.18)",
+                    borderRadius: 10,
+                    fontFamily: "var(--font-body)",
+                    fontSize: 10, fontWeight: 400,
+                    letterSpacing: "0.14em", textTransform: "uppercase",
+                    color: "#1c1c1a",
+                    cursor: (saving || saved) ? "default" : "pointer",
+                    transition: "border-color 0.18s",
+                  }}
+                >
+                  {r.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {picked && (
+            <>
+              <textarea
+                value={note}
+                onChange={e => setNote(e.target.value.slice(0, 500))}
+                placeholder="Optional note — anything you want to remember about this week."
+                rows={2}
+                disabled={saving || saved}
+                style={{
+                  width: "100%",
+                  boxSizing: "border-box",
+                  padding: "8px 10px",
+                  background: "rgba(250,249,244,0.06)",
+                  border: "1px solid rgba(45,61,43,0.20)",
+                  borderRadius: 8,
+                  fontFamily: "var(--font-body)",
+                  fontSize: 12,
+                  color: "var(--parchment, var(--color-ivory))",
+                  resize: "none",
+                  outline: "none",
+                  marginBottom: 10,
+                  opacity: (saving || saved) ? 0.55 : 1,
+                  transition: "opacity 0.18s",
+                }}
+              />
+
+              {checkinStatus === "error" && checkinError && (
+                <p role="alert" style={{
+                  fontFamily: "var(--font-body)", fontSize: 11, color: "#8b7355",
+                  margin: "0 0 10px", lineHeight: 1.5, letterSpacing: "0.01em",
+                }}>{checkinError}</p>
+              )}
+
+              <button
+                onClick={submitCheckin}
+                disabled={saving || saved}
+                aria-live="polite"
+                style={{
+                  width: "100%",
+                  padding: "10px 0",
+                  background: saved ? "rgba(250, 249, 244, 0.82)" : "rgba(45,61,43,0.12)",
+                  border: saved ? "1px solid rgba(28, 28, 26, 0.70)" : "1px solid rgba(45,61,43,0.35)",
+                  borderRadius: 10,
+                  fontFamily: "var(--font-body)",
+                  fontSize: 10, fontWeight: 400,
+                  letterSpacing: "0.12em", textTransform: "uppercase",
+                  color: saved ? "#1c1c1a" : "var(--sage, #2d3d2b)",
+                  cursor: (saving || saved) ? "default" : "pointer",
+                  opacity: saving ? 0.7 : 1,
+                  transition: "background 0.18s, border-color 0.18s, color 0.18s, opacity 0.18s",
+                  display: "inline-flex", alignItems: "center", justifyContent: "center",
+                }}
+              >
+                {saving ? "Saving…" : saved ? "Saved" : checkinStatus === "error" ? "Try again" : "Save check-in"}
+                {saved && (
+                  <svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" style={{ display: "inline-block", verticalAlign: "middle", marginLeft: 6 }}>
+                    <path d="M2 7.5 L5.5 11 L12 3.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+              </button>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Expanded phase detail — chevron-toggled, so the always-visible
+          card stays compact until the user opts in. */}
+      {expanded && (
+        <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid rgba(45,61,43,0.15)" }}>
+          <p style={{
+            fontFamily: "var(--font-body)", fontSize: 12,
+            color: "var(--clay)", margin: "0 0 14px", lineHeight: 1.7,
+          }}>{phase.instruction}</p>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 14 }}>
             <div style={{ padding: "10px 12px", background: "rgba(45,61,43,0.06)", border: "1px solid rgba(45,61,43,0.2)", borderRadius: 10 }}>
               <p style={{ fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--sage)", margin: "0 0 4px" }}>On track</p>
               <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>{phase.onTrack}</p>
@@ -274,17 +539,8 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, on
             </div>
           </div>
 
-          {/* Held state — informational only. Response logging happens
-              exclusively via RampCheckinCard now, so this card no
-              longer offers an "advance" toggle to leave the hold. */}
-          {isHeld && (
-            <div style={{ padding: "12px 16px", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.22)", borderRadius: 10, textAlign: "center", marginBottom: 16 }}>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, color: "#8b7355", margin: 0 }}>Paused — repeat this week</p>
-            </div>
-          )}
-
           {/* Reset start date — pick any past date */}
-          <div style={{ marginTop: 14, paddingTop: 12, borderTop: "1px dashed var(--border)" }}>
+          <div style={{ paddingTop: 12, borderTop: "1px dashed var(--border)" }}>
             {confirmReset ? (
               <div>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", margin: "0 0 8px", opacity: 0.8 }}>Pick the date you actually started this product — the week will recalculate from there.</p>
@@ -318,7 +574,6 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, on
           </div>
         </div>
       )}
-
     </div>
   );
 }

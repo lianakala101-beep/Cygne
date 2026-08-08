@@ -3,7 +3,6 @@ import { Icon, Section, ErrorBoundary } from "./components.jsx";
 import { detectActives, detectActivesFromProduct, analyzeShelf, detectConflicts, buildRoutine, hasSPFCoverage } from "./engine.js";
 import { getAutoSession } from "./productmodal.jsx";
 import { RAMP_SCHEDULES, RAMP_ACTIVES, IntroduceSlowlyCard, getRampWeek } from "./ramp.jsx";
-import { RampCheckinCard } from "./components/RampCheckinCard.jsx";
 import { getCurrentCycleDay, getTreatmentElapsed, daysBetweenLocal } from "./utils.jsx";
 import { CYCLE_PHASES as CANONICAL_CYCLE_PHASES, getCyclePhase as getCanonicalCyclePhase } from "./lib/cycle.js";
 import { FaceHeatMap } from "./components/FaceHeatMap.jsx";
@@ -1906,21 +1905,20 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
               if (!schedule) return null;
               const weekNumber = getRampWeek(p);
               const checkinDue = weekNumber > (p.lastCheckinWeek || 0);
+              // Single combined card per product — the check-in flow
+              // renders inline inside IntroduceSlowlyCard when checkinDue
+              // is true. Was two stacked cards (RampCheckinCard on top,
+              // IntroduceSlowlyCard below) before the merge.
               return (
                 <div key={p.id}>
-                  {checkinDue && (
-                    <RampCheckinCard
-                      productName={p.name}
-                      weekNumber={weekNumber}
-                      onSave={(responseState, note) => onRampCheckinSave(p.id, weekNumber, responseState, note)}
-                      onDone={() => onRampCheckinDone(p.id, weekNumber)}
-                    />
-                  )}
                   <IntroduceSlowlyCard
                     product={p}
                     schedule={schedule}
                     weekNumber={weekNumber}
                     onResetStart={onResetRampStart}
+                    checkinDue={checkinDue}
+                    onCheckinSave={(responseState, note) => onRampCheckinSave(p.id, weekNumber, responseState, note)}
+                    onCheckinDone={() => onRampCheckinDone(p.id, weekNumber)}
                   />
                 </div>
               );
