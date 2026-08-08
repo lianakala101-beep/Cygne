@@ -87,8 +87,11 @@ const RAMP_SCHEDULES = {
   },
   BHA: {
     label: "BHA Exfoliant",
-    color: "var(--color-ivory, #faf9f4)",
-    colorBg: "rgba(250,249,244,0.08)",
+    // Moss accent instead of ivory — the ivory value was invisible on
+    // the ivory Progress band. Moss reads on both surfaces (dark green
+    // on ivory, dark green on the dark-canvas card's ivory-tinted wash).
+    color: "#2d3d2b",
+    colorBg: "rgba(45,61,43,0.06)",
     colorBorder: "rgba(45,61,43,0.22)",
     phases: [
       {
@@ -293,7 +296,7 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, on
 
           {/* On track / Back off */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 16 }}>
-            <div style={{ padding: "10px 12px", background: "rgba(250,249,244,0.08)", border: "1px solid rgba(45,61,43,0.2)", borderRadius: 10 }}>
+            <div style={{ padding: "10px 12px", background: "rgba(45,61,43,0.06)", border: "1px solid rgba(45,61,43,0.2)", borderRadius: 10 }}>
               <p style={{ fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--sage)", margin: "0 0 4px" }}>On track</p>
               <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>{phase.onTrack}</p>
             </div>
