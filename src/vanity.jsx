@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Icon, Section, Pill } from "./components.jsx";
+import { Icon, Section } from "./components.jsx";
 import { detectActives, analyzeShelf, calcSpending } from "./engine.js";
 import { AskCygneModal } from "./components/AskCygneModal.jsx";
 import { assessRoutineFit, DEFER_TAG_CONFIG } from "./modals.jsx";
@@ -7,15 +7,15 @@ import { ProductModal } from "./productmodal.jsx";
 import { getAskCygneAccess } from "./utils.jsx";
 
 
-// Warm near-ivory product card on the dark inky-moss canvas — the
-// 0.92-alpha ivory background lets just enough of the inky-moss bleed
-// through to give the card a subtle green undertone, so it reads as
-// ivory but feels of-a-piece with the dark canvas rather than pasted
-// on top of it.
+// Flat product card — 1px ivory-alpha outline on a solid ivory fill.
+// Radius dropped to 0 so the card reads as a hard editorial rectangle
+// rather than a soft glass tile; matches the flat container spirit
+// used elsewhere in the app. Grid still gives visual separation
+// between items — the flatness is per-card, not the layout.
 const GLASS_CARD = {
   background: "rgba(250, 249, 244, 0.92)",
-  border: "1px solid rgba(250, 249, 244, 0.25)",
-  borderRadius: 8,
+  border: "1px solid rgba(250, 249, 244, 0.35)",
+  borderRadius: 0,
   overflow: "hidden",
   display: "flex",
   flexDirection: "column",
@@ -244,16 +244,17 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
           </div>
         </div>
 
-        {/* Text content — brand eyebrow → Fungis Heavy product name → muted
-            supporting details, all flush left. Mirrors the Reflection tab's
-            small-caps eyebrow + display-weight title hierarchy. */}
-        <div style={{ padding: "10px 12px 12px", textAlign: "left" }}>
+        {/* Text content — sharper hierarchy: quiet brand eyebrow and
+            price bracket the loud product name. Product name bumps to
+            Fungis display 16px so it anchors the card; brand + price
+            stay small caps at 9/11 so they read as metadata, not peers. */}
+        <div style={{ padding: "12px 12px 14px", textAlign: "left" }}>
           {product.brand && (
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 400, letterSpacing: "0.1em", textTransform: "uppercase", color: "#5a5a5a", margin: "0 0 4px" }}>{product.brand}</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 400, letterSpacing: "0.14em", textTransform: "uppercase", color: "#5a5a5a", margin: "0 0 6px", opacity: 0.9 }}>{product.brand}</p>
           )}
-          <p style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 700, letterSpacing: "0.02em", color: "#1c1c1a", margin: 0, lineHeight: 1.25 }}>{product.name}</p>
+          <p style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 700, letterSpacing: "0.01em", color: "#1c1c1a", margin: 0, lineHeight: 1.2 }}>{product.name}</p>
           {product.price > 0 && (
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, letterSpacing: "0.02em", color: "#5a5a5a", margin: "6px 0 0" }}>${(product.price || 0).toFixed(0)}</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, letterSpacing: "0.02em", color: "#5a5a5a", margin: "8px 0 0", opacity: 0.9 }}>${(product.price || 0).toFixed(0)}</p>
           )}
         </div>
       </div>
@@ -520,14 +521,46 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearAll,
         </p>
       </div>
 
-      {/* -- View Toggle ------------------------------------------------------- */}
-      <div style={{ display: "flex", background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 0, padding: 2, marginBottom: 24 }}>
-        {[{ id: "shelf", label: "Products" }, { id: "insights", label: "Insights" }].map(v => (
-          <button key={v.id} onClick={() => setView(v.id)}
-            style={{ flex: 1, padding: "9px 0", borderRadius: 0, border: "none", background: view === v.id ? "var(--cta)" : "transparent", color: view === v.id ? "#F5F0E8" : "var(--clay)", fontFamily: "var(--heading)", fontSize: 10, fontWeight: view === v.id ? 700 : 400, cursor: "pointer", letterSpacing: "0.15em", textTransform: "uppercase", transition: "all 0.18s" }}>
-            {v.label}
-          </button>
-        ))}
+      {/* -- View Toggle — segmented Products / Insights pills matching
+          the Morning / Evening toggle in ritualscreen.jsx. Thin ivory
+          outline, low-opacity fill only on the active segment, ivory
+          divider between segments, Fungis display caps. */}
+      <div
+        role="group"
+        aria-label="Vanity view"
+        style={{
+          display: "inline-flex", alignItems: "stretch",
+          marginBottom: 24,
+          border: "1px solid rgba(250,249,244,0.28)",
+          borderRadius: 999, overflow: "hidden",
+        }}
+      >
+        {[{ id: "shelf", label: "Products" }, { id: "insights", label: "Insights" }].map((v, i) => {
+          const active = view === v.id;
+          return (
+            <button
+              key={v.id}
+              type="button"
+              aria-pressed={active}
+              onClick={() => setView(v.id)}
+              style={{
+                padding: "6px 20px",
+                background: active ? "rgba(250,249,244,0.14)" : "transparent",
+                border: "none",
+                borderLeft: i === 0 ? "none" : "1px solid rgba(250,249,244,0.28)",
+                cursor: active ? "default" : "pointer",
+                fontFamily: "var(--font-display)",
+                fontSize: 10, fontWeight: 400,
+                letterSpacing: "0.2em", textTransform: "uppercase",
+                color: active ? "var(--color-ivory, #faf9f4)" : "rgba(250,249,244,0.65)",
+                WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
+                transition: "background 0.18s, color 0.18s",
+              }}
+            >
+              {v.label}
+            </button>
+          );
+        })}
       </div>
 
       {/* -- PRODUCTS VIEW ----------------------------------------------------- */}
@@ -544,9 +577,38 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearAll,
             </div>
           ) : (
             <>
-              {/* Category filter */}
-              <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 12, marginBottom: 18, scrollbarWidth: "none" }}>
-                {cats.map(c => <Pill key={c} active={filter === c} onClick={() => setFilter(c)}>{c}</Pill>)}
+              {/* Category filter — fully-rounded pills matching the
+                  Travel Edit / Shop Scan treatment on the home page
+                  (borderRadius 999, thin ivory-alpha outline, low-opacity
+                  ivory fill only when active). */}
+              <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 12, marginBottom: 18, scrollbarWidth: "none" }}>
+                {cats.map(c => {
+                  const active = filter === c;
+                  return (
+                    <button
+                      key={c}
+                      type="button"
+                      aria-pressed={active}
+                      onClick={() => setFilter(c)}
+                      style={{
+                        flexShrink: 0,
+                        padding: "6px 14px",
+                        borderRadius: 999,
+                        border: `1px solid ${active ? "rgba(250,249,244,0.55)" : "rgba(250,249,244,0.28)"}`,
+                        background: active ? "rgba(250,249,244,0.14)" : "transparent",
+                        color: active ? "var(--color-ivory, #faf9f4)" : "rgba(250,249,244,0.65)",
+                        fontFamily: "var(--font-display)",
+                        fontSize: 10, fontWeight: 400,
+                        letterSpacing: "0.18em", textTransform: "uppercase",
+                        whiteSpace: "nowrap", cursor: "pointer",
+                        WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
+                        transition: "background 0.18s, color 0.18s, border-color 0.18s",
+                      }}
+                    >
+                      {c}
+                    </button>
+                  );
+                })}
               </div>
 
               <p style={{ fontFamily: "var(--font-body)", fontSize: 9, color: "var(--clay)", letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: 14, opacity: 0.6 }}>
