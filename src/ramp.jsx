@@ -241,6 +241,7 @@ function IntroduceSlowlyCard({
   checkinDue = false,
   onCheckinSave,
   onCheckinDone,
+  isLast = false,
 }) {
   const [expanded, setExpanded] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
@@ -287,12 +288,14 @@ function IntroduceSlowlyCard({
   };
 
   return (
+    // Editorial flat container — no border/bg/radius. Each product reads
+    // as its own section separated from neighbours by hair rules.
+    // Matches the dashboard's editorial line-item treatment inverted for
+    // the ivory band.
     <div style={{
-      background: "rgba(45,61,43,0.06)",
-      border: "1px solid rgba(45,61,43,0.22)",
-      borderRadius: 14,
-      marginBottom: 12,
-      padding: "14px 16px 16px",
+      padding: "16px 0",
+      borderTop: "1px solid rgba(28,28,26,0.25)",
+      borderBottom: isLast ? "1px solid rgba(28,28,26,0.25)" : "none",
     }}>
       {/* Header row: WK badge (when check-in due) + expand chevron */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, marginBottom: 10 }}>
@@ -389,25 +392,22 @@ function IntroduceSlowlyCard({
         ))}
       </div>
 
-      {/* Held indicator — inline informational note when the ramp is on
-          hold. Kept visible without needing to expand so the state is
-          discoverable at a glance. */}
+      {/* Held indicator — inline italic caption; no bordered chip so it
+          reads as running commentary on the ivory band. */}
       {isHeld && (
-        <div style={{
-          marginTop: 14, padding: "10px 12px",
-          background: "rgba(139,115,85,0.08)",
-          border: "1px solid rgba(139,115,85,0.22)",
-          borderRadius: 10, textAlign: "center",
+        <p style={{
+          fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400,
+          fontStyle: "italic",
+          color: "#8b7355", margin: "12px 0 0",
+          letterSpacing: "0.02em",
         }}>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, color: "#8b7355", margin: 0 }}>
-            Paused — repeat this week
-          </p>
-        </div>
+          Paused — repeat this week
+        </p>
       )}
 
       {/* Check-in section — inline when a new ramp week is due */}
       {showCheckin && (
-        <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid rgba(45,61,43,0.15)" }}>
+        <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid rgba(28,28,26,0.18)" }}>
           <p style={{
             fontFamily: "var(--font-body)", fontSize: 11,
             color: "var(--clay, var(--color-stone))", margin: "0 0 12px",
@@ -522,18 +522,20 @@ function IntroduceSlowlyCard({
       {/* Expanded phase detail — chevron-toggled, so the always-visible
           card stays compact until the user opts in. */}
       {expanded && (
-        <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid rgba(45,61,43,0.15)" }}>
+        <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid rgba(28,28,26,0.18)" }}>
           <p style={{
             fontFamily: "var(--font-body)", fontSize: 12,
             color: "var(--clay)", margin: "0 0 14px", lineHeight: 1.7,
           }}>{phase.instruction}</p>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 14 }}>
-            <div style={{ padding: "10px 12px", background: "rgba(45,61,43,0.06)", border: "1px solid rgba(45,61,43,0.2)", borderRadius: 10 }}>
+          {/* On track / Back off — informational; flat two-column with
+              colored eyebrow, no bordered box on the ivory band. */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 14 }}>
+            <div>
               <p style={{ fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--sage)", margin: "0 0 4px" }}>On track</p>
               <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>{phase.onTrack}</p>
             </div>
-            <div style={{ padding: "10px 12px", background: "rgba(139,115,85,0.06)", border: "1px solid rgba(139,115,85,0.18)", borderRadius: 10 }}>
+            <div>
               <p style={{ fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "#8b7355", margin: "0 0 4px" }}>Back off</p>
               <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>{phase.backOff}</p>
             </div>
