@@ -374,8 +374,11 @@ const PHASE_META = {
     },
   },
   Follicular: {
-    color: "var(--color-ivory, #faf9f4)",
-    bg: "rgba(250,249,244,0.08)",
+    // Follicular's accent used to be ivory — invisible against the
+    // ivory Section 06 band. Moss reads on both ivory (dark on light)
+    // and dark canvas (via the existing --color-ivory-shadow wash).
+    color: "#2d3d2b",
+    bg: "rgba(45,61,43,0.08)",
     border: "rgba(45,61,43,0.25)",
     dot: "rgba(45,61,43,0.85)",
     description: "Estrogen is rising. Skin cell turnover increases and the barrier is more resilient.",
@@ -473,8 +476,8 @@ function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycled
           Your hormones shift every week. Your ritual should too. Enable this to receive phase-aware nudges drawn from what's already on your vanity.
         </p>
         <button onClick={() => onUpdateUser({ ...user, cycleTrackingEnabled: true })}
-          style={{ padding: "10px 20px", background: "transparent", border: "1px solid var(--color-ivory, #faf9f4)", borderRadius: 8, fontFamily: "var(--font-display)", fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", cursor: "pointer", transition: "all 0.2s" }}
-          onMouseEnter={e => { e.currentTarget.style.background = "rgba(250,249,244,0.08)"; }}
+          style={{ padding: "10px 20px", background: "transparent", border: "1px solid #1c1c1a", borderRadius: 8, fontFamily: "var(--font-display)", fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#1c1c1a", cursor: "pointer", transition: "all 0.2s" }}
+          onMouseEnter={e => { e.currentTarget.style.background = "rgba(28,28,26,0.06)"; }}
           onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
           Enable
         </button>
@@ -513,46 +516,46 @@ function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycled
                   style={{ width: 48, padding: "4px 8px", background: "var(--ink)", border: `1px solid ${phase.border}`, borderRadius: 6, color: "var(--parchment)", fontFamily: "var(--font-body)", fontSize: 13, textAlign: "center", outline: "none" }}
                   autoFocus
                 />
-                <button onClick={handleSetDay} style={{ padding: "4px 10px", background: "transparent", border: "1px solid var(--color-ivory, #faf9f4)", borderRadius: 6, color: "var(--color-ivory, #faf9f4)", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 9, cursor: "pointer", letterSpacing: "0.15em", textTransform: "uppercase" }}>Set</button>
+                <button onClick={handleSetDay} style={{ padding: "4px 10px", background: "transparent", border: "1px solid #1c1c1a", borderRadius: 6, color: "#1c1c1a", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 9, cursor: "pointer", letterSpacing: "0.15em", textTransform: "uppercase" }}>Set</button>
               </div>
             ) : (
               <button onClick={() => { setInputVal(String(cycleDay)); setEditing(true); }}
-                style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "5px 10px", cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
-                <span style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 13, letterSpacing: "0.08em", color: "rgba(250,249,244,0.6)", lineHeight: 1.6 }}>Day {cycleDay}</span>
+                style={{ background: "rgba(28,28,26,0.06)", border: "none", borderRadius: 8, padding: "5px 10px", cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
+                <span style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 13, letterSpacing: "0.08em", color: "rgba(28,28,26,0.75)", lineHeight: 1.6 }}>Day {cycleDay}</span>
               </button>
             )}
-            <span style={{ fontFamily: "var(--font-body)", fontSize: 9, color: "var(--clay)", opacity: 0.6, letterSpacing: "0.04em" }}>{daysUntilNext}d in phase</span>
+            <span style={{ fontFamily: "var(--font-body)", fontSize: 9, color: "rgba(28,28,26,0.65)", opacity: 0.85, letterSpacing: "0.04em" }}>{daysUntilNext}d in phase</span>
           </div>
         </div>
 
         {/* Phase description */}
-        <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 13, letterSpacing: "0.02em", color: "var(--color-ivory, #faf9f4)", margin: "0 0 14px", lineHeight: 1.6 }}>{phase.description}</p>
+        <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 13, letterSpacing: "0.02em", color: "#1c1c1a", margin: "0 0 14px", lineHeight: 1.6 }}>{phase.description}</p>
 
         {/* Quiet "running long" note — shown only when the current day has
             passed the user's chosen cycle length, normalizing a late period
             rather than capping or resetting the day count. */}
         {runningLong && (
-          <p style={{ fontFamily: "var(--font-body)", fontStyle: "italic", fontSize: 12, letterSpacing: "0.02em", color: "rgba(250,249,244,0.6)", margin: "0 0 14px", lineHeight: 1.55 }}>
+          <p style={{ fontFamily: "var(--font-body)", fontStyle: "italic", fontSize: 12, letterSpacing: "0.02em", color: "rgba(28,28,26,0.65)", margin: "0 0 14px", lineHeight: 1.55 }}>
             Your cycle is running long — this is normal.
           </p>
         )}
 
         {/* Nudge */}
-        <div style={{ padding: "12px 14px", background: "rgba(0,0,0,0.15)", borderRadius: 8, marginBottom: 0 }}>
-          <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 13, letterSpacing: "0.02em", color: "var(--color-ivory, #faf9f4)", margin: 0, lineHeight: 1.6 }}>{phase.nudge}</p>
+        <div style={{ padding: "12px 14px", background: "rgba(28,28,26,0.06)", borderRadius: 8, marginBottom: 0 }}>
+          <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 13, letterSpacing: "0.02em", color: "#1c1c1a", margin: 0, lineHeight: 1.6 }}>{phase.nudge}</p>
         </div>
       </div>
 
       {/* Shelf-specific advice */}
-      <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "14px 16px" }}>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 8px" }}>Your Vanity This Week</p>
-        <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 13, letterSpacing: "0.02em", color: "var(--color-ivory, #faf9f4)", margin: "0 0 12px", lineHeight: 1.6 }}>{advice}</p>
+      <div style={{ background: "rgba(28,28,26,0.04)", border: "none", borderRadius: 8, padding: "14px 16px" }}>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "rgba(28,28,26,0.65)", margin: "0 0 8px" }}>Your Vanity This Week</p>
+        <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 13, letterSpacing: "0.02em", color: "#1c1c1a", margin: "0 0 12px", lineHeight: 1.6 }}>{advice}</p>
 
         {/* Cycle length setting — accepts 21–45 days. Defaults to 28 when
             unset. Used by the "running long" note above and (via
             user.cycleLength) by FaceHeatMap's phase-tally lookback. */}
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-          <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)" }}>Cycle length</span>
+          <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(28,28,26,0.65)" }}>Cycle length</span>
           {editingLength ? (
             <>
               <input
@@ -560,14 +563,14 @@ function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycled
                 value={lengthInputVal}
                 onChange={e => setLengthInputVal(e.target.value)}
                 onKeyDown={e => e.key === "Enter" && handleSetLength()}
-                style={{ width: 52, padding: "3px 8px", background: "var(--ink)", border: "1px solid rgba(250,249,244,0.25)", borderRadius: 6, color: "var(--parchment)", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "center", outline: "none" }}
+                style={{ width: 52, padding: "3px 8px", background: "rgba(28,28,26,0.06)", border: "1px solid rgba(28,28,26,0.25)", borderRadius: 6, color: "#1c1c1a", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "center", outline: "none" }}
                 autoFocus
               />
-              <button onClick={handleSetLength} style={{ padding: "3px 10px", background: "transparent", border: "1px solid var(--color-ivory, #faf9f4)", borderRadius: 6, color: "var(--color-ivory, #faf9f4)", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 9, cursor: "pointer", letterSpacing: "0.15em", textTransform: "uppercase" }}>Set</button>
+              <button onClick={handleSetLength} style={{ padding: "3px 10px", background: "transparent", border: "1px solid #1c1c1a", borderRadius: 6, color: "#1c1c1a", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 9, cursor: "pointer", letterSpacing: "0.15em", textTransform: "uppercase" }}>Set</button>
             </>
           ) : (
             <button onClick={() => { setLengthInputVal(String(cycleLen)); setEditingLength(true); }}
-              style={{ background: "none", border: "none", padding: 0, cursor: "pointer", fontFamily: "var(--font-body)", fontSize: 12, letterSpacing: "0.04em", color: "var(--color-ivory, #faf9f4)", textDecoration: "underline", textDecorationColor: "rgba(250,249,244,0.35)", textUnderlineOffset: 3 }}>
+              style={{ background: "none", border: "none", padding: 0, cursor: "pointer", fontFamily: "var(--font-body)", fontSize: 12, letterSpacing: "0.04em", color: "#1c1c1a", textDecoration: "underline", textDecorationColor: "rgba(28,28,26,0.35)", textUnderlineOffset: 3 }}>
               {cycleLen} days
             </button>
           )}
@@ -587,7 +590,7 @@ function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycled
           const isActive = phase.name === p.name;
           const width = ((p.days[1] - p.days[0] + 1) / 35) * 100;
           return (
-            <div key={i} style={{ flex: p.days[1] - p.days[0] + 1, height: 3, borderRadius: 3, background: isActive ? p.dot : "rgba(255,255,255,0.07)", transition: "background 0.3s" }} />
+            <div key={i} style={{ flex: p.days[1] - p.days[0] + 1, height: 3, borderRadius: 3, background: isActive ? p.dot : "rgba(28,28,26,0.10)", transition: "background 0.3s" }} />
           );
         })}
       </div>
@@ -1679,10 +1682,12 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
 
   // Brutalist-editorial: bracketed number badge inside a thin outlined
   // pill, tone-aware so it reads on both dark and ivory section bands.
-  // The number ( 0X ) IS the eyebrow; the section title sits beside it.
-  const numberBadge = (n, tone = "ivory") => {
-    const color = tone === "ivory" ? "var(--color-ivory, #faf9f4)" : "#1c1c1a";
-    const border = tone === "ivory" ? "rgba(250,249,244,0.38)" : "rgba(28,28,26,0.38)";
+  // `tone` names the SectionShell's background — the glyph and pill
+  // stroke are the inverse so text always contrasts.
+  const numberBadge = (n, tone = "dark") => {
+    const isDarkBg = tone === "dark";
+    const color  = isDarkBg ? "var(--color-ivory, #faf9f4)" : "#1c1c1a";
+    const border = isDarkBg ? "rgba(250,249,244,0.38)" : "rgba(28,28,26,0.38)";
     return (
       <span style={{
         display: "inline-flex", alignItems: "center",
@@ -1695,9 +1700,10 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
     );
   };
 
-  const sectionHeader = (n, text, tone = "ivory") => {
-    const color = tone === "ivory" ? "var(--color-ivory, #faf9f4)" : "#1c1c1a";
-    const rule  = tone === "ivory" ? "rgba(250,249,244,0.20)" : "rgba(28,28,26,0.18)";
+  const sectionHeader = (n, text, tone = "dark") => {
+    const isDarkBg = tone === "dark";
+    const color = isDarkBg ? "var(--color-ivory, #faf9f4)" : "#1c1c1a";
+    const rule  = isDarkBg ? "rgba(250,249,244,0.20)" : "rgba(28,28,26,0.18)";
     return (
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
         {numberBadge(n, tone)}
@@ -1711,6 +1717,25 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
     );
   };
 
+  // On ivory bands every legacy design token (--clay, --parchment,
+  // --sage, --border, etc.) resolves to ivory or ivory-alpha via the
+  // dark-canvas overrides in App.jsx — so any inline style using
+  // var(--clay) etc. paints ivory-on-ivory. We shadow those tokens for
+  // the ivory subtree so all downstream var() references flip to
+  // dark-on-ivory values without touching every text node.
+  const IVORY_BAND_TOKENS = {
+    "--parchment":          "#1c1c1a",
+    "--clay":               "rgba(28,28,26,0.65)",
+    "--sage":               "#2d3d2b",
+    "--muted":              "rgba(28,28,26,0.45)",
+    "--taupe":              "rgba(28,28,26,0.55)",
+    "--border":             "rgba(28,28,26,0.18)",
+    "--surface":            "rgba(28,28,26,0.04)",
+    "--color-ivory-shadow": "rgba(28,28,26,0.05)",
+    "--cta":                "rgba(28,28,26,0.06)",
+    "--overlay":            "rgba(28,28,26,0.55)",
+  };
+
   // Full-bleed section wrapper. Alternates ivory / dark bands down the
   // page so each numbered section reads as its own editorial panel.
   // Uses negative horizontal margin to break the container's 22px inset.
@@ -1720,6 +1745,7 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
       padding: "24px 22px 20px",
       marginBottom: bottom,
       background: tone === "ivory" ? "var(--color-ivory, #faf9f4)" : "transparent",
+      ...(tone === "ivory" ? IVORY_BAND_TOKENS : null),
     }}>
       {sectionHeader(n, text, tone)}
       {children}
