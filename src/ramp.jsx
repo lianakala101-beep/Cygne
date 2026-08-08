@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { Icon } from "./components.jsx";
 import { detectActives } from "./engine.js";
 import { daysBetweenLocal } from "./utils.jsx";
@@ -204,9 +204,6 @@ function getRampWeek(product) {
   return product.rampWeek || 1;
 }
 
-const HANDLED_MESSAGE = "Noted. Check back next week — if your skin stays calm we'll increase frequency.";
-const BACKOFF_MESSAGE = "Understood. We'll slow the pace. Check back in a few days and let us know how your skin feels.";
-
 function formatStartedLabel(iso) {
   if (!iso) return null;
   const [y, m, d] = iso.split("-").map(Number);
@@ -215,51 +212,22 @@ function formatStartedLabel(iso) {
   return `Started ${dt.toLocaleDateString("en-US", { month: "long", day: "numeric" })}`;
 }
 
-function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, onAdvance, onHold, onResetStart }) {
+function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, onResetStart }) {
   const [expanded, setExpanded] = useState(false);
-  const [justActioned, setJustActioned] = useState(null); // "advance" | "hold" | null
   const [confirmReset, setConfirmReset] = useState(false);
   const [pickedDate, setPickedDate] = useState("");
-  const [graduating, setGraduating] = useState(false);
   const weekNumber = weekNumberProp ?? getRampWeek(product);
   const phase = getRampPhase(schedule, weekNumber);
   const phaseIndex = schedule.phases.findIndex(p => p.weeks.includes(Math.min(weekNumber, 12)));
   const isHeld = product.rampHeld === true;
   const clampedPhaseIndex = Math.min(phaseIndex, schedule.phases.length - 1);
   const startedLabel = formatStartedLabel(product.routineStartDate);
-
-  // Graduation: matches recordRampAction's "currentWeek >= maxWeek" guard,
-  // so a "handled" tap at the final week would clear routineStartDate and
-  // remove the product from Introduce Slowly. We intercept that single tap
-  // with a ceremonial confirmation before letting the parent's handler run.
   const maxWeek = Math.max(...schedule.phases[schedule.phases.length - 1].weeks);
-  const isFinalWeek = weekNumber >= maxWeek;
-
-  const handleAdvanceClick = () => {
-    if (isFinalWeek) {
-      setGraduating(true);
-    } else {
-      onAdvance(product.id);
-      setJustActioned("advance");
-    }
-  };
-
-  const confirmGraduation = () => {
-    setGraduating(false);
-    onAdvance(product.id);
-  };
-
-  // Auto-dismiss the contextual follow-up: 3 seconds, or on next scroll.
-  useEffect(() => {
-    if (!justActioned) return;
-    const timer = setTimeout(() => setJustActioned(null), 3000);
-    const onScroll = () => setJustActioned(null);
-    window.addEventListener("scroll", onScroll, { passive: true, once: true });
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener("scroll", onScroll);
-    };
-  }, [justActioned]);
+  // Manual "Skin handled it / Backing off" response buttons + graduation
+  // modal were removed — the RampCheckinCard is now the single per-week
+  // check-in surface. Progression stays calendar-driven (getRampWeek)
+  // and the graduation endpoint is handled by the auto-graduation safety
+  // net in App.jsx (fires two weeks past maxWeek).
 
   return (
     <div style={{ background: schedule.colorBg, border: `1px solid ${schedule.colorBorder}`, borderRadius: 14, marginBottom: 12, overflow: "hidden" }}>
@@ -306,42 +274,13 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, on
             </div>
           </div>
 
-          {/* Weekly response buttons */}
-          {isHeld ? (
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              <div style={{ padding: "12px 16px", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.22)", borderRadius: 10, textAlign: "center" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, color: "#8b7355", margin: "0 0 2px" }}>Paused — repeat this week</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", margin: 0, opacity: 0.7 }}>When you're ready, mark as handled to advance.</p>
-              </div>
-              <button onClick={handleAdvanceClick}
-                style={{ width: "100%", padding: "10px 0", background: "rgba(45,61,43,0.12)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 10, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer", transition: "all 0.18s" }}
-                onMouseEnter={e => e.currentTarget.style.background = "rgba(45,61,43,0.2)"}
-                onMouseLeave={e => e.currentTarget.style.background = "rgba(45,61,43,0.12)"}>
-                Skin handled it — advance <Icon name="check" size={10} />
-              </button>
+          {/* Held state — informational only. Response logging happens
+              exclusively via RampCheckinCard now, so this card no
+              longer offers an "advance" toggle to leave the hold. */}
+          {isHeld && (
+            <div style={{ padding: "12px 16px", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.22)", borderRadius: 10, textAlign: "center", marginBottom: 16 }}>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, color: "#8b7355", margin: 0 }}>Paused — repeat this week</p>
             </div>
-          ) : (
-            <div style={{ display: "flex", gap: 8 }}>
-              <button onClick={handleAdvanceClick}
-                style={{ flex: 1, padding: "10px 0", background: "rgba(45,61,43,0.12)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 10, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer", transition: "all 0.18s" }}
-                onMouseEnter={e => e.currentTarget.style.background = "rgba(45,61,43,0.2)"}
-                onMouseLeave={e => e.currentTarget.style.background = "rgba(45,61,43,0.12)"}>
-                Skin handled it <Icon name="check" size={10} />
-              </button>
-              <button onClick={() => { onHold(product.id); setJustActioned("hold"); }}
-                style={{ flex: 1, padding: "10px 0", background: "rgba(139,115,85,0.06)", border: "1px solid rgba(139,115,85,0.18)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400, letterSpacing: "0.1em", textTransform: "uppercase", color: "#8b7355", cursor: "pointer", transition: "all 0.18s" }}
-                onMouseEnter={e => e.currentTarget.style.background = "rgba(139,115,85,0.12)"}
-                onMouseLeave={e => e.currentTarget.style.background = "rgba(139,115,85,0.06)"}>
-                Backing off
-              </button>
-            </div>
-          )}
-
-          {/* Contextual follow-up — auto-dismisses after 3s or next scroll */}
-          {justActioned && (
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: "10px 2px 0", lineHeight: 1.6, opacity: 0.75, transition: "opacity 0.3s" }}>
-              {justActioned === "advance" ? HANDLED_MESSAGE : BACKOFF_MESSAGE}
-            </p>
           )}
 
           {/* Reset start date — pick any past date */}
@@ -380,53 +319,6 @@ function IntroduceSlowlyCard({ product, schedule, weekNumber: weekNumberProp, on
         </div>
       )}
 
-      {/* Graduation modal — appears once when the user marks the final
-          week as handled. No auto-dismiss; user must tap to confirm. */}
-      {graduating && (
-        <div style={{
-          position: "fixed", inset: 0, zIndex: 250,
-          background: "rgba(8,10,9,0.55)", backdropFilter: "blur(6px)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          padding: "0 24px",
-        }}>
-          <div style={{
-            background: "var(--color-inky-moss)",
-            color: "var(--color-ivory-shadow)",
-            border: "1px solid rgba(232,224,200,0.16)",
-            borderRadius: 18,
-            padding: "34px 28px 26px",
-            maxWidth: 360, width: "100%",
-            textAlign: "center",
-          }}>
-            <p style={{
-              fontFamily: "var(--font-display)",
-              fontSize: 18, fontWeight: 400, letterSpacing: "0.02em", lineHeight: 1.5,
-              color: "var(--color-ivory-shadow)",
-              margin: "0 0 22px",
-              whiteSpace: "pre-line",
-            }}>
-              {"Your skin has made its peace with this one.\nIt's ready to stay."}
-            </p>
-            <button onClick={confirmGraduation}
-              style={{
-                padding: "12px 24px",
-                background: "rgba(45,61,43,0.22)",
-                color: "var(--color-ivory-shadow)",
-                border: "1px solid rgba(232,224,200,0.28)",
-                borderRadius: 10,
-                fontFamily: "var(--font-body)",
-                fontSize: 11, fontWeight: 400,
-                letterSpacing: "0.18em", textTransform: "uppercase",
-                cursor: "pointer",
-                transition: "background 0.18s",
-              }}
-              onMouseEnter={e => e.currentTarget.style.background = "rgba(45,61,43,0.32)"}
-              onMouseLeave={e => e.currentTarget.style.background = "rgba(45,61,43,0.22)"}>
-              Resume Routine
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
