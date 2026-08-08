@@ -1680,33 +1680,17 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
 
   const rampProducts = [...primaryRamp, ...reintroRamp];
 
-  // Brutalist-editorial: bracketed number badge inside a thin outlined
-  // pill, tone-aware so it reads on both dark and ivory section bands.
-  // `tone` names the SectionShell's background — the glyph and pill
-  // stroke are the inverse so text always contrasts.
-  const numberBadge = (n, tone = "dark") => {
-    const isDarkBg = tone === "dark";
-    const color  = isDarkBg ? "var(--color-ivory, #faf9f4)" : "#1c1c1a";
-    const border = isDarkBg ? "rgba(250,249,244,0.38)" : "rgba(28,28,26,0.38)";
-    return (
-      <span style={{
-        display: "inline-flex", alignItems: "center",
-        padding: "3px 10px",
-        border: `1px solid ${border}`, borderRadius: 999,
-        fontFamily: "var(--font-display)",
-        fontSize: 10, fontWeight: 700, letterSpacing: "0.22em",
-        color, whiteSpace: "nowrap", lineHeight: 1,
-      }}>( {n} )</span>
-    );
-  };
-
-  const sectionHeader = (n, text, tone = "dark") => {
+  // Section header: plain caps title beside a hair rule. Tone-aware
+  // so it reads on both the dark canvas and the ivory band. The
+  // bracketed ( 0N ) badges that used to sit here were removed —
+  // bracketed pills now only carry actual data (e.g. ( WK 14 ) on
+  // check-in cards), not section counters.
+  const sectionHeader = (text, tone = "dark") => {
     const isDarkBg = tone === "dark";
     const color = isDarkBg ? "var(--color-ivory, #faf9f4)" : "#1c1c1a";
     const rule  = isDarkBg ? "rgba(250,249,244,0.20)" : "rgba(28,28,26,0.18)";
     return (
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
-        {numberBadge(n, tone)}
         <span style={{
           fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 14,
           letterSpacing: "0.15em", textTransform: "uppercase",
@@ -1737,9 +1721,9 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
   };
 
   // Full-bleed section wrapper. Alternates ivory / dark bands down the
-  // page so each numbered section reads as its own editorial panel.
-  // Uses negative horizontal margin to break the container's 22px inset.
-  const SectionShell = ({ n, text, tone = "dark", children, bottom = 28 }) => (
+  // page so each section reads as its own editorial panel. Uses
+  // negative horizontal margin to break the container's 22px inset.
+  const SectionShell = ({ text, tone = "dark", children, bottom = 28 }) => (
     <div style={{
       marginLeft: -22, marginRight: -22,
       padding: "24px 22px 20px",
@@ -1747,7 +1731,7 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
       background: tone === "ivory" ? "var(--color-ivory, #faf9f4)" : "transparent",
       ...(tone === "ivory" ? IVORY_BAND_TOKENS : null),
     }}>
-      {sectionHeader(n, text, tone)}
+      {sectionHeader(text, tone)}
       {children}
     </div>
   );
@@ -1761,7 +1745,7 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
       </div>
 
       {/* -- Skin Journal ------------------------------------------------------ */}
-      <SectionShell n="01" text="Your Journal" tone="dark">
+      <SectionShell text="Your Journal" tone="dark">
       {(() => {
         const today = new Date().toISOString().split("T")[0];
         const todayEntry = journals.find(j => j.date === today);
@@ -1826,7 +1810,7 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
       </SectionShell>
 
       {/* -- Ritual Check-in ---------------------------------------------------- */}
-      <SectionShell n="02" text="Ritual Check-in" tone="ivory">
+      <SectionShell text="Ritual Check-in" tone="ivory">
       {dueCheckin ? (
         <button onClick={() => setShowCheckIn(true)}
           style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 20px", background: "transparent", border: "1px solid rgba(28,28,26,0.30)", borderRadius: 8, cursor: "pointer", textAlign: "left" }}>
@@ -1856,7 +1840,7 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
       </SectionShell>
 
       {/* -- Inflammation Heat Map + Hero Consistency Number ---------------- */}
-      <SectionShell n="03" text="Inflammation Map" tone="dark">
+      <SectionShell text="Inflammation Map" tone="dark">
       <div style={{ marginBottom: consistencyPct !== null ? 24 : 0 }}>
         <FaceHeatMap checkIns={checkIns} onAskCygne={(q, ctx) => setAskCygneQuestion({ q, ctx })} />
       </div>
@@ -1898,13 +1882,13 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
 
       {/* -- Introduce Slowly (hidden during Acute recovery; empty state otherwise) */}
       {/acute/i.test(pausePhase?.label) ? (
-        <SectionShell n="04" text="Introduce Slowly" tone="ivory">
+        <SectionShell text="Introduce Slowly" tone="ivory">
           <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 11, letterSpacing: "0.15em", color: "#5a5a5a", textAlign: "center", margin: "16px 0" }}>
             Paused while you recover.
           </p>
         </SectionShell>
       ) : (
-        <SectionShell n="04" text="Introduce Slowly" tone="ivory">
+        <SectionShell text="Introduce Slowly" tone="ivory">
           {reintroActives.length > 0 && pauseTreatment && pausePhase && (
             <div style={{ background: "transparent", border: "1px solid rgba(28,28,26,0.20)", borderRadius: 8, padding: "12px 14px", marginBottom: 12 }}>
               <p style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: "#2d3d2b", margin: "0 0 4px" }}>Reintroducing after recovery</p>
@@ -1936,8 +1920,6 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
                     product={p}
                     schedule={schedule}
                     weekNumber={weekNumber}
-                    onAdvance={onAdvanceRamp}
-                    onHold={onHoldRamp}
                     onResetStart={onResetRampStart}
                   />
                 </div>
@@ -1954,7 +1936,7 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
       )}
 
       {/* -- Treatments --------------------------------------------------------- */}
-      <SectionShell n="05" text="Treatments" tone="dark">
+      <SectionShell text="Treatments" tone="dark">
         <TreatmentSection treatments={treatments} saveTreatment={saveTreatment} removeTreatment={removeTreatment} updateTreatmentDate={updateTreatmentDate} products={products} activeMap={activeMap} />
       </SectionShell>
 
@@ -1964,7 +1946,7 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
       </div>
 
       {/* -- Cycle Tracking ---------------------------------------------------- */}
-      <SectionShell n="06" text="Cycle Tracking" tone="ivory" bottom={20}>
+      <SectionShell text="Cycle Tracking" tone="ivory" bottom={20}>
         <CycleTracker products={products} activeMap={activeMap} cycleDay={user && user.cycleDay ? user.cycleDay : 14} onSetCycleDay={d => onUpdateUser && onUpdateUser({ ...user, cycleDay: d })} user={user} onUpdateUser={onUpdateUser} />
       </SectionShell>
 
