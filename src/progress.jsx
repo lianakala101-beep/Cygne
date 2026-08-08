@@ -1690,11 +1690,14 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
     const isDarkBg = tone === "dark";
     const color = isDarkBg ? "var(--color-ivory, #faf9f4)" : "#1c1c1a";
     const rule  = isDarkBg ? "rgba(250,249,244,0.20)" : "rgba(28,28,26,0.18)";
+    // Font sizing mirrors the home page's editorial section labels
+    // ("Ask Cygne" / "Begin Your Ritual" at src/dashboard.jsx:247,297):
+    // 16px Fungis Heavy, 0.22em tracking, uppercase.
     return (
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
         <span style={{
-          fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 14,
-          letterSpacing: "0.15em", textTransform: "uppercase",
+          fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 16,
+          letterSpacing: "0.22em", textTransform: "uppercase",
           color, lineHeight: 1.1,
         }}>{text}</span>
         <div style={{ flex: 1, height: 1, background: rule, marginLeft: 4 }} />
@@ -1867,33 +1870,52 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
         <FaceHeatMap checkIns={checkIns} onAskCygne={(q, ctx) => setAskCygneQuestion({ q, ctx })} />
       </div>
 
-      {/* Hero number treatment — the ritual-health consistency score gets
-          a full display-size Fungis numeral, unboxed, so it reads as the
-          screen's editorial pivot rather than a stat inside a card. */}
+      {/* Hero number treatment — centered pull-quote composition
+          matching the home page's seasonal / weekend headline blocks
+          (32px vertical padding, stacked eyebrow-under-headline reading
+          order). The label sits BELOW the numeral in Fungis caps so the
+          numeral carries the moment and "RITUAL HEALTH" identifies it
+          without competing for the horizontal axis. */}
       {consistencyPct !== null && (
-        <div style={{ paddingTop: 4 }}>
-          <div style={{ display: "flex", alignItems: "flex-end", gap: 14, marginBottom: 6 }}>
-            <span style={{
-              fontFamily: "var(--font-display)",
-              fontSize: 112, fontWeight: 700,
-              letterSpacing: "-0.02em",
-              color: "var(--color-ivory, #faf9f4)",
-              lineHeight: 0.92,
-            }}>{consistencyPct}</span>
-            <span style={{
-              fontFamily: "var(--font-display)", fontWeight: 700,
-              fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase",
-              color: "var(--color-ivory, #faf9f4)", opacity: 0.7,
-              paddingBottom: 12,
-            }}>Ritual<br />Health</span>
+        <div style={{ padding: "32px 0", textAlign: "center" }}>
+          <div style={{
+            fontFamily: "var(--font-display)",
+            fontSize: 112, fontWeight: 700,
+            letterSpacing: "-0.02em",
+            color: "var(--color-ivory, #faf9f4)",
+            lineHeight: 0.92,
+            margin: 0,
+          }}>{consistencyPct}</div>
+          <div style={{
+            fontFamily: "var(--font-display)", fontWeight: 700,
+            fontSize: 11, letterSpacing: "0.28em", textTransform: "uppercase",
+            color: "var(--color-ivory, #faf9f4)", opacity: 0.7,
+            marginTop: 18,
+          }}>Ritual Health</div>
+          <div style={{
+            height: 1, background: "rgba(250,249,244,0.25)",
+            margin: "24px auto 14px",
+            maxWidth: 220,
+            position: "relative",
+          }}>
+            <div style={{
+              width: consistencyPct + "%", height: 1,
+              background: "var(--color-ivory, #faf9f4)",
+              transition: "width 0.6s ease",
+            }} />
           </div>
-          <div style={{ height: 1, background: "rgba(250,249,244,0.25)", marginBottom: 12 }}>
-            <div style={{ width: consistencyPct + "%", height: 1, background: "var(--color-ivory, #faf9f4)", transition: "width 0.6s ease" }} />
-          </div>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 10 }}>
-            <span style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", opacity: 0.6 }}>From {checkIns.length} check-in{checkIns.length !== 1 ? "s" : ""}</span>
-          </div>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--color-ivory, #faf9f4)", opacity: 0.82, margin: 0, lineHeight: 1.65 }}>
+          <div style={{
+            fontFamily: "var(--font-body)", fontSize: 10,
+            letterSpacing: "0.18em", textTransform: "uppercase",
+            color: "var(--color-ivory, #faf9f4)", opacity: 0.6,
+            marginBottom: 14,
+          }}>From {checkIns.length} check-in{checkIns.length !== 1 ? "s" : ""}</div>
+          <p style={{
+            fontFamily: "var(--font-body)", fontSize: 12,
+            color: "var(--color-ivory, #faf9f4)", opacity: 0.82,
+            margin: "0 auto", lineHeight: 1.65,
+            maxWidth: 320,
+          }}>
             {consistencyPct >= 85 ? "Strong adherence — your ritual is building compounding benefit." :
              consistencyPct >= 70 ? "Mostly consistent. Fewer irritation days will improve this score." :
              "Irregularity detected. Consistent application is what drives visible results."}
