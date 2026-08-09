@@ -985,7 +985,7 @@ function Reflection({ reflections = [], onAddReflection, onReplaceReflections, p
         <button onClick={() => setCapturing(true)} disabled={saving}
           style={{
             display: "inline-flex", alignItems: "center", gap: 10,
-            padding: "14px 40px", borderRadius: 0,
+            padding: "14px 40px", borderRadius: 999,
             background: "transparent", color: "var(--color-ivory)",
             border: "1.5px solid rgba(250,249,244,0.5)",
             cursor: saving ? "default" : "pointer",
