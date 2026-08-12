@@ -1,13 +1,14 @@
 import { lazy, Suspense, useState, useRef, useEffect } from "react";
 import { Icon } from "./components.jsx";
 import { analyzeShelf, detectConflicts, buildRoutine, detectActives } from "./engine.js";
-import { RAMP_SCHEDULES, RAMP_ACTIVES, getRampWeek } from "./ramp.jsx";
+import { RAMP_ACTIVES, getRampWeek, getRampSchedule } from "./ramp.jsx";
 import { PreAuthScreen } from "./splash.jsx";
 import { Dashboard } from "./dashboard.jsx";
 import { MyRoutine } from "./ritualscreen.jsx";
 import { Shelf } from "./vanity.jsx";
 import { Progress } from "./progress.jsx";
 import { SwanWelcomeScreen, useLocalStorage, getCurrentCycleDay, daysBetweenLocal, toLocalMidnight, isoWeekNumber, isoWeekYear } from "./utils.jsx";
+import { getCyclePhase } from "./lib/cycle.js";
 import { WeekendNudgeCard } from "./weekend.jsx";
 import { SeasonalNudgeCard } from "./seasonal.jsx";
 import { supabase, logDebugEvent } from "./supabase.js";
@@ -1402,7 +1403,12 @@ export default function App() {
     const activeKey = product.category === "Toning Pad"
       ? "toning pad"
       : RAMP_ACTIVES.find(a => detectActives(product.ingredients || [])[a]);
-    const schedule = activeKey ? RAMP_SCHEDULES[activeKey] : null;
+    // Concern-aware schedule — sensitivity-tier users (Rosacea /
+    // Cystic-hormonal acne) get an extended timeline with a lower
+    // Maintain cadence. Without a sensitivity concern this returns
+    // the base RAMP_SCHEDULES[activeKey] by reference, so behavior
+    // for standard-pace users is identical.
+    const schedule = activeKey ? getRampSchedule(activeKey, user?.concerns) : null;
     const maxWeek = schedule
       ? Math.max(...schedule.phases[schedule.phases.length - 1].weeks)
       : 12;
@@ -1687,7 +1693,10 @@ export default function App() {
         ? "toning pad"
         : RAMP_ACTIVES.find(a => detectActives(p.ingredients || [])[a]);
       if (!activeKey) return p;
-      const schedule = RAMP_SCHEDULES[activeKey];
+      // Use the concern-aware schedule so sensitivity-tier users get
+      // the longer maxWeek — otherwise auto-graduation would fire at
+      // the base timeline and cut their paced ramp short.
+      const schedule = getRampSchedule(activeKey, user?.concerns);
       if (!schedule) return p;
       const maxWeek = Math.max(...schedule.phases[schedule.phases.length - 1].weeks);
       const currentWeek = Math.max(1, Math.floor(daysBetweenLocal(p.routineStartDate) / 7) + 1);
@@ -1769,6 +1778,33 @@ export default function App() {
 
   // -- First run welcome (just completed onboarding) --------------------------
   if (firstRun) return <SwanWelcomeScreen user={user} onDone={() => { setFirstRun(false); setTab("dashboard"); }} />;
+
+  // -- Cycle-phase pacing suggestion signal -----------------------------------
+  // Global (per-user, not per-product) flag used by Introduce Slowly to
+  // suggest holding when the user is in — or about to enter — the
+  // luteal window. Progesterone rises there and the barrier is more
+  // reactive; the existing app already treats luteal as a
+  // barrier-sensitivity window (see progress.jsx PHASE_META.Luteal and
+  // ritualscreen.jsx getRitualMode).
+  //
+  // Gated on cycleTrackingEnabled + a usable cycleStartDate — if the
+  // user hasn't opted in, we skip the signal entirely rather than
+  // guessing. "Entering luteal" = days 15–16 (the last two Ovulatory
+  // days before the boundary at day 17 in the canonical schedule at
+  // src/lib/cycle.js). Currently in Luteal is anything at that phase.
+  //
+  // Kept purely suggestive: no auto-hold; the user still confirms via
+  // the manual Hold button. Progress combines this with the per-
+  // product check-in signal into a single message per card.
+  const cycleSuggestsHold = (() => {
+    if (!user?.cycleTrackingEnabled) return false;
+    const day = getCurrentCycleDay(user);
+    if (!day) return false;
+    const phaseName = getCyclePhase(day)?.name;
+    if (phaseName === "Luteal") return true;
+    if (phaseName === "Ovulatory" && (day === 15 || day === 16)) return true;
+    return false;
+  })();
 
   // -- Main app ---------------------------------------------------------------
   return (
@@ -2001,7 +2037,7 @@ export default function App() {
             />
           </Suspense>
         )}
-        {tab === "progress"  && <Progress products={products} checkIns={checkIns} setCheckIns={setCheckIns} treatments={treatments} setTreatments={setTreatments} saveTreatment={saveTreatment} removeTreatment={removeTreatment} updateTreatmentDate={updateTreatmentDate} user={user} onAdvanceRamp={advanceRamp} onHoldRamp={holdRamp} onResetRampStart={resetRampStartDate} onRampCheckinSave={saveRampCheckin} onRampCheckinDone={dismissRampCheckin} rampCheckins={rampCheckins} journals={journals} setJournals={setJournals} onUpdateUser={updateUser} reflections={reflections} triggerLog={triggerLog} setTriggerLog={setTriggerLog} />}
+        {tab === "progress"  && <Progress products={products} checkIns={checkIns} setCheckIns={setCheckIns} treatments={treatments} setTreatments={setTreatments} saveTreatment={saveTreatment} removeTreatment={removeTreatment} updateTreatmentDate={updateTreatmentDate} user={user} onAdvanceRamp={advanceRamp} onHoldRamp={holdRamp} onResetRampStart={resetRampStartDate} onRampCheckinSave={saveRampCheckin} onRampCheckinDone={dismissRampCheckin} rampCheckins={rampCheckins} cycleSuggestsHold={cycleSuggestsHold} journals={journals} setJournals={setJournals} onUpdateUser={updateUser} reflections={reflections} triggerLog={triggerLog} setTriggerLog={setTriggerLog} />}
       </div>
 
       {/* Bottom nav — dark across every tab */}

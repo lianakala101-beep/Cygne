@@ -6,7 +6,7 @@ import { supabase, invokeEdgeFunction } from "./supabase.js";
 import { FitzpatrickNote } from "./components/FitzpatrickNote.jsx";
 
 const SKIN_TYPES = ["Dry", "Oily", "Combination", "Sensitive", "Normal"];
-const SKIN_CONCERNS = ["Acne", "Hyperpigmentation", "Redness", "Fine lines", "Texture", "Dehydration", "Dullness", "Sensitivity"];
+const SKIN_CONCERNS = ["Acne", "Cystic/hormonal acne", "Hyperpigmentation", "Redness", "Rosacea", "Fine lines", "Texture", "Dehydration", "Dullness", "Sensitivity"];
 
 function ProfileInner({ user, products, onLogout, locationData, setLocationData, locationDenied, setLocationDenied }) {
   // Defensive: a freshly-onboarded user can have undefined or non-array

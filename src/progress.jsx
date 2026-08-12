@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Icon, Section, ErrorBoundary } from "./components.jsx";
 import { detectActives, detectActivesFromProduct, analyzeShelf, detectConflicts, buildRoutine, hasSPFCoverage } from "./engine.js";
 import { getAutoSession } from "./productmodal.jsx";
-import { RAMP_SCHEDULES, RAMP_ACTIVES, IntroduceSlowlyCard, getRampWeek } from "./ramp.jsx";
+import { RAMP_ACTIVES, IntroduceSlowlyCard, getRampWeek, getRampSchedule, isSchedulePaced } from "./ramp.jsx";
 import { getCurrentCycleDay, getTreatmentElapsed, daysBetweenLocal } from "./utils.jsx";
 import { CYCLE_PHASES as CANONICAL_CYCLE_PHASES, getCyclePhase as getCanonicalCyclePhase } from "./lib/cycle.js";
 import { FaceHeatMap } from "./components/FaceHeatMap.jsx";
@@ -1669,7 +1669,36 @@ function deriveRampSignals(rampCheckins, productId, currentWeek) {
   return { suggestHold, recentTrend: { consecutivePositive } };
 }
 
-function ProgressInner({ products: productsProp, checkIns: checkInsProp, setCheckIns, treatments: treatmentsProp = [], setTreatments, saveTreatment, removeTreatment, updateTreatmentDate = () => {}, user = {}, onAdvanceRamp, onHoldRamp, onResetRampStart = () => {}, onRampCheckinSave = async () => {}, onRampCheckinDone = () => {}, rampCheckins: rampCheckinsProp = [], journals: journalsProp = [], setJournals = () => {}, onUpdateUser = () => {}, reflections: reflectionsProp = [], triggerLog: triggerLogProp = [], setTriggerLog = () => {} }) {
+// Merge the two hold-suggestion signals into one message per card.
+// The check-in signal fires when the current week's most-recent
+// response reported irritation. The cycle signal fires when the user
+// is in — or about to enter — the luteal window and there's an
+// active check-in context for the week (either due or already
+// submitted this week). When both fire we acknowledge both in a
+// single line rather than stacking two nudges.
+function buildHoldSuggestion({ fromCheckin, fromCycle }) {
+  if (fromCheckin && fromCycle) {
+    return {
+      active: true,
+      message: "Your skin flagged irritation this week and tends to be more sensitive right now — consider holding at your current pace.",
+    };
+  }
+  if (fromCheckin) {
+    return {
+      active: true,
+      message: "Your skin flagged irritation this week — consider holding at your current pace.",
+    };
+  }
+  if (fromCycle) {
+    return {
+      active: true,
+      message: "Your skin tends to be more sensitive this week — consider holding at your current pace.",
+    };
+  }
+  return { active: false, message: null };
+}
+
+function ProgressInner({ products: productsProp, checkIns: checkInsProp, setCheckIns, treatments: treatmentsProp = [], setTreatments, saveTreatment, removeTreatment, updateTreatmentDate = () => {}, user = {}, onAdvanceRamp, onHoldRamp, onResetRampStart = () => {}, onRampCheckinSave = async () => {}, onRampCheckinDone = () => {}, rampCheckins: rampCheckinsProp = [], cycleSuggestsHold = false, journals: journalsProp = [], setJournals = () => {}, onUpdateUser = () => {}, reflections: reflectionsProp = [], triggerLog: triggerLogProp = [], setTriggerLog = () => {} }) {
   // Defensive coercion for every collection prop. The `= []` destructure
   // defaults only catch `undefined`; explicit nulls or unexpected
   // non-array values (e.g. during the brief window between auth landing
@@ -1995,17 +2024,30 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
               const activeKey = p.category === "Toning Pad"
                 ? "toning pad"
                 : RAMP_ACTIVES.find(a => detectActives(p.ingredients || [])[a]);
-              const schedule = RAMP_SCHEDULES[activeKey];
+              // Concern-aware schedule — sensitivity-tier users get
+              // an extended timeline via getRampSchedule. schedulePaced
+              // tells the card to surface a soft "paced more gradually"
+              // caption so the user understands why the shape differs
+              // from the standard schedule.
+              const schedule = getRampSchedule(activeKey, user?.concerns);
               if (!schedule) return null;
+              const schedulePaced = isSchedulePaced(user?.concerns);
               const weekNumber = getRampWeek(p);
               const checkinDue = weekNumber > (p.lastCheckinWeek || 0);
               // Derive per-product suggestion signals from the
-              // ramp_checkins history hydrated by App.jsx. suggestHold
-              // renders as a visible nudge on the card when the last
-              // check-in flagged irritation; recentTrend is threaded
-              // through for future "safe to progress faster" logic and
-              // isn't surfaced visually yet.
-              const { suggestHold, recentTrend } = deriveRampSignals(rampCheckins, p.id, weekNumber);
+              // ramp_checkins history hydrated by App.jsx and merge
+              // with the global cycle-phase signal. Cycle only counts
+              // when there's an active check-in context for this
+              // week — either the check-in is due, or the user
+              // submitted for this exact week already. Both signals
+              // combine into a single message per card via
+              // buildHoldSuggestion.
+              const { suggestHold: checkinSuggestsHold, recentTrend } = deriveRampSignals(rampCheckins, p.id, weekNumber);
+              const activeCheckinContext = checkinDue || (Number(p.lastCheckinWeek) === weekNumber);
+              const holdSuggestion = buildHoldSuggestion({
+                fromCheckin: checkinSuggestsHold,
+                fromCycle: cycleSuggestsHold && activeCheckinContext,
+              });
               // Single combined card per product — the check-in flow
               // renders inline inside IntroduceSlowlyCard when checkinDue
               // is true. Card outer container was removed in the ivory
@@ -2024,8 +2066,9 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
                   onCheckinSave={(responseState, note) => onRampCheckinSave(p.id, weekNumber, responseState, note)}
                   onCheckinDone={() => onRampCheckinDone(p.id, weekNumber)}
                   isLast={i === rampProducts.length - 1}
-                  suggestHold={suggestHold}
+                  holdSuggestion={holdSuggestion}
                   recentTrend={recentTrend}
+                  schedulePaced={schedulePaced}
                 />
               );
             })

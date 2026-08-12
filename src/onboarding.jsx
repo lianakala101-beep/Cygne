@@ -4,7 +4,7 @@ import { FitzpatrickNote } from "./components/FitzpatrickNote.jsx";
 
 
 const SKIN_TYPES = ["Dry", "Oily", "Combination", "Sensitive", "Normal"];
-const SKIN_CONCERNS = ["Acne", "Hyperpigmentation", "Redness", "Fine lines", "Texture", "Dehydration", "Dullness", "Sensitivity"];
+const SKIN_CONCERNS = ["Acne", "Cystic/hormonal acne", "Hyperpigmentation", "Redness", "Rosacea", "Fine lines", "Texture", "Dehydration", "Dullness", "Sensitivity"];
 const KNOWN_ACTIVES = ["Retinol", "AHA", "BHA", "Vitamin C", "Niacinamide", "Peptides", "Hyaluronic Acid", "None yet"];
 
 // Fitzpatrick self-report — the six options map to fitzpatrick_type
