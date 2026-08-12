@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Icon } from "./components.jsx";
 import { detectActives } from "./engine.js";
 import { daysBetweenLocal } from "./utils.jsx";
@@ -238,15 +238,19 @@ function IntroduceSlowlyCard({
   schedule,
   weekNumber: weekNumberProp,
   onResetStart,
+  onAdvance,
+  onHold,
   checkinDue = false,
   onCheckinSave,
   onCheckinDone,
   isLast = false,
   // Read-only suggestion signals derived from ramp_checkins history.
   // suggestHold surfaces a visible nudge when the last check-in
-  // flagged irritation. recentTrend is accepted but not yet surfaced
-  // — future pacing logic will read consecutivePositive to decide
-  // when a faster progression is safe to offer.
+  // flagged irritation and points the user at the Advance/Hold
+  // controls behind the expand toggle. recentTrend is accepted but
+  // not yet surfaced — future pacing logic will read
+  // consecutivePositive to decide when a faster progression is safe
+  // to offer.
   suggestHold = false,
   // eslint-disable-next-line no-unused-vars
   recentTrend = { consecutivePositive: 0 },
@@ -254,6 +258,19 @@ function IntroduceSlowlyCard({
   const [expanded, setExpanded] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
   const [pickedDate, setPickedDate] = useState("");
+
+  // Auto-expand the card the FIRST time a suggestion appears so the
+  // user sees the Advance/Hold controls without hunting for them. If
+  // the user then manually collapses (or suggestHold stays true across
+  // renders), we don't re-expand — the effect only fires when
+  // suggestHold flips false → true.
+  const prevSuggestHoldRef = useRef(false);
+  useEffect(() => {
+    if (suggestHold && !prevSuggestHoldRef.current) {
+      setExpanded(true);
+    }
+    prevSuggestHoldRef.current = suggestHold;
+  }, [suggestHold]);
   // Check-in local state (was in the separate RampCheckinCard before the
   // two cards were combined). Reset to idle after a successful save so
   // next week's check-in starts fresh.
@@ -414,17 +431,34 @@ function IntroduceSlowlyCard({
       )}
 
       {/* Suggestion nudge — surfaces when the last check-in for the
-          current week flagged irritation. Read-only prompt; the user
-          still confirms via the next weekly check-in response. */}
+          current week flagged irritation. Points at the Advance/Hold
+          controls behind the expand toggle: the whole line is a tap
+          target that opens the expanded section, and the useEffect
+          above already auto-expands on first appearance. Never
+          auto-applies a hold; the user still confirms via the Hold
+          button in the expanded controls. */}
       {suggestHold && (
-        <p style={{
-          fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400,
-          fontStyle: "italic",
-          color: "#8b7355", margin: "12px 0 0",
-          letterSpacing: "0.02em", lineHeight: 1.55,
-        }}>
-          Your last check-in flagged irritation. Consider holding at this pace before advancing.
-        </p>
+        <button
+          type="button"
+          onClick={() => setExpanded(true)}
+          aria-label="Your skin flagged irritation this week — open pacing controls"
+          style={{
+            display: "block", width: "100%", textAlign: "left",
+            background: "none", border: "none", padding: 0,
+            margin: "12px 0 0",
+            cursor: "pointer",
+            WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
+          }}
+        >
+          <span style={{
+            fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400,
+            fontStyle: "italic",
+            color: "#8b7355",
+            letterSpacing: "0.02em", lineHeight: 1.55,
+          }}>
+            Your skin flagged irritation this week — consider holding at your current pace.
+          </span>
+        </button>
       )}
 
       {/* Check-in section — inline when a new ramp week is due */}
@@ -562,6 +596,80 @@ function IntroduceSlowlyCard({
               <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>{phase.backOff}</p>
             </div>
           </div>
+
+          {/* Manual pacing controls — user-driven Advance / Hold.
+              These are the target the irritation suggestion points at.
+              Held products only get the Advance button (Hold isn't
+              meaningful when already paused). The final week is handled
+              by App.jsx's auto-graduation safety net, so no separate
+              graduation flow is needed here. */}
+          {(onAdvance || onHold) && (
+            isHeld ? (
+              <button
+                type="button"
+                onClick={() => onAdvance?.(product.id)}
+                style={{
+                  width: "100%", padding: "10px 0",
+                  background: "rgba(45,61,43,0.10)",
+                  border: "1px solid rgba(45,61,43,0.35)",
+                  borderRadius: 10,
+                  display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6,
+                  fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400,
+                  letterSpacing: "0.12em", textTransform: "uppercase",
+                  color: "#2d3d2b", cursor: "pointer",
+                  marginBottom: 14,
+                  WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
+                  transition: "background 0.18s",
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = "rgba(45,61,43,0.18)"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "rgba(45,61,43,0.10)"; }}
+              >
+                Skin handled it — advance <Icon name="check" size={10} />
+              </button>
+            ) : (
+              <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
+                <button
+                  type="button"
+                  onClick={() => onAdvance?.(product.id)}
+                  style={{
+                    flex: 1, padding: "10px 0",
+                    background: "rgba(45,61,43,0.10)",
+                    border: "1px solid rgba(45,61,43,0.35)",
+                    borderRadius: 10,
+                    display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6,
+                    fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400,
+                    letterSpacing: "0.12em", textTransform: "uppercase",
+                    color: "#2d3d2b", cursor: "pointer",
+                    WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
+                    transition: "background 0.18s",
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "rgba(45,61,43,0.18)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "rgba(45,61,43,0.10)"; }}
+                >
+                  Skin handled it <Icon name="check" size={10} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onHold?.(product.id)}
+                  style={{
+                    flex: 1, padding: "10px 0",
+                    background: "rgba(139,115,85,0.08)",
+                    border: "1px solid rgba(139,115,85,0.28)",
+                    borderRadius: 10,
+                    fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400,
+                    letterSpacing: "0.12em", textTransform: "uppercase",
+                    color: "#8b7355", cursor: "pointer",
+                    WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
+                    transition: "background 0.18s",
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "rgba(139,115,85,0.16)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "rgba(139,115,85,0.08)"; }}
+                >
+                  Backing off
+                </button>
+              </div>
+            )
+          )}
 
           {/* Reset start date — pick any past date */}
           <div style={{ paddingTop: 12, borderTop: "1px dashed var(--border)" }}>

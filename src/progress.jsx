@@ -2018,6 +2018,8 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
                   schedule={schedule}
                   weekNumber={weekNumber}
                   onResetStart={onResetRampStart}
+                  onAdvance={onAdvanceRamp}
+                  onHold={onHoldRamp}
                   checkinDue={checkinDue}
                   onCheckinSave={(responseState, note) => onRampCheckinSave(p.id, weekNumber, responseState, note)}
                   onCheckinDone={() => onRampCheckinDone(p.id, weekNumber)}
