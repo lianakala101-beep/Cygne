@@ -242,6 +242,14 @@ function IntroduceSlowlyCard({
   onCheckinSave,
   onCheckinDone,
   isLast = false,
+  // Read-only suggestion signals derived from ramp_checkins history.
+  // suggestHold surfaces a visible nudge when the last check-in
+  // flagged irritation. recentTrend is accepted but not yet surfaced
+  // — future pacing logic will read consecutivePositive to decide
+  // when a faster progression is safe to offer.
+  suggestHold = false,
+  // eslint-disable-next-line no-unused-vars
+  recentTrend = { consecutivePositive: 0 },
 }) {
   const [expanded, setExpanded] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
@@ -402,6 +410,20 @@ function IntroduceSlowlyCard({
           letterSpacing: "0.02em",
         }}>
           Paused — repeat this week
+        </p>
+      )}
+
+      {/* Suggestion nudge — surfaces when the last check-in for the
+          current week flagged irritation. Read-only prompt; the user
+          still confirms via the next weekly check-in response. */}
+      {suggestHold && (
+        <p style={{
+          fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400,
+          fontStyle: "italic",
+          color: "#8b7355", margin: "12px 0 0",
+          letterSpacing: "0.02em", lineHeight: 1.55,
+        }}>
+          Your last check-in flagged irritation. Consider holding at this pace before advancing.
         </p>
       )}
 

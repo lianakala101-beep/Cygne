@@ -208,6 +208,11 @@ export default function App() {
   // taps a ramp-checkin push. Shape: { productId: string, weekNumber: number }.
   // Clearing this un-mounts RampCheckinModal.
   const [rampCheckinDeepLink, setRampCheckinDeepLink] = useState(null);
+  // Recent ramp check-in history — hydrated from Supabase on session
+  // change and appended optimistically after each save. Read-only from
+  // the UI's perspective; consumers derive per-product suggestion +
+  // trend signals from it (see Progress.rampProducts.map).
+  const [rampCheckins, setRampCheckins] = useState([]);
   const [products, setProducts] = useLocalStorage("cygne_products", []);
   const [modal, setModal] = useState(null);
   const [checkIns, setCheckIns] = useLocalStorage("cygne_checkins", []);
@@ -918,6 +923,32 @@ export default function App() {
     supabase.auth.updateUser({ data: { notifDismissed } }).catch(() => {});
   }, [notifDismissed]);
 
+  // -- Hydrate ramp_checkins history on session change ------------------------
+  // Read-only view of the user's per-week check-in responses; consumers
+  // derive suggestion signals (e.g. suggestHold when the last check-in
+  // flagged irritation) rather than the app auto-changing pacing.
+  // Select is small — product_id + week_number + response_state +
+  // created_at — so the whole history stays in memory without bloat.
+  useEffect(() => {
+    const userId = authSession?.user?.id;
+    if (!userId) { setRampCheckins([]); return; }
+    let alive = true;
+    (async () => {
+      const { data, error } = await supabase
+        .from("ramp_checkins")
+        .select("product_id, week_number, response_state, created_at")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false });
+      if (!alive) return;
+      if (error) {
+        console.warn("[Cygne ramp_checkins fetch]", error.message);
+        return;
+      }
+      setRampCheckins(Array.isArray(data) ? data : []);
+    })();
+    return () => { alive = false; };
+  }, [authSession?.user?.id]);
+
   // -- Sync products (vanity shelf) to Supabase -------------------------------
   // Writes to the `products` table. UPSERT-ONLY since the previous
   // stale-diff/delete pattern caused real data loss — when local state
@@ -1472,6 +1503,12 @@ export default function App() {
       console.error("[Cygne ramp check-in] insert failed:", error);
       throw new Error(error.message || "Check-in failed. Please try again.");
     }
+    // Optimistic append so downstream suggestion signals (suggestHold /
+    // recentTrend) reflect this week's response before the next fetch.
+    setRampCheckins(prev => [
+      { product_id: id, week_number: weekNumber, response_state: responseState, created_at: new Date().toISOString() },
+      ...prev,
+    ]);
     console.log("[Cygne ramp check-in]", { id, weekNumber, responseState });
   };
 
@@ -1963,7 +2000,7 @@ export default function App() {
             />
           </Suspense>
         )}
-        {tab === "progress"  && <Progress products={products} checkIns={checkIns} setCheckIns={setCheckIns} treatments={treatments} setTreatments={setTreatments} saveTreatment={saveTreatment} removeTreatment={removeTreatment} updateTreatmentDate={updateTreatmentDate} user={user} onAdvanceRamp={advanceRamp} onHoldRamp={holdRamp} onResetRampStart={resetRampStartDate} onRampCheckinSave={saveRampCheckin} onRampCheckinDone={dismissRampCheckin} journals={journals} setJournals={setJournals} onUpdateUser={updateUser} reflections={reflections} triggerLog={triggerLog} setTriggerLog={setTriggerLog} />}
+        {tab === "progress"  && <Progress products={products} checkIns={checkIns} setCheckIns={setCheckIns} treatments={treatments} setTreatments={setTreatments} saveTreatment={saveTreatment} removeTreatment={removeTreatment} updateTreatmentDate={updateTreatmentDate} user={user} onAdvanceRamp={advanceRamp} onHoldRamp={holdRamp} onResetRampStart={resetRampStartDate} onRampCheckinSave={saveRampCheckin} onRampCheckinDone={dismissRampCheckin} rampCheckins={rampCheckins} journals={journals} setJournals={setJournals} onUpdateUser={updateUser} reflections={reflections} triggerLog={triggerLog} setTriggerLog={setTriggerLog} />}
       </div>
 
       {/* Bottom nav — dark across every tab */}
