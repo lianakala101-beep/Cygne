@@ -1626,7 +1626,50 @@ function getProductSession(product) {
   return getAutoSession(product).session;
 }
 
-function ProgressInner({ products: productsProp, checkIns: checkInsProp, setCheckIns, treatments: treatmentsProp = [], setTreatments, saveTreatment, removeTreatment, updateTreatmentDate = () => {}, user = {}, onAdvanceRamp, onHoldRamp, onResetRampStart = () => {}, onRampCheckinSave = async () => {}, onRampCheckinDone = () => {}, journals: journalsProp = [], setJournals = () => {}, onUpdateUser = () => {}, reflections: reflectionsProp = [], triggerLog: triggerLogProp = [], setTriggerLog = () => {} }) {
+// Derive per-product suggestion signals from the ramp_checkins history.
+// This is the read-side counterpart to saveRampCheckin — the system
+// listens to what the user reports each week and surfaces a hint
+// rather than auto-changing pacing.
+//
+//   suggestHold — true when the most recent check-in FOR THE CURRENT
+//     WEEK reported irritation (mild_irritation) or a breakout. Only
+//     the current week is checked; older weeks are past guidance.
+//
+//   recentTrend — { consecutivePositive: N } — walk back from the
+//     current week counting how many consecutive weeks had a positive
+//     most-recent response (no_reaction or loving_it). Breaks on the
+//     first week with no entry or a non-positive entry. Not surfaced
+//     visually yet; kept accessible for future "safe to progress
+//     faster" logic.
+const NEGATIVE_RESPONSE_STATES = new Set(["breakout", "mild_irritation"]);
+const POSITIVE_RESPONSE_STATES = new Set(["no_reaction", "loving_it"]);
+
+function deriveRampSignals(rampCheckins, productId, currentWeek) {
+  const empty = { suggestHold: false, recentTrend: { consecutivePositive: 0 } };
+  if (!Array.isArray(rampCheckins) || !productId || !currentWeek) return empty;
+  const forProduct = rampCheckins.filter(c => c && c.product_id === productId);
+  if (forProduct.length === 0) return empty;
+  const sortDesc = (a, b) => String(b?.created_at || "").localeCompare(String(a?.created_at || ""));
+
+  const mostRecentThisWeek = forProduct
+    .filter(c => c.week_number === currentWeek)
+    .sort(sortDesc)[0] || null;
+  const suggestHold = !!mostRecentThisWeek && NEGATIVE_RESPONSE_STATES.has(mostRecentThisWeek.response_state);
+
+  let consecutivePositive = 0;
+  for (let w = currentWeek; w >= 1; w--) {
+    const latest = forProduct.filter(c => c.week_number === w).sort(sortDesc)[0];
+    if (latest && POSITIVE_RESPONSE_STATES.has(latest.response_state)) {
+      consecutivePositive++;
+    } else {
+      break;
+    }
+  }
+
+  return { suggestHold, recentTrend: { consecutivePositive } };
+}
+
+function ProgressInner({ products: productsProp, checkIns: checkInsProp, setCheckIns, treatments: treatmentsProp = [], setTreatments, saveTreatment, removeTreatment, updateTreatmentDate = () => {}, user = {}, onAdvanceRamp, onHoldRamp, onResetRampStart = () => {}, onRampCheckinSave = async () => {}, onRampCheckinDone = () => {}, rampCheckins: rampCheckinsProp = [], journals: journalsProp = [], setJournals = () => {}, onUpdateUser = () => {}, reflections: reflectionsProp = [], triggerLog: triggerLogProp = [], setTriggerLog = () => {} }) {
   // Defensive coercion for every collection prop. The `= []` destructure
   // defaults only catch `undefined`; explicit nulls or unexpected
   // non-array values (e.g. during the brief window between auth landing
@@ -1639,6 +1682,7 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
   const journals    = Array.isArray(journalsProp)    ? journalsProp    : [];
   const reflections = Array.isArray(reflectionsProp) ? reflectionsProp : [];
   const triggerLog  = Array.isArray(triggerLogProp)  ? triggerLogProp  : [];
+  const rampCheckins = Array.isArray(rampCheckinsProp) ? rampCheckinsProp : [];
   const [showCheckIn, setShowCheckIn] = useState(false);
   const [showJournal, setShowJournal] = useState(false);
   const [askCygneQuestion, setAskCygneQuestion] = useState(null);
@@ -1955,6 +1999,13 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
               if (!schedule) return null;
               const weekNumber = getRampWeek(p);
               const checkinDue = weekNumber > (p.lastCheckinWeek || 0);
+              // Derive per-product suggestion signals from the
+              // ramp_checkins history hydrated by App.jsx. suggestHold
+              // renders as a visible nudge on the card when the last
+              // check-in flagged irritation; recentTrend is threaded
+              // through for future "safe to progress faster" logic and
+              // isn't surfaced visually yet.
+              const { suggestHold, recentTrend } = deriveRampSignals(rampCheckins, p.id, weekNumber);
               // Single combined card per product — the check-in flow
               // renders inline inside IntroduceSlowlyCard when checkinDue
               // is true. Card outer container was removed in the ivory
@@ -1971,6 +2022,8 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
                   onCheckinSave={(responseState, note) => onRampCheckinSave(p.id, weekNumber, responseState, note)}
                   onCheckinDone={() => onRampCheckinDone(p.id, weekNumber)}
                   isLast={i === rampProducts.length - 1}
+                  suggestHold={suggestHold}
+                  recentTrend={recentTrend}
                 />
               );
             })
