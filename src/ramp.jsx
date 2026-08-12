@@ -244,14 +244,16 @@ function IntroduceSlowlyCard({
   onCheckinSave,
   onCheckinDone,
   isLast = false,
-  // Read-only suggestion signals derived from ramp_checkins history.
-  // suggestHold surfaces a visible nudge when the last check-in
-  // flagged irritation and points the user at the Advance/Hold
-  // controls behind the expand toggle. recentTrend is accepted but
+  // Read-only combined hold-suggestion object: { active, message }.
+  // Progress computes this per card by merging the check-in signal
+  // (irritation reported for the current week) with the global
+  // cycle-phase signal (in / entering luteal). The card points the
+  // user at the Advance/Hold controls behind the expand toggle when
+  // active — never auto-applies a hold. recentTrend is accepted but
   // not yet surfaced — future pacing logic will read
   // consecutivePositive to decide when a faster progression is safe
   // to offer.
-  suggestHold = false,
+  holdSuggestion = { active: false, message: null },
   // eslint-disable-next-line no-unused-vars
   recentTrend = { consecutivePositive: 0 },
 }) {
@@ -259,18 +261,20 @@ function IntroduceSlowlyCard({
   const [confirmReset, setConfirmReset] = useState(false);
   const [pickedDate, setPickedDate] = useState("");
 
-  // Auto-expand the card the FIRST time a suggestion appears so the
-  // user sees the Advance/Hold controls without hunting for them. If
-  // the user then manually collapses (or suggestHold stays true across
-  // renders), we don't re-expand — the effect only fires when
-  // suggestHold flips false → true.
-  const prevSuggestHoldRef = useRef(false);
+  const holdSuggestionActive = !!holdSuggestion?.active;
+
+  // Auto-expand the card the FIRST time a suggestion becomes active
+  // so the user sees the Advance/Hold controls without hunting for
+  // them. If the user then manually collapses (or the suggestion
+  // stays active across renders), we don't re-expand — the effect
+  // only fires when active flips false → true.
+  const prevHoldActiveRef = useRef(false);
   useEffect(() => {
-    if (suggestHold && !prevSuggestHoldRef.current) {
+    if (holdSuggestionActive && !prevHoldActiveRef.current) {
       setExpanded(true);
     }
-    prevSuggestHoldRef.current = suggestHold;
-  }, [suggestHold]);
+    prevHoldActiveRef.current = holdSuggestionActive;
+  }, [holdSuggestionActive]);
   // Check-in local state (was in the separate RampCheckinCard before the
   // two cards were combined). Reset to idle after a successful save so
   // next week's check-in starts fresh.
@@ -430,18 +434,18 @@ function IntroduceSlowlyCard({
         </p>
       )}
 
-      {/* Suggestion nudge — surfaces when the last check-in for the
-          current week flagged irritation. Points at the Advance/Hold
-          controls behind the expand toggle: the whole line is a tap
-          target that opens the expanded section, and the useEffect
-          above already auto-expands on first appearance. Never
-          auto-applies a hold; the user still confirms via the Hold
-          button in the expanded controls. */}
-      {suggestHold && (
+      {/* Suggestion nudge — surfaces the combined hold suggestion
+          (check-in irritation, luteal-phase sensitivity, or both).
+          Points at the Advance/Hold controls behind the expand
+          toggle: the whole line is a tap target that opens the
+          expanded section, and the useEffect above auto-expands on
+          first appearance. Never auto-applies a hold; the user still
+          confirms via the Hold button in the expanded controls. */}
+      {holdSuggestionActive && (
         <button
           type="button"
           onClick={() => setExpanded(true)}
-          aria-label="Your skin flagged irritation this week — open pacing controls"
+          aria-label={`${holdSuggestion.message} Open pacing controls.`}
           style={{
             display: "block", width: "100%", textAlign: "left",
             background: "none", border: "none", padding: 0,
@@ -456,7 +460,7 @@ function IntroduceSlowlyCard({
             color: "#8b7355",
             letterSpacing: "0.02em", lineHeight: 1.55,
           }}>
-            Your skin flagged irritation this week — consider holding at your current pace.
+            {holdSuggestion.message}
           </span>
         </button>
       )}
