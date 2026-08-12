@@ -1,7 +1,7 @@
 import { lazy, Suspense, useState, useRef, useEffect } from "react";
 import { Icon } from "./components.jsx";
 import { analyzeShelf, detectConflicts, buildRoutine, detectActives } from "./engine.js";
-import { RAMP_SCHEDULES, RAMP_ACTIVES, getRampWeek } from "./ramp.jsx";
+import { RAMP_ACTIVES, getRampWeek, getRampSchedule } from "./ramp.jsx";
 import { PreAuthScreen } from "./splash.jsx";
 import { Dashboard } from "./dashboard.jsx";
 import { MyRoutine } from "./ritualscreen.jsx";
@@ -1403,7 +1403,12 @@ export default function App() {
     const activeKey = product.category === "Toning Pad"
       ? "toning pad"
       : RAMP_ACTIVES.find(a => detectActives(product.ingredients || [])[a]);
-    const schedule = activeKey ? RAMP_SCHEDULES[activeKey] : null;
+    // Concern-aware schedule — sensitivity-tier users (Rosacea /
+    // Cystic-hormonal acne) get an extended timeline with a lower
+    // Maintain cadence. Without a sensitivity concern this returns
+    // the base RAMP_SCHEDULES[activeKey] by reference, so behavior
+    // for standard-pace users is identical.
+    const schedule = activeKey ? getRampSchedule(activeKey, user?.concerns) : null;
     const maxWeek = schedule
       ? Math.max(...schedule.phases[schedule.phases.length - 1].weeks)
       : 12;
@@ -1688,7 +1693,10 @@ export default function App() {
         ? "toning pad"
         : RAMP_ACTIVES.find(a => detectActives(p.ingredients || [])[a]);
       if (!activeKey) return p;
-      const schedule = RAMP_SCHEDULES[activeKey];
+      // Use the concern-aware schedule so sensitivity-tier users get
+      // the longer maxWeek — otherwise auto-graduation would fire at
+      // the base timeline and cut their paced ramp short.
+      const schedule = getRampSchedule(activeKey, user?.concerns);
       if (!schedule) return p;
       const maxWeek = Math.max(...schedule.phases[schedule.phases.length - 1].weeks);
       const currentWeek = Math.max(1, Math.floor(daysBetweenLocal(p.routineStartDate) / 7) + 1);

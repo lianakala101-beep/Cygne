@@ -184,6 +184,81 @@ const RAMP_SCHEDULES = {
 
 const RAMP_ACTIVES = ["retinol", "AHA", "BHA", "vitamin C"];
 
+// Concern-aware pacing. Users who state Rosacea or Cystic/hormonal
+// acne in their skin profile get a more conservative Introduce Slowly
+// schedule: Patch and Introduce each run one week longer, everything
+// after shifts to make room, and the Maintain-phase frequency is
+// capped one step lower than the default cadence. Everyone else gets
+// the standard schedule unchanged.
+//
+// Applied per schedule type (retinol / AHA / BHA / vitamin C / toning
+// pad) — never a blanket app-wide change. When concerns is empty or
+// undefined we return the base schedule reference, so downstream
+// referential-equality checks stay identity-stable for standard-pace
+// users.
+const SENSITIVITY_CONCERNS = new Set(["Rosacea", "Cystic/hormonal acne"]);
+
+const SENSITIVE_MAINTAIN_FREQUENCY = {
+  retinol:      "3× per week",
+  AHA:          "1–2× per week",
+  BHA:          "3–4× per week",
+  "vitamin C":  "Every other morning",
+  "toning pad": "Daily — PM only",
+};
+
+function isSensitivityConcern(concerns) {
+  if (!Array.isArray(concerns) || concerns.length === 0) return false;
+  return concerns.some(c => SENSITIVITY_CONCERNS.has(c));
+}
+
+// Transform a base schedule into its paced variant. Patch grows by 1
+// week (extend from the end). Introduce shifts forward 1 (accounting
+// for the extra Patch week) and also grows by 1. Build and Maintain
+// shift forward by 2 (Patch + Introduce each added a week). Maintain
+// frequency is overridden with the sensitivity-tier cadence when one
+// is defined for the schedule. Everything else — instructions,
+// on-track / back-off copy, colors — comes through from the base
+// unchanged so a single source of truth for the standard schedule
+// remains in RAMP_SCHEDULES.
+function paceScheduleForSensitivity(baseSchedule, activeKey) {
+  const sensitiveMaint = SENSITIVE_MAINTAIN_FREQUENCY[activeKey];
+  const phases = baseSchedule.phases.map(p => {
+    let weeks;
+    if (p.name === "Patch") {
+      const last = p.weeks[p.weeks.length - 1];
+      weeks = [...p.weeks, last + 1];
+    } else if (p.name === "Introduce") {
+      const shifted = p.weeks.map(w => w + 1);
+      const last = shifted[shifted.length - 1];
+      weeks = [...shifted, last + 1];
+    } else {
+      // Build, Maintain, and any future phases shift by 2 weeks total.
+      weeks = p.weeks.map(w => w + 2);
+    }
+    const frequency = p.name === "Maintain" && sensitiveMaint ? sensitiveMaint : p.frequency;
+    return { ...p, weeks, frequency };
+  });
+  return { ...baseSchedule, phases };
+}
+
+// Public accessor used by every consumer that previously read
+// RAMP_SCHEDULES[activeKey] directly. concerns is optional; when
+// omitted or without a sensitivity flag the base schedule is
+// returned by reference.
+function getRampSchedule(activeKey, concerns) {
+  const base = RAMP_SCHEDULES[activeKey];
+  if (!base) return null;
+  if (!isSensitivityConcern(concerns)) return base;
+  return paceScheduleForSensitivity(base, activeKey);
+}
+
+// Small helper the card + any future consumer can use to know whether
+// a paced schedule is in effect for the current user, without having
+// to compare the schedule object to the base itself.
+function isSchedulePaced(concerns) {
+  return isSensitivityConcern(concerns);
+}
+
 function getRampPhase(schedule, week) {
   for (const phase of schedule.phases) {
     if (phase.weeks.includes(week)) return phase;
@@ -256,6 +331,11 @@ function IntroduceSlowlyCard({
   holdSuggestion = { active: false, message: null },
   // eslint-disable-next-line no-unused-vars
   recentTrend = { consecutivePositive: 0 },
+  // True when the schedule was pre-paced for a sensitivity concern
+  // (Rosacea / Cystic-hormonal acne). Surfaces a soft caption so the
+  // user understands why their timeline looks different from the
+  // standard one — without naming their specific concern back to them.
+  schedulePaced = false,
 }) {
   const [expanded, setExpanded] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
@@ -408,6 +488,15 @@ function IntroduceSlowlyCard({
           fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)",
           margin: "3px 0 0", opacity: 0.7, letterSpacing: "0.04em",
         }}>{startedLabel}</p>
+      )}
+      {schedulePaced && (
+        <p style={{
+          fontFamily: "var(--font-body)", fontSize: 10, fontStyle: "italic",
+          color: "var(--clay)", opacity: 0.75,
+          margin: "6px 0 0", letterSpacing: "0.02em", lineHeight: 1.5,
+        }}>
+          Paced more gradually based on your skin profile.
+        </p>
       )}
 
       {/* Phase progress dots — small horizontal strip, one per phase */}
@@ -972,4 +1061,4 @@ function WeeklyRitualCalendar({ rampProducts, products }) {
 
 // --- PROGRESS ----------------------------------------------------------------
 
-export { RAMP_SCHEDULES, RAMP_ACTIVES, IntroduceSlowlyCard, WeeklyRitualCalendar, getRampWeek, getRampPhase };
+export { RAMP_SCHEDULES, RAMP_ACTIVES, IntroduceSlowlyCard, WeeklyRitualCalendar, getRampWeek, getRampPhase, getRampSchedule, isSchedulePaced };

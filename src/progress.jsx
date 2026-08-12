@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Icon, Section, ErrorBoundary } from "./components.jsx";
 import { detectActives, detectActivesFromProduct, analyzeShelf, detectConflicts, buildRoutine, hasSPFCoverage } from "./engine.js";
 import { getAutoSession } from "./productmodal.jsx";
-import { RAMP_SCHEDULES, RAMP_ACTIVES, IntroduceSlowlyCard, getRampWeek } from "./ramp.jsx";
+import { RAMP_ACTIVES, IntroduceSlowlyCard, getRampWeek, getRampSchedule, isSchedulePaced } from "./ramp.jsx";
 import { getCurrentCycleDay, getTreatmentElapsed, daysBetweenLocal } from "./utils.jsx";
 import { CYCLE_PHASES as CANONICAL_CYCLE_PHASES, getCyclePhase as getCanonicalCyclePhase } from "./lib/cycle.js";
 import { FaceHeatMap } from "./components/FaceHeatMap.jsx";
@@ -2024,8 +2024,14 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
               const activeKey = p.category === "Toning Pad"
                 ? "toning pad"
                 : RAMP_ACTIVES.find(a => detectActives(p.ingredients || [])[a]);
-              const schedule = RAMP_SCHEDULES[activeKey];
+              // Concern-aware schedule — sensitivity-tier users get
+              // an extended timeline via getRampSchedule. schedulePaced
+              // tells the card to surface a soft "paced more gradually"
+              // caption so the user understands why the shape differs
+              // from the standard schedule.
+              const schedule = getRampSchedule(activeKey, user?.concerns);
               if (!schedule) return null;
+              const schedulePaced = isSchedulePaced(user?.concerns);
               const weekNumber = getRampWeek(p);
               const checkinDue = weekNumber > (p.lastCheckinWeek || 0);
               // Derive per-product suggestion signals from the
@@ -2062,6 +2068,7 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
                   isLast={i === rampProducts.length - 1}
                   holdSuggestion={holdSuggestion}
                   recentTrend={recentTrend}
+                  schedulePaced={schedulePaced}
                 />
               );
             })
