@@ -375,7 +375,7 @@ function IntroduceSlowlyCard({
           fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em",
           textTransform: "uppercase",
           color: isHeld ? "#8b7355" : "var(--clay)", opacity: 0.85,
-        }}>Week {weekNumber} of {maxWeek} · {isHeld ? "Holding" : phase.name}</span>
+        }}>Week {Math.min(weekNumber, maxWeek)} of {maxWeek} · {isHeld ? "Holding" : phase.name}</span>
       </div>
 
       <p style={{

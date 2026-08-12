@@ -1,7 +1,7 @@
 import { lazy, Suspense, useState, useRef, useEffect } from "react";
 import { Icon } from "./components.jsx";
 import { analyzeShelf, detectConflicts, buildRoutine, detectActives } from "./engine.js";
-import { RAMP_SCHEDULES, RAMP_ACTIVES } from "./ramp.jsx";
+import { RAMP_SCHEDULES, RAMP_ACTIVES, getRampWeek } from "./ramp.jsx";
 import { PreAuthScreen } from "./splash.jsx";
 import { Dashboard } from "./dashboard.jsx";
 import { MyRoutine } from "./ritualscreen.jsx";
@@ -1406,9 +1406,10 @@ export default function App() {
     const maxWeek = schedule
       ? Math.max(...schedule.phases[schedule.phases.length - 1].weeks)
       : 12;
-    const currentWeek = product.routineStartDate
-      ? Math.max(1, Math.floor(daysBetweenLocal(product.routineStartDate) / 7) + 1)
-      : (product.rampWeek || 1);
+    // Single source of truth for the calendar-driven week — same
+    // Math.max(1, floor(days / 7) + 1) formula, with the same
+    // product.rampWeek || 1 fallback when routineStartDate is unset.
+    const currentWeek = getRampWeek(product);
     const timestamp = new Date().toISOString();
     const entry = {
       userId: authSession?.user?.id || null,
