@@ -1884,6 +1884,13 @@ export default function App() {
           from { opacity: 0; }
           to   { opacity: 1; }
         }
+        /* Slow breathing opacity for SwanSongCard's ivory-flat loading
+           dash — "being prepared" tempo, not a spinner. */
+        @keyframes swanBreath {
+          0%   { opacity: 0.35; }
+          50%  { opacity: 0.75; }
+          100% { opacity: 0.35; }
+        }
         option { background: #f7f4f0; color: #1c1c1a; }
         input, select, textarea {
           background: #f7f4f0;
