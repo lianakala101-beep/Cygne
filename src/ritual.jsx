@@ -455,7 +455,7 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
 
   const BIRTHDAY_LINES = [
     "Another year of taking care of yourself.",
-    "Your skin has carried you this far.",
+    "Another year around the sun. Your ritual continues.",
     "Happy birthday. Your skin looks radiant.",
   ];
 
