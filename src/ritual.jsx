@@ -3,6 +3,8 @@ import { Icon, Section } from "./components.jsx";
 import { detectActives, analyzeShelf, buildRoutine, isDampSkinProduct, hasSPFCoverage } from "./engine.js";
 import { FREQUENCIES } from "./constants.js";
 import { getLockedSession, getAutoSession } from "./productmodal.jsx";
+import { getCyclePhase } from "./lib/cycle.js";
+import { getCurrentCycleDay } from "./utils.jsx";
 
 function SessionPicker({ productId, product, initial, onSession }) {
   const locked = product ? getLockedSession(product) : null;
@@ -556,6 +558,24 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
   // the dark homepage canvas where the card chrome would clash with the
   // editorial line treatment. Centered text per homepage spec.
   if (variant === "ivory-flat") {
+    // Glanceable cycle-phase indicator. Only surfaces when the user
+    // opted in to cycle tracking AND the start date resolves — no
+    // fallback assumption, matches the pattern used elsewhere for
+    // optional cycle data. Format: "FOLLICULAR · DAY 7".
+    const cycleDay = user?.cycleTrackingEnabled ? getCurrentCycleDay(user) : null;
+    const cyclePhaseName = cycleDay ? getCyclePhase(cycleDay)?.name : null;
+    const cycleLabel = cyclePhaseName && cycleDay
+      ? `${String(cyclePhaseName).toUpperCase()} · DAY ${cycleDay}`
+      : null;
+
+    // Loading state: LLM daily line hasn't landed yet AND we're not on
+    // one of the fallback paths. A soft breathing dash replaces the
+    // bare "—" so the card reads as "something is being prepared"
+    // rather than empty. Keep it understated — one em dash, opacity
+    // pulsing between 0.35 and 0.75 on a 2.4s cycle via swanBreath
+    // (keyframes defined in App.jsx alongside softPulse / fadeInLine).
+    const showLoadingDash = dailyLoading && !isBirthday && !trimmedDaily;
+
     return (
       <div style={{ position: "relative", textAlign: "center" }}>
         <p style={{
@@ -564,19 +584,47 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
           letterSpacing: "0.28em", textTransform: "uppercase",
           color: "var(--color-ivory, #faf9f4)",
           opacity: 0.75,
-          margin: "0 0 10px",
+          margin: 0,
         }}>
           Swan Sense
         </p>
-        <p style={{
-          fontFamily: "var(--font-body)",
-          fontSize: 16, fontWeight: 400,
-          lineHeight: 1.5, letterSpacing: "0.01em",
-          color: "var(--color-ivory, #faf9f4)",
-          margin: 0,
-        }}>
-          {renderInsightLines(line)}
-        </p>
+        {cycleLabel && (
+          <p style={{
+            fontFamily: "var(--font-display)",
+            fontSize: 9, fontWeight: 700,
+            letterSpacing: "0.24em", textTransform: "uppercase",
+            color: "var(--color-ivory, #faf9f4)",
+            opacity: 0.55,
+            margin: "6px 0 0",
+          }}>
+            {cycleLabel}
+          </p>
+        )}
+        {showLoadingDash ? (
+          <p
+            aria-hidden="true"
+            style={{
+              fontFamily: "var(--font-body)",
+              fontSize: 16, fontWeight: 400,
+              lineHeight: 1.5, letterSpacing: "0.01em",
+              color: "var(--color-ivory, #faf9f4)",
+              margin: "10px 0 0",
+              animation: "swanBreath 2.4s ease-in-out infinite",
+            }}
+          >
+            —
+          </p>
+        ) : (
+          <p style={{
+            fontFamily: "var(--font-body)",
+            fontSize: 16, fontWeight: 400,
+            lineHeight: 1.5, letterSpacing: "0.01em",
+            color: "var(--color-ivory, #faf9f4)",
+            margin: "10px 0 0",
+          }}>
+            {renderInsightLines(line)}
+          </p>
+        )}
       </div>
     );
   }
