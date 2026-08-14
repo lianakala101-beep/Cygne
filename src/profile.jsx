@@ -885,16 +885,37 @@ function ProfileSheetInner({ user, products, locationData, setLocationData, loca
                   </div>
                   <div>
                     <label style={labelStyle}>Birthday</label>
+                    {/* Three clean number inputs (Year, Month, Day)
+                        matching the onboarding pattern. Replaces a
+                        single "MM / DD" text field that required the
+                        user to type a slash between digits — anything
+                        without the slash collapsed both values into
+                        birthMonth and left birthDay empty. */}
                     <div style={{ display: "flex", gap: 8 }}>
-                      <input value={accountDraft.birthYear} onChange={e => setAccountDraft(d => ({ ...d, birthYear: e.target.value }))} placeholder="Year" maxLength={4} style={{ ...inputStyle, flex: 1, minWidth: 0 }} />
                       <input
-                        value={accountDraft.birthMonth && accountDraft.birthDay ? `${accountDraft.birthMonth}/${accountDraft.birthDay}` : accountDraft.birthMonth || ""}
-                        onChange={e => {
-                          const val = e.target.value.replace(/[^0-9/]/g, "");
-                          const parts = val.split("/");
-                          setAccountDraft(d => ({ ...d, birthMonth: parts[0] || "", birthDay: parts[1] || "" }));
-                        }}
-                        placeholder="MM / DD" maxLength={5} style={{ ...inputStyle, flex: 1, minWidth: 0 }} />
+                        type="number"
+                        min="1940" max="2010"
+                        value={accountDraft.birthYear}
+                        onChange={e => setAccountDraft(d => ({ ...d, birthYear: e.target.value }))}
+                        placeholder="Year"
+                        style={{ ...inputStyle, flex: 1.5, minWidth: 0 }}
+                      />
+                      <input
+                        type="number"
+                        min="1" max="12"
+                        value={accountDraft.birthMonth}
+                        onChange={e => setAccountDraft(d => ({ ...d, birthMonth: e.target.value }))}
+                        placeholder="MM"
+                        style={{ ...inputStyle, flex: 1, minWidth: 0 }}
+                      />
+                      <input
+                        type="number"
+                        min="1" max="31"
+                        value={accountDraft.birthDay}
+                        onChange={e => setAccountDraft(d => ({ ...d, birthDay: e.target.value }))}
+                        placeholder="DD"
+                        style={{ ...inputStyle, flex: 1, minWidth: 0 }}
+                      />
                     </div>
                   </div>
                   <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
