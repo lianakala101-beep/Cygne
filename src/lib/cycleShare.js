@@ -1,23 +1,31 @@
-// Skin Status shareable card generator.
+// Skin Status shareable STICKER generator.
 //
-// Renders a standalone 1080×1920 (Instagram Story aspect) transparent
-// PNG on an off-screen canvas — NOT a screenshot of the in-app card.
-// Layout, top to bottom:
+// Renders a compact, content-sized transparent PNG on an off-screen
+// canvas — NOT a full-screen Story background and NOT a screenshot
+// of the in-app card. The exported canvas is cropped tightly to the
+// actual content bounding box (logo + status phrase + phase/day line
+// + signature) plus a small padding margin, so it behaves like a
+// normal Instagram sticker once shared: small, draggable, resizable,
+// rotatable on the user's Story canvas — not a full-bleed image they
+// have to manually shrink to make room for anything else.
+//
+// Layout, top to bottom, all tightly grouped (this is a sticker, not
+// a poster — nothing is spread across a fixed 1920px canvas anymore):
 //
 //   1. Cygne logo mark (110px, quiet), tight gap to the block below.
 //   2. Skin-status phrase in large Fungis Heavy — phase-mapped,
 //      framed as a window/phase (SKIN_STATUS map) rather than a
 //      measured biological fact. Wraps onto multiple lines when the
-//      phrase is too wide for the canvas at full size.
+//      phrase is too wide for the design wrap width.
 //   3. Directly below, smaller: "( FOLLICULAR • DAY 8 )" — phase name
 //      + day, Fungis Normal, wide tracking.
-//   4. cygne.skin signature, small, anchored near the bottom —
-//      separate from the tight group above.
+//   4. cygne.skin signature, small, sitting just below that — still
+//      part of the same tight sticker block, not a poster footer.
 //
-// Items 1–3 are laid out as one cohesive block (small fixed gaps,
-// vertically centered as a unit in the upper-middle of the canvas)
-// rather than floating at fixed absolute positions across the full
-// canvas height — the earlier draft over-spread each line.
+// The canvas is sized to fit exactly this content (measured in a
+// first pass, then drawn into a canvas sized to match) plus
+// STICKER_PADDING on every side — no large surrounding transparent
+// field.
 //
 // Transparent background is intentional — the Instagram Story
 // compositor lets the user drop this over any background of their
@@ -32,14 +40,17 @@
 // installed. Falls back to a browser download for contexts that
 // don't support file sharing.
 
-const CANVAS_W = 1080;
-const CANVAS_H = 1920;
 const INKY_MOSS = "#2d3d2b";
 const IVORY_HALO = "#faf9f4";
-// Horizontal margin the status phrase + phase/day line must respect
-// so nothing runs edge-to-edge on the exported image.
-const SIDE_MARGIN = 90;
-const MAX_TEXT_WIDTH = CANVAS_W - SIDE_MARGIN * 2;
+// Design wrap width for the status phrase — independent of the
+// export canvas now that the canvas is content-sized rather than a
+// fixed 1080px-wide Story frame. Keeps the same line-break behavior
+// the phrase had in the Story-sized draft (unchanged visual content),
+// just no longer tied to a literal canvas width.
+const STATUS_WRAP_WIDTH = 900;
+// Padding around the tightly-cropped content on every side, so the
+// sticker doesn't touch its own bounding box edges.
+const STICKER_PADDING = 56;
 
 // Phase-mapped "skin status" phrase. Framed as a window/phase the
 // user is currently in, not a stated biological measurement — e.g.
@@ -119,20 +130,6 @@ function wrapSpacedWords(ctx, text, fontSize, spacingEm, maxWidth) {
   return lines.length ? lines : [text];
 }
 
-// Draws a wrapped, spaced headline centered on x, with its vertical
-// center at yCenter. Returns the total pixel height the block
-// occupied, so callers can advance a running cursor for whatever
-// comes next.
-function drawWrappedBlock(ctx, text, x, yCenter, fontSize, spacingEm, lineHeight, halo, maxWidth) {
-  const lines = wrapSpacedWords(ctx, text, fontSize, spacingEm, maxWidth);
-  const blockHeight = lines.length * lineHeight;
-  const firstLineY = yCenter - blockHeight / 2 + lineHeight / 2;
-  lines.forEach((line, i) => {
-    drawSpacedLine(ctx, line, x, firstLineY + i * lineHeight, fontSize, spacingEm, halo);
-  });
-  return blockHeight;
-}
-
 function loadLogo() {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -144,25 +141,14 @@ function loadLogo() {
 }
 
 async function renderCycleShareBlob({ phaseName, day }) {
-  const canvas = document.createElement("canvas");
-  canvas.width = CANVAS_W;
-  canvas.height = CANVAS_H;
-  const ctx = canvas.getContext("2d");
-  // Transparent background: canvas starts fully transparent and is
-  // never filled — no fillRect / clearRect touches it — so the PNG's
-  // alpha channel is preserved end to end.
-
   try { if (document?.fonts?.ready) await document.fonts.ready; } catch {}
 
   let logo = null;
   try { logo = await loadLogo(); } catch {}
 
-  ctx.fillStyle = INKY_MOSS;
-  ctx.textBaseline = "middle";
-  ctx.textAlign = "center";
-
   // Halo widths scale with font size so the outline reads at
-  // consistent visual weight across tiers.
+  // consistent visual weight across tiers. Unchanged from the
+  // Story-sized draft — purely a cropping change, not a content one.
   const statusHalo = { color: IVORY_HALO, width: 6 };
   const phaseDayHalo = { color: IVORY_HALO, width: 3 };
   const sigHalo = { color: IVORY_HALO, width: 2 };
@@ -174,41 +160,70 @@ async function renderCycleShareBlob({ phaseName, day }) {
     ? `( ${phaseUpper} • DAY ${dayNum} )`
     : null;
 
-  // Logo + status phrase + phase/day line are laid out as ONE
-  // cohesive group: fixed small gaps between elements, with the
-  // whole group vertically centered a little above the canvas
-  // midpoint (so the separately-anchored signature has room to sit
-  // near the true bottom without crowding).
+  // Same type sizes and gaps as the Story-sized draft — only the
+  // canvas itself is now sized to fit them instead of the reverse.
   const LOGO_SIZE = 110;
   const GAP_LOGO_TO_STATUS = 46;
   const STATUS_FONT_SIZE = 108;
   const STATUS_LINE_HEIGHT = 116;
   const GAP_STATUS_TO_PHASEDAY = 34;
   const PHASEDAY_FONT_SIZE = 32;
+  const GAP_PHASEDAY_TO_SIG = 44;
+  const SIG_FONT_SIZE = 30;
 
-  ctx.font = `700 ${STATUS_FONT_SIZE}px "Fungis Heavy", "Fungis", sans-serif`;
-  const statusLines = status ? wrapSpacedWords(ctx, status, STATUS_FONT_SIZE, 0.02, MAX_TEXT_WIDTH) : [];
+  // -- Pass 1: measure ------------------------------------------------
+  // A scratch canvas gives us a 2D context for ctx.measureText before
+  // we know the final (content-sized) canvas dimensions. Canvas size
+  // doesn't affect text metrics as long as the font is set on this
+  // context the same way it'll be set on the real one.
+  const scratch = document.createElement("canvas");
+  const mctx = scratch.getContext("2d");
+  mctx.textBaseline = "middle";
+  mctx.textAlign = "center";
+
+  mctx.font = `700 ${STATUS_FONT_SIZE}px "Fungis Heavy", "Fungis", sans-serif`;
+  const statusLines = status ? wrapSpacedWords(mctx, status, STATUS_FONT_SIZE, 0.02, STATUS_WRAP_WIDTH) : [];
+  const statusLineWidths = statusLines.map(line => measureSpacedWidth(mctx, line, STATUS_FONT_SIZE * 0.02));
+  const statusMaxWidth = statusLineWidths.length ? Math.max(...statusLineWidths) : 0;
   const statusHeight = statusLines.length * STATUS_LINE_HEIGHT;
 
-  ctx.font = `400 ${PHASEDAY_FONT_SIZE}px "Fungis Normal", "Fungis", sans-serif`;
+  mctx.font = `400 ${PHASEDAY_FONT_SIZE}px "Fungis Normal", "Fungis", sans-serif`;
+  const phaseDayWidth = phaseDayText ? measureSpacedWidth(mctx, phaseDayText, PHASEDAY_FONT_SIZE * 0.24) : 0;
   const phaseDayHeight = phaseDayText ? PHASEDAY_FONT_SIZE : 0;
 
+  mctx.font = `400 ${SIG_FONT_SIZE}px "Fungis Normal", "Fungis", sans-serif`;
+  const sigWidth = measureSpacedWidth(mctx, "cygne.skin", SIG_FONT_SIZE * 0.24);
+
+  let logoWidth = 0;
   let logoHeight = 0;
   if (logo) {
+    logoWidth = LOGO_SIZE;
     logoHeight = LOGO_SIZE * (logo.naturalHeight / (logo.naturalWidth || 1));
   }
 
-  const totalGroupHeight =
+  const contentWidth = Math.max(logoWidth, statusMaxWidth, phaseDayWidth, sigWidth);
+  const contentHeight =
     (logo ? logoHeight + GAP_LOGO_TO_STATUS : 0) +
     statusHeight +
-    (phaseDayText ? GAP_STATUS_TO_PHASEDAY + phaseDayHeight : 0);
+    (phaseDayText ? GAP_STATUS_TO_PHASEDAY + phaseDayHeight : 0) +
+    GAP_PHASEDAY_TO_SIG + SIG_FONT_SIZE;
 
-  // Group's vertical center sits a bit above the canvas midpoint —
-  // this leaves generous breathing room below for the signature to
-  // sit near the true bottom without the two blocks feeling stacked
-  // on top of each other.
-  const groupCenterY = CANVAS_H * 0.42;
-  let cursorY = groupCenterY - totalGroupHeight / 2;
+  // -- Pass 2: draw into a canvas sized to exactly fit that content --
+  const canvasW = Math.ceil(contentWidth + STICKER_PADDING * 2);
+  const canvasH = Math.ceil(contentHeight + STICKER_PADDING * 2);
+  const canvas = document.createElement("canvas");
+  canvas.width = canvasW;
+  canvas.height = canvasH;
+  const ctx = canvas.getContext("2d");
+  // Transparent background: canvas is never filled with an opaque
+  // color — no fillRect / clearRect touches it — so the PNG's alpha
+  // channel is preserved end to end.
+  ctx.fillStyle = INKY_MOSS;
+  ctx.textBaseline = "middle";
+  ctx.textAlign = "center";
+
+  const centerX = canvasW / 2;
+  let cursorY = STICKER_PADDING;
 
   // 1. Logo. Natural (unfiltered) render — the source asset is
   //    inherently dark, matching the app's existing brightness(0)
@@ -216,21 +231,20 @@ async function renderCycleShareBlob({ phaseName, day }) {
   //    backgrounds; here we want the dark original. A soft ivory
   //    shadow plays the same halo role the text strokes play.
   if (logo) {
-    const w = LOGO_SIZE;
-    const h = logoHeight;
     ctx.save();
     ctx.shadowColor = "rgba(250, 249, 244, 0.85)";
     ctx.shadowBlur = 12;
-    ctx.drawImage(logo, (CANVAS_W - w) / 2, cursorY, w, h);
+    ctx.drawImage(logo, centerX - logoWidth / 2, cursorY, logoWidth, logoHeight);
     ctx.restore();
-    cursorY += h + GAP_LOGO_TO_STATUS;
+    cursorY += logoHeight + GAP_LOGO_TO_STATUS;
   }
 
   // 2. Skin-status phrase.
   if (status) {
     ctx.font = `700 ${STATUS_FONT_SIZE}px "Fungis Heavy", "Fungis", sans-serif`;
-    const centerY = cursorY + statusHeight / 2;
-    drawWrappedBlock(ctx, status, CANVAS_W / 2, centerY, STATUS_FONT_SIZE, 0.02, STATUS_LINE_HEIGHT, statusHalo, MAX_TEXT_WIDTH);
+    statusLines.forEach((line, i) => {
+      drawSpacedLine(ctx, line, centerX, cursorY + STATUS_LINE_HEIGHT / 2 + i * STATUS_LINE_HEIGHT, STATUS_FONT_SIZE, 0.02, statusHalo);
+    });
     cursorY += statusHeight;
   }
 
@@ -238,13 +252,15 @@ async function renderCycleShareBlob({ phaseName, day }) {
   if (phaseDayText) {
     cursorY += GAP_STATUS_TO_PHASEDAY;
     ctx.font = `400 ${PHASEDAY_FONT_SIZE}px "Fungis Normal", "Fungis", sans-serif`;
-    drawSpacedLine(ctx, phaseDayText, CANVAS_W / 2, cursorY + PHASEDAY_FONT_SIZE / 2, PHASEDAY_FONT_SIZE, 0.24, phaseDayHalo);
+    drawSpacedLine(ctx, phaseDayText, centerX, cursorY + PHASEDAY_FONT_SIZE / 2, PHASEDAY_FONT_SIZE, 0.24, phaseDayHalo);
+    cursorY += phaseDayHeight;
   }
 
-  // 4. cygne.skin signature — quiet, near the true bottom, anchored
-  //    independently of the group above (no CTA styling).
-  ctx.font = '400 30px "Fungis Normal", "Fungis", sans-serif';
-  drawSpacedLine(ctx, "cygne.skin", CANVAS_W / 2, 1780, 30, 0.24, sigHalo);
+  // 4. cygne.skin signature — quiet, still part of the same tight
+  //    sticker block (no CTA styling).
+  cursorY += GAP_PHASEDAY_TO_SIG;
+  ctx.font = `400 ${SIG_FONT_SIZE}px "Fungis Normal", "Fungis", sans-serif`;
+  drawSpacedLine(ctx, "cygne.skin", centerX, cursorY + SIG_FONT_SIZE / 2, SIG_FONT_SIZE, 0.24, sigHalo);
 
   return await new Promise((resolve, reject) => {
     canvas.toBlob(
