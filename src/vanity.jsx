@@ -21,149 +21,6 @@ const GLASS_CARD = {
   flexDirection: "column",
 };
 
-// Minimal SVG line illustrations shown when a product has no photo. Single
-// stroke, no fill, stroke inherits currentColor from the wrapper (stone at
-// 0.4 opacity). Rendered at 48px centered in the card image area.
-function CategoryGlyph({ category }) {
-  const props = {
-    viewBox: "0 0 100 100",
-    fill: "none",
-    stroke: "currentColor",
-    strokeWidth: 1.25,
-    strokeLinecap: "round",
-    strokeLinejoin: "round",
-    style: { width: "100%", height: "100%", display: "block" },
-    "aria-hidden": "true",
-    focusable: "false",
-  };
-  switch (category) {
-    case "Cleanser":
-      // Foam / bubble cluster
-      return (
-        <svg {...props}>
-          <circle cx="34" cy="58" r="14" />
-          <circle cx="56" cy="46" r="18" />
-          <circle cx="74" cy="62" r="10" />
-          <circle cx="46" cy="72" r="7" />
-          <circle cx="64" cy="76" r="5" />
-          <circle cx="26" cy="40" r="4" />
-        </svg>
-      );
-    case "Serum":
-      // Classic serum dropper vial — oval rubber bulb at the very top, a
-      // narrow neck collar below it, and a thin pipette tube descending
-      // visibly through a wider squat bottle body to a tapered tip.
-      return (
-        <svg {...props}>
-          <ellipse cx="50" cy="13" rx="10" ry="7" />
-          <rect x="44" y="20" width="12" height="9" />
-          <path d="M 26 36 Q 26 30 32 30 L 68 30 Q 74 30 74 36 L 74 84 Q 74 92 66 92 L 34 92 Q 26 92 26 84 Z" />
-          <line x1="48" y1="20" x2="48" y2="72" />
-          <line x1="52" y1="20" x2="52" y2="72" />
-          <path d="M 48 72 L 50 78 L 52 72" />
-        </svg>
-      );
-    case "Moisturizer":
-      // Round jar — wide squat lid + body
-      return (
-        <svg {...props}>
-          <ellipse cx="50" cy="28" rx="30" ry="5" />
-          <line x1="20" y1="28" x2="20" y2="38" />
-          <line x1="80" y1="28" x2="80" y2="38" />
-          <ellipse cx="50" cy="38" rx="30" ry="5" />
-          <path d="M 20 38 L 20 80 Q 20 86 26 86 L 74 86 Q 80 86 80 80 L 80 38" />
-        </svg>
-      );
-    case "Oil":
-      // Droplet
-      return (
-        <svg {...props}>
-          <path d="M 50 14 C 30 42, 28 60, 30 70 A 22 22 0 0 0 70 70 C 72 60, 70 42, 50 14 Z" />
-        </svg>
-      );
-    case "Prescription":
-      // Rx symbol — capital R with a small kick-slash through the leg,
-      // the universal apothecary mark. Path data from the brief, scaled
-      // from a 24-unit grid into the 100-unit viewBox the rest of the
-      // glyphs use so stroke weight stays visually consistent.
-      return (
-        <svg {...props}>
-          <path d="M 20 10 h 30 a 20 20 0 0 1 0 40 H 20 V 10 z" />
-          <line x1="20" y1="50" x2="20" y2="90" />
-          <line x1="50" y1="50" x2="80" y2="90" />
-          <line x1="65" y1="70" x2="80" y2="55" />
-        </svg>
-      );
-    case "SPF":
-    case "SPF Moisturizer":
-      // Sun outline
-      return (
-        <svg {...props}>
-          <circle cx="50" cy="50" r="16" />
-          <line x1="50" y1="20" x2="50" y2="28" />
-          <line x1="50" y1="72" x2="50" y2="80" />
-          <line x1="20" y1="50" x2="28" y2="50" />
-          <line x1="72" y1="50" x2="80" y2="50" />
-          <line x1="29" y1="29" x2="34" y2="34" />
-          <line x1="66" y1="66" x2="71" y2="71" />
-          <line x1="71" y1="29" x2="66" y2="34" />
-          <line x1="34" y1="66" x2="29" y2="71" />
-        </svg>
-      );
-    case "Eye Cream":
-      // Eye outline
-      return (
-        <svg {...props}>
-          <path d="M 14 50 Q 50 22, 86 50 Q 50 78, 14 50 Z" />
-          <circle cx="50" cy="50" r="9" />
-          <circle cx="50" cy="50" r="3" fill="currentColor" stroke="none" />
-        </svg>
-      );
-    case "Toner":
-    case "Toning Pad":
-      // Tall bottle with cap
-      return (
-        <svg {...props}>
-          <path d="M 42 12 L 58 12 L 58 24 L 42 24 Z" />
-          <line x1="42" y1="24" x2="36" y2="34" />
-          <line x1="58" y1="24" x2="64" y2="34" />
-          <path d="M 36 34 L 36 86 Q 36 92 42 92 L 58 92 Q 64 92 64 86 L 64 34" />
-        </svg>
-      );
-    case "Exfoliant":
-      // Textured circle with granules
-      return (
-        <svg {...props}>
-          <circle cx="50" cy="50" r="28" />
-          <circle cx="42" cy="44" r="2" />
-          <circle cx="56" cy="42" r="1.6" />
-          <circle cx="60" cy="56" r="2.2" />
-          <circle cx="44" cy="60" r="1.8" />
-          <circle cx="52" cy="52" r="1.4" />
-          <circle cx="38" cy="52" r="1.4" />
-        </svg>
-      );
-    case "Mask":
-      // Half-moon pouch
-      return (
-        <svg {...props}>
-          <path d="M 22 30 L 78 30 L 70 86 Q 70 90 66 90 L 34 90 Q 30 90 30 86 Z" />
-          <line x1="40" y1="22" x2="60" y2="22" />
-          <line x1="40" y1="22" x2="40" y2="30" />
-          <line x1="60" y1="22" x2="60" y2="30" />
-        </svg>
-      );
-    default:
-      // Leaf — calm, on-brand fallback for anything else
-      return (
-        <svg {...props}>
-          <path d="M 28 80 Q 28 32 72 24 Q 78 64 28 80 Z" />
-          <path d="M 30 78 Q 50 60 70 28" />
-        </svg>
-      );
-  }
-}
-
 function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, user = {}, onAskCygne }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -183,16 +40,33 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
         {/* Image area — sits directly on the card's single ivory surface
             (no background or divider of its own), so the card reads as one
             unified block. A product photo fills this area when present;
-            otherwise the placeholder glyph shows over the same ivory. */}
+            otherwise an apothecary-label treatment shows the category
+            name in bold Fungis type filling the same vertical space —
+            no illustrated glyph, no small caption. Reads as a
+            typographic label, not decorative art. */}
         <div style={{ position: "relative", width: "100%", aspectRatio: "1 / 1", background: "transparent", flexShrink: 0, overflow: "hidden" }}>
           {product.imageUrl
             ? <img src={product.imageUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
             : (
-              <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10 }}>
-                <div style={{ width: 60, height: 60, color: "#5a5a5a", pointerEvents: "none" }}>
-                  <CategoryGlyph category={product.category} />
-                </div>
-                <span style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: "#5a5a5a", opacity: 0.75 }}>
+              <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px 12px", boxSizing: "border-box" }}>
+                <span
+                  aria-label={product.category}
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    fontWeight: 700,
+                    fontSize: 30,
+                    letterSpacing: "0.02em",
+                    lineHeight: 0.95,
+                    textTransform: "uppercase",
+                    textAlign: "center",
+                    color: "#1c1c1a",
+                    // Long labels ("SPF MOISTURIZER", "PRESCRIPTION")
+                    // wrap onto a second line rather than truncate;
+                    // hyphenation stays off so the type reads clean.
+                    wordBreak: "normal",
+                    overflowWrap: "break-word",
+                  }}
+                >
                   {product.category}
                 </span>
               </div>
