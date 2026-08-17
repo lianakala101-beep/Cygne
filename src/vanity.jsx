@@ -56,12 +56,15 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
                 // wrap on the space via overflow-wrap: break-word.
                 const label = String(product.category || "");
                 const len = label.length;
+                // Sizes reduced ~17% from the prior tier (52/44/36/
+                // 30/24) so the label reads as bold and confident but
+                // doesn't dominate the card.
                 const fontSize =
-                  len <= 3  ? 52 :
-                  len <= 5  ? 44 :
-                  len <= 9  ? 36 :
-                  len <= 12 ? 30 :
-                              24;
+                  len <= 3  ? 42 :
+                  len <= 5  ? 36 :
+                  len <= 9  ? 30 :
+                  len <= 12 ? 26 :
+                              20;
                 return (
                   <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", padding: "10px", boxSizing: "border-box" }}>
                     <span
