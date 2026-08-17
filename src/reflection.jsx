@@ -3,7 +3,9 @@ import { Icon } from "./components.jsx";
 import { supabase } from "./supabase.js";
 import { API_BASE_URL } from "./config.js";
 import { getSwanSensePredictions } from "./swansense.jsx";
-import { compressImageBlob, isoWeekNumber, isoWeekYear } from "./utils.jsx";
+import { compressImageBlob, isoWeekNumber, isoWeekYear, getCurrentCycleDay } from "./utils.jsx";
+import { getCyclePhase } from "./lib/cycle.js";
+import { shareCycleCard } from "./lib/cycleShare.js";
 
 // ---------------------------------------------------------------------------
 // Reflection — a weekly triptych gallery of the user's skin journey.
@@ -735,6 +737,27 @@ function Reflection({ reflections = [], onAddReflection, onReplaceReflections, p
     const t = setTimeout(() => setJustCaptured(false), 4500);
     return () => clearTimeout(t);
   }, [justCaptured]);
+  // Second share entry point (alongside the one on the Swan Sense
+  // dashboard card in ritual.jsx). Surfaces only right after a
+  // successful capture, pairing naturally with the photo the user
+  // just took. Same gate as every other cycle-data consumer — no
+  // fallback assumption when tracking isn't enabled or the day can't
+  // be computed.
+  const [sharingSkinStatus, setSharingSkinStatus] = useState(false);
+  const skinStatusCycleDay = user?.cycleTrackingEnabled ? getCurrentCycleDay(user) : null;
+  const skinStatusPhaseName = skinStatusCycleDay ? getCyclePhase(skinStatusCycleDay)?.name : null;
+  const skinStatusShareEnabled = !!(skinStatusPhaseName && skinStatusCycleDay);
+  const handleShareSkinStatus = async () => {
+    if (!skinStatusShareEnabled || sharingSkinStatus) return;
+    setSharingSkinStatus(true);
+    try {
+      await shareCycleCard({ phaseName: skinStatusPhaseName, day: skinStatusCycleDay });
+    } catch (e) {
+      console.warn("[Cygne] skin status share failed:", e?.message || e);
+    } finally {
+      setSharingSkinStatus(false);
+    }
+  };
 
   // Fingerprint that changes whenever any entry id appears or its url
   // pointer flips (e.g. a same-week recapture replaces an earlier entry —
@@ -1007,6 +1030,40 @@ function Reflection({ reflections = [], onAddReflection, onReplaceReflections, p
           <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "rgba(250,249,244,0.6)", margin: "12px 0 0", letterSpacing: "0.02em", transition: "opacity 600ms ease" }}>
             Captured — return on your next reset day
           </p>
+        )}
+        {/* Lightweight share prompt pairing with the photo just taken —
+            a second entry point alongside the one on the Swan Sense
+            dashboard card, not a replacement. Only appears when the
+            same cycle data that card relies on actually resolves. */}
+        {justCaptured && skinStatusShareEnabled && (
+          <button
+            type="button"
+            onClick={handleShareSkinStatus}
+            disabled={sharingSkinStatus}
+            style={{
+              display: "inline-flex", alignItems: "center", gap: 6,
+              margin: "10px 0 0",
+              background: "none", border: "none", padding: 0,
+              cursor: sharingSkinStatus ? "default" : "pointer",
+              fontFamily: "var(--font-display)", fontSize: 10, fontWeight: 400,
+              letterSpacing: "0.18em", textTransform: "uppercase",
+              color: "rgba(250,249,244,0.75)",
+              opacity: sharingSkinStatus ? 0.5 : 1,
+              WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
+              transition: "opacity 0.18s",
+            }}
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" strokeWidth="1.5"
+              strokeLinecap="round" strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M12 16 V4" />
+              <path d="M7 9 l5-5 5 5" />
+              <path d="M5 13 v6 a2 2 0 0 0 2 2 h10 a2 2 0 0 0 2-2 v-6" />
+            </svg>
+            {sharingSkinStatus ? "Preparing…" : "Share your skin status"}
+          </button>
         )}
       </div>
 
