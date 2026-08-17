@@ -47,30 +47,46 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
         <div style={{ position: "relative", width: "100%", aspectRatio: "1 / 1", background: "transparent", flexShrink: 0, overflow: "hidden" }}>
           {product.imageUrl
             ? <img src={product.imageUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-            : (
-              <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px 12px", boxSizing: "border-box" }}>
-                <span
-                  aria-label={product.category}
-                  style={{
-                    fontFamily: "var(--font-display)",
-                    fontWeight: 700,
-                    fontSize: 30,
-                    letterSpacing: "0.02em",
-                    lineHeight: 0.95,
-                    textTransform: "uppercase",
-                    textAlign: "center",
-                    color: "#1c1c1a",
-                    // Long labels ("SPF MOISTURIZER", "PRESCRIPTION")
-                    // wrap onto a second line rather than truncate;
-                    // hyphenation stays off so the type reads clean.
-                    wordBreak: "normal",
-                    overflowWrap: "break-word",
-                  }}
-                >
-                  {product.category}
-                </span>
-              </div>
-            )
+            : (() => {
+                // Length-based sizing so short labels (OIL, SPF, LIP)
+                // fill the square with the same confidence as long
+                // ones (SPF MOISTURIZER, PRESCRIPTION), and long
+                // labels don't overflow. Multi-word categories with
+                // a space (EYE CREAM, TONING PAD, SPF MOISTURIZER)
+                // wrap on the space via overflow-wrap: break-word.
+                const label = String(product.category || "");
+                const len = label.length;
+                const fontSize =
+                  len <= 3  ? 52 :
+                  len <= 5  ? 44 :
+                  len <= 9  ? 36 :
+                  len <= 12 ? 30 :
+                              24;
+                return (
+                  <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", padding: "10px", boxSizing: "border-box" }}>
+                    <span
+                      aria-label={label}
+                      style={{
+                        fontFamily: "var(--font-display)",
+                        fontWeight: 700,
+                        fontSize,
+                        letterSpacing: "0.02em",
+                        // lineHeight 1 matches the em-box so
+                        // flex-centering lands the cap-height at the
+                        // vertical midpoint of the square.
+                        lineHeight: 1,
+                        textTransform: "uppercase",
+                        textAlign: "center",
+                        color: "var(--color-inky-moss, #2d3d2b)",
+                        wordBreak: "normal",
+                        overflowWrap: "break-word",
+                      }}
+                    >
+                      {label}
+                    </span>
+                  </div>
+                );
+              })()
           }
 
           {/* ⋯ menu */}
