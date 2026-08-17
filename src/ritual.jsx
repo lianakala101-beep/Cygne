@@ -5,6 +5,7 @@ import { FREQUENCIES } from "./constants.js";
 import { getLockedSession, getAutoSession } from "./productmodal.jsx";
 import { getCyclePhase } from "./lib/cycle.js";
 import { getCurrentCycleDay } from "./utils.jsx";
+import { shareCycleCard } from "./lib/cycleShare.js";
 
 function SessionPicker({ productId, product, initial, onSession }) {
   const locked = product ? getLockedSession(product) : null;
@@ -449,6 +450,11 @@ function genericFallbackLine() {
 
 function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = {}, predictions = [], dailyLine = null, dailyLoading = false, dailyFailed = false, variant = "default" }) {
   const now = new Date();
+  // Local guard against double-taps on the ivory-flat share icon
+  // while the canvas render + native share sheet are in flight. Only
+  // used inside the ivory-flat branch; harmless in the other
+  // variants since the button never renders there.
+  const [sharingCycle, setSharingCycle] = useState(false);
   const isBirthday = user.birthMonth && user.birthDay &&
     (now.getMonth() + 1) === parseInt(user.birthMonth) &&
     now.getDate() === parseInt(user.birthDay);
@@ -576,8 +582,54 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
     // (keyframes defined in App.jsx alongside softPulse / fadeInLine).
     const showLoadingDash = dailyLoading && !isBirthday && !trimmedDaily;
 
+    // Share affordance — surfaces only when the same cycle data that
+    // powers the label above resolves. If the user hasn't enabled
+    // cycle tracking (or no start date exists) the button is omitted
+    // entirely rather than falling back to an empty share.
+    const shareEnabled = !!cycleLabel;
+    const handleShareCycle = async () => {
+      if (!shareEnabled || sharingCycle) return;
+      setSharingCycle(true);
+      try {
+        await shareCycleCard({ phaseName: cyclePhaseName, day: cycleDay });
+      } catch (e) {
+        console.warn("[Cygne] cycle share failed:", e?.message || e);
+      } finally {
+        setSharingCycle(false);
+      }
+    };
+
     return (
       <div style={{ position: "relative", textAlign: "center" }}>
+        {shareEnabled && (
+          <button
+            type="button"
+            onClick={handleShareCycle}
+            disabled={sharingCycle}
+            aria-label={sharingCycle ? "Preparing cycle card" : "Share your cycle phase"}
+            style={{
+              position: "absolute", top: -6, right: -4,
+              width: 30, height: 30,
+              display: "inline-flex", alignItems: "center", justifyContent: "center",
+              background: "none", border: "none", padding: 0,
+              color: "var(--color-ivory, #faf9f4)",
+              opacity: sharingCycle ? 0.45 : 0.55,
+              cursor: sharingCycle ? "default" : "pointer",
+              WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
+              transition: "opacity 0.18s",
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" strokeWidth="1.5"
+              strokeLinecap="round" strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M12 16 V4" />
+              <path d="M7 9 l5-5 5 5" />
+              <path d="M5 13 v6 a2 2 0 0 0 2 2 h10 a2 2 0 0 0 2-2 v-6" />
+            </svg>
+          </button>
+        )}
         <p style={{
           fontFamily: "var(--font-display)",
           fontSize: 10, fontWeight: 700,
