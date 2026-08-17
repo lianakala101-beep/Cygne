@@ -63,10 +63,28 @@
   );
 }
 
-/* Base */
+/* Base
+ * html + body both painted inky-moss so the strip iOS exposes during
+ * a rubber-band overscroll bounce shows the app's dark canvas
+ * instead of a default-white / ivory flash. Every screen renders
+ * inside an App-level `var(--color-inky-moss)` div, so this color
+ * is invisible in the normal viewport — it only matters when the
+ * WebView pulls past a scroll boundary and reveals the underlayer.
+ *
+ * overscroll-behavior-y: contain prevents scroll chaining and keeps
+ * the elastic bounce inside the app's own scroller. `contain` (not
+ * `none`) is deliberate — it preserves the native elastic feel;
+ * combined with the dark body background above, the bounce simply
+ * reveals the same dark color rather than an unstyled surface. No
+ * pull-to-refresh depends on chaining, so nothing regresses here. */
+html,
+body {
+  background-color: var(--color-inky-moss);
+  overscroll-behavior-y: contain;
+}
+
 body {
   font-family: var(--font-body);
-  background-color: var(--color-ivory);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='250' height='250' filter='url(%23grain)' opacity='0.045'/%3E%3C/svg%3E");
   background-repeat: repeat;
   background-attachment: fixed;
