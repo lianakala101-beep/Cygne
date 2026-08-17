@@ -27,7 +27,16 @@
 
 const CANVAS_W = 1080;
 const CANVAS_H = 1920;
-const IVORY = "#faf9f4";
+// Sticker asset colors. Text and logo paint inky-moss so the graphic
+// reads as intended when the user drops it onto a LIGHT Story
+// background (a solid ivory fill, a photo, a gradient). The ivory
+// halo we stroke around each glyph — an "outline" but soft enough to
+// read as a halo — keeps the same inky-moss text legible when it
+// lands on a DARK background instead. Standard transparent-sticker
+// practice: dark stroke + light halo (or the inverse) so a single
+// asset works on both light and dark surfaces.
+const INKY_MOSS = "#2d3d2b";
+const IVORY_HALO = "#faf9f4";
 
 // One mood word per canonical phase. Kept poetic — not advice, not
 // clinical. Menstrual = rest, Follicular = building energy,
@@ -46,7 +55,13 @@ const MOOD_WORDS = {
 // individually with a manual px offset. Text is centered by measuring
 // total advance (glyph widths + inter-glyph spacing) and starting
 // left of the anchor x by half that.
-function drawSpacedText(ctx, text, x, y, fontSize, spacingEm) {
+//
+// If `halo` is provided ({ color, width }) the glyph is stroked
+// before it's filled — a soft outline that keeps dark text legible
+// against dark Story backgrounds. On light backgrounds the ivory
+// halo blends into the background and the dark fill dominates, so
+// the same asset reads on either surface.
+function drawSpacedText(ctx, text, x, y, fontSize, spacingEm, halo) {
   const chars = Array.from(String(text));
   if (chars.length === 0) return;
   const spacingPx = fontSize * spacingEm;
@@ -56,6 +71,20 @@ function drawSpacedText(ctx, text, x, y, fontSize, spacingEm) {
   ctx.textAlign = "left";
   let cursor = x - total / 2;
   for (let i = 0; i < chars.length; i++) {
+    if (halo) {
+      const prevStroke = ctx.strokeStyle;
+      const prevWidth = ctx.lineWidth;
+      const prevJoin = ctx.lineJoin;
+      ctx.strokeStyle = halo.color;
+      ctx.lineWidth = halo.width;
+      // Round joins so the stroke sits cleanly around each glyph at
+      // the wider halo widths used on the DAY numeral (~7px).
+      ctx.lineJoin = "round";
+      ctx.strokeText(chars[i], cursor, y);
+      ctx.strokeStyle = prevStroke;
+      ctx.lineWidth = prevWidth;
+      ctx.lineJoin = prevJoin;
+    }
     ctx.fillText(chars[i], cursor, y);
     cursor += widths[i] + spacingPx;
   }
@@ -93,22 +122,36 @@ async function renderCycleShareBlob({ phaseName, day }) {
   let logo = null;
   try { logo = await loadLogo(); } catch {}
 
-  ctx.fillStyle = IVORY;
+  ctx.fillStyle = INKY_MOSS;
   ctx.textBaseline = "middle";
   ctx.textAlign = "center";
 
-  // 1. Logo — quiet size (140px), centered on x = 540, top-anchored
-  //    around y = 320.
+  // Halo configs per element. Widths scale roughly with font size so
+  // the outline reads at the same visual weight across the four text
+  // tiers. IVORY_HALO keeps the outline invisible on light Story
+  // backgrounds (blends in) and provides a legible glow on dark
+  // ones.
+  const badgeHalo = { color: IVORY_HALO, width: 3 };
+  const dayHalo   = { color: IVORY_HALO, width: 7 };
+  const moodHalo  = { color: IVORY_HALO, width: 3 };
+  const sigHalo   = { color: IVORY_HALO, width: 2 };
+
+  // 1. Logo — quiet size (140px), centered horizontally, top-anchored
+  //    around y = 260. The logo asset itself renders naturally dark
+  //    (that's why every other placement in the app inverts it with
+  //    filter: brightness(0) invert(1)) — we want the dark version
+  //    here, so no filter. A subtle ivory shadow around the logo
+  //    plays the same "halo for dark backgrounds" role the stroke
+  //    plays for text.
   if (logo) {
     const logoSize = 140;
-    // Fit while preserving the natural aspect ratio (some logo files
-    // are wider than tall; assume square-ish here and let
-    // drawImage handle scaling).
     const w = logoSize;
     const h = logoSize * (logo.naturalHeight / (logo.naturalWidth || 1));
-    ctx.globalAlpha = 0.9;
+    ctx.save();
+    ctx.shadowColor = "rgba(250, 249, 244, 0.85)";
+    ctx.shadowBlur = 14;
     ctx.drawImage(logo, (CANVAS_W - w) / 2, 260, w, h);
-    ctx.globalAlpha = 1;
+    ctx.restore();
   }
 
   // 2. Bracketed phase badge — "( FOLLICULAR )".
@@ -116,9 +159,7 @@ async function renderCycleShareBlob({ phaseName, day }) {
   const badgeText = phaseUpper ? `( ${phaseUpper} )` : "";
   if (badgeText) {
     ctx.font = '700 44px "Fungis Heavy", "Fungis", sans-serif';
-    ctx.globalAlpha = 0.85;
-    drawSpacedText(ctx, badgeText, CANVAS_W / 2, 780, 44, 0.22);
-    ctx.globalAlpha = 1;
+    drawSpacedText(ctx, badgeText, CANVAS_W / 2, 780, 44, 0.22, badgeHalo);
   }
 
   // 3. Day numeral — apothecary hero number, tight caps tracking.
@@ -126,23 +167,19 @@ async function renderCycleShareBlob({ phaseName, day }) {
   const dayNum = Number.isFinite(Number(day)) ? Number(day) : 0;
   const dayPad = String(Math.max(0, Math.floor(dayNum))).padStart(2, "0");
   ctx.font = '700 260px "Fungis Heavy", "Fungis", sans-serif';
-  drawSpacedText(ctx, `DAY ${dayPad}`, CANVAS_W / 2, 1080, 260, 0.02);
+  drawSpacedText(ctx, `DAY ${dayPad}`, CANVAS_W / 2, 1080, 260, 0.02, dayHalo);
 
-  // 4. Mood word — smaller caps, quieter, mapped from phase name.
+  // 4. Mood word — smaller caps, mapped from phase name.
   //    Unknown phases fall back to no mood word rather than guessing.
   const mood = MOOD_WORDS[phaseName];
   if (mood) {
     ctx.font = '700 56px "Fungis Heavy", "Fungis", sans-serif';
-    ctx.globalAlpha = 0.7;
-    drawSpacedText(ctx, mood, CANVAS_W / 2, 1360, 56, 0.32);
-    ctx.globalAlpha = 1;
+    drawSpacedText(ctx, mood, CANVAS_W / 2, 1360, 56, 0.32, moodHalo);
   }
 
   // 5. cygne.skin signature — quiet, near the bottom, no CTA styling.
   ctx.font = '400 30px "Fungis Normal", "Fungis", sans-serif';
-  ctx.globalAlpha = 0.55;
-  drawSpacedText(ctx, "cygne.skin", CANVAS_W / 2, 1780, 30, 0.24);
-  ctx.globalAlpha = 1;
+  drawSpacedText(ctx, "cygne.skin", CANVAS_W / 2, 1780, 30, 0.24, sigHalo);
 
   return await new Promise((resolve, reject) => {
     canvas.toBlob(
