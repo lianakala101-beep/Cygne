@@ -40,6 +40,20 @@ describe("buildSkinIndex", () => {
     expect(withoutUv.items.find(i => i.key === "uv")).toBeUndefined();
   });
 
+  it("rounds the displayed UV value but keeps threshold checks on the raw figure", () => {
+    // 5.6 rounds up to "6" for display, and 5.6 itself is below the
+    // >=6 caution threshold — so the pill should show 6 while still
+    // reading as non-caution, proving the round happens at display
+    // time only and doesn't leak into the threshold math.
+    const result = buildSkinIndex({ weather: { uvIndex: 5.6 } });
+    const uv = result.items.find(i => i.key === "uv");
+    expect(uv.value).toBe("6");
+    expect(uv.tone).toBe("neutral");
+
+    expect(buildSkinIndex({ weather: { uvIndex: 2.4 } }).items.find(i => i.key === "uv").value).toBe("2");
+    expect(buildSkinIndex({ weather: { uvIndex: 8.9 } }).items.find(i => i.key === "uv").value).toBe("9");
+  });
+
   it("combines cycle + humidity into a higher barrier risk than either alone", () => {
     const cycleOnly = buildSkinIndex({ cyclePhaseName: "Luteal", weather: null });
     const combined = buildSkinIndex({ cyclePhaseName: "Luteal", weather: { humidity: 25 } });

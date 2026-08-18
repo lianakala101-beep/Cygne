@@ -475,7 +475,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
               {hasWeather && (
                 <div style={{ display: "inline-flex", alignItems: "center", gap: 10, marginLeft: "auto" }}>
                   {weather.temp !== null && <span style={txtSt}>{Math.round(tempUnit === "F" ? (weather.temp * 9 / 5 + 32) : weather.temp)}°{tempUnit}</span>}
-                  {weather.uvIndex !== null && <span style={txtSt}>UV {weather.uvIndex}</span>}
+                  {weather.uvIndex !== null && <span style={txtSt}>UV {Math.round(weather.uvIndex)}</span>}
                   {weather.humidity !== null && <span style={txtSt}>{weather.humidity}%</span>}
                   {locationData?.city && <span style={{ ...txtSt, opacity: 0.5 }}>{locationData.city}</span>}
                 </div>
