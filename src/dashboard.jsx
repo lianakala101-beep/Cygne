@@ -226,7 +226,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             Renders nothing (no wrapper margin either — the component
             owns its own spacing) when neither cycle phase nor
             weather resolves — see DailySkinIndexCard. */}
-        <DailySkinIndexCard cyclePhaseName={cyclePhase?.name || null} weather={weather} />
+        <DailySkinIndexCard cyclePhaseName={cyclePhase?.name || null} cycleDay={currentCycleDay} weather={weather} locationData={locationData} />
 
         {_now.getDate() >= 14 && (
           <div style={{ textAlign: "right", marginBottom: 24 }}>

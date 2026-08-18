@@ -2,18 +2,19 @@ import { describe, it, expect } from "vitest";
 import { buildSkinIndex } from "./skinIndex.js";
 
 describe("buildSkinIndex", () => {
-  it("returns no items and no action line when nothing resolves", () => {
+  it("returns no items and no actions when nothing resolves", () => {
     const result = buildSkinIndex({ cyclePhaseName: null, weather: null });
     expect(result.items).toEqual([]);
-    expect(result.actionLine).toBeNull();
+    expect(result.actions).toEqual([]);
   });
 
   it("computes sebum trend from cycle phase alone, no weather needed", () => {
     const result = buildSkinIndex({ cyclePhaseName: "Follicular", weather: null });
     const sebum = result.items.find(i => i.key === "sebum");
     expect(sebum.value).toBe("Escalating");
-    // No weather at all — UV item must be absent.
+    // No weather at all — UV and humidity items must be absent.
     expect(result.items.find(i => i.key === "uv")).toBeUndefined();
+    expect(result.items.find(i => i.key === "humidity")).toBeUndefined();
   });
 
   it("maps each phase to its expected sebum trend", () => {
@@ -54,6 +55,21 @@ describe("buildSkinIndex", () => {
     expect(buildSkinIndex({ weather: { uvIndex: 8.9 } }).items.find(i => i.key === "uv").value).toBe("9");
   });
 
+  it("shows the humidity item only when weather provides it, rounded to a whole percent", () => {
+    const withHumidity = buildSkinIndex({ weather: { humidity: 42.6 } });
+    const humidity = withHumidity.items.find(i => i.key === "humidity");
+    expect(humidity.value).toBe("43%");
+
+    const withoutHumidity = buildSkinIndex({ weather: { uvIndex: 4, humidity: null } });
+    expect(withoutHumidity.items.find(i => i.key === "humidity")).toBeUndefined();
+  });
+
+  it("tones humidity independently: dry is caution, comfortable is neutral, humid is positive", () => {
+    expect(buildSkinIndex({ weather: { humidity: 15 } }).items.find(i => i.key === "humidity").tone).toBe("caution");
+    expect(buildSkinIndex({ weather: { humidity: 45 } }).items.find(i => i.key === "humidity").tone).toBe("neutral");
+    expect(buildSkinIndex({ weather: { humidity: 75 } }).items.find(i => i.key === "humidity").tone).toBe("positive");
+  });
+
   it("combines cycle + humidity into a higher barrier risk than either alone", () => {
     const cycleOnly = buildSkinIndex({ cyclePhaseName: "Luteal", weather: null });
     const combined = buildSkinIndex({ cyclePhaseName: "Luteal", weather: { humidity: 25 } });
@@ -61,22 +77,46 @@ describe("buildSkinIndex", () => {
     expect(combined.items.find(i => i.key === "barrier").value).toBe("High");
   });
 
-  it("prioritizes the high-sebum + high-UV action line over other combos", () => {
+  it("produces up to 3 guidance bullets, most-severe combo first, when everything is elevated", () => {
     const result = buildSkinIndex({ cyclePhaseName: "Luteal", weather: { humidity: 60, uvIndex: 8 } });
-    expect(result.actionLine).toMatch(/gel moisturizer/i);
+    expect(result.actions.length).toBeLessThanOrEqual(3);
+    expect(result.actions.some(a => /gel moisturizer/i.test(a))).toBe(true);
+    expect(result.actions.some(a => /exfoliating acids/i.test(a))).toBe(true);
+    expect(result.actions.some(a => /spf/i.test(a))).toBe(true);
+    // High barrier risk means the "add a BHA" oil-trend bullet must
+    // NOT also appear — never suggest adding an active in the same
+    // breath as backing off actives.
+    expect(result.actions.some(a => /bha/i.test(a))).toBe(false);
   });
 
-  it("falls back to a barrier-risk line when barrier is High but UV isn't", () => {
+  it("suggests holding off on actives, not adding one, when barrier risk is High", () => {
     const result = buildSkinIndex({ cyclePhaseName: "Luteal", weather: { humidity: 15, uvIndex: null } });
-    expect(result.actionLine).toMatch(/barrier risk is elevated/i);
+    expect(result.actions.some(a => /exfoliating acids/i.test(a) && /barrier sensitivity/i.test(a))).toBe(true);
+    // No UV signal — SPF bullet must not appear.
+    expect(result.actions.some(a => /spf/i.test(a))).toBe(false);
   });
 
-  it("gives a calm fallback line when nothing is notable", () => {
+  it("suggests an active step (not a caution) when oil is rising and barrier risk isn't High", () => {
     const result = buildSkinIndex({ cyclePhaseName: "Ovulatory", weather: { humidity: 70, uvIndex: 2 } });
-    // Ovulatory sebum is "Escalating" per the phase map, which takes
-    // priority over the calm fallback — assert the escalating-only
-    // branch fires instead of the barrier="Low" branch.
-    expect(result.actionLine).toMatch(/sebum is climbing/i);
+    // Ovulatory + comfortable humidity + low UV → barrier risk Low,
+    // sebum Escalating. Should get the oil-trend suggestion, not the
+    // barrier-caution one, and no SPF bullet.
+    expect(result.actions.some(a => /bha or clay/i.test(a))).toBe(true);
+    expect(result.actions.some(a => /exfoliating acids/i.test(a))).toBe(false);
+    expect(result.actions.some(a => /spf/i.test(a))).toBe(false);
+  });
+
+  it("gives a calm fallback bullet only when nothing else triggered", () => {
+    const result = buildSkinIndex({ cyclePhaseName: "Ovulatory", weather: { humidity: 70, uvIndex: 2 } });
+    // The oil-trend bullet fires here (previous test), so the calm
+    // fallback must NOT also appear alongside it.
+    expect(result.actions.some(a => /nothing unusual/i.test(a))).toBe(false);
+
+    // Menstrual (sebum "Low", not rising) + comfortable weather has
+    // no trigger at all — this is the one case the calm fallback
+    // should show up in.
+    const calm = buildSkinIndex({ cyclePhaseName: "Menstrual", weather: { humidity: 70, uvIndex: 1 } });
+    expect(calm.actions).toEqual(["Nothing unusual in today's pattern — your usual ritual should serve you well."]);
   });
 
   it("never assumes a concern-adjacent tone when only Low/neutral values are present", () => {

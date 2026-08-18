@@ -10,7 +10,16 @@
 //
 // Every value here is a same-day readout, not a diagnosis — labels
 // stay in the "risk / trend" register the rest of the app already
-// uses (see PHASE_META in progress.jsx), never a clinical claim.
+// uses (see PHASE_META in progress.jsx), never a clinical claim. The
+// generated guidance bullets follow the same rule: pattern/trend
+// framing ("may benefit from", "consider") rather than declarative
+// diagnostic statements.
+//
+// Fast-follow, not in this pass: Air Quality Index. Open-Meteo serves
+// AQI from a separate Air Quality API (air-quality-api.open-meteo.com)
+// that isn't integrated yet — environment.jsx's useWeather only calls
+// the standard forecast endpoint. Wiring that up is a self-contained
+// follow-up, not a blocker for this card.
 
 // Sebum trend is driven entirely by cycle phase — no weather
 // dependency, so this item is still available with cycle tracking
@@ -49,6 +58,16 @@ function computeBarrierRisk({ cyclePhaseName, humidity, uvIndex }) {
   return "Low";
 }
 
+// Humidity's own tone reads independently of barrier risk (which
+// already folds humidity in as one input among several) — this is
+// just "is today's air dry, comfortable, or humid," a simpler and
+// more literal read of the same number.
+function toneForHumidity(humidity) {
+  if (humidity < 30) return "caution";
+  if (humidity < 55) return "neutral";
+  return "positive";
+}
+
 // Tone maps each index value to the same semantic palette used
 // elsewhere in the app: sage/moss for a favorable reading, warm clay
 // for a caution reading, plain ivory for anything in between.
@@ -61,13 +80,18 @@ function toneFor(value) {
   return TONE_BY_VALUE[value] || "neutral";
 }
 
-// Builds the short list of index items + one synthesized action line.
-// Returns { items: [{ key, label, value, tone }], actionLine: string|null }.
-// items is [] (and actionLine null) only when neither cycle phase nor
-// any weather field resolved — the caller should omit the whole card
-// in that case; any partial signal still produces a reduced-but-
-// present card, per spec ("gracefully reduce... rather than hiding
-// the whole card").
+// Builds the short list of index items + a short list of rule-based
+// guidance bullets. Returns:
+//   { items: [{ key, label, value, tone }], actions: string[] }
+//
+// items is [] (and actions []) only when neither cycle phase nor any
+// weather field resolved — the caller should omit the whole card in
+// that case; any partial signal still produces a reduced-but-present
+// card, per spec ("gracefully reduce... rather than hiding the whole
+// card"). Each guidance bullet only appears when the specific
+// condition behind it is actually present in the data — there's no
+// padding to hit a target count, so the list can be anywhere from 0
+// to 3 items.
 function buildSkinIndex({ cyclePhaseName = null, weather = null } = {}) {
   const humidity = weather?.humidity ?? null;
   const uvIndex = weather?.uvIndex ?? null;
@@ -88,40 +112,59 @@ function buildSkinIndex({ cyclePhaseName = null, weather = null } = {}) {
     items.push({ key: "uv", label: "UV Index", value: String(Math.round(uvIndex)), tone: uvIndex >= 6 ? "caution" : "neutral" });
   }
 
+  if (humidity != null) {
+    // relative_humidity_2m from Open-Meteo, already fetched by
+    // environment.jsx's useWeather — same source as the UV item
+    // above, just a different field off the same response.
+    items.push({ key: "humidity", label: "Humidity", value: `${Math.round(humidity)}%`, tone: toneForHumidity(humidity) });
+  }
+
   const sebumTrend = cyclePhaseName ? SEBUM_TREND_BY_PHASE[cyclePhaseName] || null : null;
   if (sebumTrend) {
     items.push({ key: "sebum", label: "Sebum Trend", value: sebumTrend, tone: toneFor(sebumTrend) });
   }
 
   if (items.length === 0) {
-    return { items: [], actionLine: null };
+    return { items: [], actions: [] };
   }
 
   const highUv = uvIndex != null && uvIndex >= 6;
   const risingOil = sebumTrend === "Escalating" || sebumTrend === "Peak";
 
-  let actionLine;
-  if (highUv && risingOil) {
-    actionLine = "High sebum + high UV today. Consider your gel moisturizer over your cream, and don't skip SPF.";
-  } else if (barrierRisk === "High") {
-    actionLine = "Barrier risk is elevated today — lean on ceramides, skip new actives, and keep the ritual gentle.";
-  } else if (sebumTrend === "Peak") {
-    actionLine = "Oil is at its peak this phase — a clay mask or your BHA can help keep congestion in check.";
-  } else if (sebumTrend === "Escalating") {
-    actionLine = "Sebum is climbing — a lighter moisturizer may feel better than usual today.";
+  // Each candidate is independent and only fires on its own specific
+  // condition — no artificial padding to reach a target count.
+  const actions = [];
+
+  // Morning product suggestion.
+  if (barrierRisk === "High" || (highUv && risingOil)) {
+    actions.push("A lightweight gel moisturizer may suit better than a heavier cream this morning.");
   } else if (barrierRisk === "Medium" && humidity != null && humidity < 35) {
-    actionLine = "Low humidity is stressing your barrier — layer a hydrating serum underneath your moisturizer.";
-  } else if (highUv) {
-    actionLine = "UV is high today — SPF isn't optional.";
-  } else if (sebumTrend === "Low") {
-    actionLine = "Oil production is naturally lower right now — a good window for richer textures.";
-  } else if (barrierRisk === "Low") {
-    actionLine = "Nothing unusual in today's readout — stick with your usual ritual.";
-  } else {
-    actionLine = null;
+    actions.push("Today's lower humidity may benefit from a richer, barrier-supporting moisturizer.");
   }
 
-  return { items, actionLine };
+  // Active-ingredient guidance — a caution when the barrier looks
+  // stressed, or a trend-based suggestion when oil is climbing and
+  // the barrier isn't compromised. Mutually exclusive: never suggest
+  // adding an active in the same breath as backing off actives.
+  if (barrierRisk === "High") {
+    actions.push("Exfoliating acids may be worth holding off on — barrier sensitivity looks elevated today.");
+  } else if (risingOil) {
+    actions.push("Rising oil this phase may benefit from a BHA or clay-based step in your routine.");
+  }
+
+  // SPF reminder, only when UV is meaningfully high.
+  if (highUv) {
+    actions.push("Consider reapplying SPF today, especially with extended time outdoors.");
+  }
+
+  // Calm fallback — only when there's real data to read but nothing
+  // notable enough to have triggered a bullet above, so the section
+  // never renders as an empty gap under a populated index.
+  if (actions.length === 0) {
+    actions.push("Nothing unusual in today's pattern — your usual ritual should serve you well.");
+  }
+
+  return { items, actions };
 }
 
 export { buildSkinIndex, SEBUM_TREND_BY_PHASE };
