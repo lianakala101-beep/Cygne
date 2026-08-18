@@ -11,6 +11,7 @@ import { getTreatmentPhase, TreatmentRecoveryCard, getCyclePhase } from "./progr
 import { getCurrentCycleDay, daysBetweenLocal, getAskCygneAccess } from "./utils.jsx";
 import { AskCygneButton } from "./AskCygne.jsx";
 import { useSwanSenseDaily } from "./hooks/useSwanSenseDaily.js";
+import { DailySkinIndexCard } from "./components/DailySkinIndexCard.jsx";
 
 // Code-split: both overlays only render on user action, so let Vite ship them
 // in their own chunks instead of in the dashboard's initial paint bundle.
@@ -57,6 +58,11 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
   const { activeMap } = analyzeShelf(products);
   const swanSensePredictions = getSwanSensePredictions(products, checkIns, user, locationData, journals);
   const { env: weather } = useWeather(locationData, user?.tempUnit || "C");
+  // Same gate used for every other cycle-data consumer on this
+  // screen (the context footer below, the expanded cycle modal) — no
+  // fallback assumption when tracking isn't enabled or the day can't
+  // be computed. Feeds the Daily Skin Index card's sebum-trend item.
+  const cyclePhase = user?.cycleTrackingEnabled && currentCycleDay ? getCyclePhase(currentCycleDay) : null;
 
   // LLM-generated daily Swan Sense line — fetched once per (user, day), cached
   // in localStorage + the server-side ask_cygne_cache table. Falls back to the
@@ -211,6 +217,17 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         <div style={{ marginBottom: 20 }}>
           <SwanSongCard currentSession={currentSession} asPopup={false} user={user} predictions={swanSensePredictions} dailyLine={swanDailyLine} dailyLoading={swanLoading} dailyFailed={swanFailed} variant="ivory-flat" />
         </div>
+
+        {/* Daily Skin Index — glanceable data readout synthesized from
+            cycle phase + local weather. Sits directly under Swan
+            Sense but is deliberately a bordered flat card (not a
+            borderless editorial line) so it reads as a distinct
+            data-index format next to Swan Sense's written sentence.
+            Renders nothing (no wrapper margin either — the component
+            owns its own spacing) when neither cycle phase nor
+            weather resolves — see DailySkinIndexCard. */}
+        <DailySkinIndexCard cyclePhaseName={cyclePhase?.name || null} weather={weather} />
+
         {_now.getDate() >= 14 && (
           <div style={{ textAlign: "right", marginBottom: 24 }}>
             <button
