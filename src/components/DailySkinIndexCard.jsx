@@ -33,14 +33,12 @@ const TONE_STYLES = {
 //     the per-item row labels) — font-size and letter-spacing never
 //     do, so the labels read as one family of text.
 //
-//   VALUE_STYLE  — the three index values. Fungis Normal (not Heavy —
-//     the bracket/outline pill itself carries the emphasis, so the
-//     glyphs stay lighter-weight inside it), 20px — genuinely bigger
-//     than the 10px labels, not a marginal bump — with 0.02em
-//     tracking matching the large-Fungis-headline convention used
-//     elsewhere (e.g. the skin-status phrase in src/lib/cycleShare.js),
-//     not the wide small-caps tracking that only belongs on tiny
-//     label text.
+//   VALUE_STYLE  — the three index values. Fungis Heavy — the only
+//     Heavy-weight text on the card besides the labels/header (which
+//     stay exactly as they were), 20px, 0.02em tracking matching the
+//     large-Fungis-headline convention used elsewhere (e.g. the
+//     skin-status phrase in src/lib/cycleShare.js), not the wide
+//     small-caps tracking that only belongs on tiny label text.
 //
 //   ACTION_LINE_STYLE — matches Swan Sense's own daily-insight
 //     paragraph exactly (src/ritual.jsx's ivory-flat variant): Fungis
@@ -53,10 +51,16 @@ const LABEL_STYLE = {
 };
 
 const VALUE_STYLE = {
-  fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 20,
+  fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 20,
   letterSpacing: "0.02em", textTransform: "uppercase",
   lineHeight: 1,
 };
+
+// Every pill shares this floor so "0" and "ESCALATING" read as the
+// same fixed-size object rather than shrink-wrapping to their own
+// text — sized to comfortably fit the longest actual value
+// ("ESCALATING") without wrapping.
+const PILL_MIN_WIDTH = 140;
 
 const ACTION_LINE_STYLE = {
   fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 16,
@@ -92,14 +96,16 @@ function DailySkinIndexCard({ cyclePhaseName = null, weather = null }) {
                 {item.label}
               </span>
               <span style={{
-                display: "inline-flex", alignItems: "center",
+                display: "inline-flex", alignItems: "center", justifyContent: "center",
+                minWidth: PILL_MIN_WIDTH,
+                whiteSpace: "nowrap",
                 padding: "6px 16px",
                 border: `1px solid ${tone.border}`,
                 borderRadius: 999,
                 ...VALUE_STYLE,
                 color: tone.color,
               }}>
-                ( {item.value} )
+                {item.value}
               </span>
             </div>
           );
