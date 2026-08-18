@@ -11,14 +11,22 @@
 // to read in ~5 seconds like a weather app rather than a paragraph.
 import { buildSkinIndex } from "../lib/skinIndex.js";
 
-// Tone → { label color, pill border } pairs. Matches the semantic
-// palette already used elsewhere in the app: sage/moss for a
-// favorable reading (e.g. ritual.jsx's "in ritual" state), warm clay
-// for a caution reading (e.g. shelf-life warnings, back-off states),
-// plain ivory for anything in between.
+// Tone → { label color, pill border } pairs. The pill sits on a
+// near-transparent wash over the dashboard's dark inky-moss canvas,
+// so text needs to pair with a DARK background the same way the
+// Progress-screen contrast fix paired text color with actual
+// surface tone rather than a semantic-only palette (see
+// src/progress.jsx's ivory-band SectionShell token overrides). At
+// the pill's small 9px size, the previous tinted caution/positive
+// colors (warm clay / sage) sat around a 4-4.5:1 contrast ratio
+// against the dark fill — legible in isolation but marginal at that
+// size. All three tones now share one uniform bright ivory/cream
+// text color (~11:1 against the dark fill) so contrast is never in
+// question; the tone signal still comes through via the pill's
+// outline color, which stays distinct per tone.
 const TONE_STYLES = {
-  caution:  { color: "#c9a985", border: "rgba(139,115,85,0.45)" },
-  positive: { color: "#8fac93", border: "rgba(110,138,114,0.4)" },
+  caution:  { color: "var(--color-ivory, #faf9f4)", border: "rgba(139,115,85,0.45)" },
+  positive: { color: "var(--color-ivory, #faf9f4)", border: "rgba(110,138,114,0.4)" },
   neutral:  { color: "var(--color-ivory, #faf9f4)", border: "rgba(250,249,244,0.32)" },
 };
 

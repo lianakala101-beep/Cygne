@@ -95,8 +95,15 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           : gap >= 3 ? "Welcome back. Let's ease back into your ritual."
           : null;
         return (
-          <div style={{ marginBottom: products.length === 0 || welcomeBackLine ? 20 : 24 }}>
-            <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 500, fontSize: 32, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 6px", lineHeight: 1.05 }}>
+          // paddingTop adds breathing room below the sticky logo header
+          // (App.jsx's shared content wrapper only gives 32px, which read
+          // as a near-collision above the greeting) — scoped to the
+          // dashboard's own greeting block rather than the shared
+          // wrapper, so no other tab's top spacing changes. Applies
+          // identically across all three greeting slots (morning/
+          // afternoon/evening) since they share this one block.
+          <div style={{ paddingTop: 16, marginBottom: products.length === 0 || welcomeBackLine ? 20 : 24 }}>
+            <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 500, fontSize: 32, letterSpacing: "0.28em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 6px", lineHeight: 1.05 }}>
               {greeting}{firstName ? "," : "."}
             </h1>
             {firstName && (
