@@ -80,7 +80,12 @@ function buildSkinIndex({ cyclePhaseName = null, weather = null } = {}) {
   }
 
   if (uvIndex != null) {
-    items.push({ key: "uv", label: "UV Index", value: String(uvIndex), tone: uvIndex >= 6 ? "caution" : "neutral" });
+    // Display rounded to the nearest whole number — UV index is
+    // conventionally shown on a 0-11+ integer scale, no decimals.
+    // The raw fractional value (e.g. from open-meteo) is still what
+    // drives the >=6 threshold checks above/below, so precision isn't
+    // lost for the scoring logic — only the displayed label rounds.
+    items.push({ key: "uv", label: "UV Index", value: String(Math.round(uvIndex)), tone: uvIndex >= 6 ? "caution" : "neutral" });
   }
 
   const sebumTrend = cyclePhaseName ? SEBUM_TREND_BY_PHASE[cyclePhaseName] || null : null;
