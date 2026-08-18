@@ -21,6 +21,49 @@ const TONE_STYLES = {
   neutral:  { color: "var(--color-ivory, #faf9f4)", border: "rgba(250,249,244,0.32)" },
 };
 
+// Typography audit — one shared spec per role, reused everywhere that
+// role appears so nothing drifts row to row:
+//
+//   LABEL_STYLE  — every uppercase small-caps label, including the
+//     card's own "Daily Skin Index" header. Fungis Heavy, 10px,
+//     0.28em tracking — exactly the Swan Sense eyebrow spec
+//     (src/ritual.jsx's ivory-flat "Swan Sense" label), which is the
+//     small-caps size already established for this part of the
+//     dashboard. Only opacity varies (header slightly louder than
+//     the per-item row labels) — font-size and letter-spacing never
+//     do, so the labels read as one family of text.
+//
+//   VALUE_STYLE  — the three index values. Fungis Heavy, 20px —
+//     genuinely bigger than the 10px labels, not a marginal bump —
+//     with 0.02em tracking matching the large-Fungis-headline
+//     convention used elsewhere (e.g. the skin-status phrase in
+//     src/lib/cycleShare.js), not the wide small-caps tracking that
+//     only belongs on tiny label text.
+//
+//   ACTION_LINE_STYLE — matches Swan Sense's own daily-insight
+//     paragraph exactly (src/ritual.jsx's ivory-flat variant): Fungis
+//     Normal, 16px, 0.01em tracking, 1.5 line-height, full-opacity
+//     ivory. Body text stays Normal weight everywhere; only labels
+//     and values (the "emphasis" roles) use the Heavy face.
+const LABEL_STYLE = {
+  fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 10,
+  letterSpacing: "0.28em", textTransform: "uppercase",
+  color: "var(--color-ivory, #faf9f4)",
+};
+
+const VALUE_STYLE = {
+  fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 20,
+  letterSpacing: "0.02em", textTransform: "uppercase",
+  lineHeight: 1,
+};
+
+const ACTION_LINE_STYLE = {
+  fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 16,
+  letterSpacing: "0.01em", lineHeight: 1.5,
+  color: "var(--color-ivory, #faf9f4)",
+  margin: 0,
+};
+
 function DailySkinIndexCard({ cyclePhaseName = null, weather = null }) {
   const { items, actionLine } = buildSkinIndex({ cyclePhaseName, weather });
   if (items.length === 0) return null;
@@ -33,36 +76,31 @@ function DailySkinIndexCard({ cyclePhaseName = null, weather = null }) {
       padding: "18px 20px",
       marginBottom: 20,
     }}>
-      <p style={{
-        fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 10,
-        letterSpacing: "0.28em", textTransform: "uppercase",
-        color: "var(--color-ivory, #faf9f4)", opacity: 0.75,
-        margin: "0 0 14px",
-      }}>
+      <p style={{ ...LABEL_STYLE, opacity: 0.75, margin: "0 0 16px" }}>
         Daily Skin Index
       </p>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      {/* Each item stacks label above value rather than splitting them
+          across one row — at real hero-adjacent size, a value like
+          "( ESCALATING )" doesn't reliably fit beside its label on
+          narrow screens. Stacking guarantees no overflow at any
+          viewport while still reading as a single scannable unit. */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
         {items.map(item => {
           const tone = TONE_STYLES[item.tone] || TONE_STYLES.neutral;
           return (
-            <div key={item.key} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-              <span style={{
-                fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 11,
-                letterSpacing: "0.14em", textTransform: "uppercase",
-                color: "var(--color-ivory, #faf9f4)", opacity: 0.65,
-              }}>
+            <div key={item.key} style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <span style={{ ...LABEL_STYLE, opacity: 0.6 }}>
                 {item.label}
               </span>
               <span style={{
                 display: "inline-flex", alignItems: "center",
-                padding: "3px 10px",
+                alignSelf: "flex-start",
+                padding: "6px 16px",
                 border: `1px solid ${tone.border}`,
                 borderRadius: 999,
-                fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 10,
-                letterSpacing: "0.16em", textTransform: "uppercase",
+                ...VALUE_STYLE,
                 color: tone.color,
-                whiteSpace: "nowrap", lineHeight: 1,
               }}>
                 ( {item.value} )
               </span>
@@ -73,12 +111,8 @@ function DailySkinIndexCard({ cyclePhaseName = null, weather = null }) {
 
       {actionLine && (
         <>
-          <div style={{ height: 1, background: "rgba(250,249,244,0.14)", margin: "14px 0" }} />
-          <p style={{
-            fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 12,
-            color: "#F4F3EF", opacity: 0.88,
-            lineHeight: 1.6, margin: 0,
-          }}>
+          <div style={{ height: 1, background: "rgba(250,249,244,0.14)", margin: "16px 0" }} />
+          <p style={ACTION_LINE_STYLE}>
             {actionLine}
           </p>
         </>
