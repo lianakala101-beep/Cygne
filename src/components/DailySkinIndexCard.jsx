@@ -35,10 +35,13 @@ const TONE_STYLES = {
 //
 //   VALUE_STYLE  — the three index values. Fungis Heavy — the only
 //     Heavy-weight text on the card besides the labels/header (which
-//     stay exactly as they were), 20px, 0.02em tracking matching the
-//     large-Fungis-headline convention used elsewhere (e.g. the
-//     skin-status phrase in src/lib/cycleShare.js), not the wide
-//     small-caps tracking that only belongs on tiny label text.
+//     stay exactly as they were) — at 9px, deliberately smaller than
+//     the 10px header/labels so the pill is never the largest text
+//     on the card. Distinctness comes from the Heavy weight + pill
+//     outline, not from size. 0.02em tracking matches the large-
+//     Fungis-headline convention used elsewhere (e.g. the skin-status
+//     phrase in src/lib/cycleShare.js), not the wide small-caps
+//     tracking that only belongs on tiny label text.
 //
 //   ACTION_LINE_STYLE — matches Swan Sense's own daily-insight
 //     paragraph exactly (src/ritual.jsx's ivory-flat variant): Fungis
@@ -51,7 +54,7 @@ const LABEL_STYLE = {
 };
 
 const VALUE_STYLE = {
-  fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 20,
+  fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 9,
   letterSpacing: "0.02em", textTransform: "uppercase",
   lineHeight: 1,
 };
