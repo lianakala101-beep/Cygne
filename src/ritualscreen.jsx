@@ -12,6 +12,17 @@ import { getNextUseLabel } from "./constants.js";
 import { getSeason } from "./seasonal.jsx";
 import { getRitualPeriod, getRitualTimeLabel } from "./utils/ritualPeriod.js";
 
+// Actives that are never paused during treatment recovery — same set
+// buildTreatmentRoutineAdvice (src/progress.jsx:804) uses to keep SPF
+// and barrier-supporting ingredients out of the "paused" list. Needed
+// here too: getActivePauseState's pausedActives (progress.jsx:736-748)
+// is built from every active present across the user's vanity with no
+// safe-list filtering of its own — a product whose only detected
+// active happens to be "SPF" can end up in pausedActives during an
+// early recovery phase, and without this exclusion that product would
+// incorrectly surface as paused below.
+const PAUSE_SAFE_ACTIVES = new Set(["SPF", "hyaluronic acid", "ceramides"]);
+
 const RITUAL_MODES = {
   travel: {
     name: "Travel Ritual",
@@ -201,8 +212,21 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
   const { pausedActives, treatment: pauseTreatment, phase: pausePhase } = getActivePauseState(treatments, products);
   const pausedProducts = pausedActives.length > 0
     ? products.filter(p => {
+        // Category exclusion first — belt-and-suspenders so a
+        // cleanser or SPF product is never flagged as paused even if
+        // ingredient detection somehow misses it below.
+        if (p.category === "SPF" || p.category === "Cleanser") return false;
         const actives = detectActives(p.ingredients || []);
-        return p.inRoutine !== false && pausedActives.some(a => actives[a]);
+        const matchedPausedActives = pausedActives.filter(a => actives[a]);
+        if (matchedPausedActives.length === 0) return false;
+        // Only count as paused if at least one matched active is
+        // actually unsafe to continue — SPF / HA / ceramides never
+        // pause on their own (same SAFE set buildTreatmentRoutineAdvice
+        // uses in progress.jsx), so a product whose sole detected
+        // active is barrier-safe stays out of this list even if that
+        // active happens to be present in pausedActives.
+        const hasUnsafePausedActive = matchedPausedActives.some(a => !PAUSE_SAFE_ACTIVES.has(a));
+        return p.inRoutine !== false && hasUnsafePausedActive;
       })
     : [];
   const { am, pm, periodic } = buildRoutine(products, { pausedActives });
