@@ -74,7 +74,11 @@ const CONTEXT_LINE_STYLE = {
   fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 10,
   letterSpacing: "0.14em", textTransform: "uppercase",
   color: "var(--color-ivory, #faf9f4)", opacity: 0.55,
-  margin: "0 0 10px",
+  // 16px matches the card's established section-to-section rhythm
+  // (header-to-items gap, and the divider margin before the action
+  // bullets both use 16px) — was 10px, noticeably tighter than every
+  // other gap on the card.
+  margin: "0 0 16px",
 };
 
 const VALUE_STYLE = {
