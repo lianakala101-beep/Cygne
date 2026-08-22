@@ -5,7 +5,7 @@ import { AskCygneModal } from "./components/AskCygneModal.jsx";
 import { assessRoutineFit, DEFER_TAG_CONFIG } from "./modals.jsx";
 import { ProductModal } from "./productmodal.jsx";
 import { getAskCygneAccess } from "./utils.jsx";
-import { CATEGORIES } from "./constants.js";
+import { CATEGORIES, FREQUENCIES } from "./constants.js";
 
 
 // Bottle silhouette shapes — decorative container outlines mapped by
@@ -31,10 +31,9 @@ function getBottleShape(category) {
 }
 
 // Neck (cap) + body dimensions per shape. Heights are deliberately
-// uneven across shapes — that unevenness is the point (see
-// ProductShelf's flex row, which bottom-aligns items of different
-// heights along the shelf line instead of forcing a uniform card
-// height).
+// uneven across shapes — that unevenness is the point (see BottleRow's
+// flex row, which bottom-aligns items of different heights along the
+// shelf line instead of forcing a uniform card height).
 const BOTTLE_SHAPE_SPEC = {
   pump:    { bodyW: 74, bodyH: 76, neckW: 26, neckH: 14, bodyRadius: "6px 6px 18px 18px", neckRadius: "4px 4px 1px 1px" },
   dropper: { bodyW: 44, bodyH: 120, neckW: 16, neckH: 16, bodyRadius: 12, neckRadius: "4px 4px 1px 1px" },
@@ -47,6 +46,7 @@ const BOTTLE_BORDER = "1px solid rgba(250, 249, 244, 0.4)";
 function ProductBottle({ product, onEdit, onDelete, onToggleRoutine, onSession, user = {}, onAskCygne }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [detailOpen, setDetailOpen] = useState(false);
   const menuRef = useRef(null);
   useEffect(() => {
     if (!menuOpen) return;
@@ -108,31 +108,48 @@ function ProductBottle({ product, onEdit, onDelete, onToggleRoutine, onSession, 
           )}
         </div>
 
-        {/* Neck / cap — sits flush on top of the body (negative margin
-            closes the seam so the border between them doesn't double
-            up into a thick line). */}
-        <div style={{ width: spec.neckW, height: spec.neckH, background: BOTTLE_FILL, border: BOTTLE_BORDER, borderRadius: spec.neckRadius, marginBottom: -1, flexShrink: 0 }} />
+        {/* Neck + body — tapping the silhouette itself (not the ⋯ menu,
+            a separate absolute-positioned sibling above) opens the full
+            detail sheet, since the label plate only ever shows a
+            truncated name. */}
+        <div
+          role="button"
+          tabIndex={0}
+          aria-label={`View details for ${product.name}`}
+          onClick={() => setDetailOpen(true)}
+          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setDetailOpen(true); } }}
+          style={{ display: "flex", flexDirection: "column", alignItems: "center", cursor: "pointer", WebkitTapHighlightColor: "transparent" }}
+        >
+          {/* Neck / cap — sits flush on top of the body (negative margin
+              closes the seam so the border between them doesn't double
+              up into a thick line). */}
+          <div style={{ width: spec.neckW, height: spec.neckH, background: BOTTLE_FILL, border: BOTTLE_BORDER, borderRadius: spec.neckRadius, marginBottom: -1, flexShrink: 0 }} />
 
-        {/* Body — the container's main silhouette, holding a small
-            label plate rather than filling edge-to-edge with text. */}
-        <div style={{
-          width: spec.bodyW, height: spec.bodyH, background: BOTTLE_FILL, border: BOTTLE_BORDER, borderRadius: spec.bodyRadius,
-          display: "flex", alignItems: "center", justifyContent: "center", padding: 5, boxSizing: "border-box", flexShrink: 0,
-        }}>
-          <div style={{ width: "100%", textAlign: "center" }}>
-            {product.brand && (
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 6.5, fontWeight: 400, letterSpacing: "0.06em", textTransform: "uppercase", color: "#5a5a5a", margin: "0 0 2px", opacity: 0.9, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{product.brand}</p>
-            )}
-            <p style={{
-              fontFamily: "var(--font-display)", fontSize: 8.5, fontWeight: 700, letterSpacing: "0", color: "#1c1c1a", margin: 0, lineHeight: 1.15,
-              display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", textOverflow: "ellipsis",
-            }}>{product.name}</p>
-            {product.price > 0 && (
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 6.5, fontWeight: 400, color: "#5a5a5a", margin: "2px 0 0", opacity: 0.9 }}>${(product.price || 0).toFixed(0)}</p>
-            )}
+          {/* Body — the container's main silhouette, holding a small
+              label plate rather than filling edge-to-edge with text. */}
+          <div style={{
+            width: spec.bodyW, height: spec.bodyH, background: BOTTLE_FILL, border: BOTTLE_BORDER, borderRadius: spec.bodyRadius,
+            display: "flex", alignItems: "center", justifyContent: "center", padding: 5, boxSizing: "border-box", flexShrink: 0,
+          }}>
+            <div style={{ width: "100%", textAlign: "center" }}>
+              {product.brand && (
+                <p style={{ fontFamily: "var(--font-body)", fontSize: 6.5, fontWeight: 400, letterSpacing: "0.06em", textTransform: "uppercase", color: "#5a5a5a", margin: "0 0 2px", opacity: 0.9, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{product.brand}</p>
+              )}
+              <p style={{
+                fontFamily: "var(--font-display)", fontSize: 8.5, fontWeight: 700, letterSpacing: "0", color: "#1c1c1a", margin: 0, lineHeight: 1.15,
+                display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", textOverflow: "ellipsis",
+              }}>{product.name}</p>
+              {product.price > 0 && (
+                <p style={{ fontFamily: "var(--font-body)", fontSize: 6.5, fontWeight: 400, color: "#5a5a5a", margin: "2px 0 0", opacity: 0.9 }}>${(product.price || 0).toFixed(0)}</p>
+              )}
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Full-detail bottom sheet — separate from the ⋯ menu's actions,
+          triggered by tapping the bottle itself. */}
+      {detailOpen && <ProductDetailSheet product={product} onClose={() => setDetailOpen(false)} />}
 
       {/* Delete confirmation */}
       {confirmDelete && (
@@ -151,20 +168,70 @@ function ProductBottle({ product, onEdit, onDelete, onToggleRoutine, onSession, 
   );
 }
 
-// Category label sitting above each shelf line — deliberately distinct
-// from the large apothecary-label treatment inside each card (that's
-// per-product; this is per-section). Small caps, quieter than the
-// filter pills so it reads as a shelf sign, not another interactive
-// control.
-const SHELF_LABEL_STYLE = {
-  fontFamily: "var(--font-display)",
-  fontSize: 11,
-  fontWeight: 400,
-  letterSpacing: "0.22em",
-  textTransform: "uppercase",
-  color: "rgba(250,249,244,0.7)",
-  margin: "0 0 12px",
-};
+function DetailPill({ label, value }) {
+  return (
+    <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "8px 12px" }}>
+      <p style={{ fontFamily: "var(--font-body)", fontSize: 8, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 3px", opacity: 0.7 }}>{label}</p>
+      <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--parchment)", margin: 0 }}>{value}</p>
+    </div>
+  );
+}
+
+// Full-detail view for a bottle whose label plate can only ever show a
+// truncated name — same bottom-sheet pattern as RoutineFitSheet in
+// productmodal.jsx (dark ink panel, rounded top corners, backdrop
+// blur), reused here as the established "more about this product"
+// pattern rather than inventing a new one. Deliberately separate from
+// ProductModal (the ⋯ menu's "Edit product" action): this is a
+// read-only view, not a form.
+function ProductDetailSheet({ product, onClose }) {
+  const actives = Object.keys(detectActives(product.ingredients || []));
+  const ingredients = Array.isArray(product.ingredients) ? product.ingredients : [];
+  const freqLabel = FREQUENCIES.find(f => f.id === product.frequency)?.label || FREQUENCIES[0].label;
+  const sessionLabel = product.session === "am" ? "Morning" : product.session === "pm" ? "Evening" : product.session === "both" ? "AM & PM" : null;
+
+  return (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(8,10,9,0.82)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)", zIndex: 210, display: "flex", alignItems: "flex-end", justifyContent: "center" }}
+      onClick={e => e.target === e.currentTarget && onClose()}>
+      <div style={{ background: "var(--ink)", width: "100%", maxWidth: 520, maxHeight: "80vh", overflowY: "auto", borderRadius: "20px 20px 0 0", padding: "28px 24px 40px", border: "1px solid var(--border)", borderBottom: "none" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20, gap: 12 }}>
+          <div>
+            {product.brand && (
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 6px" }}>{product.brand}</p>
+            )}
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 700, letterSpacing: "0.01em", color: "var(--parchment)", margin: 0, lineHeight: 1.25 }}>{product.name}</h2>
+          </div>
+          <button onClick={onClose} aria-label="Close" style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: 4, flexShrink: 0 }}><Icon name="x" size={17} /></button>
+        </div>
+
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 22 }}>
+          <DetailPill label="Category" value={product.category || "Uncategorized"} />
+          {product.price > 0 && <DetailPill label="Price" value={`$${(product.price || 0).toFixed(0)}`} />}
+          {sessionLabel && <DetailPill label="Session" value={sessionLabel} />}
+          <DetailPill label="Frequency" value={freqLabel} />
+        </div>
+
+        {actives.length > 0 && (
+          <div style={{ marginBottom: 18 }}>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 8px" }}>Detected actives</p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {actives.map(a => (
+                <span key={a} style={{ fontSize: 10, fontFamily: "var(--font-body)", color: "#2d3d2b", background: "rgba(45,61,43,0.1)", border: "1px solid rgba(45,61,43,0.25)", padding: "3px 10px", borderRadius: 20 }}>{a}</span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {ingredients.length > 0 && (
+          <div>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 8px" }}>Ingredients</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: 0, lineHeight: 1.7 }}>{ingredients.join(", ")}</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 // Same thin flat divider treatment used elsewhere in the app (dashboard's
 // section rule, progress.jsx's between-block rules) — no gradient, no
@@ -172,11 +239,10 @@ const SHELF_LABEL_STYLE = {
 const SHELF_LINE = { height: 1, background: "rgba(250,249,244,0.18)" };
 
 // Canonical apothecary ordering (from constants.js's CATEGORIES) rather
-// than array/insertion order — shelves read top-to-bottom in the same
-// sequence a physical apothecary case would group them, and the filter
-// pills follow the same order so the two stay in sync. Any category
-// present in the data but missing from CATEGORIES (legacy/custom value)
-// is appended at the end rather than dropped.
+// than array/insertion order — purely for the filter pill row, so pills
+// list in the same sequence a physical apothecary case would group
+// them. Any category present in the data but missing from CATEGORIES
+// (legacy/custom value) is appended at the end rather than dropped.
 function orderCategoriesPresent(products) {
   const present = new Set(products.map(p => p.category));
   const known = CATEGORIES.filter(c => present.has(c));
@@ -184,19 +250,20 @@ function orderCategoriesPresent(products) {
   return [...known, ...extra];
 }
 
-// One shelf = one category. Bottles flow left-to-right in a wrapping
-// flex row, bottom-aligned (align-items: flex-end) so each bottle's
-// base sits right on the shelf line regardless of its own height —
-// that's what makes the varying pump/dropper/jar heights read as
-// items actually resting on a shelf rather than a uniform grid. If a
-// category wraps to more than one row, only the last row's bottoms
-// touch the line (the divider is a sibling rendered right after this
-// flex container), same as earlier passes — bottles above it just
-// stack on top.
-function ProductShelf({ category, products, onEdit, onDelete, onToggleRoutine, onSession, user, onAskCygne }) {
+// One flowing shelf for the whole vanity (or the current filter) —
+// no per-category grouping, so a pump-bottle cleanser can sit right
+// next to a dropper-bottle serum, the way an actual shelf mixes
+// formats. Bottles flow left-to-right in a wrapping flex row,
+// bottom-aligned (align-items: flex-end) so each bottle's base sits
+// right on the shelf line regardless of its own height — that's what
+// makes the varying pump/dropper/jar heights read as items actually
+// resting on a shelf rather than a uniform grid. If the row wraps to
+// more than one line, only the last line's bottoms touch the divider
+// below (a sibling rendered right after this flex container); bottles
+// above it just stack on top.
+function BottleRow({ products, onEdit, onDelete, onToggleRoutine, onSession, user, onAskCygne }) {
   return (
     <div style={{ marginBottom: 32 }}>
-      <p style={SHELF_LABEL_STYLE}>{category}</p>
       <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", gap: 16, rowGap: 24, marginBottom: 0 }}>
         {products.map(p => (
           <ProductBottle key={p.id} product={p} onEdit={onEdit} onDelete={onDelete} onToggleRoutine={onToggleRoutine} onSession={onSession} user={user} onAskCygne={onAskCygne} />
@@ -435,10 +502,8 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearAll,
   const [askState, setAskState] = useState(null); // { question, context } | null
   const { activeMap } = analyzeShelf(products);
   const spending = calcSpending(products);
-  const orderedCategories = orderCategoriesPresent(products);
-  const cats = ["All", ...orderedCategories];
+  const cats = ["All", ...orderCategoriesPresent(products)];
   const filtered = filter === "All" ? products : products.filter(p => p.category === filter);
-  const shelfCategories = filter === "All" ? orderedCategories : orderedCategories.filter(c => c === filter);
   const insights = buildInsights(products, activeMap);
   const handleAskCygne = (q, ctx) => setAskState({ question: q, context: ctx });
 
@@ -549,23 +614,18 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearAll,
                 {filtered.length} of {products.length} product{products.length !== 1 ? "s" : ""}
               </p>
 
-              {/* Shelves — one per category, in canonical apothecary
-                  order. Each shelf groups its own cards above a single
-                  thin divider line; filtering to one category collapses
-                  this to just that shelf. */}
-              {shelfCategories.map(cat => (
-                <ProductShelf
-                  key={cat}
-                  category={cat}
-                  products={filtered.filter(p => p.category === cat)}
-                  onEdit={onEdit}
-                  onDelete={onDelete}
-                  onToggleRoutine={onToggleRoutine}
-                  onSession={onSession}
-                  user={user}
-                  onAskCygne={handleAskCygne}
-                />
-              ))}
+              {/* One flowing shelf — no per-category grouping, so shapes
+                  mix together; filtering just narrows which products
+                  populate this same single row. */}
+              <BottleRow
+                products={filtered}
+                onEdit={onEdit}
+                onDelete={onDelete}
+                onToggleRoutine={onToggleRoutine}
+                onSession={onSession}
+                user={user}
+                onAskCygne={handleAskCygne}
+              />
 
               {/* Standalone add affordance, scaled to match the jar
                   silhouette (the most neutral of the three bottle
