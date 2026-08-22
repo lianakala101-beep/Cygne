@@ -13,11 +13,15 @@ import { CATEGORIES } from "./constants.js";
 // rather than a soft glass tile; matches the flat container spirit
 // used elsewhere in the app. Grid still gives visual separation
 // between items — the flatness is per-card, not the layout.
+//
+// overflow left as visible (not "hidden") so the ⋯ dropdown menu below
+// can extend past the card's own bounds without being clipped — with
+// the shelf redesign these cards are now short enough that the menu
+// routinely taller than the card itself.
 const GLASS_CARD = {
   background: "rgba(250, 249, 244, 0.92)",
   border: "1px solid rgba(250, 249, 244, 0.35)",
   borderRadius: 0,
-  overflow: "hidden",
   display: "flex",
   flexDirection: "column",
 };
@@ -34,121 +38,87 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
   }, [menuOpen]);
 
   const inRoutine = product.inRoutine !== false;
+  const hasImage = !!product.imageUrl;
 
   return (
     <>
-      <div style={{ ...GLASS_CARD, background: "rgba(250, 249, 244, 0.82)" }}>
-        {/* Image area — sits directly on the card's single ivory surface
-            (no background or divider of its own), so the card reads as one
-            unified block. A product photo fills this area when present;
-            otherwise an apothecary-label treatment shows the category
-            name in bold Fungis type filling the same vertical space —
-            no illustrated glyph, no small caption. Reads as a
-            typographic label, not decorative art. */}
-        <div style={{ position: "relative", width: "100%", aspectRatio: "1 / 1", background: "transparent", flexShrink: 0, overflow: "hidden" }}>
-          {product.imageUrl
-            ? <img src={product.imageUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-            : (() => {
-                // Length-based sizing so short labels (OIL, SPF, LIP)
-                // fill the square with the same confidence as long
-                // ones (SPF MOISTURIZER, PRESCRIPTION), and long
-                // labels don't overflow. Multi-word categories with
-                // a space (EYE CREAM, TONING PAD, SPF MOISTURIZER)
-                // wrap on the space via overflow-wrap: break-word.
-                const label = String(product.category || "");
-                const len = label.length;
-                // Sizes reduced ~17% from the prior tier (52/44/36/
-                // 30/24) so the label reads as bold and confident but
-                // doesn't dominate the card.
-                const fontSize =
-                  len <= 3  ? 42 :
-                  len <= 5  ? 36 :
-                  len <= 9  ? 30 :
-                  len <= 12 ? 26 :
-                              20;
-                return (
-                  <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", padding: "10px", boxSizing: "border-box" }}>
-                    <span
-                      aria-label={label}
-                      style={{
-                        fontFamily: "var(--font-display)",
-                        fontWeight: 700,
-                        fontSize,
-                        letterSpacing: "0.02em",
-                        // lineHeight 1 matches the em-box so
-                        // flex-centering lands the cap-height at the
-                        // vertical midpoint of the square.
-                        lineHeight: 1,
-                        textTransform: "uppercase",
-                        textAlign: "center",
-                        color: "var(--color-inky-moss, #2d3d2b)",
-                        wordBreak: "normal",
-                        overflowWrap: "break-word",
-                      }}
-                    >
-                      {label}
-                    </span>
-                  </div>
-                );
-              })()
-          }
-
-          {/* ⋯ menu */}
-          <div ref={menuRef} style={{ position: "absolute", top: 6, right: 6 }}>
-            <button onClick={() => setMenuOpen(o => !o)} aria-label="Options"
-              style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(250,249,244,0.75)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", border: "1px solid rgba(192,192,192,0.35)", color: "#1c1c1a", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, lineHeight: 1, fontFamily: "sans-serif" }}>
-              ⋯
-            </button>
-            {menuOpen && (
-              <div style={{ position: "absolute", right: 0, top: "110%", zIndex: 50, minWidth: 170, background: "rgba(250,249,244,0.96)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", border: "1px solid rgba(192,192,192,0.3)", borderRadius: 8, padding: "6px 0", boxShadow: "0 8px 28px rgba(0,0,0,0.10)" }}>
-                <button onClick={() => { setMenuOpen(false); onEdit(product); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#1c1c1a", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "left" }}>
-                  <Icon name="edit" size={12} /><span>Edit product</span>
-                </button>
-                <button onClick={() => { setMenuOpen(false); onToggleRoutine(product.id); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#1c1c1a", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "left" }}>
-                  <Icon name="sparkle" size={12} /><span>{inRoutine ? "Remove from ritual" : "Add to ritual"}</span>
-                </button>
-                {onAskCygne && getAskCygneAccess(user) === "available" && (
-                  <button
-                    onClick={() => {
-                      setMenuOpen(false);
-                      const productName = product.name || "this product";
-                      const ingredients = (product.ingredients || []).slice(0, 12).join(", ");
-                      const ctxLines = [
-                        `Product: ${productName}${product.brand ? ` by ${product.brand}` : ""}.`,
-                        `Category: ${product.category || "uncategorized"}.`,
-                        ingredients ? `Ingredients: ${ingredients}.` : null,
-                        product.session ? `Session: ${product.session}.` : null,
-                        product.frequency && product.frequency !== "daily" ? `Frequency: ${product.frequency}.` : null,
-                      ].filter(Boolean);
-                      onAskCygne(
-                        `Tell me about ${productName} and how it works with my other products.`,
-                        ctxLines.join(" "),
-                      );
-                    }}
-                    style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#1c1c1a", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "left" }}>
-                    <Icon name="swan" size={12} /><span>Ask Cygne</span>
-                  </button>
-                )}
-                <div style={{ height: 1, background: "rgba(192,192,192,0.25)", margin: "4px 12px" }} />
-                <button onClick={() => { setMenuOpen(false); setConfirmDelete(true); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#8b7355", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "left" }}>
-                  <Icon name="trash" size={12} /><span>Remove</span>
-                </button>
-              </div>
-            )}
+      <div style={{ ...GLASS_CARD, background: "rgba(250, 249, 244, 0.82)", position: "relative" }}>
+        {/* Image area — only rendered when there's an actual photo. The
+            shelf's own category header (rendered above every card in
+            this section) already states the category, so the old
+            apothecary-label fallback that filled this same space with
+            giant category type is gone rather than shrunk — repeating
+            "CLEANSER" inside every cleanser card under a "CLEANSER"
+            shelf heading was pure redundancy, and it's what was making
+            these cards mostly-empty. Compact fixed height (not the old
+            1:1 square) so a real photo still reads as a photo without
+            reinstating the oversized card. */}
+        {hasImage && (
+          <div style={{ position: "relative", width: "100%", height: 96, background: "transparent", flexShrink: 0, overflow: "hidden" }}>
+            <img src={product.imageUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
           </div>
+        )}
+
+        {/* ⋯ menu — anchored to the card itself now rather than the
+            (sometimes absent) image area, so it still has somewhere to
+            live on image-less cards. */}
+        <div ref={menuRef} style={{ position: "absolute", top: 6, right: 6, zIndex: 2 }}>
+          <button onClick={() => setMenuOpen(o => !o)} aria-label="Options"
+            style={{ width: 26, height: 26, borderRadius: "50%", background: "rgba(250,249,244,0.75)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", border: "1px solid rgba(192,192,192,0.35)", color: "#1c1c1a", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, lineHeight: 1, fontFamily: "sans-serif" }}>
+            ⋯
+          </button>
+          {menuOpen && (
+            <div style={{ position: "absolute", right: 0, top: "110%", zIndex: 50, minWidth: 170, background: "rgba(250,249,244,0.96)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", border: "1px solid rgba(192,192,192,0.3)", borderRadius: 8, padding: "6px 0", boxShadow: "0 8px 28px rgba(0,0,0,0.10)" }}>
+              <button onClick={() => { setMenuOpen(false); onEdit(product); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#1c1c1a", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "left" }}>
+                <Icon name="edit" size={12} /><span>Edit product</span>
+              </button>
+              <button onClick={() => { setMenuOpen(false); onToggleRoutine(product.id); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#1c1c1a", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "left" }}>
+                <Icon name="sparkle" size={12} /><span>{inRoutine ? "Remove from ritual" : "Add to ritual"}</span>
+              </button>
+              {onAskCygne && getAskCygneAccess(user) === "available" && (
+                <button
+                  onClick={() => {
+                    setMenuOpen(false);
+                    const productName = product.name || "this product";
+                    const ingredients = (product.ingredients || []).slice(0, 12).join(", ");
+                    const ctxLines = [
+                      `Product: ${productName}${product.brand ? ` by ${product.brand}` : ""}.`,
+                      `Category: ${product.category || "uncategorized"}.`,
+                      ingredients ? `Ingredients: ${ingredients}.` : null,
+                      product.session ? `Session: ${product.session}.` : null,
+                      product.frequency && product.frequency !== "daily" ? `Frequency: ${product.frequency}.` : null,
+                    ].filter(Boolean);
+                    onAskCygne(
+                      `Tell me about ${productName} and how it works with my other products.`,
+                      ctxLines.join(" "),
+                    );
+                  }}
+                  style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#1c1c1a", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "left" }}>
+                  <Icon name="swan" size={12} /><span>Ask Cygne</span>
+                </button>
+              )}
+              <div style={{ height: 1, background: "rgba(192,192,192,0.25)", margin: "4px 12px" }} />
+              <button onClick={() => { setMenuOpen(false); setConfirmDelete(true); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#8b7355", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "left" }}>
+                <Icon name="trash" size={12} /><span>Remove</span>
+              </button>
+            </div>
+          )}
         </div>
 
-        {/* Text content — sharper hierarchy: quiet brand eyebrow and
-            price bracket the loud product name. Product name bumps to
-            Fungis display 16px so it anchors the card; brand + price
-            stay small caps at 9/11 so they read as metadata, not peers. */}
-        <div style={{ padding: "12px 12px 14px", textAlign: "left" }}>
+        {/* Text content — now the card's primary content, not a footnote
+            under a huge label/photo block. Product name bumped to 18px
+            so it's unambiguously the dominant line; brand + price stay
+            small caps metadata around it, same relative treatment as
+            before. Image-less cards get extra top padding to clear the
+            ⋯ button, which now floats directly over this block instead
+            of a dedicated image area. */}
+        <div style={{ padding: hasImage ? "10px 12px 12px" : "36px 12px 12px", textAlign: "left" }}>
           {product.brand && (
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 400, letterSpacing: "0.14em", textTransform: "uppercase", color: "#5a5a5a", margin: "0 0 6px", opacity: 0.9 }}>{product.brand}</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 400, letterSpacing: "0.14em", textTransform: "uppercase", color: "#5a5a5a", margin: "0 0 5px", opacity: 0.9 }}>{product.brand}</p>
           )}
-          <p style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 700, letterSpacing: "0.01em", color: "#1c1c1a", margin: 0, lineHeight: 1.2 }}>{product.name}</p>
+          <p style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 700, letterSpacing: "0.01em", color: "#1c1c1a", margin: 0, lineHeight: 1.2 }}>{product.name}</p>
           {product.price > 0 && (
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, letterSpacing: "0.02em", color: "#5a5a5a", margin: "8px 0 0", opacity: 0.9 }}>${(product.price || 0).toFixed(0)}</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, letterSpacing: "0.02em", color: "#5a5a5a", margin: "6px 0 0", opacity: 0.9 }}>${(product.price || 0).toFixed(0)}</p>
           )}
         </div>
       </div>
@@ -214,7 +184,12 @@ function ProductShelf({ category, products, onEdit, onDelete, onToggleRoutine, o
   return (
     <div style={{ marginBottom: 32 }}>
       <p style={SHELF_LABEL_STYLE}>{category}</p>
-      <div style={{ display: "grid", gridTemplateColumns: `repeat(${SHELF_CARDS_PER_ROW}, 1fr)`, gap: 12, marginBottom: 0 }}>
+      {/* alignItems: "start" so a card sizes to its own content instead
+          of stretching to match a taller sibling in the same row (e.g.
+          a photo card next to a text-only one) — otherwise the
+          text-only card would grow to fill that height, reintroducing
+          the same empty-card problem this pass is meant to fix. */}
+      <div style={{ display: "grid", gridTemplateColumns: `repeat(${SHELF_CARDS_PER_ROW}, 1fr)`, gap: 12, marginBottom: 0, alignItems: "start" }}>
         {products.map(p => (
           <GlassProductCard key={p.id} product={p} onEdit={onEdit} onDelete={onDelete} onToggleRoutine={onToggleRoutine} onSession={onSession} user={user} onAskCygne={onAskCygne} />
         ))}
@@ -584,8 +559,11 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearAll,
                 />
               ))}
 
+              {/* Height matched to the now-compact card size (not the old
+                  1:1 square) so this tile sits at the same scale as the
+                  cards above it instead of towering over them. */}
               <div style={{ display: "grid", gridTemplateColumns: `repeat(${SHELF_CARDS_PER_ROW}, 1fr)`, gap: 12 }}>
-                <button onClick={onAdd} style={{ ...GLASS_CARD, background: "rgba(250,249,244,0.25)", border: "1px dashed rgba(192,192,192,0.4)", cursor: "pointer", aspectRatio: "1 / 1", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                <button onClick={onAdd} style={{ ...GLASS_CARD, background: "rgba(250,249,244,0.25)", border: "1px dashed rgba(192,192,192,0.4)", cursor: "pointer", height: 100, alignItems: "center", justifyContent: "center", gap: 8 }}>
                   <span style={{ fontSize: 20, color: "var(--color-ivory, #faf9f4)", opacity: 0.6, lineHeight: 1 }}>+</span>
                   <span style={{ fontFamily: "var(--font-display, 'Fungis', sans-serif)", fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", opacity: 0.6 }}>Add Product</span>
                 </button>
