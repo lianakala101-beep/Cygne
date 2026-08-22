@@ -26,6 +26,16 @@ const GLASS_CARD = {
   flexDirection: "column",
 };
 
+// Fixed, content-independent card height — the whole point of "resting
+// on a shelf" is that every item on the shelf occupies the same small
+// slot regardless of what it is, the way bottles on a real shelf don't
+// each grow to fit their own label. SHELF_CARD_IMAGE_HEIGHT is the
+// sliver reserved for a photo when one exists; text-only cards (the
+// common case — most products have no photo) get the full height for
+// brand/name/price.
+const SHELF_CARD_HEIGHT = 108;
+const SHELF_CARD_IMAGE_HEIGHT = 40;
+
 function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, user = {}, onAskCygne }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -42,29 +52,25 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
 
   return (
     <>
-      <div style={{ ...GLASS_CARD, background: "rgba(250, 249, 244, 0.82)", position: "relative" }}>
+      <div style={{ ...GLASS_CARD, background: "rgba(250, 249, 244, 0.82)", position: "relative", height: SHELF_CARD_HEIGHT }}>
         {/* Image area — only rendered when there's an actual photo. The
             shelf's own category header (rendered above every card in
-            this section) already states the category, so the old
-            apothecary-label fallback that filled this same space with
-            giant category type is gone rather than shrunk — repeating
-            "CLEANSER" inside every cleanser card under a "CLEANSER"
-            shelf heading was pure redundancy, and it's what was making
-            these cards mostly-empty. Compact fixed height (not the old
-            1:1 square) so a real photo still reads as a photo without
-            reinstating the oversized card. */}
+            this section) already states the category, so there's no
+            per-card category label to make room for here — just a
+            small photo sliver when a photo exists. */}
         {hasImage && (
-          <div style={{ position: "relative", width: "100%", height: 96, background: "transparent", flexShrink: 0, overflow: "hidden" }}>
+          <div style={{ position: "relative", width: "100%", height: SHELF_CARD_IMAGE_HEIGHT, flexShrink: 0, overflow: "hidden" }}>
             <img src={product.imageUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
           </div>
         )}
 
         {/* ⋯ menu — anchored to the card itself now rather than the
             (sometimes absent) image area, so it still has somewhere to
-            live on image-less cards. */}
-        <div ref={menuRef} style={{ position: "absolute", top: 6, right: 6, zIndex: 2 }}>
+            live on image-less cards. Shrunk to fit the much smaller
+            card without eating too much of its fixed height. */}
+        <div ref={menuRef} style={{ position: "absolute", top: 4, right: 4, zIndex: 2 }}>
           <button onClick={() => setMenuOpen(o => !o)} aria-label="Options"
-            style={{ width: 26, height: 26, borderRadius: "50%", background: "rgba(250,249,244,0.75)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", border: "1px solid rgba(192,192,192,0.35)", color: "#1c1c1a", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, lineHeight: 1, fontFamily: "sans-serif" }}>
+            style={{ width: 22, height: 22, borderRadius: "50%", background: "rgba(250,249,244,0.75)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", border: "1px solid rgba(192,192,192,0.35)", color: "#1c1c1a", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, lineHeight: 1, fontFamily: "sans-serif" }}>
             ⋯
           </button>
           {menuOpen && (
@@ -105,20 +111,24 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
           )}
         </div>
 
-        {/* Text content — now the card's primary content, not a footnote
-            under a huge label/photo block. Product name bumped to 18px
-            so it's unambiguously the dominant line; brand + price stay
-            small caps metadata around it, same relative treatment as
-            before. Image-less cards get extra top padding to clear the
-            ⋯ button, which now floats directly over this block instead
-            of a dedicated image area. */}
-        <div style={{ padding: hasImage ? "10px 12px 12px" : "36px 12px 12px", textAlign: "left" }}>
+        {/* Text content — brand/name/price, tight to the card's fixed
+            height and edges. Image-less cards still need enough top
+            padding to clear the ⋯ button (there's no image sliver to
+            push content down here), but it's cut to the minimum that
+            avoids overlap rather than the old generous gap. Product
+            name is clamped to 2 lines with an ellipsis instead of
+            growing the card to fit a long one; brand is a single-line
+            ellipsis for the same reason on the narrower columns. */}
+        <div style={{ padding: hasImage ? "6px 8px 8px" : "24px 8px 8px", textAlign: "left", flex: 1, minHeight: 0, overflow: "hidden" }}>
           {product.brand && (
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 400, letterSpacing: "0.14em", textTransform: "uppercase", color: "#5a5a5a", margin: "0 0 5px", opacity: 0.9 }}>{product.brand}</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 8, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "#5a5a5a", margin: "0 0 3px", opacity: 0.9, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{product.brand}</p>
           )}
-          <p style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 700, letterSpacing: "0.01em", color: "#1c1c1a", margin: 0, lineHeight: 1.2 }}>{product.name}</p>
+          <p style={{
+            fontFamily: "var(--font-display)", fontSize: 12.5, fontWeight: 700, letterSpacing: "0.005em", color: "#1c1c1a", margin: 0, lineHeight: 1.2,
+            display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", textOverflow: "ellipsis",
+          }}>{product.name}</p>
           {product.price > 0 && (
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, letterSpacing: "0.02em", color: "#5a5a5a", margin: "6px 0 0", opacity: 0.9 }}>${(product.price || 0).toFixed(0)}</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 9.5, fontWeight: 400, letterSpacing: "0.02em", color: "#5a5a5a", margin: "3px 0 0", opacity: 0.9 }}>${(product.price || 0).toFixed(0)}</p>
           )}
         </div>
       </div>
@@ -160,7 +170,7 @@ const SHELF_LABEL_STYLE = {
 // shadow, just a 1px ivory-alpha line spanning the container.
 const SHELF_LINE = { height: 1, background: "rgba(250,249,244,0.18)" };
 
-const SHELF_CARDS_PER_ROW = 2;
+const SHELF_CARDS_PER_ROW = 3;
 
 // Canonical apothecary ordering (from constants.js's CATEGORIES) rather
 // than array/insertion order — shelves read top-to-bottom in the same
@@ -184,12 +194,10 @@ function ProductShelf({ category, products, onEdit, onDelete, onToggleRoutine, o
   return (
     <div style={{ marginBottom: 32 }}>
       <p style={SHELF_LABEL_STYLE}>{category}</p>
-      {/* alignItems: "start" so a card sizes to its own content instead
-          of stretching to match a taller sibling in the same row (e.g.
-          a photo card next to a text-only one) — otherwise the
-          text-only card would grow to fill that height, reintroducing
-          the same empty-card problem this pass is meant to fix. */}
-      <div style={{ display: "grid", gridTemplateColumns: `repeat(${SHELF_CARDS_PER_ROW}, 1fr)`, gap: 12, marginBottom: 0, alignItems: "start" }}>
+      {/* Every card is a fixed SHELF_CARD_HEIGHT now, so there's no
+          stretch-to-tallest-sibling issue to guard against — each cell
+          is already uniform regardless of content. */}
+      <div style={{ display: "grid", gridTemplateColumns: `repeat(${SHELF_CARDS_PER_ROW}, 1fr)`, gap: 12, marginBottom: 0 }}>
         {products.map(p => (
           <GlassProductCard key={p.id} product={p} onEdit={onEdit} onDelete={onDelete} onToggleRoutine={onToggleRoutine} onSession={onSession} user={user} onAskCygne={onAskCygne} />
         ))}
@@ -563,7 +571,7 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearAll,
                   1:1 square) so this tile sits at the same scale as the
                   cards above it instead of towering over them. */}
               <div style={{ display: "grid", gridTemplateColumns: `repeat(${SHELF_CARDS_PER_ROW}, 1fr)`, gap: 12 }}>
-                <button onClick={onAdd} style={{ ...GLASS_CARD, background: "rgba(250,249,244,0.25)", border: "1px dashed rgba(192,192,192,0.4)", cursor: "pointer", height: 100, alignItems: "center", justifyContent: "center", gap: 8 }}>
+                <button onClick={onAdd} style={{ ...GLASS_CARD, background: "rgba(250,249,244,0.25)", border: "1px dashed rgba(192,192,192,0.4)", cursor: "pointer", height: SHELF_CARD_HEIGHT, alignItems: "center", justifyContent: "center", gap: 6 }}>
                   <span style={{ fontSize: 20, color: "var(--color-ivory, #faf9f4)", opacity: 0.6, lineHeight: 1 }}>+</span>
                   <span style={{ fontFamily: "var(--font-display, 'Fungis', sans-serif)", fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", opacity: 0.6 }}>Add Product</span>
                 </button>
