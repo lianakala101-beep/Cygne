@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useLayoutEffect } from "react";
 import { Icon, Section } from "./components.jsx";
 import { detectActives, analyzeShelf, calcSpending } from "./engine.js";
 import { AskCygneModal } from "./components/AskCygneModal.jsx";
@@ -61,7 +61,12 @@ function ProductBottle({ product, onEdit, onDelete, onToggleRoutine, onSession, 
 
   return (
     <>
-      <div style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", width: spec.bodyW, flexShrink: 0 }}>
+      {/* data-bottle-slot marks the actual laid-out silhouette (as
+          opposed to the menu dropdown / detail sheet / delete-confirm
+          overlays below, which are fixed-position siblings within this
+          same fragment) — BottleRow queries this attribute to measure
+          where each flex-wrapped row actually breaks. */}
+      <div data-bottle-slot style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", width: spec.bodyW, flexShrink: 0 }}>
         {/* ⋯ menu — pinned to the top-right of the whole silhouette
             (not the narrow neck, which is often too small to host it)
             so it's reachable regardless of shape. */}
@@ -255,21 +260,59 @@ function orderCategoriesPresent(products) {
 // next to a dropper-bottle serum, the way an actual shelf mixes
 // formats. Bottles flow left-to-right in a wrapping flex row,
 // bottom-aligned (align-items: flex-end) so each bottle's base sits
-// right on the shelf line regardless of its own height — that's what
-// makes the varying pump/dropper/jar heights read as items actually
-// resting on a shelf rather than a uniform grid. If the row wraps to
-// more than one line, only the last line's bottoms touch the divider
-// below (a sibling rendered right after this flex container); bottles
-// above it just stack on top.
+// right on its row's shelf line regardless of its own height — that's
+// what makes the varying pump/dropper/jar heights read as items
+// actually resting on a shelf rather than a uniform grid.
+//
+// A shelf line under EVERY wrapped row (not just the last) isn't
+// something CSS flex-wrap can express on its own — the browser decides
+// where a row breaks based on available width and each bottle's own
+// (non-uniform) width, and that boundary isn't exposed as anything we
+// can target with a selector. So this measures it directly: every
+// bottle in a row shares the exact same bottom edge (that's what
+// align-items: flex-end guarantees), so grouping the DOM bottles by
+// that shared bottom position reconstructs the actual rows the browser
+// laid out, and a line gets drawn at each one. Re-measures via
+// ResizeObserver so it stays correct across viewport/orientation
+// changes and whenever the (possibly filtered) product list changes.
 function BottleRow({ products, onEdit, onDelete, onToggleRoutine, onSession, user, onAskCygne }) {
+  const containerRef = useRef(null);
+  const [shelfLineTops, setShelfLineTops] = useState([]);
+
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const measure = () => {
+      const slots = Array.from(container.querySelectorAll("[data-bottle-slot]"));
+      const tops = [];
+      let currentBottom = null;
+      slots.forEach(el => {
+        const bottom = el.offsetTop + el.offsetHeight;
+        if (currentBottom === null || Math.abs(bottom - currentBottom) > 2) {
+          tops.push(bottom);
+          currentBottom = bottom;
+        }
+      });
+      setShelfLineTops(prev => (prev.length === tops.length && prev.every((v, i) => v === tops[i])) ? prev : tops);
+    };
+
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(container);
+    return () => ro.disconnect();
+  }, [products]);
+
   return (
-    <div style={{ marginBottom: 32 }}>
-      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", gap: 16, rowGap: 24, marginBottom: 0 }}>
+    <div style={{ position: "relative", marginBottom: 32 }}>
+      <div ref={containerRef} style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", gap: 16, rowGap: 24 }}>
         {products.map(p => (
           <ProductBottle key={p.id} product={p} onEdit={onEdit} onDelete={onDelete} onToggleRoutine={onToggleRoutine} onSession={onSession} user={user} onAskCygne={onAskCygne} />
         ))}
       </div>
-      <div style={SHELF_LINE} />
+      {shelfLineTops.map((top, i) => (
+        <div key={i} style={{ ...SHELF_LINE, position: "absolute", left: 0, right: 0, top }} />
+      ))}
     </div>
   );
 }
