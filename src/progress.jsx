@@ -878,6 +878,7 @@ function AddTreatmentModal({ onSave, onClose }) {
 function TreatmentRecoveryCard({ treatment, products: productsProp = [], activeMap, onDismiss, onResetDate }) {
   const products = Array.isArray(productsProp) ? productsProp : [];
   const [confirmReset, setConfirmReset] = useState(false);
+  const [pickedDate, setPickedDate] = useState("");
   const result = getTreatmentPhase(treatment);
   if (!result || !result.phase) return null;
 
@@ -976,20 +977,32 @@ function TreatmentRecoveryCard({ treatment, products: productsProp = [], activeM
         </div>
         <div style={{ height: 18 }} />
 
-        {/* Reset start date — for correcting a corrupted date */}
+        {/* Reset start date — pick the actual date treatment began */}
         {onResetDate && (
           <div style={{ marginTop: 6, paddingTop: 10, borderTop: "1px dashed var(--border)" }}>
             {confirmReset ? (
-              <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                <span style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", flex: 1 }}>Reset Day 1 to today?</span>
-                <button onClick={() => { onResetDate(); setConfirmReset(false); }}
-                  style={{ padding: "6px 12px", background: "transparent", border: "1px solid var(--color-ivory, #faf9f4)", borderRadius: 8, fontFamily: "var(--font-display)", fontSize: 9, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", cursor: "pointer" }}>
-                  Confirm
-                </button>
-                <button onClick={() => setConfirmReset(false)}
-                  style={{ padding: "6px 12px", background: "transparent", border: "1px solid var(--color-ivory, #faf9f4)", borderRadius: 8, fontFamily: "var(--font-display)", fontSize: 9, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", cursor: "pointer" }}>
-                  Cancel
-                </button>
+              <div>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", margin: "0 0 8px", opacity: 0.8 }}>Pick the date you actually started this treatment — Day 1 will recalculate from there.</p>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                  <input
+                    type="date"
+                    value={pickedDate}
+                    max={(() => { const t = new Date(); return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`; })()}
+                    onClick={(e) => e.stopPropagation()}
+                    onChange={(e) => setPickedDate(e.target.value)}
+                    style={{ flex: 1, minWidth: 140, padding: "7px 10px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 11, color: "var(--parchment)", cursor: "pointer" }}
+                  />
+                  <button
+                    disabled={!pickedDate}
+                    onClick={(e) => { e.stopPropagation(); if (!pickedDate) return; onResetDate(pickedDate); setConfirmReset(false); setPickedDate(""); }}
+                    style={{ padding: "6px 12px", background: pickedDate ? "rgba(139,115,85,0.12)" : "transparent", border: `1px solid ${pickedDate ? "rgba(139,115,85,0.35)" : "var(--border)"}`, borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 400, letterSpacing: "0.1em", textTransform: "uppercase", color: pickedDate ? "#8b7355" : "var(--clay)", cursor: pickedDate ? "pointer" : "not-allowed", opacity: pickedDate ? 1 : 0.5 }}>
+                    Save
+                  </button>
+                  <button onClick={(e) => { e.stopPropagation(); setConfirmReset(false); setPickedDate(""); }}
+                    style={{ padding: "6px 12px", background: "transparent", border: "1px solid var(--border)", borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)", cursor: "pointer" }}>
+                    Cancel
+                  </button>
+                </div>
               </div>
             ) : (
               <button onClick={() => setConfirmReset(true)}

@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { Preferences } from "@capacitor/preferences";
 import { API_BASE_URL } from "./config.js";
 
 export const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "https://mxcefgbaaylddnyxrnao.supabase.co";
@@ -7,7 +8,34 @@ export const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbG
 console.log("[Cygne] Supabase URL:", supabaseUrl);
 console.log("[Cygne] Supabase key prefix:", supabaseAnonKey.substring(0, 20) + "...");
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Supabase's default auth storage falls back to localStorage, which is
+// unreliable for session persistence in a Capacitor iOS WebView across
+// app relaunches — this was causing users to be signed out (and, by
+// extension, blocking anything downstream of session state, like push
+// notifications) every time the app was force-quit and reopened.
+// Capacitor's Preferences API is backed by native Keychain/UserDefaults
+// storage, which survives app restarts reliably.
+//
+// Only wired up when `window` exists (native iOS WebView + browser both
+// qualify) — Capacitor's web Preferences implementation reaches into
+// `window` under the hood, which isn't present when this module loads in
+// the Node test runner. Passing `undefined` for `storage` in that case
+// lets supabase-js fall back to its own default (no-op/memory) handling,
+// same as it always has under test.
+const capacitorStorageAdapter = typeof window === "undefined" ? undefined : {
+  getItem: (key) => Preferences.get({ key }).then(({ value }) => value),
+  setItem: (key, value) => Preferences.set({ key, value }),
+  removeItem: (key) => Preferences.remove({ key }),
+};
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    storage: capacitorStorageAdapter,
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: false,
+  },
+});
 
 // ---------------------------------------------------------------------------
 // Client-side debug event logger
