@@ -216,7 +216,7 @@ function ProductDetailSheet({ product, onClose }) {
             <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 8px" }}>Detected actives</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
               {actives.map(a => (
-                <span key={a} style={{ fontSize: 10, fontFamily: "var(--font-body)", color: "#2d3d2b", background: "rgba(45,61,43,0.1)", border: "1px solid rgba(45,61,43,0.25)", padding: "3px 10px", borderRadius: 20 }}>{a}</span>
+                <span key={a} style={{ fontSize: 10, fontFamily: "var(--font-body)", color: "var(--color-ivory, #faf9f4)", background: "rgba(250,249,244,0.08)", border: "1px solid rgba(250,249,244,0.25)", padding: "3px 10px", borderRadius: 20 }}>{a}</span>
               ))}
             </div>
           </div>
