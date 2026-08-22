@@ -5,6 +5,7 @@ import { AskCygneModal } from "./components/AskCygneModal.jsx";
 import { assessRoutineFit, DEFER_TAG_CONFIG } from "./modals.jsx";
 import { ProductModal } from "./productmodal.jsx";
 import { getAskCygneAccess } from "./utils.jsx";
+import { CATEGORIES } from "./constants.js";
 
 
 // Flat product card — 1px ivory-alpha outline on a solid ivory fill.
@@ -166,6 +167,60 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
         </div>
       )}
     </>
+  );
+}
+
+// Category label sitting above each shelf line — deliberately distinct
+// from the large apothecary-label treatment inside each card (that's
+// per-product; this is per-section). Small caps, quieter than the
+// filter pills so it reads as a shelf sign, not another interactive
+// control.
+const SHELF_LABEL_STYLE = {
+  fontFamily: "var(--font-display)",
+  fontSize: 11,
+  fontWeight: 400,
+  letterSpacing: "0.22em",
+  textTransform: "uppercase",
+  color: "rgba(250,249,244,0.7)",
+  margin: "0 0 12px",
+};
+
+// Same thin flat divider treatment used elsewhere in the app (dashboard's
+// section rule, progress.jsx's between-block rules) — no gradient, no
+// shadow, just a 1px ivory-alpha line spanning the container.
+const SHELF_LINE = { height: 1, background: "rgba(250,249,244,0.18)" };
+
+const SHELF_CARDS_PER_ROW = 2;
+
+// Canonical apothecary ordering (from constants.js's CATEGORIES) rather
+// than array/insertion order — shelves read top-to-bottom in the same
+// sequence a physical apothecary case would group them, and the filter
+// pills follow the same order so the two stay in sync. Any category
+// present in the data but missing from CATEGORIES (legacy/custom value)
+// is appended at the end rather than dropped.
+function orderCategoriesPresent(products) {
+  const present = new Set(products.map(p => p.category));
+  const known = CATEGORIES.filter(c => present.has(c));
+  const extra = [...present].filter(c => !CATEGORIES.includes(c));
+  return [...known, ...extra];
+}
+
+// One shelf = one category. Cards flow left-to-right, 2 per row, in
+// normal reading order (top row first); the shelf line sits directly
+// beneath the last row, so however many rows a category wraps to, they
+// all stay grouped under that one line and label — exactly like items
+// stacked on a single physical shelf board.
+function ProductShelf({ category, products, onEdit, onDelete, onToggleRoutine, onSession, user, onAskCygne }) {
+  return (
+    <div style={{ marginBottom: 32 }}>
+      <p style={SHELF_LABEL_STYLE}>{category}</p>
+      <div style={{ display: "grid", gridTemplateColumns: `repeat(${SHELF_CARDS_PER_ROW}, 1fr)`, gap: 12, marginBottom: 0 }}>
+        {products.map(p => (
+          <GlassProductCard key={p.id} product={p} onEdit={onEdit} onDelete={onDelete} onToggleRoutine={onToggleRoutine} onSession={onSession} user={user} onAskCygne={onAskCygne} />
+        ))}
+      </div>
+      <div style={SHELF_LINE} />
+    </div>
   );
 }
 
@@ -397,9 +452,12 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearAll,
   const [askState, setAskState] = useState(null); // { question, context } | null
   const { activeMap } = analyzeShelf(products);
   const spending = calcSpending(products);
-  const cats = ["All", ...new Set(products.map(p => p.category))];
+  const orderedCategories = orderCategoriesPresent(products);
+  const cats = ["All", ...orderedCategories];
   const filtered = filter === "All" ? products : products.filter(p => p.category === filter);
+  const shelfCategories = filter === "All" ? orderedCategories : orderedCategories.filter(c => c === filter);
   const insights = buildInsights(products, activeMap);
+  const handleAskCygne = (q, ctx) => setAskState({ question: q, context: ctx });
 
   return (
     <div>
@@ -504,12 +562,29 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearAll,
                 })}
               </div>
 
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 9, color: "var(--clay)", letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: 14, opacity: 0.6 }}>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 9, color: "var(--clay)", letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: 18, opacity: 0.6 }}>
                 {filtered.length} of {products.length} product{products.length !== 1 ? "s" : ""}
               </p>
 
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
-                {filtered.map(p => <GlassProductCard key={p.id} product={p} onEdit={onEdit} onDelete={onDelete} onToggleRoutine={onToggleRoutine} onSession={onSession} user={user} onAskCygne={(q, ctx) => setAskState({ question: q, context: ctx })} />)}
+              {/* Shelves — one per category, in canonical apothecary
+                  order. Each shelf groups its own cards above a single
+                  thin divider line; filtering to one category collapses
+                  this to just that shelf. */}
+              {shelfCategories.map(cat => (
+                <ProductShelf
+                  key={cat}
+                  category={cat}
+                  products={filtered.filter(p => p.category === cat)}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                  onToggleRoutine={onToggleRoutine}
+                  onSession={onSession}
+                  user={user}
+                  onAskCygne={handleAskCygne}
+                />
+              ))}
+
+              <div style={{ display: "grid", gridTemplateColumns: `repeat(${SHELF_CARDS_PER_ROW}, 1fr)`, gap: 12 }}>
                 <button onClick={onAdd} style={{ ...GLASS_CARD, background: "rgba(250,249,244,0.25)", border: "1px dashed rgba(192,192,192,0.4)", cursor: "pointer", aspectRatio: "1 / 1", alignItems: "center", justifyContent: "center", gap: 8 }}>
                   <span style={{ fontSize: 20, color: "var(--color-ivory, #faf9f4)", opacity: 0.6, lineHeight: 1 }}>+</span>
                   <span style={{ fontFamily: "var(--font-display, 'Fungis', sans-serif)", fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", opacity: 0.6 }}>Add Product</span>
