@@ -8,35 +8,43 @@ import { getAskCygneAccess } from "./utils.jsx";
 import { CATEGORIES } from "./constants.js";
 
 
-// Flat product card — 1px ivory-alpha outline on a solid ivory fill.
-// Radius dropped to 0 so the card reads as a hard editorial rectangle
-// rather than a soft glass tile; matches the flat container spirit
-// used elsewhere in the app. Grid still gives visual separation
-// between items — the flatness is per-card, not the layout.
-//
-// overflow left as visible (not "hidden") so the ⋯ dropdown menu below
-// can extend past the card's own bounds without being clipped — with
-// the shelf redesign these cards are now short enough that the menu
-// routinely taller than the card itself.
-const GLASS_CARD = {
-  background: "rgba(250, 249, 244, 0.92)",
-  border: "1px solid rgba(250, 249, 244, 0.35)",
-  borderRadius: 0,
-  display: "flex",
-  flexDirection: "column",
+// Bottle silhouette shapes — decorative container outlines mapped by
+// category so the shelf reads like an apothecary case (small vessels
+// of different formats) rather than a spreadsheet of identical tiles.
+// Liquids that come in a pump get the pump-bottle profile; thin
+// liquids (serums, oils, and the toner/essence/mist family, which are
+// packaged the same way) get the tall dropper-bottle profile; balms
+// and creams get the squat jar. Anything without an explicit mapping
+// falls back to the jar — the least format-specific shape.
+const BOTTLE_SHAPE_BY_CATEGORY = {
+  Cleanser: "pump",
+  Serum: "dropper",
+  Oil: "dropper",
+  Toner: "dropper",
+  Essence: "dropper",
+  Mist: "dropper",
+  Moisturizer: "jar",
+  "Eye Cream": "jar",
+};
+function getBottleShape(category) {
+  return BOTTLE_SHAPE_BY_CATEGORY[category] || "jar";
+}
+
+// Neck (cap) + body dimensions per shape. Heights are deliberately
+// uneven across shapes — that unevenness is the point (see
+// ProductShelf's flex row, which bottom-aligns items of different
+// heights along the shelf line instead of forcing a uniform card
+// height).
+const BOTTLE_SHAPE_SPEC = {
+  pump:    { bodyW: 74, bodyH: 76, neckW: 26, neckH: 14, bodyRadius: "6px 6px 18px 18px", neckRadius: "4px 4px 1px 1px" },
+  dropper: { bodyW: 44, bodyH: 120, neckW: 16, neckH: 16, bodyRadius: 12, neckRadius: "4px 4px 1px 1px" },
+  jar:     { bodyW: 80, bodyH: 54, neckW: 66, neckH: 9, bodyRadius: "6px 6px 14px 14px", neckRadius: "3px 3px 1px 1px" },
 };
 
-// Fixed, content-independent card height — the whole point of "resting
-// on a shelf" is that every item on the shelf occupies the same small
-// slot regardless of what it is, the way bottles on a real shelf don't
-// each grow to fit their own label. SHELF_CARD_IMAGE_HEIGHT is the
-// sliver reserved for a photo when one exists; text-only cards (the
-// common case — most products have no photo) get the full height for
-// brand/name/price.
-const SHELF_CARD_HEIGHT = 108;
-const SHELF_CARD_IMAGE_HEIGHT = 40;
+const BOTTLE_FILL = "rgba(250, 249, 244, 0.82)";
+const BOTTLE_BORDER = "1px solid rgba(250, 249, 244, 0.4)";
 
-function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, user = {}, onAskCygne }) {
+function ProductBottle({ product, onEdit, onDelete, onToggleRoutine, onSession, user = {}, onAskCygne }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const menuRef = useRef(null);
@@ -48,29 +56,18 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
   }, [menuOpen]);
 
   const inRoutine = product.inRoutine !== false;
-  const hasImage = !!product.imageUrl;
+  const shape = getBottleShape(product.category);
+  const spec = BOTTLE_SHAPE_SPEC[shape];
 
   return (
     <>
-      <div style={{ ...GLASS_CARD, background: "rgba(250, 249, 244, 0.82)", position: "relative", height: SHELF_CARD_HEIGHT }}>
-        {/* Image area — only rendered when there's an actual photo. The
-            shelf's own category header (rendered above every card in
-            this section) already states the category, so there's no
-            per-card category label to make room for here — just a
-            small photo sliver when a photo exists. */}
-        {hasImage && (
-          <div style={{ position: "relative", width: "100%", height: SHELF_CARD_IMAGE_HEIGHT, flexShrink: 0, overflow: "hidden" }}>
-            <img src={product.imageUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-          </div>
-        )}
-
-        {/* ⋯ menu — anchored to the card itself now rather than the
-            (sometimes absent) image area, so it still has somewhere to
-            live on image-less cards. Shrunk to fit the much smaller
-            card without eating too much of its fixed height. */}
-        <div ref={menuRef} style={{ position: "absolute", top: 4, right: 4, zIndex: 2 }}>
+      <div style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", width: spec.bodyW, flexShrink: 0 }}>
+        {/* ⋯ menu — pinned to the top-right of the whole silhouette
+            (not the narrow neck, which is often too small to host it)
+            so it's reachable regardless of shape. */}
+        <div ref={menuRef} style={{ position: "absolute", top: -6, right: -8, zIndex: 2 }}>
           <button onClick={() => setMenuOpen(o => !o)} aria-label="Options"
-            style={{ width: 22, height: 22, borderRadius: "50%", background: "rgba(250,249,244,0.75)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", border: "1px solid rgba(192,192,192,0.35)", color: "#1c1c1a", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, lineHeight: 1, fontFamily: "sans-serif" }}>
+            style={{ width: 18, height: 18, borderRadius: "50%", background: "rgba(250,249,244,0.9)", border: "1px solid rgba(192,192,192,0.4)", color: "#1c1c1a", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, lineHeight: 1, fontFamily: "sans-serif" }}>
             ⋯
           </button>
           {menuOpen && (
@@ -111,25 +108,29 @@ function GlassProductCard({ product, onEdit, onDelete, onToggleRoutine, onSessio
           )}
         </div>
 
-        {/* Text content — brand/name/price, tight to the card's fixed
-            height and edges. Image-less cards still need enough top
-            padding to clear the ⋯ button (there's no image sliver to
-            push content down here), but it's cut to the minimum that
-            avoids overlap rather than the old generous gap. Product
-            name is clamped to 2 lines with an ellipsis instead of
-            growing the card to fit a long one; brand is a single-line
-            ellipsis for the same reason on the narrower columns. */}
-        <div style={{ padding: hasImage ? "6px 8px 8px" : "24px 8px 8px", textAlign: "left", flex: 1, minHeight: 0, overflow: "hidden" }}>
-          {product.brand && (
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 8, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "#5a5a5a", margin: "0 0 3px", opacity: 0.9, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{product.brand}</p>
-          )}
-          <p style={{
-            fontFamily: "var(--font-display)", fontSize: 12.5, fontWeight: 700, letterSpacing: "0.005em", color: "#1c1c1a", margin: 0, lineHeight: 1.2,
-            display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", textOverflow: "ellipsis",
-          }}>{product.name}</p>
-          {product.price > 0 && (
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 9.5, fontWeight: 400, letterSpacing: "0.02em", color: "#5a5a5a", margin: "3px 0 0", opacity: 0.9 }}>${(product.price || 0).toFixed(0)}</p>
-          )}
+        {/* Neck / cap — sits flush on top of the body (negative margin
+            closes the seam so the border between them doesn't double
+            up into a thick line). */}
+        <div style={{ width: spec.neckW, height: spec.neckH, background: BOTTLE_FILL, border: BOTTLE_BORDER, borderRadius: spec.neckRadius, marginBottom: -1, flexShrink: 0 }} />
+
+        {/* Body — the container's main silhouette, holding a small
+            label plate rather than filling edge-to-edge with text. */}
+        <div style={{
+          width: spec.bodyW, height: spec.bodyH, background: BOTTLE_FILL, border: BOTTLE_BORDER, borderRadius: spec.bodyRadius,
+          display: "flex", alignItems: "center", justifyContent: "center", padding: 5, boxSizing: "border-box", flexShrink: 0,
+        }}>
+          <div style={{ width: "100%", textAlign: "center" }}>
+            {product.brand && (
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 6.5, fontWeight: 400, letterSpacing: "0.06em", textTransform: "uppercase", color: "#5a5a5a", margin: "0 0 2px", opacity: 0.9, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{product.brand}</p>
+            )}
+            <p style={{
+              fontFamily: "var(--font-display)", fontSize: 8.5, fontWeight: 700, letterSpacing: "0", color: "#1c1c1a", margin: 0, lineHeight: 1.15,
+              display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", textOverflow: "ellipsis",
+            }}>{product.name}</p>
+            {product.price > 0 && (
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 6.5, fontWeight: 400, color: "#5a5a5a", margin: "2px 0 0", opacity: 0.9 }}>${(product.price || 0).toFixed(0)}</p>
+            )}
+          </div>
         </div>
       </div>
 
@@ -170,8 +171,6 @@ const SHELF_LABEL_STYLE = {
 // shadow, just a 1px ivory-alpha line spanning the container.
 const SHELF_LINE = { height: 1, background: "rgba(250,249,244,0.18)" };
 
-const SHELF_CARDS_PER_ROW = 3;
-
 // Canonical apothecary ordering (from constants.js's CATEGORIES) rather
 // than array/insertion order — shelves read top-to-bottom in the same
 // sequence a physical apothecary case would group them, and the filter
@@ -185,21 +184,22 @@ function orderCategoriesPresent(products) {
   return [...known, ...extra];
 }
 
-// One shelf = one category. Cards flow left-to-right, 2 per row, in
-// normal reading order (top row first); the shelf line sits directly
-// beneath the last row, so however many rows a category wraps to, they
-// all stay grouped under that one line and label — exactly like items
-// stacked on a single physical shelf board.
+// One shelf = one category. Bottles flow left-to-right in a wrapping
+// flex row, bottom-aligned (align-items: flex-end) so each bottle's
+// base sits right on the shelf line regardless of its own height —
+// that's what makes the varying pump/dropper/jar heights read as
+// items actually resting on a shelf rather than a uniform grid. If a
+// category wraps to more than one row, only the last row's bottoms
+// touch the line (the divider is a sibling rendered right after this
+// flex container), same as earlier passes — bottles above it just
+// stack on top.
 function ProductShelf({ category, products, onEdit, onDelete, onToggleRoutine, onSession, user, onAskCygne }) {
   return (
     <div style={{ marginBottom: 32 }}>
       <p style={SHELF_LABEL_STYLE}>{category}</p>
-      {/* Every card is a fixed SHELF_CARD_HEIGHT now, so there's no
-          stretch-to-tallest-sibling issue to guard against — each cell
-          is already uniform regardless of content. */}
-      <div style={{ display: "grid", gridTemplateColumns: `repeat(${SHELF_CARDS_PER_ROW}, 1fr)`, gap: 12, marginBottom: 0 }}>
+      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", gap: 16, rowGap: 24, marginBottom: 0 }}>
         {products.map(p => (
-          <GlassProductCard key={p.id} product={p} onEdit={onEdit} onDelete={onDelete} onToggleRoutine={onToggleRoutine} onSession={onSession} user={user} onAskCygne={onAskCygne} />
+          <ProductBottle key={p.id} product={p} onEdit={onEdit} onDelete={onDelete} onToggleRoutine={onToggleRoutine} onSession={onSession} user={user} onAskCygne={onAskCygne} />
         ))}
       </div>
       <div style={SHELF_LINE} />
@@ -567,13 +567,20 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearAll,
                 />
               ))}
 
-              {/* Height matched to the now-compact card size (not the old
-                  1:1 square) so this tile sits at the same scale as the
-                  cards above it instead of towering over them. */}
-              <div style={{ display: "grid", gridTemplateColumns: `repeat(${SHELF_CARDS_PER_ROW}, 1fr)`, gap: 12 }}>
-                <button onClick={onAdd} style={{ ...GLASS_CARD, background: "rgba(250,249,244,0.25)", border: "1px dashed rgba(192,192,192,0.4)", cursor: "pointer", height: SHELF_CARD_HEIGHT, alignItems: "center", justifyContent: "center", gap: 6 }}>
-                  <span style={{ fontSize: 20, color: "var(--color-ivory, #faf9f4)", opacity: 0.6, lineHeight: 1 }}>+</span>
-                  <span style={{ fontFamily: "var(--font-display, 'Fungis', sans-serif)", fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", opacity: 0.6 }}>Add Product</span>
+              {/* Standalone add affordance, scaled to match the jar
+                  silhouette (the most neutral of the three bottle
+                  shapes) rather than the old rectangular tile — a
+                  dashed outline of the same shape family instead of a
+                  shape belonging to any one category. */}
+              <div style={{ display: "flex" }}>
+                <button onClick={onAdd} style={{
+                  width: BOTTLE_SHAPE_SPEC.jar.bodyW, height: BOTTLE_SHAPE_SPEC.jar.bodyH,
+                  background: "rgba(250,249,244,0.12)", border: "1px dashed rgba(250,249,244,0.4)", borderRadius: BOTTLE_SHAPE_SPEC.jar.bodyRadius,
+                  cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4,
+                  WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
+                }}>
+                  <span style={{ fontSize: 16, color: "var(--color-ivory, #faf9f4)", opacity: 0.6, lineHeight: 1 }}>+</span>
+                  <span style={{ fontFamily: "var(--font-display, 'Fungis', sans-serif)", fontSize: 6.5, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", opacity: 0.6 }}>Add</span>
                 </button>
               </div>
             </>
