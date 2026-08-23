@@ -1772,10 +1772,17 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
   // bracketed ( 0N ) badges that used to sit here were removed —
   // bracketed pills now only carry actual data (e.g. ( WK 14 ) on
   // check-in cards), not section counters.
-  const sectionHeader = (text, tone = "dark") => {
+  // showRule controls the trailing horizontal line next to the label —
+  // several sections (Cycle Tracking, Ritual Check-in, Inflammation
+  // Map, Introduce Slowly) render their own hair rules immediately
+  // beneath the header already, so that trailing line was redundant
+  // decoration stacked right on top of it. Defaults to true so
+  // sections that don't have that issue (Your Journal, Treatments)
+  // keep their existing look.
+  const sectionHeader = (text, tone = "dark", showRule = true) => {
     const isDarkBg = tone === "dark";
     const color = isDarkBg ? "var(--color-ivory, #faf9f4)" : "#1c1c1a";
-    const rule  = isDarkBg ? "rgba(250,249,244,0.20)" : "rgba(28,28,26,0.18)";
+    const ruleColor = isDarkBg ? "rgba(250,249,244,0.20)" : "rgba(28,28,26,0.18)";
     // Font sizing mirrors the home page's editorial section labels
     // ("Ask Cygne" / "Begin Your Ritual" at src/dashboard.jsx:247,297):
     // 16px Fungis Heavy, 0.22em tracking, uppercase.
@@ -1786,7 +1793,7 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
           letterSpacing: "0.22em", textTransform: "uppercase",
           color, lineHeight: 1.1,
         }}>{text}</span>
-        <div style={{ flex: 1, height: 1, background: rule, marginLeft: 4 }} />
+        {showRule && <div style={{ flex: 1, height: 1, background: ruleColor, marginLeft: 4 }} />}
       </div>
     );
   };
@@ -1813,7 +1820,7 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
   // Full-bleed section wrapper. Alternates ivory / dark bands down the
   // page so each section reads as its own editorial panel. Uses
   // negative horizontal margin to break the container's 22px inset.
-  const SectionShell = ({ text, tone = "dark", children, bottom = 28 }) => (
+  const SectionShell = ({ text, tone = "dark", children, bottom = 28, showRule = true }) => (
     <div style={{
       marginLeft: -22, marginRight: -22,
       padding: "24px 22px 20px",
@@ -1821,7 +1828,7 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
       background: tone === "ivory" ? "var(--color-ivory, #faf9f4)" : "transparent",
       ...(tone === "ivory" ? IVORY_BAND_TOKENS : null),
     }}>
-      {sectionHeader(text, tone)}
+      {sectionHeader(text, tone, showRule)}
       {children}
     </div>
   );
@@ -1900,11 +1907,15 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
       </SectionShell>
 
       {/* -- Ritual Check-in ---------------------------------------------------- */}
-      <SectionShell text="Ritual Check-in" tone="ivory">
-      {/* Editorial line-item treatment — no bordered box; content stacked
-          between hair rules, matching the dashboard's Ask Cygne row.
-          Divider color inverts the home page's ivory-alpha 25% to
-          ink-alpha 25% for readable contrast on the ivory band. */}
+      <SectionShell text="Ritual Check-in" tone="ivory" showRule={false}>
+      {/* Editorial line-item treatment — no bordered box; content sits
+          above a single closing hair rule, matching the dashboard's
+          Ask Cygne row. Divider color inverts the home page's
+          ivory-alpha 25% to ink-alpha 25% for readable contrast on the
+          ivory band. No leading rule / eyebrow label here — the
+          SectionShell header directly above already says "Ritual
+          Check-in"; repeating it as a smaller label with its own rule
+          between the two was pure duplication. */}
       {dueCheckin ? (
         <button onClick={() => setShowCheckIn(true)}
           style={{
@@ -1913,13 +1924,11 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
             padding: "18px 0",
             background: "transparent",
             border: "none",
-            borderTop: "1px solid rgba(28,28,26,0.25)",
             borderBottom: "1px solid rgba(28,28,26,0.25)",
             cursor: "pointer", textAlign: "left",
             WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
           }}>
           <div>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#5a5a5a", margin: "0 0 4px" }}>Ritual Check-in</p>
             <p style={{ fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 400, letterSpacing: "0.08em", color: "#1c1c1a", margin: "0 0 4px", lineHeight: 1 }}>How did your skin respond?</p>
             <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#5a5a5a", margin: 0 }}>
               {daysSince === null ? "Log your first check-in to start tracking." : "Last check-in " + daysSince + " day" + (daysSince !== 1 ? "s" : "") + " ago."}
@@ -1933,7 +1942,6 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
           padding: "14px 0",
           background: "transparent",
           border: "none",
-          borderTop: "1px solid rgba(28,28,26,0.25)",
           borderBottom: "1px solid rgba(28,28,26,0.25)",
         }}>
           <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#2d3d2b", flexShrink: 0 }} />
@@ -1951,7 +1959,7 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
       </SectionShell>
 
       {/* -- Inflammation Heat Map + Hero Consistency Number ---------------- */}
-      <SectionShell text="Inflammation Map" tone="dark">
+      <SectionShell text="Inflammation Map" tone="dark" showRule={false}>
       <div style={{ marginBottom: consistencyPct !== null ? 24 : 0 }}>
         <FaceHeatMap checkIns={checkIns} onAskCygne={(q, ctx) => setAskCygneQuestion({ q, ctx })} />
       </div>
@@ -2012,13 +2020,13 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
 
       {/* -- Introduce Slowly (hidden during Acute recovery; empty state otherwise) */}
       {/acute/i.test(pausePhase?.label) ? (
-        <SectionShell text="Introduce Slowly" tone="ivory">
+        <SectionShell text="Introduce Slowly" tone="ivory" showRule={false}>
           <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: 11, letterSpacing: "0.15em", color: "#5a5a5a", textAlign: "center", margin: "16px 0" }}>
             Paused while you recover.
           </p>
         </SectionShell>
       ) : (
-        <SectionShell text="Introduce Slowly" tone="ivory">
+        <SectionShell text="Introduce Slowly" tone="ivory" showRule={false}>
           {reintroActives.length > 0 && pauseTreatment && pausePhase && (
             <div style={{
               padding: "14px 0",
@@ -2110,7 +2118,7 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
       </div>
 
       {/* -- Cycle Tracking ---------------------------------------------------- */}
-      <SectionShell text="Cycle Tracking" tone="ivory" bottom={20}>
+      <SectionShell text="Cycle Tracking" tone="ivory" bottom={20} showRule={false}>
         <CycleTracker products={products} activeMap={activeMap} cycleDay={user && user.cycleDay ? user.cycleDay : 14} onSetCycleDay={d => onUpdateUser && onUpdateUser({ ...user, cycleDay: d })} user={user} onUpdateUser={onUpdateUser} />
       </SectionShell>
 
