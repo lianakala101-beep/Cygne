@@ -494,7 +494,15 @@ export default function App() {
       setAuthLoading(false);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      // Diagnostic-only logging for an intermittent multi-day logout
+      // bug — need visibility into what's actually happening to the
+      // session over time (token refresh failures, unexpected sign-outs),
+      // not just at app launch. Fire-and-forget; logDebugEvent swallows
+      // its own errors, so this can never affect auth behavior below.
+      if (event === "TOKEN_REFRESHED" || event === "SIGNED_OUT" || event === "INITIAL_SESSION") {
+        logDebugEvent(`auth.stateChange.${event}`, { hasSession: !!session });
+      }
       setAuthSession(session);
       // Keep RC identity in lockstep with Supabase's — sign-in migrates
       // to the user id, sign-out drops back to an anonymous identity so
