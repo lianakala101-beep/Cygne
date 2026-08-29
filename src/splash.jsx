@@ -105,7 +105,7 @@ function SplashOverlay({ onDone }) {
 // successful auth result we fade the whole layer out before calling
 // onAuth, so the transition into the main app is a smooth crossfade
 // instead of an abrupt cut.
-function PreAuthScreen({ onAuth }) {
+function PreAuthScreen({ onAuth, notice = null }) {
   const [splashDone, setSplashDone] = useState(false);
   const [fadingOut, setFadingOut] = useState(false);
 
@@ -125,7 +125,7 @@ function PreAuthScreen({ onAuth }) {
       }}>
         {!splashDone
           ? <SplashOverlay onDone={() => setSplashDone(true)} />
-          : <AuthScreen onAuth={handleAuth} />
+          : <AuthScreen onAuth={handleAuth} initialNotice={notice} />
         }
       </div>
     </>

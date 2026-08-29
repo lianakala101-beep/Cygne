@@ -187,6 +187,11 @@ export default function App() {
   const [authSession, setAuthSession] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
+  // Shown on the sign-in screen when we land there because a session
+  // unexpectedly dropped (failed refresh token) rather than a normal,
+  // user-initiated sign-out — see the mount effect below and handleLogout.
+  const [authNotice, setAuthNotice] = useState(null);
+  const intentionalSignOutRef = useRef(false);
 
   const requestNotifications = () => {
     setNotifPermission("granted");
@@ -478,7 +483,31 @@ export default function App() {
 
   // -- Check Supabase session on mount ----------------------------------------
   useEffect(() => {
+    // Guards against a known failure mode where a stale/invalid refresh
+    // token leaves the initial getSession() promise hanging indefinitely
+    // (a GoTrue lock deadlock, most reliably seen on Safari/WKWebView)
+    // instead of rejecting or resolving to a signed-out state — nothing
+    // else ever flips authLoading false in that case, so the app is
+    // stuck on the loading spinner forever. If getSession() hasn't
+    // settled within GET_SESSION_TIMEOUT_MS, treat it the same as a
+    // failed refresh: clear the loading gate, drop any session, and
+    // tell the user plainly rather than leaving them stuck.
+    const GET_SESSION_TIMEOUT_MS = 8000;
+    let settled = false;
+    const timeoutId = setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      console.warn("[Cygne] getSession timed out — falling back to signed-out state");
+      logDebugEvent("auth.getSession.timeout");
+      setAuthSession(null);
+      setAuthLoading(false);
+      setAuthNotice("Your session expired — please sign in again.");
+    }, GET_SESSION_TIMEOUT_MS);
+
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (settled) return; // the timeout above already resolved this
+      settled = true;
+      clearTimeout(timeoutId);
       console.log("[Cygne] getSession result:", session ? "active session" : "no session");
       setAuthSession(session);
       if (session) {
@@ -490,8 +519,13 @@ export default function App() {
       rcSyncIdentity(session);
       setAuthLoading(false);
     }).catch((e) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeoutId);
       console.error("[Cygne] getSession failed:", e);
+      setAuthSession(null);
       setAuthLoading(false);
+      setAuthNotice("Your session expired — please sign in again.");
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
@@ -503,12 +537,37 @@ export default function App() {
       if (event === "TOKEN_REFRESHED" || event === "SIGNED_OUT" || event === "INITIAL_SESSION") {
         logDebugEvent(`auth.stateChange.${event}`, { hasSession: !!session });
       }
+      // This listener firing at all is proof the client resolved to
+      // *some* state, even a signed-out one after a failed refresh — so
+      // it always clears the loading gate too, as a second safety net
+      // alongside the getSession() timeout above (whichever settles
+      // first wins; the other is a no-op via `settled`).
+      if (!settled) {
+        settled = true;
+        clearTimeout(timeoutId);
+        setAuthLoading(false);
+      }
       setAuthSession(session);
       // Keep RC identity in lockstep with Supabase's — sign-in migrates
       // to the user id, sign-out drops back to an anonymous identity so
       // premium status doesn't leak between accounts on shared devices.
       rcSyncIdentity(session);
+      if (session) {
+        // A live session landed — any stale "expired" notice no longer
+        // applies.
+        setAuthNotice(null);
+      }
       if (!session) {
+        // Distinguish a normal, user-initiated sign-out (handleLogout
+        // sets this ref right before calling supabase.auth.signOut())
+        // from an unexpected one — GoTrue emits the same SIGNED_OUT
+        // event when a background token refresh fails, which is
+        // exactly the case that needs a clear message instead of just
+        // silently landing back on the sign-in screen.
+        if (event === "SIGNED_OUT" && !intentionalSignOutRef.current) {
+          setAuthNotice("Your session expired — please sign in again.");
+        }
+        intentionalSignOutRef.current = false;
         setUser(null);
         setNeedsOnboarding(false);
         profileLoaded.current = false;
@@ -1315,6 +1374,10 @@ export default function App() {
     // for the incoming user.
     registerPushRef.current = false;
 
+    // Flag this as a deliberate sign-out so the onAuthStateChange
+    // listener's SIGNED_OUT branch doesn't mistake it for a failed
+    // token refresh and show the "session expired" notice.
+    intentionalSignOutRef.current = true;
     await supabase.auth.signOut();
     setAuthSession(null);
     setUser(null);
@@ -1756,7 +1819,7 @@ export default function App() {
 
   // -- No session → Pre-auth (swan-video splash + frosted-glass auth form) ---
   if (!authSession) {
-    return <PreAuthScreen onAuth={handleAuth} />;
+    return <PreAuthScreen onAuth={handleAuth} notice={authNotice} />;
   }
 
   // -- Needs onboarding (new signup) ------------------------------------------

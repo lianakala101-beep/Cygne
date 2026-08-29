@@ -1,14 +1,19 @@
 import { useState } from "react";
 import { supabase } from "./supabase.js";
 
-function AuthScreen({ onAuth }) {
+function AuthScreen({ onAuth, initialNotice = null }) {
   const [mode, setMode] = useState("login");
   const [email, setEmail] = useState(() => localStorage.getItem("cygne_remember_email") || "");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [resetSent, setResetSent] = useState(false);
-  const [error, setError] = useState(null);
+  // Seeded from initialNotice (e.g. "Your session expired — please
+  // sign in again" after a failed background token refresh) so it's
+  // shown the moment this screen mounts, using the same banner a
+  // login/signup error would use — same shared state so a form
+  // submission naturally replaces it if the user tries something else.
+  const [error, setError] = useState(initialNotice);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
