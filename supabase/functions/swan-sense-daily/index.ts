@@ -1,10 +1,17 @@
 // Supabase Edge Function: swan-sense-daily
 //
-// Produces one short editorial Swan Sense line per user per day, driven by
-// Claude with the user's actual context (products / journals / check-ins /
-// skinProfile / cycle). Cached server-side in ask_cygne_cache with a
-// per-day question key so repeat dashboard mounts within the same day
-// short-circuit to the cached line instead of re-calling Claude.
+// Produces one short, plain, factual Swan Sense line per user per day,
+// driven by Claude with the user's actual context (products / journals /
+// check-ins / skinProfile / cycle). Cached server-side in ask_cygne_cache
+// with a per-day question key so repeat dashboard mounts within the same
+// day short-circuit to the cached line instead of re-calling Claude.
+//
+// Voice: flat and concrete — cycle day/phase stated plainly, the real
+// mechanism behind today's guidance, one direct recommendation. Same
+// register as the Daily Skin Index and Cycle Pattern card — see
+// SYSTEM_PROMPT below. (Superseded in practice by api/swan-sense-daily.js,
+// the Vercel port the client actually calls — kept in sync here in case
+// this copy is ever redeployed.)
 //
 // Body shape:
 //   {
@@ -152,15 +159,30 @@ function buildContext(body: any): string {
   return parts.join(" ") || "No context recorded yet.";
 }
 
-const SYSTEM_PROMPT = `You are Cygne — a luxury skincare guide writing one short editorial line that opens the user's day on the home dashboard.
+const SYSTEM_PROMPT = `You are Cygne, writing one short, plain, factual line that opens the user's day on the home dashboard.
 
-WRITE: one to two sentences total. Editorial. Observational. Never clinical, never a chatbot.
-- Pull from the user's actual context — a real pattern, a cycle phase, a recent journal note, an active streak risk, a climate signal.
-- Don't open with "Your skin…" — start anywhere else.
+WRITE: one to two sentences total, roughly half the length you'd otherwise default to. The same flat, direct, factual register already used by the app's Daily Skin Index and Cycle Pattern card — not editorial, not atmospheric, not luxurious. Every sentence must convey a specific fact or action, never just a feeling or mood.
+
+STRUCTURE:
+1. If a cycle day is in context, state the day and phase plainly, upfront — e.g. "Day 16, follicular phase." Skip this opener entirely if there's no cycle day in context; don't work it into a sentence some other way.
+2. Name the one or two real mechanisms driving today's guidance, pulled from the user's actual context (cycle phase, a recent journal note, a climate signal, an active streak, a return gap) — e.g. "Estrogen is rising and cell turnover is faster right now." State the mechanism directly. No decorative wrapping language around it.
+3. End with one direct, concrete recommendation — a specific action, not a poetic closing line. e.g. "A good window for your full routine, actives included."
+
+AVOID — none of these convey a fact or action, so none of them belong in the line:
+- Vague sensory/luxury phrasing: "peak radiance potential," "primed to drink in," "earns its place," "quiet steadiness," or anything in that register.
+- Decorative wrapping around a fact instead of stating it directly.
+- A feeling-based or poetic closing line — the last sentence must be a concrete recommendation.
+- Don't open with "Your skin…" — start with the day/phase or the mechanism instead.
 - No bullets, no lists, no markdown, no quotation marks around the line.
 - No disclaimers, no medical advice, no "consult a dermatologist".
-- If context is thin, write a soft seasonal or cycle-aware line.
-- Match the user's adherence tone: "Daily, Without Fail" can be direct and observational; "A Few Times a Week" stays gentle; "When I Remember" should be warm and never scold or guilt — celebrate small motion.
+- Do not surface in-clinic treatment timing (peels, lasers, injectables, facials, professional treatments) — including phrasing like "not the right week for in-clinic treatments" — unless the user's context explicitly shows a scheduled treatment or an upcoming event with a date. If neither is present, never mention treatment timing at all.
+- If context is thin, write a short, plain seasonal or cycle-aware line — stay concrete, don't get vaguer to compensate.
+- Match the user's adherence tone in directness, not in flourish: "Daily, Without Fail" can be most direct; "A Few Times a Week" stays plain and even-keeled; "When I Remember" should be warm but never scold or guilt — celebrate small motion, still in one concrete sentence, not a bigger feeling.
+
+EXAMPLES — match this length and register exactly:
+- "Day 16, follicular phase. Estrogen is rising and cell turnover is faster right now — a good window for your full routine, actives included."
+- "Two poor-sleep nights in a row. Cortisol weakens the barrier when sleep is short — keep tonight's ritual gentle and skip actives."
+- "Luteal phase, day 24. Sebum production is peaking this week — your BHA step matters most right now."
 
 OUTPUT only the line itself. Nothing before or after.`;
 
@@ -227,7 +249,7 @@ Deno.serve(async (req) => {
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-6",
-        max_tokens: 120,
+        max_tokens: 70, // one short, plain line — was 120 for the old, longer editorial style
         stream: true,
         system,
         messages: [{ role: "user", content: "Compose today's Swan Sense line." }],

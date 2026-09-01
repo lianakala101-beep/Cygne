@@ -459,10 +459,12 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
     (now.getMonth() + 1) === parseInt(user.birthMonth) &&
     now.getDate() === parseInt(user.birthDay);
 
+  // Plain and concrete, matching Swan Sense's tightened daily-line voice —
+  // no vague sensory descriptors like "radiant" standing in for a fact.
   const BIRTHDAY_LINES = [
     "Another year of taking care of yourself.",
     "Another year around the sun. Your ritual continues.",
-    "Happy birthday. Your skin looks radiant.",
+    "Happy birthday. One more year of consistent care.",
   ];
 
   // Separate meaningful predictions from baseline fallbacks
