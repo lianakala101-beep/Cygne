@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { invokeEdgeFunction, supabase } from "../supabase.js";
 import { SkinGoalsSection } from "./SkinGoalsSection.jsx";
 import { getCyclePhaseNameForDate } from "../lib/cycle.js";
+import { buildMonthlyDataCards } from "../lib/monthlyDataCards.js";
 
 // Linen / paper noise — matches the rest of the app's editorial surfaces.
 const GRAIN = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='250' height='250' filter='url(%23g)' opacity='0.045'/%3E%3C/svg%3E\")";
@@ -41,23 +42,26 @@ function sanitizeSkinProfile(skinProfile) {
 }
 
 // Resolve the month being recapped (matches /api/monthly-recap's logic) so
-// the header reads the same month the AI is writing about.
+// the header reads the same month the AI is writing about. month is
+// 0-indexed (JS Date convention) — used to scope the data-card
+// derivation to the same month.
 function resolveMonth(offset) {
   const today = new Date();
   const off = Number.isFinite(offset) ? offset : 0;
   const target = new Date(today.getFullYear(), today.getMonth() + off, 1);
-  return { year: target.getFullYear(), monthLabel: MONTHS[target.getMonth()] };
+  return { year: target.getFullYear(), month: target.getMonth(), monthLabel: MONTHS[target.getMonth()] };
 }
 
 // ─── MonthlyRecap overlay ─────────────────────────────────────────────────────
 //
-// Editorial monthly recap. Replaces the previous calendar / stats / hand-
-// written narrate* layout with a single AI-generated narrative pulled from
-// /api/monthly-recap. The endpoint receives the user's products, journals,
-// check-ins, treatments, cycleDay, and skin profile for the target month
-// (offset 0 = current, -1 = previous) and returns 3 short paragraphs of
-// editorial prose. We render those centered, ivory-on-inky-moss, in the
-// Swan Sense reading style.
+// Leads with concrete, rule-based data cards (Best Days / What's Working /
+// Check-In Clarity / What Changed — see src/lib/monthlyDataCards.js, same
+// flat factual style as the Cycle Pattern card below and the Dashboard's
+// Daily Skin Index) rather than a long narrative. /api/monthly-recap now
+// supplies just one short sentence of light framing above the cards — the
+// endpoint still receives the user's products, journals, check-ins,
+// treatments, cycleDay, and skin profile for the target month (offset 0 =
+// current, -1 = previous) for grounding, it's just asked to write far less.
 //
 // Every array prop defaults to []. Non-array values are coerced so a half-
 // loaded auth state can't crash the component.
@@ -234,11 +238,54 @@ export function MonthlyRecap({
     return () => { cancelled = true; };
   }, [offset, user?.id, user?.cycleStartDate, user?.cycleLength, reflections]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Split narrative on blank lines into paragraphs. The system prompt asks
-  // for 3 paragraphs separated by \n\n; we render each as its own <p>.
-  const paragraphs = narrative
-    ? narrative.split(/\n\s*\n/).map(s => s.trim()).filter(Boolean)
-    : [];
+  // ─── Monthly data cards (Best Days / What's Working / etc.) ──────────────
+  //
+  // Concrete, rule-based cards computed client-side — see
+  // src/lib/monthlyDataCards.js. Needs its own ramp_checkins fetch
+  // (product_id + response_state + created_at) rather than reusing the
+  // Cycle Pattern insight's query above: that query only runs when cycle
+  // tracking is enabled at all and gates on a much higher volume/span bar
+  // (10+ items across 3+ full cycles) — "What's Working" just needs 2+
+  // check-ins on one product, a far lower and unrelated bar. No LLM call;
+  // each candidate card is independently gated on having enough real data,
+  // so a sparse month simply yields fewer cards.
+  const [dataCards, setDataCards] = useState([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    setDataCards([]);
+    (async () => {
+      const userId = user?.id;
+      let rampCheckinRows = [];
+      if (userId) {
+        const { data, error } = await supabase
+          .from("ramp_checkins")
+          .select("product_id, response_state, created_at")
+          .eq("user_id", userId);
+        if (error) {
+          console.warn("[MonthlyRecap] ramp_checkins fetch (data cards) failed:", error.message);
+        } else {
+          rampCheckinRows = data || [];
+        }
+      }
+      if (cancelled) return;
+      const { year, month } = resolveMonth(offset);
+      setDataCards(buildMonthlyDataCards({
+        journals: Array.isArray(journals) ? journals : [],
+        checkIns: Array.isArray(checkIns) ? checkIns : [],
+        rampCheckins: rampCheckinRows,
+        products: Array.isArray(products) ? products : [],
+        year, month,
+      }));
+    })();
+    return () => { cancelled = true; };
+  }, [offset, user?.id, journals, checkIns, products]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // narrative is now a single short sentence of light framing (see
+  // api/monthly-recap.js's SYSTEM_PROMPT) — the data cards below are the
+  // actual content. Trimmed defensively in case the model still wraps it
+  // in stray whitespace or a trailing newline.
+  const framingLine = narrative ? narrative.trim() : "";
 
   return (
     <div
@@ -306,8 +353,10 @@ export function MonthlyRecap({
           background: "linear-gradient(90deg, transparent 0%, rgba(192,192,192,0.55) 50%, transparent 100%)",
         }} />
 
-        {/* Narrative — paragraphs, or loading / failed state */}
-        <div style={{ marginTop: 36, marginBottom: 48, minHeight: 200 }}>
+        {/* Framing — at most one short, quiet sentence (or loading /
+            failed state). Deliberately understated relative to the data
+            cards below, which are the recap's actual content now. */}
+        <div style={{ marginTop: 36, marginBottom: 28, minHeight: 24 }}>
           {loading && (
             <p style={{
               fontFamily: "var(--font-body)",
@@ -328,18 +377,55 @@ export function MonthlyRecap({
             </p>
           )}
 
-          {!loading && !failed && paragraphs.map((p, i) => (
-            <p key={i} style={{
+          {!loading && !failed && framingLine && (
+            <p style={{
               fontFamily: "var(--font-body)",
-              fontSize: 16, fontWeight: 400,
-              lineHeight: 1.7, letterSpacing: "0.01em",
-              color: IVORY,
-              margin: i === 0 ? "0" : "22px 0 0",
+              fontSize: 14, fontWeight: 400,
+              lineHeight: 1.6, letterSpacing: "0.01em",
+              color: IVORY, opacity: 0.75,
+              margin: 0,
             }}>
-              {p}
+              {framingLine}
             </p>
-          ))}
+          )}
         </div>
+
+        {/* Monthly data cards — Best Days / What's Working / Check-In
+            Clarity / What Changed, whichever the month's actual logged
+            data supports (0-4; see src/lib/monthlyDataCards.js). Same
+            flat, factual card treatment as the Cycle Pattern card
+            directly below — label eyebrow + one plain-language line, no
+            narrative voice. Absent entirely for a sparse month rather
+            than padded with a card that isn't really data-backed. */}
+        {dataCards.map(card => (
+          <div key={card.key} style={{
+            margin: "0 auto 16px",
+            maxWidth: 420,
+            padding: "18px 20px",
+            background: "rgba(250,249,244,0.05)",
+            border: "1px solid rgba(250,249,244,0.16)",
+            borderRadius: 12,
+            textAlign: "center",
+          }}>
+            <p style={{
+              fontFamily: "var(--font-display)",
+              fontSize: 10, fontWeight: 700, letterSpacing: "0.18em",
+              textTransform: "uppercase", color: "rgba(255,255,255,0.55)",
+              margin: "0 0 10px",
+            }}>
+              {card.label}
+            </p>
+            <p style={{
+              fontFamily: "var(--font-body)",
+              fontSize: 14, fontWeight: 400,
+              lineHeight: 1.6, letterSpacing: "0.01em",
+              color: IVORY,
+              margin: 0,
+            }}>
+              {card.body}
+            </p>
+          </div>
+        ))}
 
         {/* Cycle-pattern insight — LLM-generated single-sentence
             observation of any notable phase-correlated pattern in
