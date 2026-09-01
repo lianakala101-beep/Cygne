@@ -1,10 +1,13 @@
 // Vercel serverless function: monthly-recap
 //
-// Produces a short editorial narrative (3-4 paragraphs) summarizing a user's
-// month — pattern, ritual, and a brief forward look — driven by Claude with
-// the user's actual logged context for that month. Replaces the previous
-// hand-written narrate* helpers in MonthlyRecap.jsx with a single coherent
-// AI voice.
+// Produces ONE short sentence of light editorial framing for the top of the
+// Monthly Recap, driven by Claude with the user's actual logged context for
+// that month. The recap itself now leads with concrete, rule-based data
+// cards computed client-side (see src/lib/monthlyDataCards.js) — this
+// endpoint no longer writes the bulk of the recap, just a brief warm line
+// above those cards. Previously wrote 3-4 full paragraphs; kept as an AI
+// call (rather than a static line) so it can still ground itself in real,
+// specific context when there's any to pull from.
 //
 // Body shape:
 //   {
@@ -25,7 +28,7 @@
 // stripped from props on certain screens.
 //
 // Response:
-//   200: { narrative: string, cached: boolean }
+//   200: { narrative: string, cached: boolean }  — narrative is now one sentence
 //   4xx/5xx: { error: string }
 
 import { createClient } from "@supabase/supabase-js";
@@ -251,26 +254,22 @@ function buildContext(body, slice, rampLog) {
   return parts.join(" ");
 }
 
-const SYSTEM_PROMPT = `You are Cygne — a luxury skincare guide writing a monthly skin recap for the user. The recap opens at the end of a month and reads like a single editorial letter, not a report.
+const SYSTEM_PROMPT = `You are Cygne — a luxury skincare guide writing the opening line of a monthly skin recap for the user. The recap itself is a set of concrete data cards further down the screen; this is just one short line of light, warm framing before them — not a report, not a narrative, not a summary of the cards.
 
-WRITE: 3 short paragraphs, separated by blank lines (\\n\\n). Each paragraph 1-2 sentences, ~80-140 characters. Editorial. Observational. Calm. Never clinical, never a chatbot. Never bullet points or lists. Never headings or labels — just the prose.
+WRITE: exactly ONE sentence, roughly 60-110 characters. Editorial, warm, calm. Never clinical, never a chatbot. No bullet points, no lists, no headings or labels — just the one sentence.
 
-STRUCTURE — keep this order, but don't label the sections:
-1. The pattern of the month. Pull a real signal from their context — a recurring skin condition, irritation cluster, poor-sleep streak, breakout zone, treatment, ramp progress. If context is thin, say so gently.
-2. Their ritual through it. Reference what carried them — a specific product, a phase of an active they're ramping, the act of logging itself. One observation, no preaching.
-3. Looking ahead. One soft cue for next month — a cycle phase, season turn, an upcoming event from skinProfile, or just a steady-as-you-go line.
+Pull a real, specific signal from their context if one stands out — a recurring skin condition, irritation cluster, a product or ramp they're working through, a cycle phase, an upcoming event from skinProfile. If context is thin, write a plain, steady-as-you-go line grounded in something concrete and real about them (a goal, a product in routine, their skin type) rather than a generic platitude — but keep it to one line regardless.
 
 VOICE:
-- Warm, observational, slightly literary.
-- Reference SPECIFIC details from their context — not generic skincare advice.
+- Warm, observational.
 - "You" not "the user". Past tense for what happened, present for now.
 - No medical advice, no "consult a dermatologist", no disclaimers.
-- No emojis, no markdown, no quotes around lines.
-- No salutation, no signoff. Just the three paragraphs.
+- No emojis, no markdown, no quotes around the line.
+- No salutation, no signoff — just the one sentence.
 
-If the user has little or no logged activity this month (few/no journals, check-ins, or treatments), do NOT write generically about silence or absence. Instead, ground the recap in what IS known and stable about them — their skin goals, current products in routine, an active Introduce Slowly ramp and its week number, their skin type or concerns, or an upcoming focus/occasion from their profile. Write as if picking up a thread that's still there, even if it wasn't logged this month: reference a specific real product, goal, or ramp week by name. Still keep the same warm, editorial tone — just anchor it in something concrete rather than naming the absence of data. Never invent activity, conditions, or events that weren't provided in context.
+Never invent activity, conditions, or events that weren't provided in context.
 
-OUTPUT only the three paragraphs separated by blank lines. Nothing before or after.`;
+OUTPUT only the single sentence. Nothing before or after.`;
 
 export default async function handler(req, res) {
   setCors(res);
@@ -339,10 +338,10 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-6",
-        max_tokens: 400,
+        max_tokens: 80, // one short sentence — was 400 for the old 3-paragraph narrative
         stream: true,
         system,
-        messages: [{ role: "user", content: `Compose the monthly recap for ${slice.monthName} ${slice.year}.` }],
+        messages: [{ role: "user", content: `Write the opening line for the ${slice.monthName} ${slice.year} recap.` }],
       }),
     });
 
