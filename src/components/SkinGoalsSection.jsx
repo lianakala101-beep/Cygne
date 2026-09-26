@@ -71,7 +71,7 @@ export function SkinGoalsSection({
           UI panel dropped in. */}
       <p style={{
         fontFamily: "var(--font-display)",
-        fontSize: 11, fontWeight: 700, letterSpacing: "0.15em",
+        fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)",
         textTransform: "uppercase", color: IVORY,
         margin: "0 0 6px", textAlign: "center", opacity: 0.85,
       }}>
@@ -79,7 +79,7 @@ export function SkinGoalsSection({
       </p>
       <p style={{
         fontFamily: "var(--font-body)",
-        fontSize: 13, fontWeight: 400, lineHeight: 1.6,
+        fontSize: "var(--text-sm)", fontWeight: 400, lineHeight: 1.6,
         color: "rgba(255,255,255,0.7)",
         margin: "0 0 22px", textAlign: "center",
       }}>
@@ -102,7 +102,7 @@ export function SkinGoalsSection({
             }}
           >
             <span style={{
-              fontFamily: "var(--font-body)", fontSize: 14,
+              fontFamily: "var(--font-body)", fontSize: "var(--text-sm)",
               color: IVORY, flex: 1, minWidth: 0,
             }}>
               {labelFor(g.goal)}
@@ -117,7 +117,7 @@ export function SkinGoalsSection({
                   border: "1px solid rgba(250,249,244,0.6)",
                   borderRadius: 999,
                   fontFamily: "var(--font-body)",
-                  fontSize: 9, fontWeight: 400, letterSpacing: "0.14em",
+                  fontSize: "var(--text-xs)", fontWeight: 400, letterSpacing: "var(--tracking-label)",
                   textTransform: "uppercase", color: IVORY,
                   cursor: busy != null ? "default" : "pointer",
                   opacity: busy === g.id ? 0.5 : 1,
@@ -136,7 +136,7 @@ export function SkinGoalsSection({
                   background: "none", border: "none",
                   color: "rgba(255,255,255,0.45)",
                   cursor: busy != null ? "default" : "pointer",
-                  fontSize: 18, lineHeight: 1, padding: 4,
+                  fontSize: "var(--text-lg)", lineHeight: 1, padding: 4,
                 }}
               >×</button>
             </div>
@@ -155,7 +155,7 @@ export function SkinGoalsSection({
               style={{
                 background: "none", border: "none",
                 fontFamily: "var(--font-body)",
-                fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase",
+                fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase",
                 color: "rgba(255,255,255,0.55)",
                 cursor: "pointer", padding: "4px 8px",
               }}
@@ -181,7 +181,7 @@ export function SkinGoalsSection({
                       border: "1px solid rgba(250,249,244,0.24)",
                       borderRadius: 999,
                       fontFamily: "var(--font-body)",
-                      fontSize: 11, color: IVORY,
+                      fontSize: "var(--text-xs)", color: IVORY,
                       cursor: busy != null ? "default" : "pointer",
                       opacity: busy != null && !active ? 0.5 : 1,
                     }}
@@ -196,8 +196,8 @@ export function SkinGoalsSection({
                 style={{
                   background: "none", border: "none",
                   color: "rgba(255,255,255,0.4)",
-                  fontFamily: "var(--font-body)", fontSize: 11,
-                  letterSpacing: "0.14em", textTransform: "uppercase",
+                  fontFamily: "var(--font-body)", fontSize: "var(--text-xs)",
+                  letterSpacing: "var(--tracking-label)", textTransform: "uppercase",
                   cursor: busy != null ? "default" : "pointer", padding: "6px 8px",
                 }}
               >Cancel</button>

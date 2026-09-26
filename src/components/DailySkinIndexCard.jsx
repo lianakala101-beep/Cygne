@@ -65,14 +65,14 @@ const TONE_STYLES = {
 //     0.28em) so it reads as quiet framing rather than competing with
 //     the header directly beneath it for top billing.
 const LABEL_STYLE = {
-  fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 10,
-  letterSpacing: "0.28em", textTransform: "uppercase",
+  fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-xs)",
+  letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
   color: "var(--color-ivory, #faf9f4)",
 };
 
 const CONTEXT_LINE_STYLE = {
-  fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 10,
-  letterSpacing: "0.14em", textTransform: "uppercase",
+  fontFamily: "var(--font-body)", fontWeight: 400, fontSize: "var(--text-xs)",
+  letterSpacing: "var(--tracking-label)", textTransform: "uppercase",
   color: "var(--color-ivory, #faf9f4)", opacity: 0.55,
   // 16px matches the card's established section-to-section rhythm
   // (header-to-items gap, and the divider margin before the action
@@ -82,7 +82,7 @@ const CONTEXT_LINE_STYLE = {
 };
 
 const VALUE_STYLE = {
-  fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 9,
+  fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-xs)",
   letterSpacing: "0.02em", textTransform: "uppercase",
   lineHeight: 1,
 };
@@ -94,7 +94,7 @@ const VALUE_STYLE = {
 const PILL_MIN_WIDTH = 140;
 
 const ACTION_LINE_STYLE = {
-  fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 16,
+  fontFamily: "var(--font-body)", fontWeight: 400, fontSize: "var(--text-md)",
   letterSpacing: "0.01em", lineHeight: 1.5,
   color: "var(--color-ivory, #faf9f4)",
   margin: 0,

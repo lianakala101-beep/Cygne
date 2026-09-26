@@ -72,15 +72,15 @@ function ProductBottle({ product, onEdit, onDelete, onToggleRoutine, onSession, 
             so it's reachable regardless of shape. */}
         <div ref={menuRef} style={{ position: "absolute", top: -6, right: -8, zIndex: 2 }}>
           <button onClick={() => setMenuOpen(o => !o)} aria-label="Options"
-            style={{ width: 18, height: 18, borderRadius: "50%", background: "rgba(250,249,244,0.9)", border: "1px solid rgba(192,192,192,0.4)", color: "#1c1c1a", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, lineHeight: 1, fontFamily: "sans-serif" }}>
+            style={{ width: 18, height: 18, borderRadius: "50%", background: "rgba(250,249,244,0.9)", border: "1px solid rgba(192,192,192,0.4)", color: "#1c1c1a", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "var(--text-xs)", lineHeight: 1, fontFamily: "sans-serif" }}>
             ⋯
           </button>
           {menuOpen && (
             <div style={{ position: "absolute", right: 0, top: "110%", zIndex: 50, minWidth: 170, background: "rgba(250,249,244,0.96)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", border: "1px solid rgba(192,192,192,0.3)", borderRadius: 8, padding: "6px 0", boxShadow: "0 8px 28px rgba(0,0,0,0.10)" }}>
-              <button onClick={() => { setMenuOpen(false); onEdit(product); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#1c1c1a", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "left" }}>
+              <button onClick={() => { setMenuOpen(false); onEdit(product); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#1c1c1a", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", textAlign: "left" }}>
                 <Icon name="edit" size={12} /><span>Edit product</span>
               </button>
-              <button onClick={() => { setMenuOpen(false); onToggleRoutine(product.id); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#1c1c1a", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "left" }}>
+              <button onClick={() => { setMenuOpen(false); onToggleRoutine(product.id); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#1c1c1a", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", textAlign: "left" }}>
                 <Icon name="sparkle" size={12} /><span>{inRoutine ? "Remove from ritual" : "Add to ritual"}</span>
               </button>
               {onAskCygne && getAskCygneAccess(user) === "available" && (
@@ -101,12 +101,12 @@ function ProductBottle({ product, onEdit, onDelete, onToggleRoutine, onSession, 
                       ctxLines.join(" "),
                     );
                   }}
-                  style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#1c1c1a", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "left" }}>
+                  style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#1c1c1a", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", textAlign: "left" }}>
                   <Icon name="swan" size={12} /><span>Ask Cygne</span>
                 </button>
               )}
               <div style={{ height: 1, background: "rgba(192,192,192,0.25)", margin: "4px 12px" }} />
-              <button onClick={() => { setMenuOpen(false); setConfirmDelete(true); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#8b7355", fontFamily: "var(--font-body)", fontSize: 12, textAlign: "left" }}>
+              <button onClick={() => { setMenuOpen(false); setConfirmDelete(true); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: "none", border: "none", cursor: "pointer", color: "#8b7355", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", textAlign: "left" }}>
                 <Icon name="trash" size={12} /><span>Remove</span>
               </button>
             </div>
@@ -160,11 +160,11 @@ function ProductBottle({ product, onEdit, onDelete, onToggleRoutine, onSession, 
       {confirmDelete && (
         <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(250,249,244,0.8)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", padding: "0 28px" }} onClick={() => setConfirmDelete(false)}>
           <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 320, background: "rgba(250,249,244,0.97)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", border: "1px solid rgba(192,192,192,0.3)", borderRadius: 8, padding: "26px 24px 22px", boxShadow: "0 16px 48px rgba(0,0,0,0.10)" }}>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#5a5a5a", margin: "0 0 12px" }}>Confirm</p>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "#1c1c1a", margin: "0 0 22px", lineHeight: 1.65 }}>Remove <strong>{product.name}</strong> from your vanity? This cannot be undone.</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "#5a5a5a", margin: "0 0 12px" }}>Confirm</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "#1c1c1a", margin: "0 0 22px", lineHeight: 1.65 }}>Remove <strong>{product.name}</strong> from your vanity? This cannot be undone.</p>
             <div style={{ display: "flex", gap: 10 }}>
-              <button onClick={() => setConfirmDelete(false)} style={{ flex: 1, padding: "12px 0", borderRadius: 0, border: "1px solid rgba(192,192,192,0.35)", background: "transparent", color: "#1c1c1a", fontFamily: "var(--font-body)", fontSize: 12, cursor: "pointer" }}>Cancel</button>
-              <button onClick={() => { setConfirmDelete(false); onDelete(product.id); }} style={{ flex: 1, padding: "12px 0", borderRadius: 0, border: "1px solid rgba(139,115,85,0.3)", background: "rgba(139,115,85,0.07)", color: "#8b7355", fontFamily: "var(--font-body)", fontSize: 12, cursor: "pointer" }}>Remove</button>
+              <button onClick={() => setConfirmDelete(false)} style={{ flex: 1, padding: "12px 0", borderRadius: 0, border: "1px solid rgba(192,192,192,0.35)", background: "transparent", color: "#1c1c1a", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => { setConfirmDelete(false); onDelete(product.id); }} style={{ flex: 1, padding: "12px 0", borderRadius: 0, border: "1px solid rgba(139,115,85,0.3)", background: "rgba(139,115,85,0.07)", color: "#8b7355", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", cursor: "pointer" }}>Remove</button>
             </div>
           </div>
         </div>
@@ -176,8 +176,8 @@ function ProductBottle({ product, onEdit, onDelete, onToggleRoutine, onSession, 
 function DetailPill({ label, value }) {
   return (
     <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "8px 12px" }}>
-      <p style={{ fontFamily: "var(--font-body)", fontSize: 8, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 3px", opacity: 0.7 }}>{label}</p>
-      <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--parchment)", margin: 0 }}>{value}</p>
+      <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 3px", opacity: 0.7 }}>{label}</p>
+      <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--parchment)", margin: 0 }}>{value}</p>
     </div>
   );
 }
@@ -202,9 +202,9 @@ function ProductDetailSheet({ product, onClose }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20, gap: 12 }}>
           <div>
             {product.brand && (
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 6px" }}>{product.brand}</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 6px" }}>{product.brand}</p>
             )}
-            <h2 style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 700, letterSpacing: "0.01em", color: "var(--parchment)", margin: 0, lineHeight: 1.25 }}>{product.name}</h2>
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 700, letterSpacing: "0.01em", color: "var(--parchment)", margin: 0, lineHeight: 1.25 }}>{product.name}</h2>
           </div>
           <button onClick={onClose} aria-label="Close" style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: 4, flexShrink: 0 }}><Icon name="x" size={17} /></button>
         </div>
@@ -218,10 +218,10 @@ function ProductDetailSheet({ product, onClose }) {
 
         {actives.length > 0 && (
           <div style={{ marginBottom: 18 }}>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 8px" }}>Detected actives</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 8px" }}>Detected actives</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
               {actives.map(a => (
-                <span key={a} style={{ fontSize: 10, fontFamily: "var(--font-body)", color: "var(--color-ivory, #faf9f4)", background: "rgba(250,249,244,0.08)", border: "1px solid rgba(250,249,244,0.25)", padding: "3px 10px", borderRadius: 20 }}>{a}</span>
+                <span key={a} style={{ fontSize: "var(--text-xs)", fontFamily: "var(--font-body)", color: "var(--color-ivory, #faf9f4)", background: "rgba(250,249,244,0.08)", border: "1px solid rgba(250,249,244,0.25)", padding: "3px 10px", borderRadius: 20 }}>{a}</span>
               ))}
             </div>
           </div>
@@ -229,8 +229,8 @@ function ProductDetailSheet({ product, onClose }) {
 
         {ingredients.length > 0 && (
           <div>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 8px" }}>Ingredients</p>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: 0, lineHeight: 1.7 }}>{ingredients.join(", ")}</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 8px" }}>Ingredients</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: 0, lineHeight: 1.7 }}>{ingredients.join(", ")}</p>
           </div>
         )}
       </div>
@@ -491,10 +491,10 @@ function InsightRow({ item }) {
     <div style={{ display: "flex", gap: 12, padding: "12px 0", borderBottom: "1px solid var(--border)" }}>
       <div style={{ width: 5, height: 5, borderRadius: "50%", background: dot, flexShrink: 0, marginTop: 6 }} />
       <div style={{ flex: 1 }}>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: item.severity === "ok" ? "var(--clay)" : "var(--parchment)", margin: "0 0 4px", lineHeight: 1.6 }}>{item.text}</p>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: item.severity === "ok" ? "var(--clay)" : "var(--parchment)", margin: "0 0 4px", lineHeight: 1.6 }}>{item.text}</p>
         {item.meta && (
           <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 4 }}>
-            {item.meta.map((m, i) => <span key={i} style={{ fontSize: 9, fontFamily: "var(--font-body)", color: "var(--clay)", background: "var(--surface)", padding: "2px 7px", borderRadius: 20, border: "1px solid var(--border)", letterSpacing: "0.04em" }}>{m}</span>)}
+            {item.meta.map((m, i) => <span key={i} style={{ fontSize: "var(--text-xs)", fontFamily: "var(--font-body)", color: "var(--clay)", background: "var(--surface)", padding: "2px 7px", borderRadius: 20, border: "1px solid var(--border)", letterSpacing: "0.04em" }}>{m}</span>)}
           </div>
         )}
       </div>
@@ -509,7 +509,7 @@ function InsightBlock({ insight }) {
       <button onClick={() => setOpen(o => !o)}
         style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "14px 0", background: "none", border: "none", borderTop: "1px solid var(--border)", cursor: "pointer" }}>
         <span style={{ color: "var(--clay)", opacity: 0.55 }}><Icon name={insight.icon} size={13} /></span>
-        <span style={{ fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)", flex: 1, textAlign: "left" }}>{insight.section}</span>
+        <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)", flex: 1, textAlign: "left" }}>{insight.section}</span>
         <span style={{ color: "var(--clay)", opacity: 0.35, display: "inline-block", transform: open ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>
           <Icon name="chevron" size={12} />
         </span>
@@ -533,7 +533,7 @@ function ClearAllButton({ onClearAll }) {
         if (confirming) { onClearAll(); setConfirming(false); }
         else { setConfirming(true); setTimeout(() => setConfirming(false), 3000); }
       }}
-      style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: confirming ? "#8b7355" : "var(--clay)", opacity: confirming ? 1 : 0.35, background: "none", border: "none", cursor: "pointer", paddingTop: 8, transition: "all 0.2s" }}>
+      style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: confirming ? "#8b7355" : "var(--clay)", opacity: confirming ? 1 : 0.35, background: "none", border: "none", cursor: "pointer", paddingTop: 8, transition: "all 0.2s" }}>
       {confirming ? "Tap again to confirm" : "Clear all"}
     </button>
   );
@@ -555,10 +555,10 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearAll,
       {/* -- Header ----------------------------------------------------------- */}
       <div style={{ marginBottom: 24, paddingTop: 44 }}>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-          <h1 style={{ fontFamily: "var(--font-display)", fontSize: 32, fontWeight: 500, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-ivory)", margin: "0 0 4px", lineHeight: 1.15 }}>Your Vanity</h1>
+          <h1 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-2xl)", fontWeight: 500, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory)", margin: "0 0 4px", lineHeight: 1.15 }}>Your Vanity</h1>
           {false && <ClearAllButton onClearAll={onClearAll} />}  {/* hidden — dev only */}
         </div>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: 0 }}>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: 0 }}>
           {products.length} product{products.length !== 1 ? "s" : ""}{spending.total > 0 ? ` · $${spending.total.toFixed(0)} estimated` : ""}
         </p>
       </div>
@@ -592,8 +592,8 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearAll,
                 borderLeft: i === 0 ? "none" : "1px solid rgba(250,249,244,0.28)",
                 cursor: active ? "default" : "pointer",
                 fontFamily: "var(--font-display)",
-                fontSize: 10, fontWeight: 400,
-                letterSpacing: "0.2em", textTransform: "uppercase",
+                fontSize: "var(--text-xs)", fontWeight: 400,
+                letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
                 color: active ? "var(--color-ivory, #faf9f4)" : "rgba(250,249,244,0.65)",
                 WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
                 transition: "background 0.18s, color 0.18s",
@@ -610,10 +610,10 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearAll,
         <>
           {products.length === 0 ? (
             <div style={{ textAlign: "center", padding: "60px 0 40px" }}>
-              <p style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 400, letterSpacing: "0.08em", color: "var(--clay)", margin: "0 0 8px" }}>Your vanity is empty.</p>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", opacity: 0.6, margin: "0 0 28px", lineHeight: 1.6 }}>Scan a product to add it, or add one manually.</p>
+              <p style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 400, letterSpacing: "var(--tracking-label)", color: "var(--clay)", margin: "0 0 8px" }}>Your vanity is empty.</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", opacity: 0.6, margin: "0 0 28px", lineHeight: 1.6 }}>Scan a product to add it, or add one manually.</p>
               <button onClick={onAdd}
-                style={{ padding: "12px 28px", background: "rgba(250,249,244,0.10)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer" }}>
+                style={{ padding: "12px 28px", background: "rgba(250,249,244,0.10)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: 8, fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--sage)", cursor: "pointer" }}>
                 + Add Product
               </button>
             </div>
@@ -640,8 +640,8 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearAll,
                         background: active ? "rgba(250,249,244,0.14)" : "transparent",
                         color: active ? "var(--color-ivory, #faf9f4)" : "rgba(250,249,244,0.65)",
                         fontFamily: "var(--font-display)",
-                        fontSize: 10, fontWeight: 400,
-                        letterSpacing: "0.18em", textTransform: "uppercase",
+                        fontSize: "var(--text-xs)", fontWeight: 400,
+                        letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
                         whiteSpace: "nowrap", cursor: "pointer",
                         WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
                         transition: "background 0.18s, color 0.18s, border-color 0.18s",
@@ -653,7 +653,7 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearAll,
                 })}
               </div>
 
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 9, color: "var(--clay)", letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: 18, opacity: 0.6 }}>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", marginBottom: 18, opacity: 0.6 }}>
                 {filtered.length} of {products.length} product{products.length !== 1 ? "s" : ""}
               </p>
 
@@ -682,8 +682,8 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearAll,
                   cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4,
                   WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
                 }}>
-                  <span style={{ fontSize: 16, color: "var(--color-ivory, #faf9f4)", opacity: 0.6, lineHeight: 1 }}>+</span>
-                  <span style={{ fontFamily: "var(--font-display, 'Fungis', sans-serif)", fontSize: 6.5, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", opacity: 0.6 }}>Add</span>
+                  <span style={{ fontSize: "var(--text-md)", color: "var(--color-ivory, #faf9f4)", opacity: 0.6, lineHeight: 1 }}>+</span>
+                  <span style={{ fontFamily: "var(--font-display, 'Fungis', sans-serif)", fontSize: 6.5, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", opacity: 0.6 }}>Add</span>
                 </button>
               </div>
             </>
@@ -696,7 +696,7 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearAll,
         <div>
           {products.length === 0 ? (
             <div style={{ textAlign: "center", padding: "40px 0" }}>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", letterSpacing: "0.06em" }}>Add products to see vanity insights.</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", letterSpacing: "0.06em" }}>Add products to see vanity insights.</p>
             </div>
           ) : (
             <>
@@ -707,8 +707,8 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearAll,
                   { label: "Value", value: `$${(spending.total || 0).toFixed(0)}` },
                 ].map(({ label, value }) => (
                   <div key={label} style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "16px 14px", textAlign: "center" }}>
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: 22, fontWeight: 200, color: "var(--parchment)", margin: "0 0 3px", letterSpacing: "-0.02em" }}>{value}</p>
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", margin: 0 }}>{label}</p>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-lg)", fontWeight: 200, color: "var(--parchment)", margin: "0 0 3px", letterSpacing: "-0.02em" }}>{value}</p>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--clay)", margin: 0 }}>{label}</p>
                   </div>
                 ))}
               </div>
@@ -722,10 +722,10 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearAll,
       {waitingRoom.length > 0 && (
         <div style={{ marginTop: 32 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--clay)", margin: 0 }}>Waiting Room</p>
-            <span style={{ padding: "1px 8px", borderRadius: 8, background: "rgba(250,249,244,0.10)", border: "1px solid rgba(45,61,43,0.2)", fontFamily: "var(--font-body)", fontSize: 9, color: "var(--sage)" }}>{waitingRoom.length}</span>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)", margin: 0 }}>Waiting Room</p>
+            <span style={{ padding: "1px 8px", borderRadius: 8, background: "rgba(250,249,244,0.10)", border: "1px solid rgba(45,61,43,0.2)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--sage)" }}>{waitingRoom.length}</span>
           </div>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: "0 0 16px", lineHeight: 1.6, opacity: 0.7 }}>Products Cygne suggested holding for now. You'll get a nudge when the timing shifts.</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: "0 0 16px", lineHeight: 1.6, opacity: 0.7 }}>Products Cygne suggested holding for now. You'll get a nudge when the timing shifts.</p>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {waitingRoom.map((item, idx) => {
               const tagCfg = DEFER_TAG_CONFIG[item.deferTag] || DEFER_TAG_CONFIG.overlap;
@@ -736,26 +736,26 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearAll,
                   {nowReady && (
                     <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
                       <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#2d3d2b" }} />
-                      <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)" }}>Ready to introduce</span>
+                      <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)" }}>Ready to introduce</span>
                     </div>
                   )}
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
                     <div>
-                      <p style={{ fontFamily: "var(--font-body)", fontSize: 13, fontWeight: 400, color: "var(--parchment)", margin: "0 0 2px" }}>{item.product.name}</p>
-                      <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0 }}>{item.product.brand} · {item.product.category}</p>
+                      <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", fontWeight: 400, color: "var(--parchment)", margin: "0 0 2px" }}>{item.product.name}</p>
+                      <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: 0 }}>{item.product.brand} · {item.product.category}</p>
                     </div>
-                    <span style={{ padding: "2px 9px", borderRadius: 20, background: tagCfg.bg, border: `1px solid ${tagCfg.color}40`, fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: tagCfg.color, flexShrink: 0, marginLeft: 10 }}>
+                    <span style={{ padding: "2px 9px", borderRadius: 20, background: tagCfg.bg, border: `1px solid ${tagCfg.color}40`, fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: tagCfg.color, flexShrink: 0, marginLeft: 10 }}>
                       {tagCfg.label}
                     </span>
                   </div>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: "0 0 14px", lineHeight: 1.6, opacity: 0.8 }}>{item.reason}</p>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: "0 0 14px", lineHeight: 1.6, opacity: 0.8 }}>{item.reason}</p>
                   <div style={{ display: "flex", gap: 8 }}>
                     <button onClick={() => onAddFromWaiting(item)}
-                      style={{ flex: 1, padding: "9px 0", background: nowReady ? "#2d3d2b" : "rgba(250,249,244,0.10)", color: nowReady ? "#fdfcf9" : "var(--sage)", border: `1px solid ${nowReady ? "#2d3d2b" : "rgba(45,61,43,0.3)"}`, borderRadius: 9, fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s" }}>
+                      style={{ flex: 1, padding: "9px 0", background: nowReady ? "#2d3d2b" : "rgba(250,249,244,0.10)", color: nowReady ? "#fdfcf9" : "var(--sage)", border: `1px solid ${nowReady ? "#2d3d2b" : "rgba(45,61,43,0.3)"}`, borderRadius: 9, fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s" }}>
                       Add to Ritual
                     </button>
                     <button onClick={() => onDismissWaiting(item)}
-                      style={{ padding: "9px 14px", background: "transparent", color: "var(--clay)", border: "1px solid var(--border)", borderRadius: 9, fontFamily: "var(--font-body)", fontSize: 10, cursor: "pointer", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                      style={{ padding: "9px 14px", background: "transparent", color: "var(--clay)", border: "1px solid var(--border)", borderRadius: 9, fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", cursor: "pointer", letterSpacing: "var(--tracking-label)", textTransform: "uppercase" }}>
                       Remove
                     </button>
                   </div>

@@ -40,7 +40,7 @@
   --font-body: 'Fungis Normal', 'Fungis', sans-serif;
   --font-weight-normal: 400;
   --font-weight-heavy: 700;
-  --tracking-fungis: 0.15em;
+  --tracking-fungis: var(--tracking-display);
 
   /* Backgrounds */
   --color-ivory: #faf9f4;

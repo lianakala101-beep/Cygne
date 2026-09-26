@@ -97,8 +97,8 @@ function AuthScreen({ onAuth, initialNotice = null }) {
         <p style={{
           fontFamily: "var(--font-display)",
           fontWeight: 700,
-          fontSize: 13,
-          letterSpacing: "0.22em",
+          fontSize: "var(--text-sm)",
+          letterSpacing: "var(--tracking-display)",
           textTransform: "uppercase",
           color: "var(--color-ivory, #faf9f4)",
           margin: "0 0 26px",
@@ -149,7 +149,7 @@ function AuthScreen({ onAuth, initialNotice = null }) {
                 </svg>
               )}
             </div>
-            <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)" }}>
+            <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)" }}>
               Remember Me
             </span>
           </div>
@@ -159,7 +159,7 @@ function AuthScreen({ onAuth, initialNotice = null }) {
           <p style={{
             width: "100%",
             fontFamily: "var(--font-body)",
-            fontSize: 11,
+            fontSize: "var(--text-xs)",
             color: "var(--color-ivory, #faf9f4)",
             opacity: 0.85,
             margin: "0 0 14px",
@@ -176,9 +176,9 @@ function AuthScreen({ onAuth, initialNotice = null }) {
             width: "100%",
             padding: "14px 24px",
             fontFamily: "var(--font-display)",
-            fontSize: 12,
+            fontSize: "var(--text-xs)",
             fontWeight: 700,
-            letterSpacing: "0.22em",
+            letterSpacing: "var(--tracking-display)",
             textTransform: "uppercase",
             color: "var(--color-ivory, #faf9f4)",
             background: "transparent",
@@ -202,7 +202,7 @@ function AuthScreen({ onAuth, initialNotice = null }) {
             background: "none",
             border: "none",
             fontFamily: "var(--font-body)",
-            fontSize: 12,
+            fontSize: "var(--text-xs)",
             color: "var(--color-ivory, #faf9f4)",
             cursor: "pointer",
             padding: "8px 0",
@@ -229,7 +229,7 @@ function AuthScreen({ onAuth, initialNotice = null }) {
               background: "none",
               border: "none",
               fontFamily: "var(--font-body)",
-              fontSize: 12,
+              fontSize: "var(--text-xs)",
               color: "var(--color-ivory, #faf9f4)",
               cursor: "pointer",
               padding: "4px 0",
@@ -242,7 +242,7 @@ function AuthScreen({ onAuth, initialNotice = null }) {
         )}
 
         {resetSent && (
-          <p style={{ fontSize: 12, color: "var(--color-ivory, #faf9f4)", marginTop: 12, textAlign: "center", letterSpacing: "0.02em", opacity: 0.9 }}>
+          <p style={{ fontSize: "var(--text-xs)", color: "var(--color-ivory, #faf9f4)", marginTop: 12, textAlign: "center", letterSpacing: "0.02em", opacity: 0.9 }}>
             Reset link sent — check your email.
           </p>
         )}
@@ -264,7 +264,7 @@ const inputStyle = {
   border: "1px solid rgba(250,249,244,0.25)",
   borderRadius: 6,
   fontFamily: "var(--font-body)",
-  fontSize: 14,
+  fontSize: "var(--text-sm)",
   color: "var(--color-ivory, #faf9f4)",
   outline: "none",
   boxSizing: "border-box",

@@ -125,17 +125,17 @@ export function RampCheckinCard({ productName, weekNumber, onSave, onDone, onDis
               border: "1px solid rgba(45,61,43,0.42)",
               borderRadius: 999,
               fontFamily: "var(--font-display)",
-              fontSize: 10, fontWeight: 700, letterSpacing: "0.22em",
+              fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)",
               color: "var(--sage, #2d3d2b)",
               whiteSpace: "nowrap", lineHeight: 1,
             }}>( WK {String(weekNumber).padStart(2, "0")} )</span>
             <span style={{
-              fontFamily: "var(--font-display)", fontSize: 9, fontWeight: 700,
-              letterSpacing: "0.20em", textTransform: "uppercase",
+              fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 700,
+              letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
               color: "var(--sage, #2d3d2b)", opacity: 0.75,
             }}>Check-in</span>
           </div>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "var(--parchment, var(--color-ivory))", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "var(--parchment, var(--color-ivory))", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {productName}
           </p>
         </div>
@@ -143,14 +143,14 @@ export function RampCheckinCard({ productName, weekNumber, onSave, onDone, onDis
           <button
             onClick={onDismiss}
             aria-label="Dismiss check-in nudge"
-            style={{ background: "none", border: "none", color: "var(--clay, var(--color-stone))", opacity: 0.6, fontSize: 18, lineHeight: 1, cursor: "pointer", padding: 4, flexShrink: 0 }}
+            style={{ background: "none", border: "none", color: "var(--clay, var(--color-stone))", opacity: 0.6, fontSize: "var(--text-lg)", lineHeight: 1, cursor: "pointer", padding: 4, flexShrink: 0 }}
           >
             ×
           </button>
         )}
       </div>
 
-      <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay, var(--color-stone))", margin: "0 0 12px", lineHeight: 1.55, opacity: 0.85 }}>
+      <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay, var(--color-stone))", margin: "0 0 12px", lineHeight: 1.55, opacity: 0.85 }}>
         How did your skin respond this week?
       </p>
 
@@ -180,9 +180,9 @@ export function RampCheckinCard({ productName, weekNumber, onSave, onDone, onDis
                 border: isSelected ? BUTTON_STYLE.selected.border : BUTTON_STYLE.base.border,
                 borderRadius: 10,
                 fontFamily: "var(--font-body)",
-                fontSize: 10,
+                fontSize: "var(--text-xs)",
                 fontWeight: 400,
-                letterSpacing: "0.14em",
+                letterSpacing: "var(--tracking-label)",
                 textTransform: "uppercase",
                 color: BUTTON_STYLE.base.color,
                 cursor: (saving || saved) ? "default" : "pointer",
@@ -216,7 +216,7 @@ export function RampCheckinCard({ productName, weekNumber, onSave, onDone, onDis
               border: "1px solid rgba(45,61,43,0.20)",
               borderRadius: 8,
               fontFamily: "var(--font-body)",
-              fontSize: 12,
+              fontSize: "var(--text-xs)",
               color: "var(--parchment, var(--color-ivory))",
               resize: "none",
               outline: "none",
@@ -234,7 +234,7 @@ export function RampCheckinCard({ productName, weekNumber, onSave, onDone, onDis
               role="alert"
               style={{
                 fontFamily: "var(--font-body)",
-                fontSize: 11,
+                fontSize: "var(--text-xs)",
                 color: "#8b7355",
                 margin: "0 0 10px",
                 lineHeight: 1.5,
@@ -265,9 +265,9 @@ export function RampCheckinCard({ productName, weekNumber, onSave, onDone, onDis
                        "1px solid rgba(45,61,43,0.35)",
               borderRadius: 10,
               fontFamily: "var(--font-body)",
-              fontSize: 10,
+              fontSize: "var(--text-xs)",
               fontWeight: 400,
-              letterSpacing: "0.12em",
+              letterSpacing: "var(--tracking-label)",
               textTransform: "uppercase",
               color: saved ? "#1c1c1a" : "var(--sage, #2d3d2b)",
               cursor: (saving || saved) ? "default" : "pointer",

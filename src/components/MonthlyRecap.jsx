@@ -305,7 +305,7 @@ export function MonthlyRecap({
         style={{
           position: "fixed", top: 18, right: 22, zIndex: 1,
           background: "none", border: "none", cursor: "pointer",
-          color: "rgba(255,255,255,0.6)", fontSize: 22, lineHeight: 1, padding: 6,
+          color: "rgba(255,255,255,0.6)", fontSize: "var(--text-lg)", lineHeight: 1, padding: 6,
           fontFamily: "var(--font-display)",
         }}
       >×</button>
@@ -319,7 +319,7 @@ export function MonthlyRecap({
             the header itself to carry the "IN REVIEW" treatment. */}
         <h1 style={{
           fontFamily: "var(--font-display)",
-          fontSize: 20, fontWeight: 700, letterSpacing: "0.15em",
+          fontSize: "var(--text-lg)", fontWeight: 700, letterSpacing: "var(--tracking-display)",
           textTransform: "uppercase", color: IVORY,
           margin: 0, lineHeight: 1.2,
         }}>
@@ -327,7 +327,7 @@ export function MonthlyRecap({
         </h1>
         <p style={{
           fontFamily: "var(--font-body)",
-          fontSize: 10, fontWeight: 400, letterSpacing: "0.22em",
+          fontSize: "var(--text-xs)", fontWeight: 400, letterSpacing: "var(--tracking-display)",
           textTransform: "uppercase", color: "rgba(255,255,255,0.4)",
           margin: "6px 0 0",
         }}>
@@ -338,7 +338,7 @@ export function MonthlyRecap({
         {occLine && (
           <p style={{
             fontFamily: "var(--font-body)",
-            fontSize: 11, fontWeight: 400, letterSpacing: "0.18em",
+            fontSize: "var(--text-xs)", fontWeight: 400, letterSpacing: "var(--tracking-display)",
             textTransform: "uppercase", color: IVORY,
             margin: "14px 0 0", opacity: 0.55,
           }}>
@@ -360,7 +360,7 @@ export function MonthlyRecap({
           {loading && (
             <p style={{
               fontFamily: "var(--font-body)",
-              fontSize: 12, letterSpacing: "0.22em", textTransform: "uppercase",
+              fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
               color: "rgba(255,255,255,0.6)", margin: 0,
             }}>
               Gathering your month…
@@ -370,7 +370,7 @@ export function MonthlyRecap({
           {!loading && failed && (
             <p style={{
               fontFamily: "var(--font-body)",
-              fontSize: 14, color: "rgba(255,255,255,0.6)",
+              fontSize: "var(--text-sm)", color: "rgba(255,255,255,0.6)",
               margin: 0, lineHeight: 1.7,
             }}>
               Your recap will be ready soon.
@@ -380,7 +380,7 @@ export function MonthlyRecap({
           {!loading && !failed && framingLine && (
             <p style={{
               fontFamily: "var(--font-body)",
-              fontSize: 14, fontWeight: 400,
+              fontSize: "var(--text-sm)", fontWeight: 400,
               lineHeight: 1.6, letterSpacing: "0.01em",
               color: IVORY, opacity: 0.75,
               margin: 0,
@@ -409,7 +409,7 @@ export function MonthlyRecap({
           }}>
             <p style={{
               fontFamily: "var(--font-display)",
-              fontSize: 10, fontWeight: 700, letterSpacing: "0.18em",
+              fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)",
               textTransform: "uppercase", color: "rgba(255,255,255,0.55)",
               margin: "0 0 10px",
             }}>
@@ -417,7 +417,7 @@ export function MonthlyRecap({
             </p>
             <p style={{
               fontFamily: "var(--font-body)",
-              fontSize: 14, fontWeight: 400,
+              fontSize: "var(--text-sm)", fontWeight: 400,
               lineHeight: 1.6, letterSpacing: "0.01em",
               color: IVORY,
               margin: 0,
@@ -444,7 +444,7 @@ export function MonthlyRecap({
           }}>
             <p style={{
               fontFamily: "var(--font-display)",
-              fontSize: 10, fontWeight: 700, letterSpacing: "0.18em",
+              fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)",
               textTransform: "uppercase", color: "rgba(255,255,255,0.55)",
               margin: "0 0 10px",
             }}>
@@ -452,7 +452,7 @@ export function MonthlyRecap({
             </p>
             <p style={{
               fontFamily: "var(--font-body)",
-              fontSize: 14, fontWeight: 400,
+              fontSize: "var(--text-sm)", fontWeight: 400,
               lineHeight: 1.6, letterSpacing: "0.01em",
               color: IVORY,
               margin: 0,
@@ -482,7 +482,7 @@ export function MonthlyRecap({
         {/* Closing signature */}
         <p style={{
           fontFamily: "var(--font-display)",
-          fontSize: 11, fontWeight: 700, letterSpacing: "0.15em",
+          fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)",
           textTransform: "uppercase", color: IVORY,
           margin: "0 0 18px", opacity: 0.8,
         }}>

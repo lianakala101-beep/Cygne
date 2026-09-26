@@ -253,7 +253,7 @@ export function PaywallScreen({ trialExpired, onUnlock, onSignOut }) {
       <h1
         style={{
           fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
-          fontWeight: 700, fontSize: 22, letterSpacing: "0.15em",
+          fontWeight: 700, fontSize: "var(--text-lg)", letterSpacing: "var(--tracking-display)",
           textTransform: "uppercase",
           color: IVORY,
           margin: "0 0 14px",
@@ -266,7 +266,7 @@ export function PaywallScreen({ trialExpired, onUnlock, onSignOut }) {
       <p
         style={{
           fontFamily: "var(--font-body, 'Fungis Normal', sans-serif)",
-          fontSize: 14, lineHeight: 1.65,
+          fontSize: "var(--text-sm)", lineHeight: 1.65,
           color: MUTED,
           margin: "0 auto 32px",
           textAlign: "center",
@@ -281,7 +281,7 @@ export function PaywallScreen({ trialExpired, onUnlock, onSignOut }) {
         <p style={{
           textAlign: "center",
           fontFamily: "var(--font-body, 'Fungis Normal', sans-serif)",
-          fontSize: 12, color: FAINT, letterSpacing: "0.1em",
+          fontSize: "var(--text-xs)", color: FAINT, letterSpacing: "var(--tracking-label)",
           textTransform: "uppercase", margin: "40px 0",
         }}>
           Loading options…
@@ -289,7 +289,7 @@ export function PaywallScreen({ trialExpired, onUnlock, onSignOut }) {
       ) : orderedPackages.length === 0 ? (
         <p style={{
           fontFamily: "var(--font-body, 'Fungis Normal', sans-serif)",
-          fontSize: 13, color: MUTED, textAlign: "center", margin: "40px auto",
+          fontSize: "var(--text-sm)", color: MUTED, textAlign: "center", margin: "40px auto",
           maxWidth: 320, lineHeight: 1.55,
         }}>
           {error || "Subscription options aren't available right now."}
@@ -326,7 +326,7 @@ export function PaywallScreen({ trialExpired, onUnlock, onSignOut }) {
                   <div>
                     <p style={{
                       fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
-                      fontWeight: 700, fontSize: 11, letterSpacing: "0.18em",
+                      fontWeight: 700, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)",
                       textTransform: "uppercase", color: IVORY,
                       margin: "0 0 4px",
                     }}>
@@ -334,7 +334,7 @@ export function PaywallScreen({ trialExpired, onUnlock, onSignOut }) {
                     </p>
                     <p style={{
                       fontFamily: "var(--font-body, 'Fungis Normal', sans-serif)",
-                      fontSize: 13, color: MUTED, margin: 0,
+                      fontSize: "var(--text-sm)", color: MUTED, margin: 0,
                     }}>
                       {pkg.product?.priceString} / {period}
                     </p>
@@ -342,7 +342,7 @@ export function PaywallScreen({ trialExpired, onUnlock, onSignOut }) {
                   {isAnnual && savingsPct !== null && (
                     <span style={{
                       fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
-                      fontWeight: 700, fontSize: 9, letterSpacing: "0.2em",
+                      fontWeight: 700, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)",
                       textTransform: "uppercase",
                       color: INKY_MOSS,
                       background: IVORY,
@@ -370,7 +370,7 @@ export function PaywallScreen({ trialExpired, onUnlock, onSignOut }) {
               color: IVORY,
               borderRadius: 10,
               fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
-              fontWeight: 700, fontSize: 12, letterSpacing: "0.22em",
+              fontWeight: 700, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)",
               textTransform: "uppercase",
               cursor: busy || !selectedId ? "default" : "pointer",
               opacity: busy || !selectedId ? 0.5 : 1,
@@ -390,7 +390,7 @@ export function PaywallScreen({ trialExpired, onUnlock, onSignOut }) {
               background: "none", border: "none",
               color: MUTED,
               fontFamily: "var(--font-body, 'Fungis Normal', sans-serif)",
-              fontSize: 12, letterSpacing: "0.06em",
+              fontSize: "var(--text-xs)", letterSpacing: "0.06em",
               margin: "0 auto 20px",
               cursor: busy ? "default" : "pointer",
               padding: 8,
@@ -409,7 +409,7 @@ export function PaywallScreen({ trialExpired, onUnlock, onSignOut }) {
       {error && !loading && orderedPackages.length > 0 && (
         <p style={{
           fontFamily: "var(--font-body, 'Fungis Normal', sans-serif)",
-          fontSize: 12, color: "#e8b4a0",
+          fontSize: "var(--text-xs)", color: "#e8b4a0",
           textAlign: "center", margin: "0 auto 20px", maxWidth: 340, lineHeight: 1.55,
         }}>
           {error}
@@ -420,14 +420,14 @@ export function PaywallScreen({ trialExpired, onUnlock, onSignOut }) {
       <div style={{ marginTop: "auto", paddingTop: 24, textAlign: "center", maxWidth: 380, marginLeft: "auto", marginRight: "auto" }}>
         <p style={{
           fontFamily: "var(--font-body, 'Fungis Normal', sans-serif)",
-          fontSize: 10, color: FAINT, lineHeight: 1.6,
+          fontSize: "var(--text-xs)", color: FAINT, lineHeight: 1.6,
           margin: "0 0 8px",
         }}>
           Cancel anytime. Subscription auto-renews unless cancelled at least 24 hours before the end of the current period.
         </p>
         <p style={{
           fontFamily: "var(--font-body, 'Fungis Normal', sans-serif)",
-          fontSize: 10, color: FAINT, letterSpacing: "0.06em",
+          fontSize: "var(--text-xs)", color: FAINT, letterSpacing: "0.06em",
           margin: 0,
         }}>
           <a href="https://cygne.skin/terms" target="_blank" rel="noreferrer" style={{ color: FAINT, textDecoration: "underline" }}>
@@ -446,7 +446,7 @@ export function PaywallScreen({ trialExpired, onUnlock, onSignOut }) {
               background: "none", border: "none",
               color: FAINT,
               fontFamily: "var(--font-body, 'Fungis Normal', sans-serif)",
-              fontSize: 10, letterSpacing: "0.06em",
+              fontSize: "var(--text-xs)", letterSpacing: "0.06em",
               marginTop: 14,
               cursor: busy ? "default" : "pointer",
               padding: 6,

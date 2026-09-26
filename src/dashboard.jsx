@@ -103,20 +103,20 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           // identically across all three greeting slots (morning/
           // afternoon/evening) since they share this one block.
           <div style={{ paddingTop: 16, marginBottom: products.length === 0 || welcomeBackLine ? 20 : 24 }}>
-            <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 500, fontSize: 32, letterSpacing: "0.28em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 6px", lineHeight: 1.05 }}>
+            <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 500, fontSize: "var(--text-2xl)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 6px", lineHeight: 1.05 }}>
               {greeting}{firstName ? "," : "."}
             </h1>
             {firstName && (
-              <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 13, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", opacity: 0.7, margin: 0, lineHeight: 1.1 }}>
+              <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: "var(--text-sm)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", opacity: 0.7, margin: 0, lineHeight: 1.1 }}>
                 {firstName}
               </p>
             )}
             {welcomeBackLine ? (
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 14, letterSpacing: "0.02em", color: "#F4F3EF", margin: "14px 0 0", lineHeight: 1.55, maxWidth: 360 }}>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", letterSpacing: "0.02em", color: "#F4F3EF", margin: "14px 0 0", lineHeight: 1.55, maxWidth: 360 }}>
                 {welcomeBackLine}
               </p>
             ) : products.length === 0 && (
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 14, letterSpacing: "0.04em", color: "#F4F3EF", margin: "10px 0 0", lineHeight: 1.5 }}>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", letterSpacing: "0.04em", color: "#F4F3EF", margin: "10px 0 0", lineHeight: 1.5 }}>
                 Welcome.
               </p>
             )}
@@ -134,7 +134,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         return (
           <div>
             <div style={{ marginBottom: 28 }}>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 14, color: "#F4F3EF", margin: 0, lineHeight: 1.6 }}>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "#F4F3EF", margin: 0, lineHeight: 1.6 }}>
                 Your ritual lives here. Let's build it around you.
               </p>
             </div>
@@ -147,7 +147,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
                       step label for emphasis. */}
                   <span style={{
                     fontFamily: "var(--font-display)",
-                    fontSize: 28, fontWeight: 700, letterSpacing: "0.04em",
+                    fontSize: "var(--text-xl)", fontWeight: 700, letterSpacing: "0.04em",
                     color: "rgba(255,255,255,0.4)",
                     lineHeight: 1,
                     flexShrink: 0,
@@ -158,10 +158,10 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
                     {String(i + 1).padStart(2, "0")}
                   </span>
                   <div style={{ flex: 1 }}>
-                    <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 13, fontWeight: 400, color: "#F4F3EF", margin: "0 0 4px", lineHeight: 1.3 }}>{s.label}</p>
-                    <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "#F4F3EF", opacity: 0.75, margin: s.cta ? "0 0 10px" : 0, lineHeight: 1.6 }}>{s.sub}</p>
+                    <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-sm)", fontWeight: 400, color: "#F4F3EF", margin: "0 0 4px", lineHeight: 1.3 }}>{s.label}</p>
+                    <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "#F4F3EF", opacity: 0.75, margin: s.cta ? "0 0 10px" : 0, lineHeight: 1.6 }}>{s.sub}</p>
                     {s.cta && (
-                      <button onClick={s.action} style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "var(--font-body), sans-serif", fontSize: 11, fontWeight: 400, color: "#6e8a72", background: "rgba(122,144,112,0.1)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 20, padding: "6px 14px", cursor: "pointer" }}>
+                      <button onClick={s.action} style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, color: "#6e8a72", background: "rgba(122,144,112,0.1)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 20, padding: "6px 14px", cursor: "pointer" }}>
                         {s.cta} <Icon name="arrow-right" size={11} />
                       </button>
                     )}
@@ -190,7 +190,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           return (
             <div style={{ marginBottom: 24, background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "16px 18px" }}>
               <div style={{ marginBottom: 14 }}>
-                <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--clay)", margin: 0 }}>Getting started</p>
+                <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)", margin: 0 }}>Getting started</p>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {steps.map((s, i) => (
@@ -198,12 +198,12 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
                     onClick={s.action || undefined}>
                     <div style={{ width: 20, height: 20, borderRadius: "50%", flexShrink: 0, background: s.done ? "#6e8a72" : "var(--ink)", border: "1px solid " + (s.done ? "#6e8a72" : "var(--border)"), display: "flex", alignItems: "center", justifyContent: "center", color: s.done ? "var(--ink)" : "var(--clay)" }}>
                       {s.done && <Icon name="check" size={10} />}
-                      {!s.done && <span style={{ fontSize: 9, opacity: 0.5 }}>{i + 1}</span>}
+                      {!s.done && <span style={{ fontSize: "var(--text-xs)", opacity: 0.5 }}>{i + 1}</span>}
                     </div>
-                    <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 12, color: s.done ? "var(--clay)" : "var(--parchment)", margin: 0, flex: 1, textDecoration: s.done ? "line-through" : "none", opacity: s.done ? 0.5 : 1 }}>{s.label}</p>
+                    <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: s.done ? "var(--clay)" : "var(--parchment)", margin: 0, flex: 1, textDecoration: s.done ? "line-through" : "none", opacity: s.done ? 0.5 : 1 }}>{s.label}</p>
                     {!s.done && s.cta && (
                       <button onClick={e => { e.stopPropagation(); s.action(); }}
-                        style={{ display: "inline-flex", alignItems: "center", gap: 5, fontFamily: "var(--font-body), sans-serif", fontSize: 10, fontWeight: 400, color: "#6e8a72", background: "rgba(122,144,112,0.1)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 20, padding: "4px 12px", cursor: "pointer", whiteSpace: "nowrap" }}>
+                        style={{ display: "inline-flex", alignItems: "center", gap: 5, fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, color: "#6e8a72", background: "rgba(122,144,112,0.1)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 20, padding: "4px 12px", cursor: "pointer", whiteSpace: "nowrap" }}>
                         {s.cta} <Icon name="arrow-right" size={10} />
                       </button>
                     )}
@@ -242,7 +242,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
               style={{
                 background: "none", border: "none", padding: 0, cursor: "pointer",
                 fontFamily: "var(--font-body)",
-                fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase",
+                fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
                 color: "var(--color-ivory, #faf9f4)",
                 opacity: 0.65,
                 fontWeight: 400,
@@ -268,7 +268,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             cursor: "pointer",
             WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
           }}>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 12, fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 16, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)" }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 12, fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-md)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)" }}>
             <Icon name={currentSession === "am" ? "sun" : "moon"} size={14} />
             Begin Your Ritual
           </span>
@@ -297,7 +297,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
               }}>
                 <p style={{
                   fontFamily: "var(--font-body)",
-                  fontSize: 12, letterSpacing: "0.06em", lineHeight: 1.6,
+                  fontSize: "var(--text-xs)", letterSpacing: "0.06em", lineHeight: 1.6,
                   color: "rgba(255,255,255,0.6)",
                   margin: 0,
                 }}>
@@ -318,7 +318,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
                 cursor: "pointer",
                 WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
               }}>
-              <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 16, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)" }}>
+              <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-md)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)" }}>
                 Ask Cygne
               </span>
               <span style={{ color: "var(--color-ivory, #faf9f4)", display: "inline-flex" }}>
@@ -333,7 +333,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           <div style={{ marginBottom: 20 }}>
             {irreconcilable.map((c, i) => (
               <p key={i} style={{
-                fontFamily: "var(--font-body)", fontSize: 12,
+                fontFamily: "var(--font-body)", fontSize: "var(--text-xs)",
                 letterSpacing: "0.02em",
                 color: "#F4F3EF",
                 lineHeight: 1.6,
@@ -360,7 +360,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
               padding: "10px 22px",
               cursor: "pointer",
               fontFamily: "var(--font-display)", fontWeight: 700,
-              fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase",
+              fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
               color: "var(--color-ivory, #faf9f4)",
               WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
               transition: "background 0.18s",
@@ -379,7 +379,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
               padding: "10px 22px",
               cursor: "pointer",
               fontFamily: "var(--font-display)", fontWeight: 700,
-              fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase",
+              fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
               color: "var(--color-ivory, #faf9f4)",
               WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
               transition: "background 0.18s",
@@ -397,11 +397,11 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           <div style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.25)", borderRadius: 8, padding: "12px 14px", marginBottom: 20 }}>
             <span style={{ color: "#6e8a72", flexShrink: 0, display: "inline-flex" }}><Icon name="bell" size={16} /></span>
             <div style={{ flex: 1 }}>
-              <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 12, fontWeight: 400, color: "var(--parchment)", margin: "0 0 2px" }}>Stay on ritual</p>
-              <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>Get AM & PM reminders so your ritual stays consistent.</p>
+              <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, color: "var(--parchment)", margin: "0 0 2px" }}>Stay on ritual</p>
+              <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--clay)", margin: 0 }}>Get AM & PM reminders so your ritual stays consistent.</p>
             </div>
             <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-              <button onClick={onRequestNotif} style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, fontWeight: 400, background: "rgba(122,144,112,0.25)", border: "1px solid rgba(122,144,112,0.4)", borderRadius: 8, color: "var(--parchment)", padding: "6px 12px", cursor: "pointer" }}>Enable</button>
+              <button onClick={onRequestNotif} style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, background: "rgba(122,144,112,0.25)", border: "1px solid rgba(122,144,112,0.4)", borderRadius: 8, color: "var(--parchment)", padding: "6px 12px", cursor: "pointer" }}>Enable</button>
               <button onClick={onDismissNotif} aria-label="Dismiss notification prompt" style={{ background: "transparent", border: "none", color: "var(--clay)", cursor: "pointer", padding: "6px 4px", display: "inline-flex" }}><Icon name="x" size={12} /></button>
             </div>
           </div>
@@ -416,7 +416,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           return (
             <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.2)", borderRadius: 8, padding: "10px 14px", marginBottom: 20 }}>
               <span style={{ color: "#6e8a72", display: "inline-flex" }}><Icon name="sparkle" size={12} /></span>
-              <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--clay)", margin: 0 }}>{label}</p>
+              <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--clay)", margin: 0 }}>{label}</p>
               <button onClick={onDismissNotif} aria-label="Dismiss" style={{ marginLeft: "auto", background: "transparent", border: "none", color: "var(--clay)", cursor: "pointer", display: "inline-flex", padding: 4 }}><Icon name="x" size={12} /></button>
             </div>
           );
@@ -454,7 +454,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
 
           if (!phase && !hasWeather && daysSince === null) return null;
 
-          const txtSt = { fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", opacity: 0.75, whiteSpace: "nowrap" };
+          const txtSt = { fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", opacity: 0.75, whiteSpace: "nowrap" };
           const btnSt = { display: "inline-flex", alignItems: "center", gap: 6, padding: 0, background: "none", border: "none", cursor: "pointer", fontFamily: "var(--font-body)", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" };
 
           return (
@@ -501,13 +501,13 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
                 style={{ background: "var(--ink)", border: `1px solid ${phase.border}`, borderRadius: 8, padding: "24px 22px", maxWidth: 440, width: "100%" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
                   <div style={{ width: 8, height: 8, borderRadius: "50%", background: phase.dot }} />
-                  <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 14, fontWeight: 400, color: "var(--parchment)" }}>{phase.name} Phase</span>
-                  <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--clay)", opacity: 0.7, marginLeft: "auto" }}>Day {currentCycleDay}</span>
+                  <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-sm)", fontWeight: 400, color: "var(--parchment)" }}>{phase.name} Phase</span>
+                  <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--clay)", opacity: 0.7, marginLeft: "auto" }}>Day {currentCycleDay}</span>
                   <button onClick={() => setCycleExpanded(false)} aria-label="Close cycle detail" style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", marginLeft: 6, display: "inline-flex", padding: 2 }}><Icon name="x" size={14} /></button>
                 </div>
-                <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 12, color: "var(--clay)", margin: "0 0 14px", lineHeight: 1.65 }}>{phase.description}</p>
+                <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--clay)", margin: "0 0 14px", lineHeight: 1.65 }}>{phase.description}</p>
                 <div style={{ padding: "12px 14px", background: "rgba(0,0,0,0.2)", borderRadius: 8 }}>
-                  <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: 11, color: "var(--parchment)", margin: 0, lineHeight: 1.6 }}>{phase.nudge}</p>
+                  <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--parchment)", margin: 0, lineHeight: 1.6 }}>{phase.nudge}</p>
                 </div>
               </div>
             </div>

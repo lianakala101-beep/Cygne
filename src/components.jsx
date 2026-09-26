@@ -50,12 +50,12 @@ const Icon = ({ name, size = 20 }) => {
 };
 
 // --- SHARED -------------------------------------------------------------------
-const labelSt = { display: "block", fontFamily: "var(--heading)", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--clay)", marginBottom: 8 };
-const inputSt = { width: "100%", padding: "12px 14px", background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 0, color: "var(--parchment)", fontFamily: "var(--font-body)", fontSize: 14, outline: "none", boxSizing: "border-box" };
+const labelSt = { display: "block", fontFamily: "var(--heading)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)", marginBottom: 8 };
+const inputSt = { width: "100%", padding: "12px 14px", background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 0, color: "var(--parchment)", fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", outline: "none", boxSizing: "border-box" };
 
 function Pill({ children, active, onClick }) {
   return (
-    <button onClick={onClick} style={{ flexShrink: 0, padding: "6px 16px", borderRadius: 0, border: `1px solid ${active ? "rgba(160,160,160,0.7)" : "var(--border)"}`, background: active ? "var(--cta)" : "transparent", color: active ? "#F5F0E8" : "var(--clay)", fontFamily: "var(--heading)", fontSize: 10, cursor: "pointer", letterSpacing: "0.12em", textTransform: "uppercase", whiteSpace: "nowrap", transition: "all 0.18s" }}>
+    <button onClick={onClick} style={{ flexShrink: 0, padding: "6px 16px", borderRadius: 0, border: `1px solid ${active ? "rgba(160,160,160,0.7)" : "var(--border)"}`, background: active ? "var(--cta)" : "transparent", color: active ? "#F5F0E8" : "var(--clay)", fontFamily: "var(--heading)", fontSize: "var(--text-xs)", cursor: "pointer", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", whiteSpace: "nowrap", transition: "all 0.18s" }}>
       {children}
     </button>
   );
@@ -66,7 +66,7 @@ function Section({ title, icon, children }) {
     <div style={{ marginBottom: 32 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
         {icon && <span style={{ color: "var(--clay)", opacity: 0.7 }}><Icon name={icon} size={13} /></span>}
-        <span style={{ fontFamily: "var(--heading)", fontSize: 10, letterSpacing: "0.20em", textTransform: "uppercase", color: "var(--clay)" }}>{title}</span>
+        <span style={{ fontFamily: "var(--heading)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)" }}>{title}</span>
         <div style={{ flex: 1, height: 1, background: "var(--border)", marginLeft: 8 }} />
       </div>
       {children}
@@ -127,15 +127,15 @@ function FlagCard({ f }) {
       }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
         <span style={{
-          fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 9,
-          letterSpacing: "0.18em", textTransform: "uppercase",
+          fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-xs)",
+          letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
           color: tone.color, background: tone.bg,
           padding: "3px 8px", borderRadius: 2,
           flexShrink: 0, whiteSpace: "nowrap",
         }}>{label}</span>
         <span style={{
           flex: 1, minWidth: 0,
-          fontFamily: "var(--font-body)", fontSize: 13,
+          fontFamily: "var(--font-body)", fontSize: "var(--text-sm)",
           color: "var(--parchment)", fontWeight: 400,
           overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
         }}>{f.label}</span>
@@ -152,7 +152,7 @@ function FlagCard({ f }) {
         <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid rgba(45,61,43,0.08)" }}>
           {f.detail && (
             <p style={{
-              fontFamily: "var(--font-body)", fontSize: 12,
+              fontFamily: "var(--font-body)", fontSize: "var(--text-xs)",
               color: "var(--color-ivory, #faf9f4)",
               margin: 0, lineHeight: 1.55,
               whiteSpace: "normal",
@@ -168,7 +168,7 @@ function FlagCard({ f }) {
                     padding: "3px 9px", borderRadius: 20,
                     background: "var(--color-ivory-shadow, #f0ebe0)",
                     border: "1px solid rgba(45,61,43,0.14)",
-                    fontFamily: "var(--font-body)", fontSize: 10,
+                    fontFamily: "var(--font-body)", fontSize: "var(--text-xs)",
                     color: "var(--color-ivory, #faf9f4)",
                     whiteSpace: "nowrap",
                   }}>{name}</span>
@@ -250,12 +250,12 @@ class ErrorBoundary extends Component {
         <div style={{ maxWidth: 360 }}>
           <p style={{
             fontFamily: "var(--font-display)",
-            fontSize: 14, fontWeight: 700, letterSpacing: "0.22em",
+            fontSize: "var(--text-sm)", fontWeight: 700, letterSpacing: "var(--tracking-display)",
             textTransform: "uppercase", margin: "0 0 14px", opacity: 0.85,
           }}>Something interrupted us</p>
           <p style={{
             fontFamily: "var(--font-body)",
-            fontSize: 13, lineHeight: 1.7, margin: "0 0 24px",
+            fontSize: "var(--text-sm)", lineHeight: 1.7, margin: "0 0 24px",
             color: "rgba(250,249,244,0.75)",
           }}>This page hit an error. Try refreshing the app — your data is safe.</p>
           <button onClick={() => window.location.reload()}
@@ -266,7 +266,7 @@ class ErrorBoundary extends Component {
               border: "1px solid rgba(250,249,244,0.5)",
               borderRadius: 0,
               fontFamily: "var(--font-display)",
-              fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase",
+              fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
               cursor: "pointer",
               WebkitAppearance: "none", appearance: "none",
               WebkitTapHighlightColor: "transparent",

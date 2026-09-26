@@ -94,15 +94,15 @@ function WeekendNudgeCard({ products, activeMap, lineMode = false }) {
             position: "relative",
           }}>
           <span style={{
-            fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 10,
-            letterSpacing: "0.28em", textTransform: "uppercase",
+            fontFamily: "var(--font-body)", fontWeight: 400, fontSize: "var(--text-xs)",
+            letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
             color: "#F4F3EF", opacity: 0.7,
             whiteSpace: "nowrap",
           }}>{cfg.label}</span>
           <span style={{
             width: "100%",
-            fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700,
-            letterSpacing: "0.14em", textTransform: "uppercase",
+            fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 700,
+            letterSpacing: "var(--tracking-label)", textTransform: "uppercase",
             color: "#F4F3EF",
             lineHeight: 1.25,
           }}>{cfg.headline}</span>
@@ -117,7 +117,7 @@ function WeekendNudgeCard({ products, activeMap, lineMode = false }) {
           <div style={{ marginTop: 20, paddingTop: 20, borderTop: "1px solid rgba(250,249,244,0.18)", textAlign: "center" }}>
             {lines.map((s, i) => (
               <p key={i} style={{
-                fontFamily: "var(--font-body)", fontSize: 12,
+                fontFamily: "var(--font-body)", fontSize: "var(--text-xs)",
                 color: "#F4F3EF",
                 margin: i === lines.length - 1 ? 0 : "0 0 8px",
                 lineHeight: 1.65,
@@ -153,8 +153,8 @@ function WeekendNudgeCard({ products, activeMap, lineMode = false }) {
           WebkitTapHighlightColor: "transparent",
         }}>
         <span style={{
-          fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 11,
-          letterSpacing: "0.22em", textTransform: "uppercase",
+          fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-xs)",
+          letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
           color: "var(--color-ivory, #faf9f4)",
           background: "rgba(250,249,244,0.15)",
           padding: "3px 8px", borderRadius: 2,
@@ -162,7 +162,7 @@ function WeekendNudgeCard({ products, activeMap, lineMode = false }) {
         }}>{cfg.label}</span>
         <span style={{
           flex: 1, minWidth: 0,
-          fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 400,
+          fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", fontWeight: 400,
           letterSpacing: "0.02em",
           color: "var(--color-ivory, #faf9f4)",
           lineHeight: 1.4,
@@ -179,7 +179,7 @@ function WeekendNudgeCard({ products, activeMap, lineMode = false }) {
         <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid rgba(250,249,244,0.18)" }}>
           {lines.map((s, i) => (
             <p key={i} style={{
-              fontFamily: "var(--font-body)", fontSize: 12,
+              fontFamily: "var(--font-body)", fontSize: "var(--text-xs)",
               color: "var(--color-ivory, #faf9f4)",
               margin: i === lines.length - 1 ? 0 : "0 0 8px",
               lineHeight: 1.65,

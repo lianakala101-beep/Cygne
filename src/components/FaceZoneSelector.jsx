@@ -109,8 +109,8 @@ export function FaceZoneSelector({ selected = [], onChange }) {
         style={{
           fontFamily: "var(--font-display, 'Fungis Heavy', 'Fungis Normal', sans-serif)",
           fontWeight: 400,
-          fontSize: 10,
-          letterSpacing: "0.15em",
+          fontSize: "var(--text-xs)",
+          letterSpacing: "var(--tracking-display)",
           color: "var(--color-inky-moss, #2d3d2b)",
           textAlign: "center",
           marginTop: 14,

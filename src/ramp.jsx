@@ -417,20 +417,20 @@ function IntroduceSlowlyCard({
                 border: "1px solid rgba(45,61,43,0.42)",
                 borderRadius: 999,
                 fontFamily: "var(--font-display)",
-                fontSize: 10, fontWeight: 700, letterSpacing: "0.22em",
+                fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)",
                 color: "var(--sage, #2d3d2b)",
                 whiteSpace: "nowrap", lineHeight: 1,
               }}>( WK {weekPad} )</span>
               <span style={{
-                fontFamily: "var(--font-display)", fontSize: 9, fontWeight: 700,
-                letterSpacing: "0.20em", textTransform: "uppercase",
+                fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 700,
+                letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
                 color: "var(--sage, #2d3d2b)", opacity: 0.75,
               }}>Check-in</span>
             </>
           ) : (
             <span style={{
-              fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 400,
-              letterSpacing: "0.14em", textTransform: "uppercase",
+              fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400,
+              letterSpacing: "var(--tracking-label)", textTransform: "uppercase",
               color: schedule.color, background: `${schedule.color}18`,
               padding: "2px 8px", borderRadius: 20,
               whiteSpace: "nowrap",
@@ -457,7 +457,7 @@ function IntroduceSlowlyCard({
 
       {/* Product name — visual anchor */}
       <p style={{
-        fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 400,
+        fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", fontWeight: 400,
         color: "var(--parchment)", margin: "0 0 8px",
         lineHeight: 1.35,
       }}>{product.name}</p>
@@ -466,32 +466,32 @@ function IntroduceSlowlyCard({
       <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 6 }}>
         {showCheckin && (
           <span style={{
-            fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 400,
-            letterSpacing: "0.14em", textTransform: "uppercase",
+            fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400,
+            letterSpacing: "var(--tracking-label)", textTransform: "uppercase",
             color: schedule.color, background: `${schedule.color}18`,
             padding: "2px 8px", borderRadius: 20,
           }}>{schedule.label}</span>
         )}
         <span style={{
-          fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em",
+          fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)",
           textTransform: "uppercase",
           color: isHeld ? "#8b7355" : "var(--clay)", opacity: 0.85,
         }}>Week {Math.min(weekNumber, maxWeek)} of {maxWeek} · {isHeld ? "Holding" : phase.name}</span>
       </div>
 
       <p style={{
-        fontFamily: "var(--font-body)", fontSize: 11, color: schedule.color,
+        fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: schedule.color,
         margin: 0, letterSpacing: "0.04em",
       }}>{phase.frequency}</p>
       {startedLabel && (
         <p style={{
-          fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)",
+          fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)",
           margin: "3px 0 0", opacity: 0.7, letterSpacing: "0.04em",
         }}>{startedLabel}</p>
       )}
       {schedulePaced && (
         <p style={{
-          fontFamily: "var(--font-body)", fontSize: 10, fontStyle: "italic",
+          fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontStyle: "italic",
           color: "var(--clay)", opacity: 0.75,
           margin: "6px 0 0", letterSpacing: "0.02em", lineHeight: 1.5,
         }}>
@@ -514,7 +514,7 @@ function IntroduceSlowlyCard({
           reads as running commentary on the ivory band. */}
       {isHeld && (
         <p style={{
-          fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400,
+          fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400,
           fontStyle: "italic",
           color: "#8b7355", margin: "12px 0 0",
           letterSpacing: "0.02em",
@@ -544,7 +544,7 @@ function IntroduceSlowlyCard({
           }}
         >
           <span style={{
-            fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400,
+            fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400,
             fontStyle: "italic",
             color: "#8b7355",
             letterSpacing: "0.02em", lineHeight: 1.55,
@@ -558,7 +558,7 @@ function IntroduceSlowlyCard({
       {showCheckin && (
         <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid rgba(28,28,26,0.18)" }}>
           <p style={{
-            fontFamily: "var(--font-body)", fontSize: 11,
+            fontFamily: "var(--font-body)", fontSize: "var(--text-xs)",
             color: "var(--clay, var(--color-stone))", margin: "0 0 12px",
             lineHeight: 1.55, opacity: 0.85,
           }}>How did your skin respond this week?</p>
@@ -590,8 +590,8 @@ function IntroduceSlowlyCard({
                       : "1px solid rgba(28, 28, 26, 0.18)",
                     borderRadius: 10,
                     fontFamily: "var(--font-body)",
-                    fontSize: 10, fontWeight: 400,
-                    letterSpacing: "0.14em", textTransform: "uppercase",
+                    fontSize: "var(--text-xs)", fontWeight: 400,
+                    letterSpacing: "var(--tracking-label)", textTransform: "uppercase",
                     color: "#1c1c1a",
                     cursor: (saving || saved) ? "default" : "pointer",
                     transition: "border-color 0.18s",
@@ -619,7 +619,7 @@ function IntroduceSlowlyCard({
                   border: "1px solid rgba(45,61,43,0.20)",
                   borderRadius: 8,
                   fontFamily: "var(--font-body)",
-                  fontSize: 12,
+                  fontSize: "var(--text-xs)",
                   color: "var(--parchment, var(--color-ivory))",
                   resize: "none",
                   outline: "none",
@@ -631,7 +631,7 @@ function IntroduceSlowlyCard({
 
               {checkinStatus === "error" && checkinError && (
                 <p role="alert" style={{
-                  fontFamily: "var(--font-body)", fontSize: 11, color: "#8b7355",
+                  fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "#8b7355",
                   margin: "0 0 10px", lineHeight: 1.5, letterSpacing: "0.01em",
                 }}>{checkinError}</p>
               )}
@@ -647,8 +647,8 @@ function IntroduceSlowlyCard({
                   border: saved ? "1px solid rgba(28, 28, 26, 0.70)" : "1px solid rgba(45,61,43,0.35)",
                   borderRadius: 10,
                   fontFamily: "var(--font-body)",
-                  fontSize: 10, fontWeight: 400,
-                  letterSpacing: "0.12em", textTransform: "uppercase",
+                  fontSize: "var(--text-xs)", fontWeight: 400,
+                  letterSpacing: "var(--tracking-label)", textTransform: "uppercase",
                   color: saved ? "#1c1c1a" : "var(--sage, #2d3d2b)",
                   cursor: (saving || saved) ? "default" : "pointer",
                   opacity: saving ? 0.7 : 1,
@@ -673,7 +673,7 @@ function IntroduceSlowlyCard({
       {expanded && (
         <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid rgba(28,28,26,0.18)" }}>
           <p style={{
-            fontFamily: "var(--font-body)", fontSize: 12,
+            fontFamily: "var(--font-body)", fontSize: "var(--text-xs)",
             color: "var(--clay)", margin: "0 0 14px", lineHeight: 1.7,
           }}>{phase.instruction}</p>
 
@@ -681,12 +681,12 @@ function IntroduceSlowlyCard({
               colored eyebrow, no bordered box on the ivory band. */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 14 }}>
             <div>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--sage)", margin: "0 0 4px" }}>On track</p>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>{phase.onTrack}</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--sage)", margin: "0 0 4px" }}>On track</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>{phase.onTrack}</p>
             </div>
             <div>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "#8b7355", margin: "0 0 4px" }}>Back off</p>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>{phase.backOff}</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "#8b7355", margin: "0 0 4px" }}>Back off</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>{phase.backOff}</p>
             </div>
           </div>
 
@@ -707,8 +707,8 @@ function IntroduceSlowlyCard({
                   border: "1px solid rgba(45,61,43,0.35)",
                   borderRadius: 10,
                   display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6,
-                  fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400,
-                  letterSpacing: "0.12em", textTransform: "uppercase",
+                  fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400,
+                  letterSpacing: "var(--tracking-label)", textTransform: "uppercase",
                   color: "#2d3d2b", cursor: "pointer",
                   marginBottom: 14,
                   WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
@@ -730,8 +730,8 @@ function IntroduceSlowlyCard({
                     border: "1px solid rgba(45,61,43,0.35)",
                     borderRadius: 10,
                     display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6,
-                    fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400,
-                    letterSpacing: "0.12em", textTransform: "uppercase",
+                    fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400,
+                    letterSpacing: "var(--tracking-label)", textTransform: "uppercase",
                     color: "#2d3d2b", cursor: "pointer",
                     WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
                     transition: "background 0.18s",
@@ -749,8 +749,8 @@ function IntroduceSlowlyCard({
                     background: "rgba(139,115,85,0.08)",
                     border: "1px solid rgba(139,115,85,0.28)",
                     borderRadius: 10,
-                    fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400,
-                    letterSpacing: "0.12em", textTransform: "uppercase",
+                    fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400,
+                    letterSpacing: "var(--tracking-label)", textTransform: "uppercase",
                     color: "#8b7355", cursor: "pointer",
                     WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
                     transition: "background 0.18s",
@@ -768,7 +768,7 @@ function IntroduceSlowlyCard({
           <div style={{ paddingTop: 12, borderTop: "1px dashed var(--border)" }}>
             {confirmReset ? (
               <div>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", margin: "0 0 8px", opacity: 0.8 }}>Pick the date you actually started this product — the week will recalculate from there.</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: "0 0 8px", opacity: 0.8 }}>Pick the date you actually started this product — the week will recalculate from there.</p>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                   <input
                     type="date"
@@ -776,23 +776,23 @@ function IntroduceSlowlyCard({
                     max={(() => { const t = new Date(); return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`; })()}
                     onClick={(e) => e.stopPropagation()}
                     onChange={(e) => setPickedDate(e.target.value)}
-                    style={{ flex: 1, minWidth: 140, padding: "7px 10px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 11, color: "var(--parchment)", cursor: "pointer" }}
+                    style={{ flex: 1, minWidth: 140, padding: "7px 10px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--parchment)", cursor: "pointer" }}
                   />
                   <button
                     disabled={!pickedDate}
                     onClick={(e) => { e.stopPropagation(); if (!pickedDate) return; onResetStart?.(product.id, pickedDate); setConfirmReset(false); setPickedDate(""); }}
-                    style={{ padding: "6px 12px", background: pickedDate ? "rgba(139,115,85,0.12)" : "transparent", border: `1px solid ${pickedDate ? "rgba(139,115,85,0.35)" : "var(--border)"}`, borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 400, letterSpacing: "0.1em", textTransform: "uppercase", color: pickedDate ? "#8b7355" : "var(--clay)", cursor: pickedDate ? "pointer" : "not-allowed", opacity: pickedDate ? 1 : 0.5 }}>
+                    style={{ padding: "6px 12px", background: pickedDate ? "rgba(139,115,85,0.12)" : "transparent", border: `1px solid ${pickedDate ? "rgba(139,115,85,0.35)" : "var(--border)"}`, borderRadius: 8, fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: pickedDate ? "#8b7355" : "var(--clay)", cursor: pickedDate ? "pointer" : "not-allowed", opacity: pickedDate ? 1 : 0.5 }}>
                     Save
                   </button>
                   <button onClick={(e) => { e.stopPropagation(); setConfirmReset(false); setPickedDate(""); }}
-                    style={{ padding: "6px 12px", background: "transparent", border: "1px solid var(--border)", borderRadius: 8, fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--clay)", cursor: "pointer" }}>
+                    style={{ padding: "6px 12px", background: "transparent", border: "1px solid var(--border)", borderRadius: 8, fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--clay)", cursor: "pointer" }}>
                     Cancel
                   </button>
                 </div>
               </div>
             ) : (
               <button onClick={(e) => { e.stopPropagation(); setConfirmReset(true); }}
-                style={{ background: "none", border: "none", padding: 0, fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", opacity: 0.6, cursor: "pointer", letterSpacing: "0.06em", textDecoration: "underline" }}>
+                style={{ background: "none", border: "none", padding: 0, fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", opacity: 0.6, cursor: "pointer", letterSpacing: "0.06em", textDecoration: "underline" }}>
                 Reset start date
               </button>
             )}
@@ -936,9 +936,9 @@ function WeeklyRitualCalendar({ rampProducts, products }) {
               {/* Day label */}
               <span style={{
                 fontFamily: "var(--font-body)",
-                fontSize: 10,
+                fontSize: "var(--text-xs)",
                 fontWeight: 400,
-                letterSpacing: "0.08em",
+                letterSpacing: "var(--tracking-label)",
                 color: active ? "var(--parchment)" : "var(--clay)",
               }}>{day.label}</span>
 
@@ -988,14 +988,14 @@ function WeeklyRitualCalendar({ rampProducts, products }) {
       <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: selectedDay !== null ? 16 : 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
           <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--clay)", opacity: 0.9 }} />
-          <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.6 }}>AM</span>
+          <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--clay)", opacity: 0.6 }}>AM</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
           <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--clay)", opacity: 0.45 }} />
-          <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.6 }}>PM</span>
+          <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--clay)", opacity: 0.6 }}>PM</span>
         </div>
         <div style={{ flex: 1 }} />
-        <span style={{ fontFamily: "var(--font-body)", fontSize: 9, color: "var(--clay)", opacity: 0.4, letterSpacing: "0.06em" }}>Tap a day to expand</span>
+        <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", opacity: 0.4, letterSpacing: "0.06em" }}>Tap a day to expand</span>
       </div>
 
       {/* Expanded day detail */}
@@ -1008,14 +1008,14 @@ function WeeklyRitualCalendar({ rampProducts, products }) {
           marginTop: 4,
         }}>
           <div style={{ padding: "14px 16px 12px", borderBottom: "1px solid var(--border)" }}>
-            <p style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 400, letterSpacing: "0.08em", color: "var(--parchment)", margin: 0 }}>
+            <p style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-md)", fontWeight: 400, letterSpacing: "var(--tracking-label)", color: "var(--parchment)", margin: 0 }}>
               {selectedDayObj.full}
             </p>
           </div>
 
           {selectedProducts.am.length === 0 && selectedProducts.pm.length === 0 ? (
             <div style={{ padding: "18px 16px" }}>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: 0, opacity: 0.6 }}>Rest day — no actives scheduled.</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: 0, opacity: 0.6 }}>Rest day — no actives scheduled.</p>
             </div>
           ) : (
             <div>
@@ -1024,7 +1024,7 @@ function WeeklyRitualCalendar({ rampProducts, products }) {
                 if (slotProducts.length === 0) return null;
                 return (
                   <div key={slot} style={{ padding: "12px 16px", borderBottom: "1px solid var(--border)" }}>
-                    <p style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 400, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 10px", opacity: 0.55 }}>
+                    <p style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 10px", opacity: 0.55 }}>
                       <Icon name={slot === "am" ? "sun" : "moon"} size={10} /> {slot === "am" ? "Morning" : "Evening"}
                     </p>
                     {slotProducts.map((p, i) => {
@@ -1038,9 +1038,9 @@ function WeeklyRitualCalendar({ rampProducts, products }) {
                         <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: i < slotProducts.length - 1 ? 10 : 0 }}>
                           <div style={{ width: 8, height: 8, borderRadius: "50%", background: color, flexShrink: 0 }} />
                           <div style={{ flex: 1 }}>
-                            <p style={{ fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 400, color: "var(--parchment)", margin: "0 0 1px" }}>{p.name}</p>
+                            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400, color: "var(--parchment)", margin: "0 0 1px" }}>{p.name}</p>
                             {phase && (
-                              <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color, margin: 0, letterSpacing: "0.04em" }}>
+                              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color, margin: 0, letterSpacing: "0.04em" }}>
                                 Week {getRampWeek(p)} · {phase.frequency}
                               </p>
                             )}

@@ -131,8 +131,8 @@ function ShopScanModal({ products, user = {}, onClose }) {
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "24px 24px 0" }}>
           <div>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 4px" }}>Shopping</p>
-            <h2 style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--parchment)", margin: 0 }}>Would my skin like this?</h2>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 4px" }}>Shopping</p>
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--parchment)", margin: 0 }}>Would my skin like this?</h2>
           </div>
           <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: 4, marginTop: 2 }}><Icon name="x" size={17} /></button>
         </div>
@@ -148,25 +148,25 @@ function ShopScanModal({ products, user = {}, onClose }) {
           {/* Prompt phase */}
           {phase === "prompt" && (
             <div>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: "0 0 20px", lineHeight: 1.65 }}>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: "0 0 20px", lineHeight: 1.65 }}>
                 Photograph the ingredients list or product label. Cygne will check it against your skin type, concerns, and current vanity.
               </p>
               {scanError && (
-                <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#8b7355", margin: "0 0 12px", padding: "8px 12px", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.2)", borderRadius: 8 }}>{scanError}</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "#8b7355", margin: "0 0 12px", padding: "8px 12px", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.2)", borderRadius: 8 }}>{scanError}</p>
               )}
 
               <div style={{ width: "100%", padding: "26px 20px 20px", border: "1.5px dashed var(--border)", borderRadius: 16, background: "var(--surface)", textAlign: "center" }}>
                 <div style={{ color: "var(--clay)", marginBottom: 8, display: "flex", justifyContent: "center" }}><Icon name="camera" size={28} /></div>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--parchment)", margin: "0 0 14px", fontWeight: 400 }}>Scan product</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--parchment)", margin: "0 0 14px", fontWeight: 400 }}>Scan product</p>
                 <div style={{ display: "flex", gap: 8 }}>
                   <button onClick={() => cameraRef.current?.click()}
-                    style={{ flex: 1, padding: "11px 0", background: "transparent", border: "1px solid rgba(250,249,244,0.25)", borderRadius: 10, cursor: "pointer", fontFamily: "var(--font-display)", fontSize: 10, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", transition: "background 0.2s, color 0.2s" }}
+                    style={{ flex: 1, padding: "11px 0", background: "transparent", border: "1px solid rgba(250,249,244,0.25)", borderRadius: 10, cursor: "pointer", fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", transition: "background 0.2s, color 0.2s" }}
                     onMouseEnter={e => { e.currentTarget.style.background = "var(--color-inky-moss, #2d3d2b)"; e.currentTarget.style.color = "var(--color-ivory, #faf9f4)"; }}
                     onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--color-inky-moss, #2d3d2b)"; }}>
                     Take Photo
                   </button>
                   <button onClick={() => libraryRef.current?.click()}
-                    style={{ flex: 1, padding: "11px 0", background: "transparent", border: "1px solid rgba(250,249,244,0.25)", borderRadius: 10, cursor: "pointer", fontFamily: "var(--font-display)", fontSize: 10, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", transition: "background 0.2s, color 0.2s" }}
+                    style={{ flex: 1, padding: "11px 0", background: "transparent", border: "1px solid rgba(250,249,244,0.25)", borderRadius: 10, cursor: "pointer", fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", transition: "background 0.2s, color 0.2s" }}
                     onMouseEnter={e => { e.currentTarget.style.background = "var(--color-inky-moss, #2d3d2b)"; e.currentTarget.style.color = "var(--color-ivory, #faf9f4)"; }}
                     onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--color-inky-moss, #2d3d2b)"; }}>
                     Choose Photo
@@ -176,10 +176,10 @@ function ShopScanModal({ products, user = {}, onClose }) {
               {/* Skin context preview */}
               {(user.skinType || user.concerns?.length > 0) && (
                 <div style={{ marginTop: 16, padding: "12px 14px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10 }}>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 6px" }}>Checking against your skin</p>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 6px" }}>Checking against your skin</p>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-                    {user.skinType && <span style={{ fontSize: 10, fontFamily: "var(--font-body)", color: "var(--color-ivory, #faf9f4)", background: "rgba(45,61,43,0.1)", border: "1px solid rgba(45,61,43,0.25)", padding: "2px 9px", borderRadius: 20 }}>{user.skinType}</span>}
-                    {(user.concerns || []).map((c, i) => <span key={i} style={{ fontSize: 10, fontFamily: "var(--font-body)", color: "var(--clay)", background: "var(--surface)", border: "1px solid var(--border)", padding: "2px 9px", borderRadius: 20 }}>{c}</span>)}
+                    {user.skinType && <span style={{ fontSize: "var(--text-xs)", fontFamily: "var(--font-body)", color: "var(--color-ivory, #faf9f4)", background: "rgba(45,61,43,0.1)", border: "1px solid rgba(45,61,43,0.25)", padding: "2px 9px", borderRadius: 20 }}>{user.skinType}</span>}
+                    {(user.concerns || []).map((c, i) => <span key={i} style={{ fontSize: "var(--text-xs)", fontFamily: "var(--font-body)", color: "var(--clay)", background: "var(--surface)", border: "1px solid var(--border)", padding: "2px 9px", borderRadius: 20 }}>{c}</span>)}
                   </div>
                 </div>
               )}
@@ -192,9 +192,9 @@ function ShopScanModal({ products, user = {}, onClose }) {
               {imgPreview && <img src={imgPreview} alt="" style={{ width: 120, height: 120, objectFit: "cover", borderRadius: 12, marginBottom: 20, opacity: 0.6 }} />}
               <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 10 }}>
                 <div style={{ width: 14, height: 14, border: "1.5px solid #2d3d2b", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
-                <span style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)" }}>Reading the ingredients...</span>
+                <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)" }}>Reading the ingredients...</span>
               </div>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", opacity: 0.5, margin: 0 }}>Checking against your skin and vanity</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", opacity: 0.5, margin: 0 }}>Checking against your skin and vanity</p>
             </div>
           )}
 
@@ -205,68 +205,68 @@ function ShopScanModal({ products, user = {}, onClose }) {
               <div style={{ padding: "18px 18px", background: vc.bg, border: `1px solid ${vc.border}`, borderRadius: 16, marginBottom: 16 }}>
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 8 }}>
                   <div>
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: vc.color, margin: "0 0 5px" }}>{vc.label}</p>
-                    <p style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 400, letterSpacing: "0.08em", color: "var(--parchment)", margin: 0, lineHeight: 1.3 }}>{result.headline}</p>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: vc.color, margin: "0 0 5px" }}>{vc.label}</p>
+                    <p style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 400, letterSpacing: "var(--tracking-label)", color: "var(--parchment)", margin: 0, lineHeight: 1.3 }}>{result.headline}</p>
                   </div>
                   {imgPreview && <img src={imgPreview} alt="" style={{ width: 52, height: 52, objectFit: "cover", borderRadius: 8, flexShrink: 0, marginLeft: 12 }} />}
                 </div>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.65 }}>{result.reason}</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: 0, lineHeight: 1.65 }}>{result.reason}</p>
               </div>
 
               {/* Product name */}
               <div style={{ marginBottom: 14 }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "var(--parchment)", margin: "0 0 2px", fontWeight: 400 }}>{result.name || "Product"}</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0 }}>{result.brand}{result.category ? ` · ${result.category}` : ""}</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "var(--parchment)", margin: "0 0 2px", fontWeight: 400 }}>{result.name || "Product"}</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: 0 }}>{result.brand}{result.category ? ` · ${result.category}` : ""}</p>
               </div>
 
               {/* Skin type fit */}
               {result.skinTypeFit && (
                 <div style={{ padding: "11px 14px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10, marginBottom: 10 }}>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 4px" }}>For your skin type</p>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{result.skinTypeFit}</p>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 4px" }}>For your skin type</p>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{result.skinTypeFit}</p>
                 </div>
               )}
 
               {/* Conflicts */}
               {result.conflicts?.length > 0 && (
                 <div style={{ padding: "11px 14px", background: "rgba(139,115,85,0.06)", border: "1px solid rgba(139,115,85,0.2)", borderRadius: 10, marginBottom: 10 }}>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "#8b7355", margin: "0 0 6px" }}>Conflicts with your vanity</p>
-                  {result.conflicts.map((c, i) => <p key={i} style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: "0 0 3px", lineHeight: 1.5 }}>· {c}</p>)}
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "#8b7355", margin: "0 0 6px" }}>Conflicts with your vanity</p>
+                  {result.conflicts.map((c, i) => <p key={i} style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: "0 0 3px", lineHeight: 1.5 }}>· {c}</p>)}
                 </div>
               )}
 
               {/* Duplicates */}
               {result.duplicates?.length > 0 && (
                 <div style={{ padding: "11px 14px", background: "rgba(139,115,85,0.06)", border: "1px solid rgba(139,115,85,0.2)", borderRadius: 10, marginBottom: 10 }}>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "#8b7355", margin: "0 0 6px" }}>Already covered</p>
-                  {result.duplicates.map((d, i) => <p key={i} style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: "0 0 3px", lineHeight: 1.5 }}>· {d}</p>)}
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "#8b7355", margin: "0 0 6px" }}>Already covered</p>
+                  {result.duplicates.map((d, i) => <p key={i} style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: "0 0 3px", lineHeight: 1.5 }}>· {d}</p>)}
                 </div>
               )}
 
               {/* Fills a gap */}
               {result.fillsGap && result.gap && (
                 <div style={{ padding: "11px 14px", background: "rgba(45,61,43,0.06)", border: "1px solid rgba(45,61,43,0.2)", borderRadius: 10, marginBottom: 10 }}>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 4px" }}>Fills a gap</p>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{result.gap}</p>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 4px" }}>Fills a gap</p>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{result.gap}</p>
                 </div>
               )}
 
               {/* Routine slot */}
               {result.routineSlot && (
                 <div style={{ padding: "9px 14px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10, marginBottom: 16 }}>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 3px" }}>Ritual position</p>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--parchment)", margin: 0 }}>{result.routineSlot}</p>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 3px" }}>Ritual position</p>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--parchment)", margin: 0 }}>{result.routineSlot}</p>
                 </div>
               )}
 
               {/* Actions */}
               <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
                 <button onClick={() => { setPhase("prompt"); setResult(null); setImgPreview(null); }}
-                  style={{ flex: 1, padding: "12px 0", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", cursor: "pointer", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                  style={{ flex: 1, padding: "12px 0", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", cursor: "pointer", letterSpacing: "var(--tracking-label)", textTransform: "uppercase" }}>
                   Scan Another
                 </button>
                 <button onClick={onClose}
-                  style={{ flex: 1, padding: "12px 0", background: "#2d3d2b", border: "none", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 10, color: "#fdfcf9", fontWeight: 400, cursor: "pointer", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                  style={{ flex: 1, padding: "12px 0", background: "#2d3d2b", border: "none", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "#fdfcf9", fontWeight: 400, cursor: "pointer", letterSpacing: "var(--tracking-label)", textTransform: "uppercase" }}>
                   Done
                 </button>
               </div>

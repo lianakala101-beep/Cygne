@@ -89,9 +89,9 @@ function SplashOverlay({ onDone }) {
       />
       <p style={{
         fontFamily: "var(--font-body)",
-        fontSize: 12,
+        fontSize: "var(--text-xs)",
         fontWeight: 400,
-        letterSpacing: "0.2em",
+        letterSpacing: "var(--tracking-display)",
         textTransform: "uppercase",
         color: "var(--color-ivory, #faf9f4)",
         margin: 0,

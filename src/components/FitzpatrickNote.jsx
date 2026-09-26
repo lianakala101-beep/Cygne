@@ -90,7 +90,7 @@ export function FitzpatrickNote({ variant = "dark" }) {
       <p style={{
         flex: 1, minWidth: 0, margin: 0,
         fontFamily: "var(--font-body)",
-        fontSize: 12, lineHeight: 1.6,
+        fontSize: "var(--text-xs)", lineHeight: 1.6,
         color, opacity: 0.9,
       }}>
         <strong style={{ fontWeight: 700 }}>A quick note:</strong>{" "}
@@ -105,7 +105,7 @@ export function FitzpatrickNote({ variant = "dark" }) {
         aria-label="Dismiss note"
         style={{
           background: "none", border: "none", cursor: "pointer",
-          color: mutedX, fontSize: 18, lineHeight: 1, padding: 2, flexShrink: 0,
+          color: mutedX, fontSize: "var(--text-lg)", lineHeight: 1, padding: 2, flexShrink: 0,
         }}
       >×</button>
     </div>

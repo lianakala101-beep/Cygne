@@ -211,7 +211,7 @@ export function AskCygneModal({
           />
           <h2 style={{
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
-            fontWeight: 700, fontSize: 13, letterSpacing: "0.15em",
+            fontWeight: 700, fontSize: "var(--text-sm)", letterSpacing: "var(--tracking-display)",
             textTransform: "uppercase",
             color: "var(--color-ivory, #faf9f4)",
             margin: "0 0 18px",
@@ -221,7 +221,7 @@ export function AskCygneModal({
           </h2>
           <p style={{
             fontFamily: "var(--font-body, 'Fungis Normal', sans-serif)",
-            fontSize: 13, lineHeight: 1.65,
+            fontSize: "var(--text-sm)", lineHeight: 1.65,
             color: "rgba(255,255,255,0.7)",
             margin: "0 0 26px",
           }}>
@@ -240,7 +240,7 @@ export function AskCygneModal({
               color: "var(--color-ivory, #faf9f4)",
               borderRadius: 0,
               fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
-              fontWeight: 700, fontSize: 11, letterSpacing: "0.24em",
+              fontWeight: 700, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)",
               textTransform: "uppercase",
               cursor: "pointer",
               WebkitAppearance: "none", appearance: "none",
@@ -283,7 +283,7 @@ export function AskCygneModal({
             position: "absolute", top: 18, right: 22,
             background: "none", border: "none", cursor: "pointer",
             color: "rgba(250,249,244,0.6)",
-            fontSize: 22, lineHeight: 1, padding: 4,
+            fontSize: "var(--text-lg)", lineHeight: 1, padding: 4,
             WebkitTapHighlightColor: "transparent",
             WebkitAppearance: "none", appearance: "none",
           }}
@@ -297,7 +297,7 @@ export function AskCygneModal({
           />
           <p style={{
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
-            fontWeight: 700, fontSize: 13, letterSpacing: "0.32em",
+            fontWeight: 700, fontSize: "var(--text-sm)", letterSpacing: "var(--tracking-display)",
             textTransform: "uppercase",
             color: "var(--color-ivory, #faf9f4)",
             margin: 0,
@@ -312,7 +312,7 @@ export function AskCygneModal({
             padding: "16px 8px",
             textAlign: "center",
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
-            fontWeight: 700, fontSize: 11, letterSpacing: "0.22em",
+            fontWeight: 700, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)",
             textTransform: "uppercase",
             color: "var(--color-ivory, #faf9f4)",
             lineHeight: 1.6,
@@ -333,7 +333,7 @@ export function AskCygneModal({
                 border: "1px solid rgba(250,249,244,0.2)",
                 borderRadius: 0,
                 fontFamily: "var(--font-body, 'Fungis Normal', 'Fungis Normal', sans-serif)",
-                fontSize: 14, lineHeight: 1.55,
+                fontSize: "var(--text-sm)", lineHeight: 1.55,
                 color: "var(--color-ivory, #faf9f4)",
                 caretColor: "var(--color-ivory, #faf9f4)",
                 resize: "none",
@@ -354,7 +354,7 @@ export function AskCygneModal({
                 color: "var(--color-ivory, #faf9f4)",
                 borderRadius: 0,
                 fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
-                fontWeight: 700, fontSize: 11, letterSpacing: "0.24em",
+                fontWeight: 700, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)",
                 textTransform: "uppercase",
                 cursor: loading || !question.trim() ? "default" : "pointer",
                 opacity: loading || !question.trim() ? 0.45 : 1,
@@ -371,7 +371,7 @@ export function AskCygneModal({
           <p style={{
             marginTop: 18,
             fontFamily: "var(--font-body, 'Fungis Normal', sans-serif)",
-            fontSize: 12, lineHeight: 1.55,
+            fontSize: "var(--text-xs)", lineHeight: 1.55,
             color: "#8b7355",
           }}>
             {error}
@@ -385,7 +385,7 @@ export function AskCygneModal({
             borderTop: "1px solid rgba(250,249,244,0.18)",
             borderRadius: 0,
             fontFamily: "var(--font-body, 'Fungis Normal', 'Fungis Normal', sans-serif)",
-            fontSize: 14, lineHeight: 1.7,
+            fontSize: "var(--text-sm)", lineHeight: 1.7,
             color: "var(--color-ivory, #faf9f4)",
             whiteSpace: "pre-wrap",
           }}>

@@ -19,8 +19,8 @@ function RoutineFitSheet({ product, assessment, onAddNow, onDefer, onClose }) {
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 22 }}>
           <div>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 5px" }}>Ritual Fit</p>
-            <h2 style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 400, letterSpacing: "0.08em", color: "var(--parchment)", margin: 0 }}>{product.name}</h2>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 5px" }}>Ritual Fit</p>
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-md)", fontWeight: 400, letterSpacing: "var(--tracking-label)", color: "var(--parchment)", margin: 0 }}>{product.name}</h2>
           </div>
           <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: 4 }}><Icon name="x" size={17} /></button>
         </div>
@@ -30,7 +30,7 @@ function RoutineFitSheet({ product, assessment, onAddNow, onDefer, onClose }) {
           <div style={{ background: "rgba(45,61,43,0.08)", border: "1px solid rgba(45,61,43,0.2)", borderRadius: 12, padding: "13px 16px", marginBottom: 14 }}>
             <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
               <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#2d3d2b", marginTop: 5, flexShrink: 0 }} />
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--parchment)", margin: 0, lineHeight: 1.6 }}>{assessment.positiveRead}</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--parchment)", margin: 0, lineHeight: 1.6 }}>{assessment.positiveRead}</p>
             </div>
           </div>
         )}
@@ -39,12 +39,12 @@ function RoutineFitSheet({ product, assessment, onAddNow, onDefer, onClose }) {
         {isDefer && (
           <div style={{ background: tagCfg.bg, border: `1px solid ${tagCfg.color}40`, borderRadius: 12, padding: "14px 16px", marginBottom: 22 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-              <span style={{ padding: "2px 9px", borderRadius: 20, background: `${tagCfg.color}20`, border: `1px solid ${tagCfg.color}50`, fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: tagCfg.color }}>
+              <span style={{ padding: "2px 9px", borderRadius: 20, background: `${tagCfg.color}20`, border: `1px solid ${tagCfg.color}50`, fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: tagCfg.color }}>
                 {tagCfg.label}
               </span>
-              <span style={{ fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, color: "var(--parchment)" }}>{assessment.reason}</span>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400, color: "var(--parchment)" }}>{assessment.reason}</span>
             </div>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", margin: 0, lineHeight: 1.65 }}>{assessment.detail}</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: 0, lineHeight: 1.65 }}>{assessment.detail}</p>
           </div>
         )}
 
@@ -53,17 +53,17 @@ function RoutineFitSheet({ product, assessment, onAddNow, onDefer, onClose }) {
           {isDefer ? (
             <>
               <button onClick={onDefer}
-                style={{ width: "100%", padding: "14px 0", background: "#2d3d2b", color: "#fdfcf9", border: "none", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}>
+                style={{ width: "100%", padding: "14px 0", background: "#2d3d2b", color: "#fdfcf9", border: "none", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", cursor: "pointer" }}>
                 Save for Later
               </button>
               <button onClick={onAddNow}
-                style={{ width: "100%", padding: "13px 0", background: "transparent", color: "var(--clay)", border: "1px solid var(--border)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer" }}>
+                style={{ width: "100%", padding: "13px 0", background: "transparent", color: "var(--clay)", border: "1px solid var(--border)", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", cursor: "pointer" }}>
                 Add to Ritual Anyway
               </button>
             </>
           ) : (
             <button onClick={onAddNow}
-              style={{ width: "100%", padding: "14px 0", background: "#2d3d2b", color: "#fdfcf9", border: "none", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: 11, fontWeight: 400, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}>
+              style={{ width: "100%", padding: "14px 0", background: "#2d3d2b", color: "#fdfcf9", border: "none", borderRadius: 10, fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", cursor: "pointer" }}>
               Add to Ritual
             </button>
           )}
@@ -273,12 +273,12 @@ function getOveruseWarning(chosenFreq, suggested, product) {
 
 function ShelfLifeSection({ form, set }) {
   const [open, setOpen] = useState(false);
-  const labelSt = { fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", display: "block", marginBottom: 5 };
-  const inputSt2 = { width: "100%", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "8px 10px", color: "var(--parchment)", fontFamily: "var(--font-body)", fontSize: 12, outline: "none", boxSizing: "border-box" };
+  const labelSt = { fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--clay)", display: "block", marginBottom: 5 };
+  const inputSt2 = { width: "100%", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "8px 10px", color: "var(--parchment)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", outline: "none", boxSizing: "border-box" };
   return (
     <div>
       <button onClick={() => setOpen(o => !o)} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", padding: "0 0 10px", cursor: "pointer" }}>
-        <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.6 }}>Shelf life & expiry</span>
+        <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--clay)", opacity: 0.6 }}>Shelf life & expiry</span>
         <span style={{ color: "var(--clay)", opacity: 0.4, display: "inline-flex", transform: open ? "rotate(-90deg)" : "rotate(90deg)", transition: "transform 0.18s" }}><Icon name="chevron" size={10} /></span>
       </button>
       {open && (
@@ -293,7 +293,7 @@ function ShelfLifeSection({ form, set }) {
               const active = (form.paoMonths ?? null) === m;
               return (
                 <button key={m ?? "none"} onClick={() => set("paoMonths", m)}
-                  style={{ padding: "6px 13px", borderRadius: 20, border: "1px solid " + (active ? "var(--sage)" : "var(--border)"), background: active ? "rgba(45,61,43,0.18)" : "transparent", color: active ? "var(--parchment)" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 11, cursor: "pointer" }}>
+                  style={{ padding: "6px 13px", borderRadius: 20, border: "1px solid " + (active ? "var(--sage)" : "var(--border)"), background: active ? "rgba(45,61,43,0.18)" : "transparent", color: active ? "var(--parchment)" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", cursor: "pointer" }}>
                   {m === null ? "—" : m + "M"}
                 </button>
               );
@@ -482,8 +482,8 @@ function ProductModal({ product, onSave, onClose, user }) {
     onSave({ ...form, id: product && product.id ? product.id : Date.now().toString(), ingredients: ingArr, price: parseFloat(form.price) || 0 });
   };
 
-  const labelSt = { fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", display: "block", marginBottom: 5 };
-  const inputSt = { width: "100%", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 12px", fontFamily: "var(--font-body)", fontSize: 13, color: "var(--parchment)", outline: "none", boxSizing: "border-box" };
+  const labelSt = { fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--clay)", display: "block", marginBottom: 5 };
+  const inputSt = { width: "100%", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 12px", fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "var(--parchment)", outline: "none", boxSizing: "border-box" };
 
   return (
     <div style={{ position: "fixed", inset: 0, background: "var(--overlay)", backdropFilter: "blur(8px)", zIndex: 100, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
@@ -494,7 +494,7 @@ function ProductModal({ product, onSave, onClose, user }) {
             {modalStep === "form" && !(product && product.id) && (
               <button onClick={() => setModalStep("choose")} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: "0 8px 0 0", opacity: 0.6, display: "inline-flex" }}><Icon name="arrow-left" size={16} /></button>
             )}
-            <h2 style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--parchment)", margin: 0 }}>
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--parchment)", margin: 0 }}>
               {product && product.id ? "Edit Product" : modalStep === "choose" ? "Add a Product" : "Product Details"}
             </h2>
           </div>
@@ -507,7 +507,7 @@ function ProductModal({ product, onSave, onClose, user }) {
               <div style={{ display: "flex", alignItems: "center", gap: 10, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 11, padding: "12px 16px" }}>
                 <Icon name="search" size={16} color="var(--clay)" />
                 <input value={searchQuery} onChange={e => handleSearchInput(e.target.value)} placeholder="Search by product name…" autoFocus
-                  style={{ flex: 1, background: "none", border: "none", outline: "none", fontFamily: "var(--font-body)", fontSize: 14, color: "var(--parchment)" }} />
+                  style={{ flex: 1, background: "none", border: "none", outline: "none", fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "var(--parchment)" }} />
                 {searching && <div style={{ width: 14, height: 14, borderRadius: "50%", border: "1.5px solid var(--sage)", borderTopColor: "transparent", animation: "spin 0.7s linear infinite", flexShrink: 0 }} />}
                 {searchQuery && !searching && <button onClick={() => { setSearchQuery(""); setSearchResults([]); setSearchDone(false); }} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: 0 }}><Icon name="x" size={12} /></button>}
               </div>
@@ -518,8 +518,8 @@ function ProductModal({ product, onSave, onClose, user }) {
                       style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "flex-start", padding: "12px 16px", background: "none", border: "none", borderBottom: idx < searchResults.length - 1 ? "1px solid var(--border)" : "none", cursor: "pointer", textAlign: "left" }}
                       onMouseEnter={e => e.currentTarget.style.background = "var(--surface)"}
                       onMouseLeave={e => e.currentTarget.style.background = "none"}>
-                      <span style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "var(--parchment)", lineHeight: 1.3 }}>{p.product_name}</span>
-                      <span style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", marginTop: 2 }}>
+                      <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "var(--parchment)", lineHeight: 1.3 }}>{p.product_name}</span>
+                      <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", marginTop: 2 }}>
                         {(p.brands || "").split(",")[0].trim()}
                         {guessCategory(p.categories_tags) ? " · " + guessCategory(p.categories_tags) : ""}
                       </span>
@@ -528,13 +528,13 @@ function ProductModal({ product, onSave, onClose, user }) {
                 </div>
               )}
               {searchDone && searchResults.length === 0 && (
-                <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: "8px 0 0", opacity: 0.6 }}>No results — try entering manually.</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: "8px 0 0", opacity: 0.6 }}>No results — try entering manually.</p>
               )}
             </div>
 
             <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "20px 0" }}>
               <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
-              <span style={{ fontFamily: "var(--font-body)", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--clay)", opacity: 0.5 }}>or</span>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--clay)", opacity: 0.5 }}>or</span>
               <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
             </div>
 
@@ -544,20 +544,20 @@ function ProductModal({ product, onSave, onClose, user }) {
               onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}>
               <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleFile} />
               <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(45,61,43,0.12)", border: "1px solid rgba(45,61,43,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                {analyzing ? <span style={{ fontFamily: "var(--font-body)", fontSize: 9, color: "var(--sage)" }}>…</span> : <Icon name="camera" size={16} color="var(--sage)" />}
+                {analyzing ? <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--sage)" }}>…</span> : <Icon name="camera" size={16} color="var(--sage)" />}
               </div>
               <div>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: 13, fontWeight: 400, color: "var(--parchment)", margin: "0 0 2px" }}>{analyzing ? "Analysing…" : "Scan a photo"}</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0 }}>Point at the product — Cygne reads the label.</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", fontWeight: 400, color: "var(--parchment)", margin: "0 0 2px" }}>{analyzing ? "Analysing…" : "Scan a photo"}</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: 0 }}>Point at the product — Cygne reads the label.</p>
               </div>
             </div>
 
             {scanError && (
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#8b7355", margin: "0 0 10px", padding: "8px 12px", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.2)", borderRadius: 8 }}>{scanError}</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "#8b7355", margin: "0 0 10px", padding: "8px 12px", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.2)", borderRadius: 8 }}>{scanError}</p>
             )}
 
             <button onClick={() => setModalStep("form")}
-              style={{ width: "100%", padding: "13px 0", background: "none", border: "1px solid var(--border)", borderRadius: 14, fontFamily: "var(--font-body)", fontSize: 12, color: "var(--clay)", cursor: "pointer", marginTop: 4 }}>
+              style={{ width: "100%", padding: "13px 0", background: "none", border: "1px solid var(--border)", borderRadius: 14, fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", cursor: "pointer", marginTop: 4 }}>
               Enter manually
             </button>
           </div>
@@ -617,7 +617,7 @@ function ProductModal({ product, onSave, onClose, user }) {
 
                 return (
                   <div>
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", margin: "0 0 10px", lineHeight: 1.5, opacity: 0.7 }}>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: "0 0 10px", lineHeight: 1.5, opacity: 0.7 }}>
                       Tap each active in your formula, then select the percentage.
                     </p>
                     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -627,7 +627,7 @@ function ProductModal({ product, onSave, onClose, user }) {
                         return (
                           <div key={active.key} style={{ background: isOn ? "rgba(45,61,43,0.08)" : "var(--surface)", border: "1px solid " + (isOn ? "rgba(45,61,43,0.35)" : "var(--border)"), borderRadius: 11, padding: "10px 14px" }}>
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: isOn ? 8 : 0 }}>
-                              <span style={{ fontFamily: "var(--font-body)", fontSize: 12, color: isOn ? "var(--parchment)" : "var(--clay)", fontWeight: 400 }}>{active.name}</span>
+                              <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: isOn ? "var(--parchment)" : "var(--clay)", fontWeight: 400 }}>{active.name}</span>
                               <button onClick={() => {
                                 if (isOn) {
                                   const current = typeof form.ingredients === "string"
@@ -646,7 +646,7 @@ function ProductModal({ product, onSave, onClose, user }) {
                               <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
                                 {active.options.map(pct => (
                                   <button key={pct} onClick={() => toggleActive(active.key, pct)}
-                                    style={{ padding: "4px 12px", borderRadius: 20, border: "1px solid " + (selected === pct ? "#2d3d2b" : "var(--border)"), background: selected === pct ? "rgba(45,61,43,0.18)" : "transparent", fontFamily: "var(--font-body)", fontSize: 11, color: selected === pct ? "var(--parchment)" : "var(--clay)", cursor: "pointer" }}>
+                                    style={{ padding: "4px 12px", borderRadius: 20, border: "1px solid " + (selected === pct ? "#2d3d2b" : "var(--border)"), background: selected === pct ? "rgba(45,61,43,0.18)" : "transparent", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: selected === pct ? "var(--parchment)" : "var(--clay)", cursor: "pointer" }}>
                                     {pct}
                                   </button>
                                 ))}
@@ -654,7 +654,7 @@ function ProductModal({ product, onSave, onClose, user }) {
                                   placeholder="custom %"
                                   defaultValue={selected && !active.options.includes(selected) ? selected : ""}
                                   onBlur={e => { if (e.target.value.trim()) toggleActive(active.key, e.target.value.trim()); }}
-                                  style={{ width: 72, padding: "4px 10px", borderRadius: 20, border: "1px solid var(--border)", background: "transparent", fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", outline: "none" }}
+                                  style={{ width: 72, padding: "4px 10px", borderRadius: 20, border: "1px solid var(--border)", background: "transparent", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", outline: "none" }}
                                 />
                               </div>
                             )}
@@ -663,7 +663,7 @@ function ProductModal({ product, onSave, onClose, user }) {
                       })}
                     </div>
                     {currentIng && (
-                      <p style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", margin: "10px 0 0", opacity: 0.5, lineHeight: 1.5 }}>
+                      <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: "10px 0 0", opacity: 0.5, lineHeight: 1.5 }}>
                         Formula: {currentIng}
                       </p>
                     )}
@@ -684,21 +684,21 @@ function ProductModal({ product, onSave, onClose, user }) {
                   const isSuggested = f.id === freqSuggestion.id && !active;
                   return (
                     <button key={f.id} onClick={() => { setFreqTouched(true); set("frequency", f.id); }}
-                      style={{ padding: "7px 14px", borderRadius: 20, border: "1px solid " + (active ? "var(--sage)" : isSuggested ? "rgba(45,61,43,0.35)" : "var(--border)"), background: active ? "rgba(45,61,43,0.18)" : "transparent", color: active ? "var(--parchment)" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 11, cursor: "pointer", position: "relative" }}>
+                      style={{ padding: "7px 14px", borderRadius: 20, border: "1px solid " + (active ? "var(--sage)" : isSuggested ? "rgba(45,61,43,0.35)" : "var(--border)"), background: active ? "rgba(45,61,43,0.18)" : "transparent", color: active ? "var(--parchment)" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", cursor: "pointer", position: "relative" }}>
                       {f.label}
                     </button>
                   );
                 })}
               </div>
               {freqSuggestion.reason && (
-                <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--sage)", margin: "10px 0 0", lineHeight: 1.6, opacity: 0.85 }}>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--sage)", margin: "10px 0 0", lineHeight: 1.6, opacity: 0.85 }}>
                   {freqSuggestion.reason}
                 </p>
               )}
               {overuseWarning && (
                 <div style={{ display: "flex", gap: 10, marginTop: 10, padding: "10px 14px", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.25)", borderRadius: 10 }}>
                   <span style={{ color: "#8b7355", flexShrink: 0, marginTop: 1, display: "inline-flex" }}><Icon name="warning" size={13} /></span>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#8b7355", margin: 0, lineHeight: 1.6 }}>{overuseWarning}</p>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "#8b7355", margin: 0, lineHeight: 1.6 }}>{overuseWarning}</p>
                 </div>
               )}
             </div>
@@ -708,10 +708,10 @@ function ProductModal({ product, onSave, onClose, user }) {
               {locked ? (
                 <div>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                    <span style={{ padding: "5px 14px", borderRadius: 20, background: locked.session === "am" ? "rgba(45,61,43,0.14)" : "rgba(232,226,217,0.10)", border: "1px solid " + (locked.session === "am" ? "rgba(45,61,43,0.4)" : "rgba(232,226,217,0.3)"), fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400, color: locked.session === "am" ? "var(--sage)" : "#e8e2d9" }}>{locked.session === "am" ? "AM only" : "PM only"}</span>
-                    <span style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--clay)", opacity: 0.6 }}>locked by ingredients</span>
+                    <span style={{ padding: "5px 14px", borderRadius: 20, background: locked.session === "am" ? "rgba(45,61,43,0.14)" : "rgba(232,226,217,0.10)", border: "1px solid " + (locked.session === "am" ? "rgba(45,61,43,0.4)" : "rgba(232,226,217,0.3)"), fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400, color: locked.session === "am" ? "var(--sage)" : "#e8e2d9" }}>{locked.session === "am" ? "AM only" : "PM only"}</span>
+                    <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", opacity: 0.6 }}>locked by ingredients</span>
                   </div>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: 0, lineHeight: 1.5, opacity: 0.7 }}>{locked.reason}</p>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: 0, lineHeight: 1.5, opacity: 0.7 }}>{locked.reason}</p>
                 </div>
               ) : (
                 <div>
@@ -720,14 +720,14 @@ function ProductModal({ product, onSave, onClose, user }) {
                       const active = effectiveSession === s.id;
                       return (
                         <button key={s.id} onClick={() => { setSessionTouched(true); set("session", s.id); }}
-                          style={{ flex: 1, padding: "8px 0", borderRadius: 20, border: "1px solid " + (active ? "var(--sage)" : "var(--border)"), background: active ? "rgba(45,61,43,0.18)" : "transparent", color: active ? "var(--parchment)" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 400, cursor: "pointer" }}>
+                          style={{ flex: 1, padding: "8px 0", borderRadius: 20, border: "1px solid " + (active ? "var(--sage)" : "var(--border)"), background: active ? "rgba(45,61,43,0.18)" : "transparent", color: active ? "var(--parchment)" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400, cursor: "pointer" }}>
                           {s.label}
                         </button>
                       );
                     })}
                   </div>
                   {autoSession.reason && (
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--clay)", margin: "8px 0 0", lineHeight: 1.5, opacity: 0.6 }}>{autoSession.reason}</p>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: "8px 0 0", lineHeight: 1.5, opacity: 0.6 }}>{autoSession.reason}</p>
                   )}
                 </div>
               )}
@@ -738,7 +738,7 @@ function ProductModal({ product, onSave, onClose, user }) {
             </div>
 
             <button onClick={save}
-              style={{ width: "100%", padding: "14px 0", background: "var(--sage)", border: "none", borderRadius: 12, fontFamily: "var(--font-body)", fontSize: 13, fontWeight: 400, color: "var(--ink)", cursor: "pointer", opacity: (!form.brand || !form.name) ? 0.4 : 1 }}>
+              style={{ width: "100%", padding: "14px 0", background: "var(--sage)", border: "none", borderRadius: 12, fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", fontWeight: 400, color: "var(--ink)", cursor: "pointer", opacity: (!form.brand || !form.name) ? 0.4 : 1 }}>
               Save to Vanity
             </button>
           </div>

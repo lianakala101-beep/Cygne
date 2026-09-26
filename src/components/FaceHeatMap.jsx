@@ -125,7 +125,7 @@ export function FaceHeatMap({ checkIns = [], products = [], user = {} }) {
                 background: "none", border: "none", cursor: "pointer",
                 padding: "4px 10px",
                 fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
-                fontSize: 9, letterSpacing: "0.15em",
+                fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)",
                 color: period === p.key ? INK : PEBBLE,
                 fontWeight: period === p.key ? 700 : 400,
               }}
@@ -133,7 +133,7 @@ export function FaceHeatMap({ checkIns = [], products = [], user = {} }) {
               {p.label}
             </button>
             {i < PERIODS.length - 1 && (
-              <span style={{ color: PEBBLE, fontSize: 9, opacity: 0.6 }}>·</span>
+              <span style={{ color: PEBBLE, fontSize: "var(--text-xs)", opacity: 0.6 }}>·</span>
             )}
           </span>
         ))}
@@ -180,14 +180,14 @@ export function FaceHeatMap({ checkIns = [], products = [], user = {} }) {
           <p style={{
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
             fontWeight: 400,
-            fontSize: 13, color: INK,
+            fontSize: "var(--text-sm)", color: INK,
             textAlign: "center", marginTop: 16,
           }}>
             your map is taking shape
           </p>
           <p style={{
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
-            fontSize: 10, letterSpacing: "0.1em",
+            fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)",
             color: PEBBLE, opacity: 0.7,
             textAlign: "center", marginTop: 6, textTransform: "uppercase",
           }}>
@@ -294,7 +294,7 @@ function ZoneInsightDrawer({ zoneId, checkIns, products, user, onClose, onAskCyg
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
           <h3 style={{
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
-            fontWeight: 400, fontSize: 14, letterSpacing: "0.18em",
+            fontWeight: 400, fontSize: "var(--text-sm)", letterSpacing: "var(--tracking-display)",
             color: INK, margin: 0,
           }}>
             {zoneLabelDisplay(zoneId)}
@@ -302,14 +302,14 @@ function ZoneInsightDrawer({ zoneId, checkIns, products, user, onClose, onAskCyg
           <button
             onClick={onClose}
             aria-label="Close"
-            style={{ background: "none", border: "none", cursor: "pointer", color: STONE, fontSize: 18, lineHeight: 1 }}
+            style={{ background: "none", border: "none", cursor: "pointer", color: STONE, fontSize: "var(--text-lg)", lineHeight: 1 }}
           >×</button>
         </div>
 
         {/* Stats */}
         <p style={{
           fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
-          fontWeight: 400, fontSize: 13, color: INK,
+          fontWeight: 400, fontSize: "var(--text-sm)", color: INK,
           margin: "0 0 12px",
         }}>
           Logged {flareCount} time{flareCount === 1 ? "" : "s"} this month
@@ -319,7 +319,7 @@ function ZoneInsightDrawer({ zoneId, checkIns, products, user, onClose, onAskCyg
         {dominantPhase && (
           <p style={{
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
-            fontSize: 12,
+            fontSize: "var(--text-xs)",
             color: PEBBLE,
             margin: "0 0 18px",
           }}>
@@ -331,7 +331,7 @@ function ZoneInsightDrawer({ zoneId, checkIns, products, user, onClose, onAskCyg
         <div style={{ marginTop: 8, marginBottom: 22 }}>
           <p style={{
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
-            fontWeight: 400, fontSize: 10, letterSpacing: "0.15em",
+            fontWeight: 400, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)",
             color: PEBBLE, textTransform: "uppercase",
             margin: "0 0 8px",
           }}>
@@ -340,7 +340,7 @@ function ZoneInsightDrawer({ zoneId, checkIns, products, user, onClose, onAskCyg
           {topProducts.length === 0 ? (
             <p style={{
               fontFamily: "var(--font-body, 'Fungis Normal', 'Fungis Normal', sans-serif)",
-              fontSize: 12, color: PEBBLE, opacity: 0.75, margin: 0,
+              fontSize: "var(--text-xs)", color: PEBBLE, opacity: 0.75, margin: 0,
             }}>
               Not enough data yet.
             </p>
@@ -351,7 +351,7 @@ function ZoneInsightDrawer({ zoneId, checkIns, products, user, onClose, onAskCyg
                   key={p.id}
                   style={{
                     fontFamily: "var(--font-body, 'Fungis Normal', 'Fungis Normal', sans-serif)",
-                    fontSize: 13, color: INK,
+                    fontSize: "var(--text-sm)", color: INK,
                     padding: "6px 0",
                     borderBottom: "1px solid rgba(28,28,26,0.10)",
                   }}
@@ -373,7 +373,7 @@ function ZoneInsightDrawer({ zoneId, checkIns, products, user, onClose, onAskCyg
             color: INK,
             borderRadius: 12,
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
-            fontWeight: 400, fontSize: 11, letterSpacing: "0.18em",
+            fontWeight: 400, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)",
             cursor: "pointer",
           }}
         >
