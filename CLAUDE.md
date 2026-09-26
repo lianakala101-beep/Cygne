@@ -14,7 +14,8 @@ All tokens live in `:root` in `src/index.css`.
 - Logo always: <img src="/cygne-logo.png" />
 
 ### Tokens
-- Type scale (1.25 ratio): --text-xs 11px, --text-sm 13px, --text-md 16px, --text-lg 20px, --text-xl 26px, --text-2xl 34px
+- Type scale (1.25 ratio): --text-xs 11px, --text-sm 13px, --text-md 16px, --text-lg 20px, --text-xl 26px, --text-2xl clamp(28px, 8.2vw, 34px) (fluid)
+- --text-nav 10px: bottom-nav labels only — the one exception to the 11px minimum, matching the iOS tab bar label size
 - Spacing (4px rhythm): --space-1 4px, --space-2 8px, --space-3 12px, --space-4 16px, --space-5 20px, --space-6 24px, --space-8 32px, --space-10 40px, --space-12 48px, --space-16 64px
 - Radius: --radius 12px, --radius-sheet 20px 20px 0 0, --radius-pill 999px
 - Tracking: --tracking-label 0.12em, --tracking-display 0.15em

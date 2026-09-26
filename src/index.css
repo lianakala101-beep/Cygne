@@ -76,7 +76,10 @@
   --text-md: 16px;
   --text-lg: 20px;
   --text-xl: 26px;
-  --text-2xl: 34px;
+  --text-2xl: clamp(28px, 8.2vw, 34px); /* fluid: page titles fit one line on phones */
+  /* The one exception to the 11px minimum: bottom-nav labels, matching
+     the iOS tab bar label size. */
+  --text-nav: 10px;
 
   /* Spacing — 4px rhythm */
   --space-1: 4px;
