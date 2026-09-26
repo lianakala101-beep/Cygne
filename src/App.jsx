@@ -535,7 +535,10 @@ export default function App() {
       // not just at app launch. Fire-and-forget; logDebugEvent swallows
       // its own errors, so this can never affect auth behavior below.
       if (event === "TOKEN_REFRESHED" || event === "SIGNED_OUT" || event === "INITIAL_SESSION") {
-        logDebugEvent(`auth.stateChange.${event}`, { hasSession: !!session });
+        logDebugEvent(`auth.stateChange.${event}`, {
+          hasSession: !!session,
+          ...(event === "SIGNED_OUT" ? { intentional: intentionalSignOutRef.current } : {}),
+        });
       }
       // This listener firing at all is proof the client resolved to
       // *some* state, even a signed-out one after a failed refresh — so
