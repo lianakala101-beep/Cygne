@@ -88,6 +88,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         const h = new Date().getHours();
         const slot = h >= 5 && h < 12 ? "morning" : h >= 12 && h < 17 ? "afternoon" : "evening";
         const greeting = slot === "morning" ? "Good Morning" : slot === "afternoon" ? "Good Afternoon" : "Good Evening";
+        const [greetingFirst, greetingSecond] = greeting.split(" ");
         const firstName = user?.name?.split(" ")[0] || "";
         const gap = typeof daysSinceLastActive === "number" ? daysSinceLastActive : null;
         const welcomeBackLine = gap == null ? null
@@ -104,7 +105,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           // afternoon/evening) since they share this one block.
           <div style={{ paddingTop: "var(--space-4)", marginBottom: products.length === 0 || welcomeBackLine ? "var(--space-5)" : "var(--space-6)" }}>
             <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 500, fontSize: "var(--text-2xl)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 var(--space-2)", lineHeight: 1.05 }}>
-              {greeting}{firstName ? "," : "."}
+              {greetingFirst}<br />{greetingSecond}{firstName ? "," : "."}
             </h1>
             {firstName && (
               <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: "var(--text-sm)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", opacity: 0.7, margin: 0, lineHeight: 1.1 }}>
