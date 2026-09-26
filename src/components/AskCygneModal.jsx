@@ -186,7 +186,7 @@ export function AskCygneModal({
           position: "fixed", inset: 0, zIndex: 300,
           background: "rgba(0,0,0,0.7)",
           display: "flex", alignItems: "center", justifyContent: "center",
-          padding: "0 24px",
+          padding: "0 var(--space-6)",
         }}
       >
         <div
@@ -194,8 +194,8 @@ export function AskCygneModal({
             width: "100%", maxWidth: 440,
             background: "var(--color-inky-moss, #2d3d2b)",
             border: "1px solid rgba(250,249,244,0.25)",
-            borderRadius: 12,
-            padding: "32px 28px 28px",
+            borderRadius: "var(--radius)",
+            padding: "var(--space-8) calc(var(--space-1) * 7) calc(var(--space-1) * 7)",
             color: "var(--color-ivory, #faf9f4)",
             textAlign: "center",
           }}
@@ -205,7 +205,7 @@ export function AskCygneModal({
             alt=""
             style={{
               height: 40, width: "auto", display: "block",
-              margin: "0 auto 22px",
+              margin: "0 auto var(--space-6)",
               filter: "brightness(0) invert(1)", opacity: 0.95,
             }}
           />
@@ -214,7 +214,7 @@ export function AskCygneModal({
             fontWeight: 700, fontSize: "var(--text-sm)", letterSpacing: "var(--tracking-display)",
             textTransform: "uppercase",
             color: "var(--color-ivory, #faf9f4)",
-            margin: "0 0 18px",
+            margin: "0 0 var(--space-5)",
             lineHeight: 1.4,
           }}>
             A note before we begin
@@ -223,7 +223,7 @@ export function AskCygneModal({
             fontFamily: "var(--font-body, 'Fungis Normal', sans-serif)",
             fontSize: "var(--text-sm)", lineHeight: 1.65,
             color: "rgba(255,255,255,0.7)",
-            margin: "0 0 26px",
+            margin: "0 0 calc(var(--space-1) * 7)",
           }}>
             Ask Cygne is an AI assistant for informational purposes only. It
             is not a substitute for professional dermatological or medical
@@ -234,7 +234,7 @@ export function AskCygneModal({
             onClick={dismissDisclaimer}
             style={{
               width: "100%",
-              padding: "14px 0",
+              padding: "var(--space-4) 0",
               background: "transparent",
               border: "1.5px solid rgba(250,249,244,0.5)",
               color: "var(--color-ivory, #faf9f4)",
@@ -270,7 +270,7 @@ export function AskCygneModal({
           width: "100%", maxWidth: 520,
           background: "var(--color-inky-moss, #2d3d2b)",
           borderRadius: 0,
-          padding: "32px 26px 40px",
+          padding: "var(--space-8) calc(var(--space-1) * 7) var(--space-10)",
           maxHeight: "88vh", overflowY: "auto",
           color: "var(--color-ivory, #faf9f4)",
           position: "relative",
@@ -283,17 +283,17 @@ export function AskCygneModal({
             position: "absolute", top: 18, right: 22,
             background: "none", border: "none", cursor: "pointer",
             color: "rgba(250,249,244,0.6)",
-            fontSize: "var(--text-lg)", lineHeight: 1, padding: 4,
+            fontSize: "var(--text-lg)", lineHeight: 1, padding: "var(--space-1)",
             WebkitTapHighlightColor: "transparent",
             WebkitAppearance: "none", appearance: "none",
           }}
         >×</button>
 
-        <div style={{ textAlign: "center", marginBottom: 26 }}>
+        <div style={{ textAlign: "center", marginBottom: "calc(var(--space-1) * 7)" }}>
           <img
             src="/cygne-logo.png"
             alt=""
-            style={{ height: 56, width: "auto", display: "block", margin: "0 auto 14px", filter: "brightness(0) invert(1)", opacity: 0.95 }}
+            style={{ height: 56, width: "auto", display: "block", margin: "0 auto var(--space-4)", filter: "brightness(0) invert(1)", opacity: 0.95 }}
           />
           <p style={{
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
@@ -308,8 +308,8 @@ export function AskCygneModal({
 
         {reached ? (
           <p style={{
-            margin: "10px 0 4px",
-            padding: "16px 8px",
+            margin: "var(--space-3) 0 var(--space-1)",
+            padding: "var(--space-4) var(--space-2)",
             textAlign: "center",
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
             fontWeight: 700, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)",
@@ -328,7 +328,7 @@ export function AskCygneModal({
               placeholder="What would you like to ask?"
               style={{
                 width: "100%", boxSizing: "border-box",
-                padding: "14px 16px",
+                padding: "var(--space-4) var(--space-4)",
                 background: "rgba(255,255,255,0.06)",
                 border: "1px solid rgba(250,249,244,0.2)",
                 borderRadius: 0,
@@ -347,8 +347,8 @@ export function AskCygneModal({
               onClick={() => ask(question)}
               disabled={loading || !question.trim()}
               style={{
-                marginTop: 14, width: "100%",
-                padding: "14px 0",
+                marginTop: "var(--space-4)", width: "100%",
+                padding: "var(--space-4) 0",
                 background: "transparent",
                 border: "1.5px solid rgba(250,249,244,0.5)",
                 color: "var(--color-ivory, #faf9f4)",
@@ -369,7 +369,7 @@ export function AskCygneModal({
 
         {error && (
           <p style={{
-            marginTop: 18,
+            marginTop: "var(--space-5)",
             fontFamily: "var(--font-body, 'Fungis Normal', sans-serif)",
             fontSize: "var(--text-xs)", lineHeight: 1.55,
             color: "#8b7355",
@@ -380,7 +380,7 @@ export function AskCygneModal({
 
         {answer && (
           <div style={{
-            marginTop: 24, padding: "20px 20px",
+            marginTop: "var(--space-6)", padding: "var(--space-5) var(--space-5)",
             background: "rgba(255,255,255,0.06)",
             borderTop: "1px solid rgba(250,249,244,0.18)",
             borderRadius: 0,

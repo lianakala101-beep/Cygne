@@ -80,14 +80,14 @@ function WeekendNudgeCard({ products, activeMap, lineMode = false }) {
   // typography, brightened ivory body copy.
   if (lineMode) {
     return (
-      <div style={{ borderTop: "1px solid rgba(250,249,244,0.25)", borderBottom: "1px solid rgba(250,249,244,0.25)", marginTop: -1, padding: "32px 0" }}>
+      <div style={{ borderTop: "1px solid rgba(250,249,244,0.25)", borderBottom: "1px solid rgba(250,249,244,0.25)", marginTop: -1, padding: "var(--space-8) 0" }}>
         <button
           type="button"
           onClick={() => setOpen(o => !o)}
           aria-expanded={open}
           style={{
             display: "flex", width: "100%", textAlign: "center",
-            flexDirection: "column", gap: 14,
+            flexDirection: "column", gap: "var(--space-4)",
             background: "none", border: "none", padding: 0, cursor: "pointer",
             fontFamily: "var(--font-body)",
             WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
@@ -114,12 +114,12 @@ function WeekendNudgeCard({ products, activeMap, lineMode = false }) {
           }}><Icon name="chevron" size={11} /></span>
         </button>
         {open && lines.length > 0 && (
-          <div style={{ marginTop: 20, paddingTop: 20, borderTop: "1px solid rgba(250,249,244,0.18)", textAlign: "center" }}>
+          <div style={{ marginTop: "var(--space-5)", paddingTop: "var(--space-5)", borderTop: "1px solid rgba(250,249,244,0.18)", textAlign: "center" }}>
             {lines.map((s, i) => (
               <p key={i} style={{
                 fontFamily: "var(--font-body)", fontSize: "var(--text-xs)",
                 color: "#F4F3EF",
-                margin: i === lines.length - 1 ? 0 : "0 0 8px",
+                margin: i === lines.length - 1 ? 0 : "0 0 var(--space-2)",
                 lineHeight: 1.65,
               }}>{s}</p>
             ))}
@@ -133,9 +133,9 @@ function WeekendNudgeCard({ products, activeMap, lineMode = false }) {
     <div style={{
       background: "var(--color-inky-moss, #2d3d2b)",
       border: "none",
-      borderRadius: 8,
-      padding: "14px 16px",
-      marginBottom: 20,
+      borderRadius: "var(--radius)",
+      padding: "var(--space-4) var(--space-4)",
+      marginBottom: "var(--space-5)",
       position: "relative",
       overflow: "hidden",
     }}>
@@ -145,7 +145,7 @@ function WeekendNudgeCard({ products, activeMap, lineMode = false }) {
         aria-expanded={open}
         style={{
           display: "flex", width: "100%", textAlign: "left",
-          alignItems: "center", gap: 12,
+          alignItems: "center", gap: "var(--space-3)",
           background: "none", border: "none", padding: 0,
           cursor: "pointer",
           fontFamily: "var(--font-body)",
@@ -157,7 +157,7 @@ function WeekendNudgeCard({ products, activeMap, lineMode = false }) {
           letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
           color: "var(--color-ivory, #faf9f4)",
           background: "rgba(250,249,244,0.15)",
-          padding: "3px 8px", borderRadius: 2,
+          padding: "var(--space-1) var(--space-2)", borderRadius: "var(--radius-pill)",
           flexShrink: 0, whiteSpace: "nowrap",
         }}>{cfg.label}</span>
         <span style={{
@@ -176,12 +176,12 @@ function WeekendNudgeCard({ products, activeMap, lineMode = false }) {
         }}><Icon name="chevron" size={11} /></span>
       </button>
       {open && lines.length > 0 && (
-        <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid rgba(250,249,244,0.18)" }}>
+        <div style={{ marginTop: "var(--space-3)", paddingTop: "var(--space-3)", borderTop: "1px solid rgba(250,249,244,0.18)" }}>
           {lines.map((s, i) => (
             <p key={i} style={{
               fontFamily: "var(--font-body)", fontSize: "var(--text-xs)",
               color: "var(--color-ivory, #faf9f4)",
-              margin: i === lines.length - 1 ? 0 : "0 0 8px",
+              margin: i === lines.length - 1 ? 0 : "0 0 var(--space-2)",
               lineHeight: 1.65,
             }}>{s}</p>
           ))}

@@ -127,9 +127,9 @@ function ReflectionPromptCard({ zone, onOpen, onDismiss }) {
       position: "relative",
       background: "var(--color-inky-moss, #2d3d2b)",
       border: "1px solid var(--color-ivory, #faf9f4)",
-      borderRadius: 8,
-      padding: "20px 22px",
-      marginBottom: 24,
+      borderRadius: "var(--radius)",
+      padding: "var(--space-5) var(--space-6)",
+      marginBottom: "var(--space-6)",
       color: "var(--color-ivory, #faf9f4)",
     }}>
       <button
@@ -138,7 +138,7 @@ function ReflectionPromptCard({ zone, onOpen, onDismiss }) {
         style={{
           position: "absolute", top: 12, right: 12,
           background: "none", border: "none", cursor: "pointer",
-          color: "rgba(250,249,244,0.6)", padding: 4, display: "inline-flex",
+          color: "rgba(250,249,244,0.6)", padding: "var(--space-1)", display: "inline-flex",
           WebkitTapHighlightColor: "transparent",
         }}
       >
@@ -146,8 +146,8 @@ function ReflectionPromptCard({ zone, onOpen, onDismiss }) {
       </button>
 
       <p style={{
-        margin: "0 0 16px",
-        paddingRight: 18,
+        margin: "0 0 var(--space-4)",
+        paddingRight: "var(--space-5)",
         fontFamily: "var(--font-body, 'Fungis Normal', sans-serif)",
         fontWeight: 400,
         fontSize: "var(--text-xs)",
@@ -164,14 +164,14 @@ function ReflectionPromptCard({ zone, onOpen, onDismiss }) {
         style={{
           background: "transparent",
           border: "1px solid var(--color-ivory, #faf9f4)",
-          borderRadius: 6,
+          borderRadius: "var(--radius)",
           color: "var(--color-ivory, #faf9f4)",
           fontFamily: "var(--font-body, 'Fungis Normal', sans-serif)",
           fontWeight: 400,
           fontSize: "var(--text-xs)",
           letterSpacing: "var(--tracking-display)",
           textTransform: "uppercase",
-          padding: "11px 20px",
+          padding: "var(--space-3) var(--space-5)",
           cursor: "pointer",
           WebkitTapHighlightColor: "transparent",
         }}
@@ -1976,7 +1976,7 @@ export default function App() {
         background: "rgba(45,61,43,0.94)",
         backdropFilter: "blur(16px)",
         borderBottom: "1px solid rgba(250,249,244,0.12)",
-        padding: "0 22px",
+        padding: "0 var(--space-6)",
       }}>
         <div style={{ position: "relative", maxWidth: 600, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "flex-end", height: 76 }}>
           <img
@@ -1995,7 +1995,7 @@ export default function App() {
               opacity: 0.95,
             }}
           />
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
             <button
               onClick={() => setProfileOpen(true)}
               aria-label="Open profile"
@@ -2023,7 +2023,7 @@ export default function App() {
       </div>
 
       {/* Content */}
-      <div style={{ maxWidth: 600, margin: "0 auto", padding: "32px 22px 0", animation: "fadeUp 0.3s ease" }} key={tab}>
+      <div style={{ maxWidth: 600, margin: "0 auto", padding: "var(--space-8) var(--space-6) 0", animation: "fadeUp 0.3s ease" }} key={tab}>
         {tab === "dashboard" && (
           <>
             {showReflectionPrompt && reflectionPromptZone && (
@@ -2123,7 +2123,7 @@ export default function App() {
         <div style={{ maxWidth: 600, margin: "0 auto", display: "flex" }}>
           {tabs.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
-              style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", padding: "12px 0 18px", background: "none", border: "none", cursor: "pointer", color: tab === t.id ? "var(--sage)" : "var(--clay)", transition: "color 0.2s", gap: 5, position: "relative", opacity: tab === t.id ? 1 : 0.65 }}>
+              style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", padding: "var(--space-3) 0 var(--space-5)", background: "none", border: "none", cursor: "pointer", color: tab === t.id ? "var(--sage)" : "var(--clay)", transition: "color 0.2s", gap: "var(--space-1)", position: "relative", opacity: tab === t.id ? 1 : 0.65 }}>
               <Icon name={t.icon} size={tab === t.id ? 20 : 18} />
               <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", fontWeight: 400 }}>{t.label}</span>
               {tab === t.id && <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 18, height: 1, background: "var(--sage)" }} />}

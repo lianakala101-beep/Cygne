@@ -50,10 +50,9 @@ export function RampCheckinModal({ products, deepLink, onSave, onDone, onClose }
         style={{
           width: "100%",
           maxWidth: 600,
-          padding: "20px 18px 32px",
+          padding: "var(--space-5) var(--space-5) var(--space-8)",
           background: "var(--color-ivory-shadow, #1c1c1a)",
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
+          borderRadius: "var(--radius-sheet)",
         }}
       >
         <RampCheckinCard

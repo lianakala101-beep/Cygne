@@ -234,7 +234,7 @@ export function PaywallScreen({ trialExpired, onUnlock, onSignOut }) {
         background: INKY_MOSS,
         display: "flex", flexDirection: "column",
         overflow: "auto",
-        padding: "56px 24px 32px",
+        padding: "calc(var(--space-1) * 14) var(--space-6) var(--space-8)",
         color: IVORY,
       }}
     >
@@ -244,7 +244,7 @@ export function PaywallScreen({ trialExpired, onUnlock, onSignOut }) {
         alt="Cygne"
         style={{
           height: 40, width: "auto", display: "block",
-          margin: "0 auto 32px",
+          margin: "0 auto var(--space-8)",
           filter: "brightness(0) invert(1)", opacity: 0.95,
         }}
       />
@@ -256,7 +256,7 @@ export function PaywallScreen({ trialExpired, onUnlock, onSignOut }) {
           fontWeight: 700, fontSize: "var(--text-lg)", letterSpacing: "var(--tracking-display)",
           textTransform: "uppercase",
           color: IVORY,
-          margin: "0 0 14px",
+          margin: "0 0 var(--space-4)",
           textAlign: "center",
           lineHeight: 1.3,
         }}
@@ -268,7 +268,7 @@ export function PaywallScreen({ trialExpired, onUnlock, onSignOut }) {
           fontFamily: "var(--font-body, 'Fungis Normal', sans-serif)",
           fontSize: "var(--text-sm)", lineHeight: 1.65,
           color: MUTED,
-          margin: "0 auto 32px",
+          margin: "0 auto var(--space-8)",
           textAlign: "center",
           maxWidth: 340,
         }}
@@ -282,14 +282,14 @@ export function PaywallScreen({ trialExpired, onUnlock, onSignOut }) {
           textAlign: "center",
           fontFamily: "var(--font-body, 'Fungis Normal', sans-serif)",
           fontSize: "var(--text-xs)", color: FAINT, letterSpacing: "var(--tracking-label)",
-          textTransform: "uppercase", margin: "40px 0",
+          textTransform: "uppercase", margin: "var(--space-10) 0",
         }}>
           Loading options…
         </p>
       ) : orderedPackages.length === 0 ? (
         <p style={{
           fontFamily: "var(--font-body, 'Fungis Normal', sans-serif)",
-          fontSize: "var(--text-sm)", color: MUTED, textAlign: "center", margin: "40px auto",
+          fontSize: "var(--text-sm)", color: MUTED, textAlign: "center", margin: "var(--space-10) auto",
           maxWidth: 320, lineHeight: 1.55,
         }}>
           {error || "Subscription options aren't available right now."}
@@ -297,7 +297,7 @@ export function PaywallScreen({ trialExpired, onUnlock, onSignOut }) {
       ) : (
         <>
           {/* Pricing cards */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 440, width: "100%", margin: "0 auto 20px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)", maxWidth: 440, width: "100%", margin: "0 auto var(--space-5)" }}>
             {orderedPackages.map(pkg => {
               const period = formatPeriod(pkg);
               const isSelected = selectedId === pkg.identifier;
@@ -310,10 +310,10 @@ export function PaywallScreen({ trialExpired, onUnlock, onSignOut }) {
                   style={{
                     position: "relative",
                     display: "flex", justifyContent: "space-between", alignItems: "center",
-                    padding: "18px 20px",
+                    padding: "var(--space-5) var(--space-5)",
                     background: isSelected ? CARD_BG_SELECTED : CARD_BG,
                     border: `1.5px solid ${isSelected ? BORDER_SELECTED : BORDER_DIM}`,
-                    borderRadius: 10,
+                    borderRadius: "var(--radius)",
                     color: IVORY,
                     cursor: busy ? "default" : "pointer",
                     textAlign: "left",
@@ -328,7 +328,7 @@ export function PaywallScreen({ trialExpired, onUnlock, onSignOut }) {
                       fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
                       fontWeight: 700, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)",
                       textTransform: "uppercase", color: IVORY,
-                      margin: "0 0 4px",
+                      margin: "0 0 var(--space-1)",
                     }}>
                       {periodAdjective(period)}
                     </p>
@@ -346,7 +346,7 @@ export function PaywallScreen({ trialExpired, onUnlock, onSignOut }) {
                       textTransform: "uppercase",
                       color: INKY_MOSS,
                       background: IVORY,
-                      padding: "5px 10px", borderRadius: 4,
+                      padding: "var(--space-1) var(--space-3)", borderRadius: "var(--radius-pill)",
                     }}>
                       Save {savingsPct}%
                     </span>
@@ -363,12 +363,12 @@ export function PaywallScreen({ trialExpired, onUnlock, onSignOut }) {
             style={{
               display: "block",
               width: "100%", maxWidth: 440,
-              margin: "0 auto 14px",
-              padding: "16px 0",
+              margin: "0 auto var(--space-4)",
+              padding: "var(--space-4) 0",
               background: "transparent",
               border: `1.5px solid ${IVORY}`,
               color: IVORY,
-              borderRadius: 10,
+              borderRadius: "var(--radius)",
               fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
               fontWeight: 700, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)",
               textTransform: "uppercase",
@@ -391,9 +391,9 @@ export function PaywallScreen({ trialExpired, onUnlock, onSignOut }) {
               color: MUTED,
               fontFamily: "var(--font-body, 'Fungis Normal', sans-serif)",
               fontSize: "var(--text-xs)", letterSpacing: "0.06em",
-              margin: "0 auto 20px",
+              margin: "0 auto var(--space-5)",
               cursor: busy ? "default" : "pointer",
-              padding: 8,
+              padding: "var(--space-2)",
               textDecoration: "underline",
               textDecorationColor: FAINT,
               textUnderlineOffset: 4,
@@ -410,18 +410,18 @@ export function PaywallScreen({ trialExpired, onUnlock, onSignOut }) {
         <p style={{
           fontFamily: "var(--font-body, 'Fungis Normal', sans-serif)",
           fontSize: "var(--text-xs)", color: "#e8b4a0",
-          textAlign: "center", margin: "0 auto 20px", maxWidth: 340, lineHeight: 1.55,
+          textAlign: "center", margin: "0 auto var(--space-5)", maxWidth: 340, lineHeight: 1.55,
         }}>
           {error}
         </p>
       )}
 
       {/* Legal footer */}
-      <div style={{ marginTop: "auto", paddingTop: 24, textAlign: "center", maxWidth: 380, marginLeft: "auto", marginRight: "auto" }}>
+      <div style={{ marginTop: "auto", paddingTop: "var(--space-6)", textAlign: "center", maxWidth: 380, marginLeft: "auto", marginRight: "auto" }}>
         <p style={{
           fontFamily: "var(--font-body, 'Fungis Normal', sans-serif)",
           fontSize: "var(--text-xs)", color: FAINT, lineHeight: 1.6,
-          margin: "0 0 8px",
+          margin: "0 0 var(--space-2)",
         }}>
           Cancel anytime. Subscription auto-renews unless cancelled at least 24 hours before the end of the current period.
         </p>
@@ -447,9 +447,9 @@ export function PaywallScreen({ trialExpired, onUnlock, onSignOut }) {
               color: FAINT,
               fontFamily: "var(--font-body, 'Fungis Normal', sans-serif)",
               fontSize: "var(--text-xs)", letterSpacing: "0.06em",
-              marginTop: 14,
+              marginTop: "var(--space-4)",
               cursor: busy ? "default" : "pointer",
-              padding: 6,
+              padding: "var(--space-2)",
               textDecoration: "underline",
               WebkitTapHighlightColor: "transparent",
             }}

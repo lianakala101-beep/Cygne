@@ -7,9 +7,9 @@ export function AskCygneButton({ onClick }) {
     <button
       onClick={onClick}
       style={{
-        display: "flex", width: "100%", alignItems: "center", justifyContent: "center", gap: 8,
-        padding: "14px 16px", background: "transparent",
-        border: "1.5px solid rgba(250,249,244,0.5)", borderRadius: 6,
+        display: "flex", width: "100%", alignItems: "center", justifyContent: "center", gap: "var(--space-2)",
+        padding: "var(--space-4) var(--space-4)", background: "transparent",
+        border: "1.5px solid rgba(250,249,244,0.5)", borderRadius: "var(--radius)",
         cursor: "pointer", fontFamily: "var(--font-display)", fontWeight: 700,
         fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
         color: "var(--color-ivory, #faf9f4)", transition: "all 0.2s",

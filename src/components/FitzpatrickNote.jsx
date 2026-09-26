@@ -78,13 +78,13 @@ export function FitzpatrickNote({ variant = "dark" }) {
 
   return (
     <div style={{
-      marginTop: 20,
-      padding: "14px 16px 14px 18px",
+      marginTop: "var(--space-5)",
+      padding: "var(--space-4) var(--space-4) var(--space-4) var(--space-5)",
       background: bg,
       border,
-      borderRadius: 8,
+      borderRadius: "var(--radius)",
       display: "flex",
-      gap: 12,
+      gap: "var(--space-3)",
       alignItems: "flex-start",
     }}>
       <p style={{

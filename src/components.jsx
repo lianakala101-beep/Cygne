@@ -50,12 +50,12 @@ const Icon = ({ name, size = 20 }) => {
 };
 
 // --- SHARED -------------------------------------------------------------------
-const labelSt = { display: "block", fontFamily: "var(--heading)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)", marginBottom: 8 };
-const inputSt = { width: "100%", padding: "12px 14px", background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 0, color: "var(--parchment)", fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", outline: "none", boxSizing: "border-box" };
+const labelSt = { display: "block", fontFamily: "var(--heading)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)", marginBottom: "var(--space-2)" };
+const inputSt = { width: "100%", padding: "var(--space-3) var(--space-4)", background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 0, color: "var(--parchment)", fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", outline: "none", boxSizing: "border-box" };
 
 function Pill({ children, active, onClick }) {
   return (
-    <button onClick={onClick} style={{ flexShrink: 0, padding: "6px 16px", borderRadius: 0, border: `1px solid ${active ? "rgba(160,160,160,0.7)" : "var(--border)"}`, background: active ? "var(--cta)" : "transparent", color: active ? "#F5F0E8" : "var(--clay)", fontFamily: "var(--heading)", fontSize: "var(--text-xs)", cursor: "pointer", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", whiteSpace: "nowrap", transition: "all 0.18s" }}>
+    <button onClick={onClick} style={{ flexShrink: 0, padding: "var(--space-2) var(--space-4)", borderRadius: 0, border: `1px solid ${active ? "rgba(160,160,160,0.7)" : "var(--border)"}`, background: active ? "var(--cta)" : "transparent", color: active ? "#F5F0E8" : "var(--clay)", fontFamily: "var(--heading)", fontSize: "var(--text-xs)", cursor: "pointer", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", whiteSpace: "nowrap", transition: "all 0.18s" }}>
       {children}
     </button>
   );
@@ -63,11 +63,11 @@ function Pill({ children, active, onClick }) {
 
 function Section({ title, icon, children }) {
   return (
-    <div style={{ marginBottom: 32 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+    <div style={{ marginBottom: "var(--space-8)" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", marginBottom: "var(--space-4)" }}>
         {icon && <span style={{ color: "var(--clay)", opacity: 0.7 }}><Icon name={icon} size={13} /></span>}
         <span style={{ fontFamily: "var(--heading)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)" }}>{title}</span>
-        <div style={{ flex: 1, height: 1, background: "var(--border)", marginLeft: 8 }} />
+        <div style={{ flex: 1, height: 1, background: "var(--border)", marginLeft: "var(--space-2)" }} />
       </div>
       {children}
     </div>
@@ -116,21 +116,21 @@ function FlagCard({ f }) {
       aria-expanded={hasDetail ? open : undefined}
       style={{
         display: "block", width: "100%", textAlign: "left",
-        padding: "12px 14px",
+        padding: "var(--space-3) var(--space-4)",
         background: "var(--surface)",
         border: "1px solid var(--border)",
-        borderRadius: 8,
-        marginBottom: 8,
+        borderRadius: "var(--radius)",
+        marginBottom: "var(--space-2)",
         cursor: hasDetail ? "pointer" : "default",
         WebkitAppearance: "none", appearance: "none",
         WebkitTapHighlightColor: "transparent",
       }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
         <span style={{
           fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-xs)",
           letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
           color: tone.color, background: tone.bg,
-          padding: "3px 8px", borderRadius: 2,
+          padding: "var(--space-1) var(--space-2)", borderRadius: "var(--radius-pill)",
           flexShrink: 0, whiteSpace: "nowrap",
         }}>{label}</span>
         <span style={{
@@ -149,7 +149,7 @@ function FlagCard({ f }) {
         )}
       </div>
       {open && hasDetail && (
-        <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid rgba(45,61,43,0.08)" }}>
+        <div style={{ marginTop: "var(--space-3)", paddingTop: "var(--space-3)", borderTop: "1px solid rgba(45,61,43,0.08)" }}>
           {f.detail && (
             <p style={{
               fontFamily: "var(--font-body)", fontSize: "var(--text-xs)",
@@ -159,13 +159,13 @@ function FlagCard({ f }) {
             }}>{f.detail}</p>
           )}
           {uniqueProducts.length > 0 && (
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: f.detail ? 10 : 0 }}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-1)", marginTop: f.detail ? "var(--space-3)" : 0 }}>
               {uniqueProducts.map((p, i) => {
                 const name = p?.name || (typeof p === "string" ? p : "");
                 if (!name) return null;
                 return (
                   <span key={p?.id || name + i} style={{
-                    padding: "3px 9px", borderRadius: 20,
+                    padding: "var(--space-1) var(--space-2)", borderRadius: "var(--radius-pill)",
                     background: "var(--color-ivory-shadow, #f0ebe0)",
                     border: "1px solid rgba(45,61,43,0.14)",
                     fontFamily: "var(--font-body)", fontSize: "var(--text-xs)",
@@ -245,22 +245,22 @@ class ErrorBoundary extends Component {
         background: "var(--color-inky-moss, #2d3d2b)",
         color: "var(--color-ivory, #faf9f4)",
         display: "flex", alignItems: "center", justifyContent: "center",
-        padding: "60px 28px", textAlign: "center",
+        padding: "calc(var(--space-1) * 15) calc(var(--space-1) * 7)", textAlign: "center",
       }}>
         <div style={{ maxWidth: 360 }}>
           <p style={{
             fontFamily: "var(--font-display)",
             fontSize: "var(--text-sm)", fontWeight: 700, letterSpacing: "var(--tracking-display)",
-            textTransform: "uppercase", margin: "0 0 14px", opacity: 0.85,
+            textTransform: "uppercase", margin: "0 0 var(--space-4)", opacity: 0.85,
           }}>Something interrupted us</p>
           <p style={{
             fontFamily: "var(--font-body)",
-            fontSize: "var(--text-sm)", lineHeight: 1.7, margin: "0 0 24px",
+            fontSize: "var(--text-sm)", lineHeight: 1.7, margin: "0 0 var(--space-6)",
             color: "rgba(250,249,244,0.75)",
           }}>This page hit an error. Try refreshing the app — your data is safe.</p>
           <button onClick={() => window.location.reload()}
             style={{
-              padding: "12px 22px",
+              padding: "var(--space-3) var(--space-6)",
               background: "transparent",
               color: "var(--color-ivory, #faf9f4)",
               border: "1px solid rgba(250,249,244,0.5)",

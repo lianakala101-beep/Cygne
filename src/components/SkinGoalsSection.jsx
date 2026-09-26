@@ -65,7 +65,7 @@ export function SkinGoalsSection({
   };
 
   return (
-    <div style={{ margin: "0 auto 40px", textAlign: "left", maxWidth: 420 }}>
+    <div style={{ margin: "0 auto var(--space-10)", textAlign: "left", maxWidth: 420 }}>
       {/* Section header — mirrors the recap's uppercase-tracked
           treatments so this reads as another editorial beat, not a
           UI panel dropped in. */}
@@ -73,7 +73,7 @@ export function SkinGoalsSection({
         fontFamily: "var(--font-display)",
         fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)",
         textTransform: "uppercase", color: IVORY,
-        margin: "0 0 6px", textAlign: "center", opacity: 0.85,
+        margin: "0 0 var(--space-2)", textAlign: "center", opacity: 0.85,
       }}>
         Your Skin Goals
       </p>
@@ -81,7 +81,7 @@ export function SkinGoalsSection({
         fontFamily: "var(--font-body)",
         fontSize: "var(--text-sm)", fontWeight: 400, lineHeight: 1.6,
         color: "rgba(255,255,255,0.7)",
-        margin: "0 0 22px", textAlign: "center",
+        margin: "0 0 var(--space-6)", textAlign: "center",
       }}>
         Do you feel your skin goals have been met this month?
       </p>
@@ -89,16 +89,16 @@ export function SkinGoalsSection({
       {/* One row per active goal — label on the left, met + remove on
           the right. Small × doubles as the "deprioritize" affordance
           the spec calls out. */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
         {activeGoals.map((g) => (
           <div
             key={g.id}
             style={{
               display: "flex", alignItems: "center", justifyContent: "space-between",
-              padding: "12px 14px",
+              padding: "var(--space-3) var(--space-4)",
               background: "rgba(250,249,244,0.06)",
               border: "1px solid rgba(250,249,244,0.18)",
-              borderRadius: 10,
+              borderRadius: "var(--radius)",
             }}
           >
             <span style={{
@@ -107,15 +107,15 @@ export function SkinGoalsSection({
             }}>
               {labelFor(g.goal)}
             </span>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", flexShrink: 0 }}>
               <button
                 onClick={() => withBusy(g.id, () => onMarkMet?.(g.id))}
                 disabled={busy != null}
                 style={{
-                  padding: "6px 12px",
+                  padding: "var(--space-2) var(--space-3)",
                   background: "transparent",
                   border: "1px solid rgba(250,249,244,0.6)",
-                  borderRadius: 999,
+                  borderRadius: "var(--radius-pill)",
                   fontFamily: "var(--font-body)",
                   fontSize: "var(--text-xs)", fontWeight: 400, letterSpacing: "var(--tracking-label)",
                   textTransform: "uppercase", color: IVORY,
@@ -136,7 +136,7 @@ export function SkinGoalsSection({
                   background: "none", border: "none",
                   color: "rgba(255,255,255,0.45)",
                   cursor: busy != null ? "default" : "pointer",
-                  fontSize: "var(--text-lg)", lineHeight: 1, padding: 4,
+                  fontSize: "var(--text-lg)", lineHeight: 1, padding: "var(--space-1)",
                 }}
               >×</button>
             </div>
@@ -148,7 +148,7 @@ export function SkinGoalsSection({
           remaining catalog as tappable chips. Hidden when the user
           already has every catalog option active. */}
       {remainingCatalog.length > 0 && (
-        <div style={{ marginTop: 18, textAlign: "center" }}>
+        <div style={{ marginTop: "var(--space-5)", textAlign: "center" }}>
           {!showAdder ? (
             <button
               onClick={() => setShowAdder(true)}
@@ -157,13 +157,13 @@ export function SkinGoalsSection({
                 fontFamily: "var(--font-body)",
                 fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase",
                 color: "rgba(255,255,255,0.55)",
-                cursor: "pointer", padding: "4px 8px",
+                cursor: "pointer", padding: "var(--space-1) var(--space-2)",
               }}
             >
               + Add another
             </button>
           ) : (
-            <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 8 }}>
+            <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "var(--space-2)" }}>
               {remainingCatalog.map((opt) => {
                 const key = `add:${opt.value}`;
                 const active = busy === key;
@@ -176,10 +176,10 @@ export function SkinGoalsSection({
                     })}
                     disabled={busy != null}
                     style={{
-                      padding: "6px 12px",
+                      padding: "var(--space-2) var(--space-3)",
                       background: active ? "rgba(250,249,244,0.18)" : "rgba(250,249,244,0.06)",
                       border: "1px solid rgba(250,249,244,0.24)",
-                      borderRadius: 999,
+                      borderRadius: "var(--radius-pill)",
                       fontFamily: "var(--font-body)",
                       fontSize: "var(--text-xs)", color: IVORY,
                       cursor: busy != null ? "default" : "pointer",
@@ -198,7 +198,7 @@ export function SkinGoalsSection({
                   color: "rgba(255,255,255,0.4)",
                   fontFamily: "var(--font-body)", fontSize: "var(--text-xs)",
                   letterSpacing: "var(--tracking-label)", textTransform: "uppercase",
-                  cursor: busy != null ? "default" : "pointer", padding: "6px 8px",
+                  cursor: busy != null ? "default" : "pointer", padding: "var(--space-2) var(--space-2)",
                 }}
               >Cancel</button>
             </div>

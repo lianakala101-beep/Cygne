@@ -75,7 +75,7 @@ function AuthScreen({ onAuth, initialNotice = null }) {
       flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
-      padding: "0 28px",
+      padding: "0 calc(var(--space-1) * 7)",
       position: "relative",
     }}>
 
@@ -83,12 +83,12 @@ function AuthScreen({ onAuth, initialNotice = null }) {
       <div style={{
         width: "100%",
         maxWidth: 360,
-        padding: "32px 28px 28px",
+        padding: "var(--space-8) calc(var(--space-1) * 7) calc(var(--space-1) * 7)",
         background: "rgba(250, 249, 244, 0.15)",
         backdropFilter: "blur(16px)",
         WebkitBackdropFilter: "blur(16px)",
         border: "1px solid rgba(250, 249, 244, 0.25)",
-        borderRadius: 8,
+        borderRadius: "var(--radius)",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -101,14 +101,14 @@ function AuthScreen({ onAuth, initialNotice = null }) {
           letterSpacing: "var(--tracking-display)",
           textTransform: "uppercase",
           color: "var(--color-ivory, #faf9f4)",
-          margin: "0 0 26px",
+          margin: "0 0 calc(var(--space-1) * 7)",
           textAlign: "center",
         }}>
           {mode === "login" ? "Welcome Back" : "Create Account"}
         </p>
 
         {/* Inputs */}
-        <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 12, marginBottom: 16 }}>
+        <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: "var(--space-3)", marginBottom: "var(--space-4)" }}>
           <input
             type="email"
             value={email}
@@ -134,7 +134,7 @@ function AuthScreen({ onAuth, initialNotice = null }) {
         {mode === "login" && (
           <div
             onClick={() => setRememberMe(r => !r)}
-            style={{ display: "flex", alignItems: "center", gap: 9, width: "100%", marginBottom: 18, cursor: "pointer", userSelect: "none" }}>
+            style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", width: "100%", marginBottom: "var(--space-5)", cursor: "pointer", userSelect: "none" }}>
             <div style={{
               width: 14, height: 14, flexShrink: 0,
               border: "1px solid rgba(250,249,244,0.6)",
@@ -162,7 +162,7 @@ function AuthScreen({ onAuth, initialNotice = null }) {
             fontSize: "var(--text-xs)",
             color: "var(--color-ivory, #faf9f4)",
             opacity: 0.85,
-            margin: "0 0 14px",
+            margin: "0 0 var(--space-4)",
             lineHeight: 1.5,
           }}>{error}</p>
         )}
@@ -174,7 +174,7 @@ function AuthScreen({ onAuth, initialNotice = null }) {
           disabled={loading}
           style={{
             width: "100%",
-            padding: "14px 24px",
+            padding: "var(--space-4) var(--space-6)",
             fontFamily: "var(--font-display)",
             fontSize: "var(--text-xs)",
             fontWeight: 700,
@@ -183,7 +183,7 @@ function AuthScreen({ onAuth, initialNotice = null }) {
             color: "var(--color-ivory, #faf9f4)",
             background: "transparent",
             border: "1.5px solid var(--color-ivory, #faf9f4)",
-            borderRadius: 6,
+            borderRadius: "var(--radius)",
             cursor: loading ? "default" : "pointer",
             opacity: loading ? 0.5 : 1,
             transition: "opacity 0.2s, background 0.2s",
@@ -198,14 +198,14 @@ function AuthScreen({ onAuth, initialNotice = null }) {
         <button
           onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(null); }}
           style={{
-            marginTop: 18,
+            marginTop: "var(--space-5)",
             background: "none",
             border: "none",
             fontFamily: "var(--font-body)",
             fontSize: "var(--text-xs)",
             color: "var(--color-ivory, #faf9f4)",
             cursor: "pointer",
-            padding: "8px 0",
+            padding: "var(--space-2) 0",
             letterSpacing: "0.04em",
             opacity: 0.85,
           }}>
@@ -225,14 +225,14 @@ function AuthScreen({ onAuth, initialNotice = null }) {
               setError(null);
             }}
             style={{
-              marginTop: 10,
+              marginTop: "var(--space-3)",
               background: "none",
               border: "none",
               fontFamily: "var(--font-body)",
               fontSize: "var(--text-xs)",
               color: "var(--color-ivory, #faf9f4)",
               cursor: "pointer",
-              padding: "4px 0",
+              padding: "var(--space-1) 0",
               letterSpacing: "0.04em",
               textDecoration: "underline",
               opacity: 0.8,
@@ -242,7 +242,7 @@ function AuthScreen({ onAuth, initialNotice = null }) {
         )}
 
         {resetSent && (
-          <p style={{ fontSize: "var(--text-xs)", color: "var(--color-ivory, #faf9f4)", marginTop: 12, textAlign: "center", letterSpacing: "0.02em", opacity: 0.9 }}>
+          <p style={{ fontSize: "var(--text-xs)", color: "var(--color-ivory, #faf9f4)", marginTop: "var(--space-3)", textAlign: "center", letterSpacing: "0.02em", opacity: 0.9 }}>
             Reset link sent — check your email.
           </p>
         )}
@@ -259,10 +259,10 @@ function AuthScreen({ onAuth, initialNotice = null }) {
 
 const inputStyle = {
   width: "100%",
-  padding: "14px 14px",
+  padding: "var(--space-4) var(--space-4)",
   background: "rgba(250,249,244,0.06)",
   border: "1px solid rgba(250,249,244,0.25)",
-  borderRadius: 6,
+  borderRadius: "var(--radius)",
   fontFamily: "var(--font-body)",
   fontSize: "var(--text-sm)",
   color: "var(--color-ivory, #faf9f4)",

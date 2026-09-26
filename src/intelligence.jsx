@@ -332,42 +332,42 @@ function RecommendationCard({ rec, onAdd, onDismiss }) {
 
   return (
     <div onClick={() => setExpanded(e => !e)}
-      style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: 14, padding: "15px 17px", marginBottom: 8, cursor: "pointer", transition: "border-color 0.2s" }}
+      style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: "var(--radius)", padding: "var(--space-4) var(--space-4)", marginBottom: "var(--space-2)", cursor: "pointer", transition: "border-color 0.2s" }}
       onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(122,144,112,0.4)"}
       onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}>
-      <div style={{ display: "flex", alignItems: "flex-start", gap: 11 }}>
+      <div style={{ display: "flex", alignItems: "flex-start", gap: "var(--space-3)" }}>
         <div style={{ width: 26, height: 26, borderRadius: "50%", background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.18)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "#7a9070", marginTop: 1 }}>
           <Icon name={typeIcon[rec.type]} size={12} />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 4, flexWrap: "wrap" }}>
-            <span style={{ fontSize: "var(--text-xs)", fontFamily: "var(--font-body), sans-serif", fontWeight: 400, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: rec.tagColor, background: `${rec.tagColor}18`, padding: "2px 7px", borderRadius: 20 }}>{rec.tag}</span>
+          <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", marginBottom: "var(--space-1)", flexWrap: "wrap" }}>
+            <span style={{ fontSize: "var(--text-xs)", fontFamily: "var(--font-body), sans-serif", fontWeight: 400, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: rec.tagColor, background: `${rec.tagColor}18`, padding: "2px var(--space-2)", borderRadius: "var(--radius-pill)" }}>{rec.tag}</span>
             <span style={{ fontSize: "var(--text-xs)", fontFamily: "var(--font-body), sans-serif", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--clay)", opacity: 0.55 }}>{typeLabelMap[rec.type]}</span>
           </div>
           <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-sm)", color: "var(--parchment)", margin: 0, fontWeight: 400, lineHeight: 1.35 }}>{rec.title}</p>
         </div>
-        <span style={{ color: "var(--clay)", opacity: 0.35, flexShrink: 0, marginTop: 5, display: "inline-block", transform: expanded ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>
+        <span style={{ color: "var(--clay)", opacity: 0.35, flexShrink: 0, marginTop: "var(--space-1)", display: "inline-block", transform: expanded ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>
           <Icon name="chevron" size={13} />
         </span>
         {onDismiss && (
           <button onClick={e => { e.stopPropagation(); onDismiss(); }}
-            style={{ background: "none", border: "none", cursor: "pointer", color: "var(--clay)", opacity: 0.3, padding: "0 0 0 2px", flexShrink: 0, marginTop: 3, fontSize: "var(--text-md)", lineHeight: 1 }}
+            style={{ background: "none", border: "none", cursor: "pointer", color: "var(--clay)", opacity: 0.3, padding: "0 0 0 2px", flexShrink: 0, marginTop: "var(--space-1)", fontSize: "var(--text-md)", lineHeight: 1 }}
             onMouseEnter={e => e.currentTarget.style.opacity = "0.65"}
             onMouseLeave={e => e.currentTarget.style.opacity = "0.3"}
             aria-label="Dismiss" title="Dismiss">×</button>
         )}
       </div>
       {expanded && (
-        <div style={{ marginTop: 13, paddingTop: 13, borderTop: "1px solid var(--border)" }}>
-          <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--clay)", margin: "0 0 10px", lineHeight: 1.65 }}>{rec.body}</p>
+        <div style={{ marginTop: "var(--space-3)", paddingTop: "var(--space-3)", borderTop: "1px solid var(--border)" }}>
+          <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--clay)", margin: "0 0 var(--space-3)", lineHeight: 1.65 }}>{rec.body}</p>
           {rec.action && (
-            <div style={{ display: "flex", gap: 8, padding: "9px 12px", background: "rgba(122,144,112,0.06)", borderRadius: 9, border: "1px solid rgba(122,144,112,0.14)", marginBottom: 8 }}>
+            <div style={{ display: "flex", gap: "var(--space-2)", padding: "var(--space-2) var(--space-3)", background: "rgba(122,144,112,0.06)", borderRadius: "var(--radius)", border: "1px solid rgba(122,144,112,0.14)", marginBottom: "var(--space-2)" }}>
               <span style={{ color: "#7a9070", flexShrink: 0, marginTop: 1 }}><Icon name="check" size={11} /></span>
               <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--parchment)", margin: 0, lineHeight: 1.6 }}>{rec.action}</p>
             </div>
           )}
           {rec.note && (
-            <div style={{ display: "flex", gap: 8, padding: "9px 12px", background: "var(--surface)", borderRadius: 9, border: "1px solid var(--border)", marginBottom: 8 }}>
+            <div style={{ display: "flex", gap: "var(--space-2)", padding: "var(--space-2) var(--space-3)", background: "var(--surface)", borderRadius: "var(--radius)", border: "1px solid var(--border)", marginBottom: "var(--space-2)" }}>
               <span style={{ color: "var(--clay)", opacity: 0.45, flexShrink: 0, marginTop: 1 }}><Icon name="info" size={11} /></span>
               <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>{rec.note}</p>
             </div>
@@ -375,7 +375,7 @@ function RecommendationCard({ rec, onAdd, onDismiss }) {
           {rec.type === "addition" && rec.category && onAdd && (
             <button
               onClick={e => { e.stopPropagation(); onAdd(rec.category); }}
-              style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4, padding: "8px 14px", background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.30)", borderRadius: 9, cursor: "pointer", transition: "background 0.15s" }}
+              style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", marginTop: "var(--space-1)", padding: "var(--space-2) var(--space-4)", background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.30)", borderRadius: "var(--radius)", cursor: "pointer", transition: "background 0.15s" }}
               onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.18)"}
               onMouseLeave={e => e.currentTarget.style.background = "rgba(122,144,112,0.10)"}>
               <Icon name="plus" size={11} color="#7a9070" />
@@ -610,16 +610,16 @@ function RefinementsCard({ products, activeMap, conflicts }) {
   };
 
   return (
-    <div style={{ marginBottom: 28 }}>
+    <div style={{ marginBottom: "calc(var(--space-1) * 7)" }}>
       {/* Header trigger */}
       <button onClick={() => setOpen(o => !o)}
-        style={{ width: "100%", background: open ? "var(--surface)" : "var(--ink)", border: `1px solid ${open ? "var(--border)" : "var(--border)"}`, borderRadius: open ? "14px 14px 0 0" : 14, padding: "15px 18px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", transition: "all 0.2s" }}
+        style={{ width: "100%", background: open ? "var(--surface)" : "var(--ink)", border: `1px solid ${open ? "var(--border)" : "var(--border)"}`, borderRadius: open ? "var(--radius) var(--radius) 0 0" : "var(--radius)", padding: "var(--space-4) var(--space-5)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", transition: "all 0.2s" }}
         onMouseEnter={e => { if (!open) e.currentTarget.style.borderColor = "rgba(122,144,112,0.4)"; }}
         onMouseLeave={e => { if (!open) e.currentTarget.style.borderColor = "var(--border)"; }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
           <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#c49040", flexShrink: 0 }} />
           <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, color: "var(--parchment)", letterSpacing: "0.02em" }}>Refine Your Ritual</span>
-          <span style={{ fontSize: "var(--text-xs)", fontFamily: "var(--font-body), sans-serif", background: "rgba(196,144,64,0.14)", color: "#c49040", padding: "2px 8px", borderRadius: 20, letterSpacing: "0.06em" }}>{refinements.length}</span>
+          <span style={{ fontSize: "var(--text-xs)", fontFamily: "var(--font-body), sans-serif", background: "rgba(196,144,64,0.14)", color: "#c49040", padding: "2px var(--space-2)", borderRadius: "var(--radius-pill)", letterSpacing: "0.06em" }}>{refinements.length}</span>
         </div>
         <span style={{ color: "var(--clay)", opacity: 0.6, display: "inline-block", transform: open ? "rotate(90deg)" : "none", transition: "transform 0.22s" }}>
           <Icon name="chevron" size={14} />
@@ -627,12 +627,12 @@ function RefinementsCard({ products, activeMap, conflicts }) {
       </button>
 
       {open && (
-        <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderTop: "none", borderRadius: "0 0 14px 14px", padding: "16px 16px 18px" }}>
+        <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderTop: "none", borderRadius: "0 0 var(--radius) var(--radius)", padding: "var(--space-4) var(--space-4) var(--space-5)" }}>
 
           {/* Verb filter pills */}
-          <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", gap: "var(--space-2)", marginBottom: "var(--space-4)", flexWrap: "wrap" }}>
             <button onClick={() => setActiveVerb(null)}
-              style={{ padding: "5px 12px", borderRadius: 20, border: `1px solid ${activeVerb === null ? "var(--sage)" : "var(--border)"}`, background: activeVerb === null ? "rgba(122,144,112,0.10)" : "transparent", color: activeVerb === null ? "var(--parchment)" : "var(--clay)", fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, cursor: "pointer", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", transition: "all 0.15s" }}>
+              style={{ padding: "var(--space-1) var(--space-3)", borderRadius: "var(--radius-pill)", border: `1px solid ${activeVerb === null ? "var(--sage)" : "var(--border)"}`, background: activeVerb === null ? "rgba(122,144,112,0.10)" : "transparent", color: activeVerb === null ? "var(--parchment)" : "var(--clay)", fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, cursor: "pointer", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", transition: "all 0.15s" }}>
               All
             </button>
             {verbs.map(v => {
@@ -640,7 +640,7 @@ function RefinementsCard({ products, activeMap, conflicts }) {
               const isActive = activeVerb === v;
               return (
                 <button key={v} onClick={() => setActiveVerb(isActive ? null : v)}
-                  style={{ padding: "5px 12px", borderRadius: 20, border: `1px solid ${isActive ? vs.border : "var(--border)"}`, background: isActive ? vs.bg : "transparent", color: isActive ? vs.color : "var(--clay)", fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, cursor: "pointer", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", transition: "all 0.15s" }}>
+                  style={{ padding: "var(--space-1) var(--space-3)", borderRadius: "var(--radius-pill)", border: `1px solid ${isActive ? vs.border : "var(--border)"}`, background: isActive ? vs.bg : "transparent", color: isActive ? vs.color : "var(--clay)", fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, cursor: "pointer", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", transition: "all 0.15s" }}>
                   {v}
                 </button>
               );
@@ -664,11 +664,11 @@ function RefinementItem({ r, vs, onEdit, onDismiss }) {
   const [open, setOpen] = useState(false);
   return (
     <div onClick={() => setOpen(o => !o)}
-      style={{ background: "var(--ink)", border: `1px solid var(--border)`, borderRadius: 12, padding: "13px 15px", marginBottom: 8, cursor: "pointer", transition: "border-color 0.18s" }}
+      style={{ background: "var(--ink)", border: `1px solid var(--border)`, borderRadius: "var(--radius)", padding: "var(--space-3) var(--space-4)", marginBottom: "var(--space-2)", cursor: "pointer", transition: "border-color 0.18s" }}
       onMouseEnter={e => e.currentTarget.style.borderColor = vs.border}
       onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}>
-      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <span style={{ fontSize: "var(--text-xs)", fontFamily: "var(--font-body), sans-serif", fontWeight: 400, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: vs.color, background: `${vs.color}18`, padding: "3px 8px", borderRadius: 20, flexShrink: 0 }}>{r.verb}</span>
+      <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
+        <span style={{ fontSize: "var(--text-xs)", fontFamily: "var(--font-body), sans-serif", fontWeight: 400, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: vs.color, background: `${vs.color}18`, padding: "var(--space-1) var(--space-2)", borderRadius: "var(--radius-pill)", flexShrink: 0 }}>{r.verb}</span>
         <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--parchment)", margin: 0, flex: 1, fontWeight: 400, lineHeight: 1.3 }}>{r.title}</p>
         <span style={{ color: "var(--clay)", opacity: 0.5, flexShrink: 0, display: "inline-block", transform: open ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>
           <Icon name="chevron" size={12} />
@@ -682,10 +682,10 @@ function RefinementItem({ r, vs, onEdit, onDismiss }) {
         )}
       </div>
       {open && (
-        <div style={{ marginTop: 11, paddingTop: 11, borderTop: "1px solid var(--border)" }}>
-          <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--clay)", margin: "0 0 9px", lineHeight: 1.65 }}>{r.body}</p>
+        <div style={{ marginTop: "var(--space-3)", paddingTop: "var(--space-3)", borderTop: "1px solid var(--border)" }}>
+          <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--clay)", margin: "0 0 var(--space-2)", lineHeight: 1.65 }}>{r.body}</p>
           {r.action && (
-            <div style={{ display: "flex", gap: 8, padding: "9px 11px", background: `${vs.color}0d`, borderRadius: 8, border: `1px solid ${vs.color}28`, marginBottom: r.product && onEdit ? 8 : 0 }}>
+            <div style={{ display: "flex", gap: "var(--space-2)", padding: "var(--space-2) var(--space-3)", background: `${vs.color}0d`, borderRadius: "var(--radius)", border: `1px solid ${vs.color}28`, marginBottom: r.product && onEdit ? "var(--space-2)" : 0 }}>
               <span style={{ color: vs.color, flexShrink: 0, marginTop: 1 }}><Icon name="check" size={11} /></span>
               <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--parchment)", margin: 0, lineHeight: 1.55 }}>{r.action}</p>
             </div>
@@ -693,7 +693,7 @@ function RefinementItem({ r, vs, onEdit, onDismiss }) {
           {r.product && onEdit && (
             <button
               onClick={e => { e.stopPropagation(); onEdit(r.product); }}
-              style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4, padding: "8px 14px", background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.30)", borderRadius: 9, cursor: "pointer", transition: "background 0.15s" }}
+              style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", marginTop: "var(--space-1)", padding: "var(--space-2) var(--space-4)", background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.30)", borderRadius: "var(--radius)", cursor: "pointer", transition: "background 0.15s" }}
               onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.18)"}
               onMouseLeave={e => e.currentTarget.style.background = "rgba(122,144,112,0.10)"}>
               <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, color: "#7a9070", letterSpacing: "var(--tracking-label)", textTransform: "uppercase" }}>Edit {r.product.brand ? `${r.product.brand} ${r.product.name}` : r.product.name}</span>

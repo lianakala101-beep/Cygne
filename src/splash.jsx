@@ -69,7 +69,7 @@ function SplashOverlay({ onDone }) {
       flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
-      gap: 28,
+      gap: "calc(var(--space-1) * 7)",
       opacity: fading ? 0 : 1,
       transition: "opacity 0.6s ease",
       pointerEvents: "none",

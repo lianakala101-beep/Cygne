@@ -335,32 +335,32 @@ function CaptureFlow({ onClose, onComplete }) {
       position: "fixed", inset: 0, zIndex: 400, background: SURFACE_BG,
       display: "flex", flexDirection: "column",
     }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 22px" }}>
-        <button onClick={onClose} style={{ background: "none", border: "none", color: TEXT_SOFT, cursor: "pointer", padding: 4, display: "inline-flex", alignItems: "center", gap: 6, fontFamily: SANS, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "var(--space-5) var(--space-6)" }}>
+        <button onClick={onClose} style={{ background: "none", border: "none", color: TEXT_SOFT, cursor: "pointer", padding: "var(--space-1)", display: "inline-flex", alignItems: "center", gap: "var(--space-2)", fontFamily: SANS, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase" }}>
           <Icon name="x" size={14} /> Close
         </button>
         <span style={{ fontFamily: SANS, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: TEXT_SOFT }}>Reflection</span>
         <div style={{ width: 68 }} />
       </div>
 
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 26px", textAlign: "center" }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 calc(var(--space-1) * 7)", textAlign: "center" }}>
         {!done ? (
           <>
             <p style={{ fontFamily: SANS, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: 0 }}>
               Shot {step + 1} of 3
             </p>
-            <h2 style={{ fontFamily: CURSIVE, fontSize: 36, fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: TEXT, margin: "6px 0 10px", lineHeight: 1.15 }}>
+            <h2 style={{ fontFamily: CURSIVE, fontSize: 36, fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: TEXT, margin: "var(--space-2) 0 var(--space-3)", lineHeight: 1.15 }}>
               {current.label}
             </h2>
             <p style={{ fontFamily: SANS, fontSize: "var(--text-xs)", color: TEXT_SOFT, margin: 0, maxWidth: 300, lineHeight: 1.6 }}>
               {current.hint}
             </p>
 
-            <div style={{ position: "relative", marginTop: 32, marginBottom: 32, width: 240, height: 300, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ position: "relative", marginTop: "var(--space-8)", marginBottom: "var(--space-8)", width: 240, height: 300, display: "flex", alignItems: "center", justifyContent: "center" }}>
               <FaceGuide size={240} />
             </div>
 
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 28 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", marginBottom: "calc(var(--space-1) * 7)" }}>
               {ANGLES.map((a, i) => (
                 <div key={a.key} style={{
                   width: 9, height: 9, borderRadius: "50%",
@@ -373,8 +373,8 @@ function CaptureFlow({ onClose, onComplete }) {
 
             <button onClick={pick} disabled={busy}
               style={{
-                display: "inline-flex", alignItems: "center", gap: 10,
-                padding: "14px 40px", borderRadius: 0,
+                display: "inline-flex", alignItems: "center", gap: "var(--space-3)",
+                padding: "var(--space-4) var(--space-10)", borderRadius: 0,
                 background: "transparent", color: "var(--color-ivory)", border: "1.5px solid rgba(250,249,244,0.5)",
                 cursor: busy ? "default" : "pointer",
                 fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 400,
@@ -390,7 +390,7 @@ function CaptureFlow({ onClose, onComplete }) {
 
             {step > 0 && (
               <button onClick={retake}
-                style={{ marginTop: 16, background: "none", border: "none", color: TEXT_SOFT, cursor: "pointer", fontFamily: SANS, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", opacity: 0.7 }}>
+                style={{ marginTop: "var(--space-4)", background: "none", border: "none", color: TEXT_SOFT, cursor: "pointer", fontFamily: SANS, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", opacity: 0.7 }}>
                 Retake last shot
               </button>
             )}
@@ -400,11 +400,11 @@ function CaptureFlow({ onClose, onComplete }) {
             <p style={{ fontFamily: SANS, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: 0 }}>
               Your reflection
             </p>
-            <h2 style={{ fontFamily: CURSIVE, fontSize: "var(--text-2xl)", fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: TEXT, margin: "6px 0 18px" }}>
+            <h2 style={{ fontFamily: CURSIVE, fontSize: "var(--text-2xl)", fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: TEXT, margin: "var(--space-2) 0 var(--space-5)" }}>
               A quiet moment.
             </h2>
 
-            <div style={{ display: "flex", gap: 6, width: "100%", maxWidth: 420, marginBottom: 28, border: `1px solid ${BORDER}`, padding: 4, background: "var(--surface)" }}>
+            <div style={{ display: "flex", gap: "var(--space-2)", width: "100%", maxWidth: 420, marginBottom: "calc(var(--space-1) * 7)", border: `1px solid ${BORDER}`, padding: "var(--space-1)", background: "var(--surface)" }}>
               {shots.map((s, i) => (
                 <img key={i} src={s} alt={ANGLES[i].label}
                   style={{ flex: 1, width: 0, aspectRatio: "3/4", objectFit: "cover", display: "block" }} />
@@ -413,8 +413,8 @@ function CaptureFlow({ onClose, onComplete }) {
 
             <button onClick={finish} disabled={busy}
               style={{
-                display: "inline-flex", alignItems: "center", gap: 10,
-                padding: "14px 40px", borderRadius: 0,
+                display: "inline-flex", alignItems: "center", gap: "var(--space-3)",
+                padding: "var(--space-4) var(--space-10)", borderRadius: 0,
                 background: "transparent", color: "var(--color-ivory)", border: "1.5px solid rgba(250,249,244,0.5)",
                 cursor: busy ? "default" : "pointer",
                 fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 400,
@@ -428,7 +428,7 @@ function CaptureFlow({ onClose, onComplete }) {
             </button>
 
             <button onClick={retake} disabled={busy}
-              style={{ marginTop: 16, background: "none", border: "none", color: TEXT_SOFT, cursor: "pointer", fontFamily: SANS, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", opacity: 0.7 }}>
+              style={{ marginTop: "var(--space-4)", background: "none", border: "none", color: TEXT_SOFT, cursor: "pointer", fontFamily: SANS, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", opacity: 0.7 }}>
               Retake last shot
             </button>
           </>
@@ -566,21 +566,21 @@ function ExpandedEntry({ entry, onClose }) {
         background: OVERLAY,
         backdropFilter: "blur(14px)",
         display: "flex", flexDirection: "column", alignItems: "center",
-        overflowY: "auto", padding: "44px 18px 60px",
+        overflowY: "auto", padding: "calc(var(--space-1) * 11) var(--space-5) calc(var(--space-1) * 15)",
         animation: "fadeUp 0.3s ease",
       }}>
       <button onClick={onClose}
-        style={{ position: "absolute", top: 16, right: 18, background: "none", border: "none", color: TEXT_SOFT, cursor: "pointer", padding: 8 }}>
+        style={{ position: "absolute", top: 16, right: 18, background: "none", border: "none", color: TEXT_SOFT, cursor: "pointer", padding: "var(--space-2)" }}>
         <Icon name="x" size={18} />
       </button>
 
-      <p style={{ fontFamily: SANS, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 6px" }}>
+      <p style={{ fontFamily: SANS, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 var(--space-2)" }}>
         Week {entry.weekNumber}
       </p>
-      <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 700, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 6px", textAlign: "center", lineHeight: 1.2 }}>
+      <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 700, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 var(--space-2)", textAlign: "center", lineHeight: 1.2 }}>
         {getMoonPhase(new Date(entry.date))}
       </h2>
-      <p style={{ fontFamily: SANS, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 26px" }}>
+      <p style={{ fontFamily: SANS, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 calc(var(--space-1) * 7)" }}>
         {formatDateLong(entry.date)}
       </p>
 
@@ -595,8 +595,8 @@ function ExpandedEntry({ entry, onClose }) {
       </div>
 
       <div onClick={(e) => e.stopPropagation()}
-        style={{ maxWidth: 560, width: "100%", marginTop: 30, padding: "20px 22px", borderTop: `1px solid ${BORDER}`, borderBottom: `1px solid ${BORDER}` }}>
-        <p style={{ fontFamily: SANS, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: "0 0 10px", textAlign: "center" }}>
+        style={{ maxWidth: 560, width: "100%", marginTop: "var(--space-8)", padding: "var(--space-5) var(--space-6)", borderTop: `1px solid ${BORDER}`, borderBottom: `1px solid ${BORDER}` }}>
+        <p style={{ fontFamily: SANS, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: TEXT_SOFT, opacity: 0.7, margin: "0 0 var(--space-3)", textAlign: "center" }}>
           Swan Sense — this week
         </p>
         {entry.insight?.headline ? (
@@ -610,7 +610,7 @@ function ExpandedEntry({ entry, onClose }) {
         )}
       </div>
 
-      <p style={{ fontFamily: SANS, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: TEXT_SOFT, marginTop: 24, opacity: 0.7 }}>
+      <p style={{ fontFamily: SANS, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: TEXT_SOFT, marginTop: "var(--space-6)", opacity: 0.7 }}>
         Tap anywhere to close
       </p>
     </div>
@@ -652,7 +652,7 @@ function GalleryEntry({ entry, onExpand, onRemove, caption }) {
   return (
     <div ref={ref}
       style={{
-        position: "relative", width: "100%", margin: "0 auto 48px",
+        position: "relative", width: "100%", margin: "0 auto var(--space-12)",
         opacity: revealed ? 1 : 0,
         transform: revealed ? "translateY(0)" : "translateY(16px)",
         transition: "opacity 500ms ease-out, transform 500ms ease-out",
@@ -664,13 +664,13 @@ function GalleryEntry({ entry, onExpand, onRemove, caption }) {
           background: "none", border: "none", padding: 0, cursor: "pointer",
           textAlign: "center", color: TEXT,
         }}>
-        <p style={{ fontFamily: SANS, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(250,249,244,0.6)", margin: "0 0 4px" }}>
+        <p style={{ fontFamily: SANS, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(250,249,244,0.6)", margin: "0 0 var(--space-1)" }}>
           Week {entry.weekNumber}
         </p>
-        <h3 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-md)", fontWeight: 700, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 4px", lineHeight: 1.2 }}>
+        <h3 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-md)", fontWeight: 700, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 var(--space-1)", lineHeight: 1.2 }}>
           {getMoonPhase(new Date(entry.date))}
         </h3>
-        <p style={{ fontFamily: SANS, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(250,249,244,0.6)", margin: "0 0 18px" }}>
+        <p style={{ fontFamily: SANS, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(250,249,244,0.6)", margin: "0 0 var(--space-5)" }}>
           {formatDateLong(entry.date)}
         </p>
         <div style={{
@@ -687,7 +687,7 @@ function GalleryEntry({ entry, onExpand, onRemove, caption }) {
           />
         </div>
         {caption && (
-          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", fontWeight: 400, color: "rgba(250,249,244,0.6)", textAlign: "center", margin: "12px 0 0", letterSpacing: "0.02em", lineHeight: 1.4 }}>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", fontWeight: 400, color: "rgba(250,249,244,0.6)", textAlign: "center", margin: "var(--space-3) 0 0", letterSpacing: "0.02em", lineHeight: 1.4 }}>
             {caption}
           </p>
         )}
@@ -702,7 +702,7 @@ function GalleryEntry({ entry, onExpand, onRemove, caption }) {
             top: 72, right: 8,
             background: "rgba(28,28,26,0.65)",
             border: "1px solid rgba(250,249,244,0.4)",
-            borderRadius: 999,
+            borderRadius: "var(--radius-pill)",
             width: 30, height: 30,
             display: "inline-flex", alignItems: "center", justifyContent: "center",
             color: "var(--color-ivory, #faf9f4)",
@@ -981,14 +981,14 @@ function Reflection({ reflections = [], onAddReflection, onReplaceReflections, p
 
   return (
     <div style={{
-      margin: "-32px -22px 0",
+      margin: "calc(var(--space-8) * -1) calc(var(--space-6) * -1) 0",
       background: BG, minHeight: "calc(100vh - 54px)",
-      padding: "44px 22px 80px",
+      padding: "calc(var(--space-1) * 11) var(--space-6) 80px",
       color: TEXT,
     }}>
       {/* Header */}
-      <div style={{ maxWidth: 560, margin: "0 auto 18px", textAlign: "center" }}>
-        <h1 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-2xl)", fontWeight: 500, color: "var(--color-ivory)", margin: "0 0 6px", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", lineHeight: 1.15 }}>
+      <div style={{ maxWidth: 560, margin: "0 auto var(--space-5)", textAlign: "center" }}>
+        <h1 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-2xl)", fontWeight: 500, color: "var(--color-ivory)", margin: "0 0 var(--space-2)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", lineHeight: 1.15 }}>
           Reflection
         </h1>
         {reflections.length === 0 && (
@@ -999,16 +999,16 @@ function Reflection({ reflections = [], onAddReflection, onReplaceReflections, p
       </div>
 
       {error && (
-        <div style={{ maxWidth: 520, margin: "0 auto 20px", padding: "12px 16px", background: "var(--surface)", border: `1px solid ${BORDER}`, borderRadius: 8, textAlign: "center" }}>
+        <div style={{ maxWidth: 520, margin: "0 auto var(--space-5)", padding: "var(--space-3) var(--space-4)", background: "var(--surface)", border: `1px solid ${BORDER}`, borderRadius: "var(--radius)", textAlign: "center" }}>
           <p style={{ fontFamily: SANS, fontSize: "var(--text-xs)", color: TEXT_SOFT, margin: 0 }}>{error}</p>
         </div>
       )}
 
-      <div style={{ textAlign: "center", marginBottom: 24 }}>
+      <div style={{ textAlign: "center", marginBottom: "var(--space-6)" }}>
         <button onClick={() => setCapturing(true)} disabled={saving}
           style={{
-            display: "inline-flex", alignItems: "center", gap: 10,
-            padding: "14px 40px", borderRadius: 999,
+            display: "inline-flex", alignItems: "center", gap: "var(--space-3)",
+            padding: "var(--space-4) var(--space-10)", borderRadius: "var(--radius-pill)",
             background: "transparent", color: "var(--color-ivory)",
             border: "1.5px solid rgba(250,249,244,0.5)",
             cursor: saving ? "default" : "pointer",
@@ -1027,7 +1027,7 @@ function Reflection({ reflections = [], onAddReflection, onReplaceReflections, p
               : "Capture This Week"}
         </button>
         {justCaptured && (
-          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "rgba(250,249,244,0.6)", margin: "12px 0 0", letterSpacing: "0.02em", transition: "opacity 600ms ease" }}>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "rgba(250,249,244,0.6)", margin: "var(--space-3) 0 0", letterSpacing: "0.02em", transition: "opacity 600ms ease" }}>
             Captured — return on your next reset day
           </p>
         )}
@@ -1041,8 +1041,8 @@ function Reflection({ reflections = [], onAddReflection, onReplaceReflections, p
             onClick={handleShareSkinStatus}
             disabled={sharingSkinStatus}
             style={{
-              display: "inline-flex", alignItems: "center", gap: 6,
-              margin: "10px 0 0",
+              display: "inline-flex", alignItems: "center", gap: "var(--space-2)",
+              margin: "var(--space-3) 0 0",
               background: "none", border: "none", padding: 0,
               cursor: sharingSkinStatus ? "default" : "pointer",
               fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 400,
@@ -1069,11 +1069,11 @@ function Reflection({ reflections = [], onAddReflection, onReplaceReflections, p
 
       {/* Empty state */}
       {sorted.length === 0 && (
-        <div style={{ maxWidth: 460, margin: "20px auto 0", textAlign: "center", padding: "40px 24px", background: "var(--surface)", border: `1px solid ${BORDER}`, borderRadius: 8 }}>
-          <div style={{ color: TEXT_SOFT, display: "inline-flex", marginBottom: 14 }}>
+        <div style={{ maxWidth: 460, margin: "var(--space-5) auto 0", textAlign: "center", padding: "var(--space-10) var(--space-6)", background: "var(--surface)", border: `1px solid ${BORDER}`, borderRadius: "var(--radius)" }}>
+          <div style={{ color: TEXT_SOFT, display: "inline-flex", marginBottom: "var(--space-4)" }}>
             <Icon name="reflection" size={26} />
           </div>
-          <p style={{ fontFamily: CURSIVE, fontSize: "var(--text-xl)", color: TEXT, margin: "0 0 8px", letterSpacing: "0.02em" }}>
+          <p style={{ fontFamily: CURSIVE, fontSize: "var(--text-xl)", color: TEXT, margin: "0 0 var(--space-2)", letterSpacing: "0.02em" }}>
             Your gallery is waiting.
           </p>
           <p style={{ fontFamily: SANS, fontSize: "var(--text-xs)", color: TEXT_SOFT, margin: 0, lineHeight: 1.7 }}>

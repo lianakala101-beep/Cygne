@@ -91,7 +91,7 @@ export function RampCheckinCard({ productName, weekNumber, onSave, onDone, onDis
   // tiny inline SVG rather than another Icon import — this component
   // already avoids external icon deps to keep its render self-contained.
   const CheckGlyph = () => (
-    <svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" style={{ display: "inline-block", verticalAlign: "middle", marginLeft: 6 }}>
+    <svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" style={{ display: "inline-block", verticalAlign: "middle", marginLeft: "var(--space-2)" }}>
       <path d="M2 7.5 L5.5 11 L12 3.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
@@ -109,21 +109,21 @@ export function RampCheckinCard({ productName, weekNumber, onSave, onDone, onDis
     <div style={{
       background: "rgba(45,61,43,0.06)",
       border: "1px solid rgba(45,61,43,0.22)",
-      borderRadius: 14,
-      marginBottom: 12,
-      padding: "14px 16px 16px",
+      borderRadius: "var(--radius)",
+      marginBottom: "var(--space-3)",
+      padding: "var(--space-4) var(--space-4) var(--space-4)",
     }}>
       {/* Header — bracketed week number badge replaces the "Week N
           check-in" eyebrow. The pill IS the eyebrow; the descriptor
           "check-in" sits alongside as a small caps label. */}
-      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 10, marginBottom: 10 }}>
+      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: "var(--space-3)", marginBottom: "var(--space-3)" }}>
         <div style={{ minWidth: 0 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, margin: "0 0 6px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", margin: "0 0 var(--space-2)" }}>
             <span style={{
               display: "inline-flex", alignItems: "center",
-              padding: "3px 10px",
+              padding: "var(--space-1) var(--space-3)",
               border: "1px solid rgba(45,61,43,0.42)",
-              borderRadius: 999,
+              borderRadius: "var(--radius-pill)",
               fontFamily: "var(--font-display)",
               fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)",
               color: "var(--sage, #2d3d2b)",
@@ -143,14 +143,14 @@ export function RampCheckinCard({ productName, weekNumber, onSave, onDone, onDis
           <button
             onClick={onDismiss}
             aria-label="Dismiss check-in nudge"
-            style={{ background: "none", border: "none", color: "var(--clay, var(--color-stone))", opacity: 0.6, fontSize: "var(--text-lg)", lineHeight: 1, cursor: "pointer", padding: 4, flexShrink: 0 }}
+            style={{ background: "none", border: "none", color: "var(--clay, var(--color-stone))", opacity: 0.6, fontSize: "var(--text-lg)", lineHeight: 1, cursor: "pointer", padding: "var(--space-1)", flexShrink: 0 }}
           >
             ×
           </button>
         )}
       </div>
 
-      <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay, var(--color-stone))", margin: "0 0 12px", lineHeight: 1.55, opacity: 0.85 }}>
+      <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay, var(--color-stone))", margin: "0 0 var(--space-3)", lineHeight: 1.55, opacity: 0.85 }}>
         How did your skin respond this week?
       </p>
 
@@ -161,7 +161,7 @@ export function RampCheckinCard({ productName, weekNumber, onSave, onDone, onDis
       <div
         aria-disabled={saving || saved}
         style={{
-          display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 12,
+          display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-2)", marginBottom: "var(--space-3)",
           opacity: (saving || saved) ? 0.55 : 1,
           pointerEvents: (saving || saved) ? "none" : "auto",
           transition: "opacity 0.18s",
@@ -175,10 +175,10 @@ export function RampCheckinCard({ productName, weekNumber, onSave, onDone, onDis
               onClick={() => setPicked(r.key)}
               disabled={saving || saved}
               style={{
-                padding: "10px 8px",
+                padding: "var(--space-3) var(--space-2)",
                 background: BUTTON_STYLE.base.background,
                 border: isSelected ? BUTTON_STYLE.selected.border : BUTTON_STYLE.base.border,
-                borderRadius: 10,
+                borderRadius: "var(--radius)",
                 fontFamily: "var(--font-body)",
                 fontSize: "var(--text-xs)",
                 fontWeight: 400,
@@ -211,16 +211,16 @@ export function RampCheckinCard({ productName, weekNumber, onSave, onDone, onDis
             style={{
               width: "100%",
               boxSizing: "border-box",
-              padding: "8px 10px",
+              padding: "var(--space-2) var(--space-3)",
               background: "rgba(250,249,244,0.06)",
               border: "1px solid rgba(45,61,43,0.20)",
-              borderRadius: 8,
+              borderRadius: "var(--radius)",
               fontFamily: "var(--font-body)",
               fontSize: "var(--text-xs)",
               color: "var(--parchment, var(--color-ivory))",
               resize: "none",
               outline: "none",
-              marginBottom: 10,
+              marginBottom: "var(--space-3)",
               opacity: (saving || saved) ? 0.55 : 1,
               transition: "opacity 0.18s",
             }}
@@ -236,7 +236,7 @@ export function RampCheckinCard({ productName, weekNumber, onSave, onDone, onDis
                 fontFamily: "var(--font-body)",
                 fontSize: "var(--text-xs)",
                 color: "#8b7355",
-                margin: "0 0 10px",
+                margin: "0 0 var(--space-3)",
                 lineHeight: 1.5,
                 letterSpacing: "0.01em",
               }}
@@ -251,7 +251,7 @@ export function RampCheckinCard({ productName, weekNumber, onSave, onDone, onDis
             aria-live="polite"
             style={{
               width: "100%",
-              padding: "10px 0",
+              padding: "var(--space-3) 0",
               // Saved variant strengthens the ivory fill + inky border
               // as the visible confirmation. Loading and idle keep the
               // sage-tinted outlined style already in use elsewhere in
@@ -263,7 +263,7 @@ export function RampCheckinCard({ productName, weekNumber, onSave, onDone, onDis
               border:
                 saved ? "1px solid rgba(28, 28, 26, 0.70)" :
                        "1px solid rgba(45,61,43,0.35)",
-              borderRadius: 10,
+              borderRadius: "var(--radius)",
               fontFamily: "var(--font-body)",
               fontSize: "var(--text-xs)",
               fontWeight: 400,

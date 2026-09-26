@@ -113,7 +113,7 @@ export function FaceZoneSelector({ selected = [], onChange }) {
           letterSpacing: "var(--tracking-display)",
           color: "var(--color-inky-moss, #2d3d2b)",
           textAlign: "center",
-          marginTop: 14,
+          marginTop: "var(--space-4)",
           minHeight: 14,
         }}
       >

@@ -102,8 +102,8 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           // wrapper, so no other tab's top spacing changes. Applies
           // identically across all three greeting slots (morning/
           // afternoon/evening) since they share this one block.
-          <div style={{ paddingTop: 16, marginBottom: products.length === 0 || welcomeBackLine ? 20 : 24 }}>
-            <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 500, fontSize: "var(--text-2xl)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 6px", lineHeight: 1.05 }}>
+          <div style={{ paddingTop: "var(--space-4)", marginBottom: products.length === 0 || welcomeBackLine ? "var(--space-5)" : "var(--space-6)" }}>
+            <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 500, fontSize: "var(--text-2xl)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 var(--space-2)", lineHeight: 1.05 }}>
               {greeting}{firstName ? "," : "."}
             </h1>
             {firstName && (
@@ -112,11 +112,11 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
               </p>
             )}
             {welcomeBackLine ? (
-              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", letterSpacing: "0.02em", color: "#F4F3EF", margin: "14px 0 0", lineHeight: 1.55, maxWidth: 360 }}>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", letterSpacing: "0.02em", color: "#F4F3EF", margin: "var(--space-4) 0 0", lineHeight: 1.55, maxWidth: 360 }}>
                 {welcomeBackLine}
               </p>
             ) : products.length === 0 && (
-              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", letterSpacing: "0.04em", color: "#F4F3EF", margin: "10px 0 0", lineHeight: 1.5 }}>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", letterSpacing: "0.04em", color: "#F4F3EF", margin: "var(--space-3) 0 0", lineHeight: 1.5 }}>
                 Welcome.
               </p>
             )}
@@ -133,14 +133,14 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         ];
         return (
           <div>
-            <div style={{ marginBottom: 28 }}>
+            <div style={{ marginBottom: "calc(var(--space-1) * 7)" }}>
               <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "#F4F3EF", margin: 0, lineHeight: 1.6 }}>
                 Your ritual lives here. Let's build it around you.
               </p>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)", marginBottom: "calc(var(--space-1) * 7)" }}>
               {emptySteps.map((s, i) => (
-                <div key={i} style={{ display: "flex", gap: 14, padding: "16px 18px", background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8 }}>
+                <div key={i} style={{ display: "flex", gap: "var(--space-4)", padding: "var(--space-4) var(--space-5)", background: "var(--color-ivory-shadow)", border: "none", borderRadius: "var(--radius)" }}>
                   {/* Step numeral sits where the icon used to be. Fungis
                       Heavy, helper-alpha ivory — large enough to read as
                       structural numbering without competing with the
@@ -158,10 +158,10 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
                     {String(i + 1).padStart(2, "0")}
                   </span>
                   <div style={{ flex: 1 }}>
-                    <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-sm)", fontWeight: 400, color: "#F4F3EF", margin: "0 0 4px", lineHeight: 1.3 }}>{s.label}</p>
-                    <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "#F4F3EF", opacity: 0.75, margin: s.cta ? "0 0 10px" : 0, lineHeight: 1.6 }}>{s.sub}</p>
+                    <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-sm)", fontWeight: 400, color: "#F4F3EF", margin: "0 0 var(--space-1)", lineHeight: 1.3 }}>{s.label}</p>
+                    <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "#F4F3EF", opacity: 0.75, margin: s.cta ? "0 0 var(--space-3)" : 0, lineHeight: 1.6 }}>{s.sub}</p>
                     {s.cta && (
-                      <button onClick={s.action} style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, color: "#6e8a72", background: "rgba(122,144,112,0.1)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 20, padding: "6px 14px", cursor: "pointer" }}>
+                      <button onClick={s.action} style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-2)", fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, color: "#6e8a72", background: "rgba(122,144,112,0.1)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: "var(--radius-pill)", padding: "var(--space-2) var(--space-4)", cursor: "pointer" }}>
                         {s.cta} <Icon name="arrow-right" size={11} />
                       </button>
                     )}
@@ -188,13 +188,13 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             { label: "Swan Sense activates", done: hasProducts && hasCheckin, action: null, cta: null },
           ];
           return (
-            <div style={{ marginBottom: 24, background: "var(--color-ivory-shadow)", border: "none", borderRadius: 8, padding: "16px 18px" }}>
-              <div style={{ marginBottom: 14 }}>
+            <div style={{ marginBottom: "var(--space-6)", background: "var(--color-ivory-shadow)", border: "none", borderRadius: "var(--radius)", padding: "var(--space-4) var(--space-5)" }}>
+              <div style={{ marginBottom: "var(--space-4)" }}>
                 <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)", margin: 0 }}>Getting started</p>
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
                 {steps.map((s, i) => (
-                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 12 }}
+                  <div key={i} style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}
                     onClick={s.action || undefined}>
                     <div style={{ width: 20, height: 20, borderRadius: "50%", flexShrink: 0, background: s.done ? "#6e8a72" : "var(--ink)", border: "1px solid " + (s.done ? "#6e8a72" : "var(--border)"), display: "flex", alignItems: "center", justifyContent: "center", color: s.done ? "var(--ink)" : "var(--clay)" }}>
                       {s.done && <Icon name="check" size={10} />}
@@ -203,7 +203,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
                     <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: s.done ? "var(--clay)" : "var(--parchment)", margin: 0, flex: 1, textDecoration: s.done ? "line-through" : "none", opacity: s.done ? 0.5 : 1 }}>{s.label}</p>
                     {!s.done && s.cta && (
                       <button onClick={e => { e.stopPropagation(); s.action(); }}
-                        style={{ display: "inline-flex", alignItems: "center", gap: 5, fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, color: "#6e8a72", background: "rgba(122,144,112,0.1)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: 20, padding: "4px 12px", cursor: "pointer", whiteSpace: "nowrap" }}>
+                        style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-1)", fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, color: "#6e8a72", background: "rgba(122,144,112,0.1)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: "var(--radius-pill)", padding: "var(--space-1) var(--space-3)", cursor: "pointer", whiteSpace: "nowrap" }}>
                         {s.cta} <Icon name="arrow-right" size={10} />
                       </button>
                     )}
@@ -220,8 +220,8 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             like the interior of a magazine. */}
 
         {/* Swan Sense — fully transparent, divides greeting from action list */}
-        <div style={{ height: 1, background: "rgba(250,249,244,0.18)", marginBottom: 18 }} />
-        <div style={{ marginBottom: 20 }}>
+        <div style={{ height: 1, background: "rgba(250,249,244,0.18)", marginBottom: "var(--space-5)" }} />
+        <div style={{ marginBottom: "var(--space-5)" }}>
           <SwanSongCard currentSession={currentSession} asPopup={false} user={user} predictions={swanSensePredictions} dailyLine={swanDailyLine} dailyLoading={swanLoading} dailyFailed={swanFailed} variant="ivory-flat" />
         </div>
 
@@ -236,7 +236,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         <DailySkinIndexCard cyclePhaseName={cyclePhase?.name || null} cycleDay={currentCycleDay} weather={weather} locationData={locationData} />
 
         {_now.getDate() >= 14 && (
-          <div style={{ textAlign: "right", marginBottom: 24 }}>
+          <div style={{ textAlign: "right", marginBottom: "var(--space-6)" }}>
             <button
               onClick={() => { setRecapOffset(0); setRecapOpen(true); }}
               style={{
@@ -262,13 +262,13 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           onClick={() => setTab("routine")}
           style={{
             display: "flex", width: "100%", alignItems: "center", justifyContent: "space-between",
-            padding: "18px 22px", marginBottom: 12,
+            padding: "var(--space-5) var(--space-6)", marginBottom: "var(--space-3)",
             background: "var(--color-ivory, #faf9f4)", border: "none",
-            borderRadius: 8,
+            borderRadius: "var(--radius)",
             cursor: "pointer",
             WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
           }}>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 12, fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-md)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)" }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-3)", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-md)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)" }}>
             <Icon name={currentSession === "am" ? "sun" : "moon"} size={14} />
             Begin Your Ritual
           </span>
@@ -291,7 +291,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           if (askAccess === "unknown") {
             return (
               <div style={{
-                width: "100%", padding: "18px 0", marginBottom: 16,
+                width: "100%", padding: "var(--space-5) 0", marginBottom: "var(--space-4)",
                 borderTop: "1px solid rgba(250,249,244,0.25)",
                 borderBottom: "1px solid rgba(250,249,244,0.25)",
               }}>
@@ -311,7 +311,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
               onClick={() => askCygne("", "")}
               style={{
                 display: "flex", width: "100%", alignItems: "center", justifyContent: "space-between",
-                padding: "18px 0", marginBottom: 16,
+                padding: "var(--space-5) 0", marginBottom: "var(--space-4)",
                 background: "transparent", border: "none",
                 borderTop: "1px solid rgba(250,249,244,0.25)",
                 borderBottom: "1px solid rgba(250,249,244,0.25)",
@@ -330,14 +330,14 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
 
         {/* Irreconcilable conflicts — quiet ivory one-liner */}
         {irreconcilable.length > 0 && products.length > 0 && (
-          <div style={{ marginBottom: 20 }}>
+          <div style={{ marginBottom: "var(--space-5)" }}>
             {irreconcilable.map((c, i) => (
               <p key={i} style={{
                 fontFamily: "var(--font-body)", fontSize: "var(--text-xs)",
                 letterSpacing: "0.02em",
                 color: "#F4F3EF",
                 lineHeight: 1.6,
-                margin: i === 0 ? 0 : "6px 0 0",
+                margin: i === 0 ? 0 : "var(--space-2) 0 0",
               }}>{c.reason}</p>
             ))}
           </div>
@@ -350,14 +350,14 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             introducing solid-button emphasis that would compete with
             "Begin Your Ritual" above. Outline pattern matches the
             existing style used on Enter Cygne / Continue in onboarding. */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 60 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "var(--space-3)", marginBottom: "calc(var(--space-1) * 15)" }}>
           <button
             onClick={() => setFlightOpen(true)}
             style={{
               background: "rgba(250,249,244,0.06)",
               border: "1px solid rgba(250,249,244,0.35)",
-              borderRadius: 999,
-              padding: "10px 22px",
+              borderRadius: "var(--radius-pill)",
+              padding: "var(--space-3) var(--space-6)",
               cursor: "pointer",
               fontFamily: "var(--font-display)", fontWeight: 700,
               fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
@@ -375,8 +375,8 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             style={{
               background: "rgba(250,249,244,0.06)",
               border: "1px solid rgba(250,249,244,0.35)",
-              borderRadius: 999,
-              padding: "10px 22px",
+              borderRadius: "var(--radius-pill)",
+              padding: "var(--space-3) var(--space-6)",
               cursor: "pointer",
               fontFamily: "var(--font-display)", fontWeight: 700,
               fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
@@ -394,15 +394,15 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         {/* 6. Notification nudge — actionable prompt, transitional between
             top-of-page actions and bottom-of-page context. */}
         {!notifDismissed && notifPermission === "default" && (
-          <div style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.25)", borderRadius: 8, padding: "12px 14px", marginBottom: 20 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.25)", borderRadius: "var(--radius)", padding: "var(--space-3) var(--space-4)", marginBottom: "var(--space-5)" }}>
             <span style={{ color: "#6e8a72", flexShrink: 0, display: "inline-flex" }}><Icon name="bell" size={16} /></span>
             <div style={{ flex: 1 }}>
               <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, color: "var(--parchment)", margin: "0 0 2px" }}>Stay on ritual</p>
               <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--clay)", margin: 0 }}>Get AM & PM reminders so your ritual stays consistent.</p>
             </div>
-            <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-              <button onClick={onRequestNotif} style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, background: "rgba(122,144,112,0.25)", border: "1px solid rgba(122,144,112,0.4)", borderRadius: 8, color: "var(--parchment)", padding: "6px 12px", cursor: "pointer" }}>Enable</button>
-              <button onClick={onDismissNotif} aria-label="Dismiss notification prompt" style={{ background: "transparent", border: "none", color: "var(--clay)", cursor: "pointer", padding: "6px 4px", display: "inline-flex" }}><Icon name="x" size={12} /></button>
+            <div style={{ display: "flex", gap: "var(--space-2)", flexShrink: 0 }}>
+              <button onClick={onRequestNotif} style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, background: "rgba(122,144,112,0.25)", border: "1px solid rgba(122,144,112,0.4)", borderRadius: "var(--radius-pill)", color: "var(--parchment)", padding: "var(--space-2) var(--space-3)", cursor: "pointer" }}>Enable</button>
+              <button onClick={onDismissNotif} aria-label="Dismiss notification prompt" style={{ background: "transparent", border: "none", color: "var(--clay)", cursor: "pointer", padding: "var(--space-2) var(--space-1)", display: "inline-flex" }}><Icon name="x" size={12} /></button>
             </div>
           </div>
         )}
@@ -414,10 +414,10 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           const parts = [amOn && `${amTime}am`, pmOn && `${pmTime}pm`].filter(Boolean);
           const label = parts.length > 0 ? `Reminders on — ${parts.join(" & ")} daily.` : "Reminders enabled.";
           return (
-            <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.2)", borderRadius: 8, padding: "10px 14px", marginBottom: 20 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.2)", borderRadius: "var(--radius)", padding: "var(--space-3) var(--space-4)", marginBottom: "var(--space-5)" }}>
               <span style={{ color: "#6e8a72", display: "inline-flex" }}><Icon name="sparkle" size={12} /></span>
               <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--clay)", margin: 0 }}>{label}</p>
-              <button onClick={onDismissNotif} aria-label="Dismiss" style={{ marginLeft: "auto", background: "transparent", border: "none", color: "var(--clay)", cursor: "pointer", display: "inline-flex", padding: 4 }}><Icon name="x" size={12} /></button>
+              <button onClick={onDismissNotif} aria-label="Dismiss" style={{ marginLeft: "auto", background: "transparent", border: "none", color: "var(--clay)", cursor: "pointer", display: "inline-flex", padding: "var(--space-1)" }}><Icon name="x" size={12} /></button>
             </div>
           );
         })()}
@@ -425,14 +425,14 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         {/* Seasonal + Weekend — editorial line items, stacked sharing rules.
             marginBottom adds clear breathing room before the bottom context
             strip so it doesn't feel pinched against the last seasonal row. */}
-        <div style={{ marginBottom: 52 }}>
+        <div style={{ marginBottom: "calc(var(--space-1) * 13)" }}>
           <SeasonalNudgeCard products={products} activeMap={activeMap} locationData={locationData} user={user} lineMode />
           <WeekendNudgeCard products={products} activeMap={activeMap} lineMode />
         </div>
 
         {/* 9. Treatment recovery — only when a recovery window is active */}
         {treatments.filter(t => { const r = getTreatmentPhase(t); return r && r.phase && r.phase.label !== "Cleared"; }).map(t => (
-          <div key={t.id} style={{ marginBottom: 20 }}>
+          <div key={t.id} style={{ marginBottom: "var(--space-5)" }}>
             <TreatmentRecoveryCard treatment={t} products={products} activeMap={activeMap} onDismiss={() => {}} onResetDate={updateTreatmentDate ? (newIso) => updateTreatmentDate(t.id, newIso) : undefined} />
           </div>
         ))}
@@ -455,18 +455,18 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           if (!phase && !hasWeather && daysSince === null) return null;
 
           const txtSt = { fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", opacity: 0.75, whiteSpace: "nowrap" };
-          const btnSt = { display: "inline-flex", alignItems: "center", gap: 6, padding: 0, background: "none", border: "none", cursor: "pointer", fontFamily: "var(--font-body)", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" };
+          const btnSt = { display: "inline-flex", alignItems: "center", gap: "var(--space-2)", padding: 0, background: "none", border: "none", cursor: "pointer", fontFamily: "var(--font-body)", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" };
 
           return (
             <div style={{
               display: "flex",
               flexWrap: "wrap",
               alignItems: "center",
-              rowGap: 8,
-              columnGap: 16,
-              padding: "16px 0 0",
+              rowGap: "var(--space-2)",
+              columnGap: "var(--space-4)",
+              padding: "var(--space-4) 0 0",
               borderTop: "1px solid rgba(250,249,244,0.18)",
-              marginBottom: 20,
+              marginBottom: "var(--space-5)",
               fontFamily: "var(--font-body)",
             }}>
               {phase && (
@@ -480,7 +480,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
                 <span style={txtSt}>{checkInMsg}</span>
               </button>
               {hasWeather && (
-                <div style={{ display: "inline-flex", alignItems: "center", gap: 10, marginLeft: "auto" }}>
+                <div style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-3)", marginLeft: "auto" }}>
                   {weather.temp !== null && <span style={txtSt}>{Math.round(tempUnit === "F" ? (weather.temp * 9 / 5 + 32) : weather.temp)}°{tempUnit}</span>}
                   {weather.uvIndex !== null && <span style={txtSt}>UV {Math.round(weather.uvIndex)}</span>}
                   {weather.humidity !== null && <span style={txtSt}>{weather.humidity}%</span>}
@@ -496,17 +496,17 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           const phase = getCyclePhase(currentCycleDay);
           return (
             <div onClick={() => setCycleExpanded(false)}
-              style={{ position: "fixed", inset: 0, background: "var(--overlay)", backdropFilter: "blur(6px)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 22 }}>
+              style={{ position: "fixed", inset: 0, background: "var(--overlay)", backdropFilter: "blur(6px)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: "var(--space-6)" }}>
               <div onClick={e => e.stopPropagation()}
-                style={{ background: "var(--ink)", border: `1px solid ${phase.border}`, borderRadius: 8, padding: "24px 22px", maxWidth: 440, width: "100%" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+                style={{ background: "var(--ink)", border: `1px solid ${phase.border}`, borderRadius: "var(--radius)", padding: "var(--space-6) var(--space-6)", maxWidth: 440, width: "100%" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", marginBottom: "var(--space-4)" }}>
                   <div style={{ width: 8, height: 8, borderRadius: "50%", background: phase.dot }} />
                   <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-sm)", fontWeight: 400, color: "var(--parchment)" }}>{phase.name} Phase</span>
                   <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--clay)", opacity: 0.7, marginLeft: "auto" }}>Day {currentCycleDay}</span>
-                  <button onClick={() => setCycleExpanded(false)} aria-label="Close cycle detail" style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", marginLeft: 6, display: "inline-flex", padding: 2 }}><Icon name="x" size={14} /></button>
+                  <button onClick={() => setCycleExpanded(false)} aria-label="Close cycle detail" style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", marginLeft: "var(--space-2)", display: "inline-flex", padding: 2 }}><Icon name="x" size={14} /></button>
                 </div>
-                <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--clay)", margin: "0 0 14px", lineHeight: 1.65 }}>{phase.description}</p>
-                <div style={{ padding: "12px 14px", background: "rgba(0,0,0,0.2)", borderRadius: 8 }}>
+                <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--clay)", margin: "0 0 var(--space-4)", lineHeight: 1.65 }}>{phase.description}</p>
+                <div style={{ padding: "var(--space-3) var(--space-4)", background: "rgba(0,0,0,0.2)", borderRadius: "var(--radius)" }}>
                   <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--parchment)", margin: 0, lineHeight: 1.6 }}>{phase.nudge}</p>
                 </div>
               </div>

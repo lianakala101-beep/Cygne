@@ -111,19 +111,19 @@ export function FaceHeatMap({ checkIns = [], products = [], user = {} }) {
   return (
     <div style={{
       background: "rgba(250, 249, 244, 0.92)",
-      borderRadius: 8,
-      padding: "22px 20px 26px",
+      borderRadius: "var(--radius)",
+      padding: "var(--space-6) var(--space-5) calc(var(--space-1) * 7)",
       border: "1px solid rgba(250,249,244,0.25)",
     }}>
       {/* Time filter */}
-      <div style={{ display: "flex", justifyContent: "center", gap: 0, marginBottom: 18 }}>
+      <div style={{ display: "flex", justifyContent: "center", gap: 0, marginBottom: "var(--space-5)" }}>
         {PERIODS.map((p, i) => (
           <span key={p.key} style={{ display: "inline-flex", alignItems: "center" }}>
             <button
               onClick={() => setPeriod(p.key)}
               style={{
                 background: "none", border: "none", cursor: "pointer",
-                padding: "4px 10px",
+                padding: "var(--space-1) var(--space-3)",
                 fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
                 fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)",
                 color: period === p.key ? INK : PEBBLE,
@@ -181,7 +181,7 @@ export function FaceHeatMap({ checkIns = [], products = [], user = {} }) {
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
             fontWeight: 400,
             fontSize: "var(--text-sm)", color: INK,
-            textAlign: "center", marginTop: 16,
+            textAlign: "center", marginTop: "var(--space-4)",
           }}>
             your map is taking shape
           </p>
@@ -189,7 +189,7 @@ export function FaceHeatMap({ checkIns = [], products = [], user = {} }) {
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
             fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)",
             color: PEBBLE, opacity: 0.7,
-            textAlign: "center", marginTop: 6, textTransform: "uppercase",
+            textAlign: "center", marginTop: "var(--space-2)", textTransform: "uppercase",
           }}>
             log skin observations to reveal your patterns
           </p>
@@ -285,13 +285,13 @@ function ZoneInsightDrawer({ zoneId, checkIns, products, user, onClose, onAskCyg
         style={{
           width: "100%", maxWidth: 520,
           background: IVORY,
-          borderRadius: "20px 20px 0 0",
-          padding: "24px 22px 32px",
+          borderRadius: "var(--radius-sheet)",
+          padding: "var(--space-6) var(--space-6) var(--space-8)",
           maxHeight: "85vh", overflowY: "auto",
           color: INK,
         }}
       >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "var(--space-4)" }}>
           <h3 style={{
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
             fontWeight: 400, fontSize: "var(--text-sm)", letterSpacing: "var(--tracking-display)",
@@ -310,7 +310,7 @@ function ZoneInsightDrawer({ zoneId, checkIns, products, user, onClose, onAskCyg
         <p style={{
           fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
           fontWeight: 400, fontSize: "var(--text-sm)", color: INK,
-          margin: "0 0 12px",
+          margin: "0 0 var(--space-3)",
         }}>
           Logged {flareCount} time{flareCount === 1 ? "" : "s"} this month
         </p>
@@ -321,19 +321,19 @@ function ZoneInsightDrawer({ zoneId, checkIns, products, user, onClose, onAskCyg
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
             fontSize: "var(--text-xs)",
             color: PEBBLE,
-            margin: "0 0 18px",
+            margin: "0 0 var(--space-5)",
           }}>
             Most active during your {dominantPhase.toLowerCase()} phase
           </p>
         )}
 
         {/* Products */}
-        <div style={{ marginTop: 8, marginBottom: 22 }}>
+        <div style={{ marginTop: "var(--space-2)", marginBottom: "var(--space-6)" }}>
           <p style={{
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
             fontWeight: 400, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)",
             color: PEBBLE, textTransform: "uppercase",
-            margin: "0 0 8px",
+            margin: "0 0 var(--space-2)",
           }}>
             Products present during flare-ups
           </p>
@@ -352,7 +352,7 @@ function ZoneInsightDrawer({ zoneId, checkIns, products, user, onClose, onAskCyg
                   style={{
                     fontFamily: "var(--font-body, 'Fungis Normal', 'Fungis Normal', sans-serif)",
                     fontSize: "var(--text-sm)", color: INK,
-                    padding: "6px 0",
+                    padding: "var(--space-2) 0",
                     borderBottom: "1px solid rgba(28,28,26,0.10)",
                   }}
                 >
@@ -367,11 +367,11 @@ function ZoneInsightDrawer({ zoneId, checkIns, products, user, onClose, onAskCyg
         <button
           onClick={onAskCygne}
           style={{
-            width: "100%", padding: "14px 0",
+            width: "100%", padding: "var(--space-4) 0",
             background: "transparent",
             border: "1px solid rgba(28,28,26,0.25)",
             color: INK,
-            borderRadius: 12,
+            borderRadius: "var(--radius)",
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
             fontWeight: 400, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)",
             cursor: "pointer",

@@ -78,7 +78,7 @@ const CONTEXT_LINE_STYLE = {
   // (header-to-items gap, and the divider margin before the action
   // bullets both use 16px) — was 10px, noticeably tighter than every
   // other gap on the card.
-  margin: "0 0 16px",
+  margin: "0 0 var(--space-4)",
 };
 
 const VALUE_STYLE = {
@@ -128,26 +128,26 @@ function DailySkinIndexCard({ cyclePhaseName = null, cycleDay = null, weather = 
     <div style={{
       background: "rgba(250,249,244,0.05)",
       border: "1px solid rgba(250,249,244,0.16)",
-      borderRadius: 8,
-      padding: "18px 20px",
-      marginBottom: 20,
+      borderRadius: "var(--radius)",
+      padding: "var(--space-5) var(--space-5)",
+      marginBottom: "var(--space-5)",
     }}>
       {contextLine && (
         <p style={CONTEXT_LINE_STYLE}>
           {contextLine}
         </p>
       )}
-      <p style={{ ...LABEL_STYLE, opacity: 0.75, margin: "0 0 16px" }}>
+      <p style={{ ...LABEL_STYLE, opacity: 0.75, margin: "0 0 var(--space-4)" }}>
         Daily Skin Index
       </p>
 
       {/* Each item is a single horizontal row — label left, value
           pill right. */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
         {items.map(item => {
           const tone = TONE_STYLES[item.tone] || TONE_STYLES.neutral;
           return (
-            <div key={item.key} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+            <div key={item.key} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "var(--space-3)" }}>
               <span style={{ ...LABEL_STYLE, opacity: 0.6 }}>
                 {item.label}
               </span>
@@ -155,9 +155,9 @@ function DailySkinIndexCard({ cyclePhaseName = null, cycleDay = null, weather = 
                 display: "inline-flex", alignItems: "center", justifyContent: "center",
                 minWidth: PILL_MIN_WIDTH,
                 whiteSpace: "nowrap",
-                padding: "6px 16px",
+                padding: "var(--space-2) var(--space-4)",
                 border: `1px solid ${tone.border}`,
-                borderRadius: 999,
+                borderRadius: "var(--radius-pill)",
                 ...VALUE_STYLE,
                 color: tone.color,
               }}>
@@ -170,10 +170,10 @@ function DailySkinIndexCard({ cyclePhaseName = null, cycleDay = null, weather = 
 
       {actions.length > 0 && (
         <>
-          <div style={{ height: 1, background: "rgba(250,249,244,0.14)", margin: "16px 0" }} />
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <div style={{ height: 1, background: "rgba(250,249,244,0.14)", margin: "var(--space-4) 0" }} />
+          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
             {actions.map((action, i) => (
-              <div key={i} style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+              <div key={i} style={{ display: "flex", gap: "var(--space-2)", alignItems: "flex-start" }}>
                 <span aria-hidden="true" style={{ ...ACTION_LINE_STYLE, flexShrink: 0 }}>—</span>
                 <p style={{ ...ACTION_LINE_STYLE, margin: 0 }}>{action}</p>
               </div>

@@ -305,12 +305,12 @@ export function MonthlyRecap({
         style={{
           position: "fixed", top: 18, right: 22, zIndex: 1,
           background: "none", border: "none", cursor: "pointer",
-          color: "rgba(255,255,255,0.6)", fontSize: "var(--text-lg)", lineHeight: 1, padding: 6,
+          color: "rgba(255,255,255,0.6)", fontSize: "var(--text-lg)", lineHeight: 1, padding: "var(--space-2)",
           fontFamily: "var(--font-display)",
         }}
       >×</button>
 
-      <div style={{ maxWidth: 540, margin: "0 auto", padding: "60px 28px 60px", textAlign: "center" }}>
+      <div style={{ maxWidth: 540, margin: "0 auto", padding: "calc(var(--space-1) * 15) calc(var(--space-1) * 7) calc(var(--space-1) * 15)", textAlign: "center" }}>
 
         {/* Header — "[MONTH] IN REVIEW" in uppercase Fungis Heavy at 0.15em
             tracking. Single line, ivory on the inky-moss canvas. The
@@ -329,7 +329,7 @@ export function MonthlyRecap({
           fontFamily: "var(--font-body)",
           fontSize: "var(--text-xs)", fontWeight: 400, letterSpacing: "var(--tracking-display)",
           textTransform: "uppercase", color: "rgba(255,255,255,0.4)",
-          margin: "6px 0 0",
+          margin: "var(--space-2) 0 0",
         }}>
           {year}
         </p>
@@ -340,7 +340,7 @@ export function MonthlyRecap({
             fontFamily: "var(--font-body)",
             fontSize: "var(--text-xs)", fontWeight: 400, letterSpacing: "var(--tracking-display)",
             textTransform: "uppercase", color: IVORY,
-            margin: "14px 0 0", opacity: 0.55,
+            margin: "var(--space-4) 0 0", opacity: 0.55,
           }}>
             {occLine}
           </p>
@@ -349,14 +349,14 @@ export function MonthlyRecap({
         {/* Silver divider */}
         <div style={{
           width: 80, height: 1,
-          margin: "30px auto 0",
+          margin: "var(--space-8) auto 0",
           background: "linear-gradient(90deg, transparent 0%, rgba(192,192,192,0.55) 50%, transparent 100%)",
         }} />
 
         {/* Framing — at most one short, quiet sentence (or loading /
             failed state). Deliberately understated relative to the data
             cards below, which are the recap's actual content now. */}
-        <div style={{ marginTop: 36, marginBottom: 28, minHeight: 24 }}>
+        <div style={{ marginTop: "calc(var(--space-1) * 9)", marginBottom: "calc(var(--space-1) * 7)", minHeight: 24 }}>
           {loading && (
             <p style={{
               fontFamily: "var(--font-body)",
@@ -399,19 +399,19 @@ export function MonthlyRecap({
             than padded with a card that isn't really data-backed. */}
         {dataCards.map(card => (
           <div key={card.key} style={{
-            margin: "0 auto 16px",
+            margin: "0 auto var(--space-4)",
             maxWidth: 420,
-            padding: "18px 20px",
+            padding: "var(--space-5) var(--space-5)",
             background: "rgba(250,249,244,0.05)",
             border: "1px solid rgba(250,249,244,0.16)",
-            borderRadius: 12,
+            borderRadius: "var(--radius)",
             textAlign: "center",
           }}>
             <p style={{
               fontFamily: "var(--font-display)",
               fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)",
               textTransform: "uppercase", color: "rgba(255,255,255,0.55)",
-              margin: "0 0 10px",
+              margin: "0 0 var(--space-3)",
             }}>
               {card.label}
             </p>
@@ -434,19 +434,19 @@ export function MonthlyRecap({
             a non-empty insight. */}
         {insight && (
           <div style={{
-            margin: "0 auto 40px",
+            margin: "0 auto var(--space-10)",
             maxWidth: 420,
-            padding: "18px 20px",
+            padding: "var(--space-5) var(--space-5)",
             background: "rgba(250,249,244,0.05)",
             border: "1px solid rgba(250,249,244,0.16)",
-            borderRadius: 12,
+            borderRadius: "var(--radius)",
             textAlign: "center",
           }}>
             <p style={{
               fontFamily: "var(--font-display)",
               fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)",
               textTransform: "uppercase", color: "rgba(255,255,255,0.55)",
-              margin: "0 0 10px",
+              margin: "0 0 var(--space-3)",
             }}>
               Cycle Pattern
             </p>
@@ -475,7 +475,7 @@ export function MonthlyRecap({
         {/* Silver divider before signoff */}
         <div style={{
           width: 80, height: 1,
-          margin: "0 auto 30px",
+          margin: "0 auto var(--space-8)",
           background: "linear-gradient(90deg, transparent 0%, rgba(192,192,192,0.55) 50%, transparent 100%)",
         }} />
 
@@ -484,7 +484,7 @@ export function MonthlyRecap({
           fontFamily: "var(--font-display)",
           fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)",
           textTransform: "uppercase", color: IVORY,
-          margin: "0 0 18px", opacity: 0.8,
+          margin: "0 0 var(--space-5)", opacity: 0.8,
         }}>
           Built around you.
         </p>
