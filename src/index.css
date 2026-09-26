@@ -59,13 +59,16 @@
   --color-alert: #c06060;
 
   /* RGB channels — for alpha variants: rgba(var(--rgb-moss), 0.32).
-     Pair with one of the opacity steps: 0.08, 0.16, 0.32, 0.56, 0.82. */
+     Pair with one of the opacity steps: 0.08, 0.16, 0.32, 0.56, 0.82, 0.94. */
   --rgb-ivory: 250, 249, 244;
   --rgb-moss: 45, 61, 43;
   --rgb-ink: 28, 28, 26;
   --rgb-bronze: 139, 115, 85;
   --rgb-sage: 122, 144, 112;
   --rgb-gold: 196, 144, 64;
+  --rgb-silver: 192, 192, 192;
+  --rgb-pebble: 122, 122, 122;
+  --rgb-alert: 192, 96, 96;
 
   /* Type scale — 1.25 ratio */
   --text-xs: 11px;
@@ -94,7 +97,7 @@
 
   /* Tracking */
   --tracking-label: 0.12em;
-  --tracking-display: 0.18em;
+  --tracking-display: 0.15em;
 
   /* Brand accent — vibes only, never for readable text */
   --color-silver-gradient: linear-gradient(
@@ -159,7 +162,7 @@ nav,
   background-color: rgba(var(--rgb-ivory), 0.82) !important;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border-top: 1px solid rgba(var(--rgb-ivory), 0.16);
+  border-top: 1px solid rgba(var(--rgb-silver), 0.16);
 }
 
 /* Header — texture must show through */

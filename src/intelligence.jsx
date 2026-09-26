@@ -603,7 +603,7 @@ function RefinementsCard({ products, activeMap, conflicts }) {
 
   // Verb style map
   const verbStyle = {
-    "Remove":           { color: "#c06060", bg: "rgba(var(--rgb-bronze), 0.08)",  border: "rgba(var(--rgb-bronze), 0.32)" },
+    "Remove":           { color: "#c06060", bg: "rgba(var(--rgb-alert), 0.08)",  border: "rgba(var(--rgb-alert), 0.32)" },
     "Reduce Frequency": { color: "#c49040", bg: "rgba(var(--rgb-gold), 0.08)", border: "rgba(var(--rgb-gold), 0.32)" },
     "Replace":          { color: "#7a9070", bg: "rgba(var(--rgb-sage), 0.08)",border: "rgba(var(--rgb-sage), 0.32)" },
     "Add":              { color: "#7a9070", bg: "rgba(var(--rgb-sage), 0.08)", border: "rgba(var(--rgb-sage), 0.32)" },

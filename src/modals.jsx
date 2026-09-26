@@ -3,7 +3,7 @@ import { Icon, Section, FlagCard } from "./components.jsx";
 import { detectActives, analyzeShelf } from "./engine.js";
 import { getSeason } from "./seasonal.jsx";
 import { supabase, invokeEdgeFunction } from "./supabase.js";
-import { compressImage } from "./utils.jsx";
+import { compressImage, withAlpha } from "./utils.jsx";
 import { RAPID_ACTION_MODEL } from "./config.js";
 
 // Visually hidden but DOM-present input style — see shopscan.jsx for the
@@ -476,10 +476,10 @@ function assessRoutineFit(product, products, checkIns = [], user = {}) {
 }
 
 const DEFER_TAG_CONFIG = {
-  season:  { color: "var(--color-ivory, #faf9f4)", bg: "rgba(var(--rgb-ivory), 0.08)", label: "Seasonal hold" },
-  ramp:    { color: "#8b7355", bg: "rgba(var(--rgb-bronze), 0.08)",  label: "Ritual at capacity" },
-  skin:    { color: "#8b7355", bg: "rgba(var(--rgb-bronze), 0.08)",   label: "Skin recovery" },
-  overlap: { color: "#8b7355", bg: "rgba(var(--rgb-bronze), 0.08)", label: "Redundant active" },
+  season:  { color: "var(--color-ivory)",  bg: withAlpha("ivory", 0.08),  tint: withAlpha("ivory", 0.16),  border: withAlpha("ivory", 0.32),  label: "Seasonal hold" },
+  ramp:    { color: "var(--color-bronze)", bg: withAlpha("bronze", 0.08), tint: withAlpha("bronze", 0.16), border: withAlpha("bronze", 0.32), label: "Ritual at capacity" },
+  skin:    { color: "var(--color-bronze)", bg: withAlpha("bronze", 0.08), tint: withAlpha("bronze", 0.16), border: withAlpha("bronze", 0.32), label: "Skin recovery" },
+  overlap: { color: "var(--color-bronze)", bg: withAlpha("bronze", 0.08), tint: withAlpha("bronze", 0.16), border: withAlpha("bronze", 0.32), label: "Redundant active" },
 };
 
 

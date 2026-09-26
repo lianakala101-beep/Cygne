@@ -37,9 +37,9 @@ function RoutineFitSheet({ product, assessment, onAddNow, onDefer, onClose }) {
 
         {/* Defer reason card */}
         {isDefer && (
-          <div style={{ background: tagCfg.bg, border: `1px solid ${tagCfg.color}40`, borderRadius: "var(--radius)", padding: "var(--space-4) var(--space-4)", marginBottom: "var(--space-6)" }}>
+          <div style={{ background: tagCfg.bg, border: `1px solid ${tagCfg.border}`, borderRadius: "var(--radius)", padding: "var(--space-4) var(--space-4)", marginBottom: "var(--space-6)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", marginBottom: "var(--space-2)" }}>
-              <span style={{ padding: "2px var(--space-2)", borderRadius: "var(--radius-pill)", background: `${tagCfg.color}20`, border: `1px solid ${tagCfg.color}50`, fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: tagCfg.color }}>
+              <span style={{ padding: "2px var(--space-2)", borderRadius: "var(--radius-pill)", background: tagCfg.tint, border: `1px solid ${tagCfg.border}`, fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: tagCfg.color }}>
                 {tagCfg.label}
               </span>
               <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400, color: "var(--parchment)" }}>{assessment.reason}</span>

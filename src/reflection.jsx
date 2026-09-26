@@ -21,7 +21,7 @@ const TEXT_SOFT  = "var(--clay)";
 const BORDER     = "var(--border)";
 const OVERLAY    = "var(--overlay)";
 const CTA_BG     = "var(--cta)";
-const CTA_BORDER = "rgba(var(--rgb-sage), 0.32)";
+const CTA_BORDER = "rgba(var(--rgb-pebble), 0.56)";
 const CURSIVE    = "var(--font-display)";
 const SANS       = "var(--font-body)";
 

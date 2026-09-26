@@ -110,7 +110,7 @@ export function FaceHeatMap({ checkIns = [], products = [], user = {} }) {
 
   return (
     <div style={{
-      background: "rgba(var(--rgb-ivory), 0.82)",
+      background: "rgba(var(--rgb-ivory), 0.94)",
       borderRadius: "var(--radius)",
       padding: "var(--space-6) var(--space-5) calc(var(--space-1) * 7)",
       border: "1px solid rgba(var(--rgb-ivory), 0.32)",

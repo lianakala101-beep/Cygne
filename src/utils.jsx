@@ -233,4 +233,9 @@ function getAskCygneAccess(user) {
   return age >= ASK_CYGNE_MIN_AGE ? "available" : "underage";
 }
 
-export { SwanWelcomeScreen, useLocalStorage, daysBetweenLocal, getCurrentCycleDay, getTreatmentElapsed, toLocalMidnight, isoWeekNumber, isoWeekYear, getAskCygneAccess };
+// Alpha variant of a color token via its RGB channel token, e.g.
+// withAlpha("bronze", 0.32) -> "rgba(var(--rgb-bronze), 0.32)". Use the
+// opacity steps from src/index.css.
+const withAlpha = (tokenName, alpha) => `rgba(var(--rgb-${tokenName}), ${alpha})`;
+
+export { SwanWelcomeScreen, useLocalStorage, daysBetweenLocal, getCurrentCycleDay, getTreatmentElapsed, toLocalMidnight, isoWeekNumber, isoWeekYear, getAskCygneAccess, withAlpha };

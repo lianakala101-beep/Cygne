@@ -55,7 +55,7 @@ const inputSt = { width: "100%", padding: "var(--space-3) var(--space-4)", backg
 
 function Pill({ children, active, onClick }) {
   return (
-    <button onClick={onClick} style={{ flexShrink: 0, padding: "var(--space-2) var(--space-4)", borderRadius: 0, border: `1px solid ${active ? "rgba(var(--rgb-sage), 0.82)" : "var(--border)"}`, background: active ? "var(--cta)" : "transparent", color: active ? "#F5F0E8" : "var(--clay)", fontFamily: "var(--heading)", fontSize: "var(--text-xs)", cursor: "pointer", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", whiteSpace: "nowrap", transition: "all 0.18s" }}>
+    <button onClick={onClick} style={{ flexShrink: 0, padding: "var(--space-2) var(--space-4)", borderRadius: 0, border: `1px solid ${active ? "rgba(var(--rgb-pebble), 0.94)" : "var(--border)"}`, background: active ? "var(--cta)" : "transparent", color: active ? "#F5F0E8" : "var(--clay)", fontFamily: "var(--heading)", fontSize: "var(--text-xs)", cursor: "pointer", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", whiteSpace: "nowrap", transition: "all 0.18s" }}>
       {children}
     </button>
   );

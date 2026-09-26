@@ -1973,7 +1973,7 @@ export default function App() {
       {/* Header — dark across every tab */}
       <div style={{
         position: "sticky", top: 0, zIndex: 50,
-        background: "rgba(var(--rgb-moss), 0.82)",
+        background: "rgba(var(--rgb-moss), 0.94)",
         backdropFilter: "blur(16px)",
         borderBottom: "1px solid rgba(var(--rgb-ivory), 0.08)",
         padding: "0 var(--space-6)",
@@ -2119,7 +2119,7 @@ export default function App() {
       </div>
 
       {/* Bottom nav — dark across every tab */}
-      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "rgba(var(--rgb-moss), 0.82)", backdropFilter: "blur(16px)", borderTop: "1px solid rgba(var(--rgb-ivory), 0.08)", zIndex: 50 }}>
+      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "rgba(var(--rgb-moss), 0.94)", backdropFilter: "blur(16px)", borderTop: "1px solid rgba(var(--rgb-ivory), 0.08)", zIndex: 50 }}>
         <div style={{ maxWidth: 600, margin: "0 auto", display: "flex" }}>
           {tabs.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}

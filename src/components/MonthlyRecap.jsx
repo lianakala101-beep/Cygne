@@ -350,7 +350,7 @@ export function MonthlyRecap({
         <div style={{
           width: 80, height: 1,
           margin: "var(--space-8) auto 0",
-          background: "linear-gradient(90deg, transparent 0%, rgba(var(--rgb-ivory), 0.56) 50%, transparent 100%)",
+          background: "linear-gradient(90deg, transparent 0%, rgba(var(--rgb-silver), 0.56) 50%, transparent 100%)",
         }} />
 
         {/* Framing — at most one short, quiet sentence (or loading /
@@ -476,7 +476,7 @@ export function MonthlyRecap({
         <div style={{
           width: 80, height: 1,
           margin: "0 auto var(--space-8)",
-          background: "linear-gradient(90deg, transparent 0%, rgba(var(--rgb-ivory), 0.56) 50%, transparent 100%)",
+          background: "linear-gradient(90deg, transparent 0%, rgba(var(--rgb-silver), 0.56) 50%, transparent 100%)",
         }} />
 
         {/* Closing signature */}

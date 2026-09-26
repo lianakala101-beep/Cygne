@@ -72,11 +72,11 @@ function ProductBottle({ product, onEdit, onDelete, onToggleRoutine, onSession, 
             so it's reachable regardless of shape. */}
         <div ref={menuRef} style={{ position: "absolute", top: -6, right: -8, zIndex: 2 }}>
           <button onClick={() => setMenuOpen(o => !o)} aria-label="Options"
-            style={{ width: 18, height: 18, borderRadius: "50%", background: "rgba(var(--rgb-ivory), 0.82)", border: "1px solid rgba(var(--rgb-ivory), 0.32)", color: "var(--color-ink)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "var(--text-xs)", lineHeight: 1, fontFamily: "sans-serif" }}>
+            style={{ width: 18, height: 18, borderRadius: "50%", background: "rgba(var(--rgb-ivory), 0.82)", border: "1px solid rgba(var(--rgb-silver), 0.32)", color: "var(--color-ink)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "var(--text-xs)", lineHeight: 1, fontFamily: "sans-serif" }}>
             ⋯
           </button>
           {menuOpen && (
-            <div style={{ position: "absolute", right: 0, top: "110%", zIndex: 50, minWidth: 170, background: "rgba(var(--rgb-ivory), 0.82)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", border: "1px solid rgba(var(--rgb-ivory), 0.32)", borderRadius: "var(--radius)", padding: "var(--space-2) 0", boxShadow: "0 8px 28px rgba(var(--rgb-ink), 0.08)" }}>
+            <div style={{ position: "absolute", right: 0, top: "110%", zIndex: 50, minWidth: 170, background: "rgba(var(--rgb-ivory), 0.94)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", border: "1px solid rgba(var(--rgb-silver), 0.32)", borderRadius: "var(--radius)", padding: "var(--space-2) 0", boxShadow: "0 8px 28px rgba(var(--rgb-ink), 0.08)" }}>
               <button onClick={() => { setMenuOpen(false); onEdit(product); }} style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", width: "100%", padding: "var(--space-3) var(--space-4)", background: "none", border: "none", cursor: "pointer", color: "var(--color-ink)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", textAlign: "left" }}>
                 <Icon name="edit" size={12} /><span>Edit product</span>
               </button>
@@ -105,7 +105,7 @@ function ProductBottle({ product, onEdit, onDelete, onToggleRoutine, onSession, 
                   <Icon name="swan" size={12} /><span>Ask Cygne</span>
                 </button>
               )}
-              <div style={{ height: 1, background: "rgba(var(--rgb-ivory), 0.32)", margin: "var(--space-1) var(--space-3)" }} />
+              <div style={{ height: 1, background: "rgba(var(--rgb-silver), 0.32)", margin: "var(--space-1) var(--space-3)" }} />
               <button onClick={() => { setMenuOpen(false); setConfirmDelete(true); }} style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", width: "100%", padding: "var(--space-3) var(--space-4)", background: "none", border: "none", cursor: "pointer", color: "var(--color-bronze)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", textAlign: "left" }}>
                 <Icon name="trash" size={12} /><span>Remove</span>
               </button>
@@ -159,11 +159,11 @@ function ProductBottle({ product, onEdit, onDelete, onToggleRoutine, onSession, 
       {/* Delete confirmation */}
       {confirmDelete && (
         <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(var(--rgb-ivory), 0.82)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", padding: "0 calc(var(--space-1) * 7)" }} onClick={() => setConfirmDelete(false)}>
-          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 320, background: "rgba(var(--rgb-ivory), 0.82)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", border: "1px solid rgba(var(--rgb-ivory), 0.32)", borderRadius: "var(--radius)", padding: "calc(var(--space-1) * 7) var(--space-6) var(--space-6)", boxShadow: "0 16px 48px rgba(var(--rgb-ink), 0.08)" }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 320, background: "rgba(var(--rgb-ivory), 0.94)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", border: "1px solid rgba(var(--rgb-silver), 0.32)", borderRadius: "var(--radius)", padding: "calc(var(--space-1) * 7) var(--space-6) var(--space-6)", boxShadow: "0 16px 48px rgba(var(--rgb-ink), 0.08)" }}>
             <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-stone)", margin: "0 0 var(--space-3)" }}>Confirm</p>
             <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "var(--color-ink)", margin: "0 0 var(--space-6)", lineHeight: 1.65 }}>Remove <strong>{product.name}</strong> from your vanity? This cannot be undone.</p>
             <div style={{ display: "flex", gap: "var(--space-3)" }}>
-              <button onClick={() => setConfirmDelete(false)} style={{ flex: 1, padding: "var(--space-3) 0", borderRadius: 0, border: "1px solid rgba(var(--rgb-ivory), 0.32)", background: "transparent", color: "var(--color-ink)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => setConfirmDelete(false)} style={{ flex: 1, padding: "var(--space-3) 0", borderRadius: 0, border: "1px solid rgba(var(--rgb-silver), 0.32)", background: "transparent", color: "var(--color-ink)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", cursor: "pointer" }}>Cancel</button>
               <button onClick={() => { setConfirmDelete(false); onDelete(product.id); }} style={{ flex: 1, padding: "var(--space-3) 0", borderRadius: 0, border: "1px solid rgba(var(--rgb-bronze), 0.32)", background: "rgba(var(--rgb-bronze), 0.08)", color: "var(--color-bronze)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", cursor: "pointer" }}>Remove</button>
             </div>
           </div>
@@ -744,7 +744,7 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearAll,
                       <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", fontWeight: 400, color: "var(--parchment)", margin: "0 0 2px" }}>{item.product.name}</p>
                       <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: 0 }}>{item.product.brand} · {item.product.category}</p>
                     </div>
-                    <span style={{ padding: "2px var(--space-2)", borderRadius: "var(--radius-pill)", background: tagCfg.bg, border: `1px solid ${tagCfg.color}40`, fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: tagCfg.color, flexShrink: 0, marginLeft: "var(--space-3)" }}>
+                    <span style={{ padding: "2px var(--space-2)", borderRadius: "var(--radius-pill)", background: tagCfg.bg, border: `1px solid ${tagCfg.border}`, fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: tagCfg.color, flexShrink: 0, marginLeft: "var(--space-3)" }}>
                       {tagCfg.label}
                     </span>
                   </div>
