@@ -44,8 +44,8 @@ const ZONE_LABEL = ZONES.reduce((acc, z) => {
 }, {});
 
 const STROKE_DEFAULT = "var(--color-inky-moss, #2d3d2b)";
-const STROKE_SELECTED = "rgba(45,61,43,0.6)";
-const FILL_SELECTED = "rgba(45,61,43,0.15)";
+const STROKE_SELECTED = "rgba(var(--rgb-moss), 0.56)";
+const FILL_SELECTED = "rgba(var(--rgb-moss), 0.16)";
 
 export function FaceZoneSelector({ selected = [], onChange }) {
   const set = useMemo(() => new Set(selected), [selected]);

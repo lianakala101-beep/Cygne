@@ -80,7 +80,7 @@ function WeekendNudgeCard({ products, activeMap, lineMode = false }) {
   // typography, brightened ivory body copy.
   if (lineMode) {
     return (
-      <div style={{ borderTop: "1px solid rgba(250,249,244,0.25)", borderBottom: "1px solid rgba(250,249,244,0.25)", marginTop: -1, padding: "var(--space-8) 0" }}>
+      <div style={{ borderTop: "1px solid rgba(var(--rgb-ivory), 0.32)", borderBottom: "1px solid rgba(var(--rgb-ivory), 0.32)", marginTop: -1, padding: "var(--space-8) 0" }}>
         <button
           type="button"
           onClick={() => setOpen(o => !o)}
@@ -96,29 +96,29 @@ function WeekendNudgeCard({ products, activeMap, lineMode = false }) {
           <span style={{
             fontFamily: "var(--font-body)", fontWeight: 400, fontSize: "var(--text-xs)",
             letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
-            color: "#F4F3EF", opacity: 0.7,
+            color: "var(--color-ivory)", opacity: 0.7,
             whiteSpace: "nowrap",
           }}>{cfg.label}</span>
           <span style={{
             width: "100%",
             fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 700,
             letterSpacing: "var(--tracking-label)", textTransform: "uppercase",
-            color: "#F4F3EF",
+            color: "var(--color-ivory)",
             lineHeight: 1.25,
           }}>{cfg.headline}</span>
           <span style={{
             position: "absolute", right: 0, top: "50%", transform: `translateY(-50%) ${open ? "rotate(90deg)" : "none"}`,
-            color: "#F4F3EF", opacity: 0.6,
+            color: "var(--color-ivory)", opacity: 0.6,
             transition: "transform 0.2s",
             display: "inline-flex",
           }}><Icon name="chevron" size={11} /></span>
         </button>
         {open && lines.length > 0 && (
-          <div style={{ marginTop: "var(--space-5)", paddingTop: "var(--space-5)", borderTop: "1px solid rgba(250,249,244,0.18)", textAlign: "center" }}>
+          <div style={{ marginTop: "var(--space-5)", paddingTop: "var(--space-5)", borderTop: "1px solid rgba(var(--rgb-ivory), 0.16)", textAlign: "center" }}>
             {lines.map((s, i) => (
               <p key={i} style={{
                 fontFamily: "var(--font-body)", fontSize: "var(--text-xs)",
-                color: "#F4F3EF",
+                color: "var(--color-ivory)",
                 margin: i === lines.length - 1 ? 0 : "0 0 var(--space-2)",
                 lineHeight: 1.65,
               }}>{s}</p>
@@ -156,7 +156,7 @@ function WeekendNudgeCard({ products, activeMap, lineMode = false }) {
           fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-xs)",
           letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
           color: "var(--color-ivory, #faf9f4)",
-          background: "rgba(250,249,244,0.15)",
+          background: "rgba(var(--rgb-ivory), 0.16)",
           padding: "var(--space-1) var(--space-2)", borderRadius: "var(--radius-pill)",
           flexShrink: 0, whiteSpace: "nowrap",
         }}>{cfg.label}</span>
@@ -176,7 +176,7 @@ function WeekendNudgeCard({ products, activeMap, lineMode = false }) {
         }}><Icon name="chevron" size={11} /></span>
       </button>
       {open && lines.length > 0 && (
-        <div style={{ marginTop: "var(--space-3)", paddingTop: "var(--space-3)", borderTop: "1px solid rgba(250,249,244,0.18)" }}>
+        <div style={{ marginTop: "var(--space-3)", paddingTop: "var(--space-3)", borderTop: "1px solid rgba(var(--rgb-ivory), 0.16)" }}>
           {lines.map((s, i) => (
             <p key={i} style={{
               fontFamily: "var(--font-body)", fontSize: "var(--text-xs)",

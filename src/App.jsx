@@ -138,7 +138,7 @@ function ReflectionPromptCard({ zone, onOpen, onDismiss }) {
         style={{
           position: "absolute", top: 12, right: 12,
           background: "none", border: "none", cursor: "pointer",
-          color: "rgba(250,249,244,0.6)", padding: "var(--space-1)", display: "inline-flex",
+          color: "rgba(var(--rgb-ivory), 0.56)", padding: "var(--space-1)", display: "inline-flex",
           WebkitTapHighlightColor: "transparent",
         }}
       >
@@ -1811,7 +1811,7 @@ export default function App() {
   if (authLoading || (authSession && !user && !needsOnboarding)) {
     return (
       <div style={{ minHeight: "100vh", background: "#323d30", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ width: 24, height: 24, border: "2px solid rgba(232,227,214,0.3)", borderTopColor: "rgba(232,227,214,0.8)", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+        <div style={{ width: 24, height: 24, border: "2px solid rgba(var(--rgb-ivory), 0.32)", borderTopColor: "rgba(var(--rgb-ivory), 0.82)", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
@@ -1887,7 +1887,7 @@ export default function App() {
            stale "var(--font-body)" callsite ends up in the same family as the
            rest of the app. */
         :root {
-          --sage:      #6e8a72;
+          --sage:      var(--color-sage);
           --sans:      'Fungis Normal', 'Fungis', sans-serif;
           /* Cygne design system tokens */
           --color-ivory:        #faf9f4;
@@ -1903,21 +1903,21 @@ export default function App() {
              --border / --surface auto-skins without a hand edit. */
           --deep:               var(--color-inky-moss);
           --ink:                #354a32;
-          --surface:            rgba(255,255,255,0.06);
-          --border:             rgba(250,249,244,0.2);
+          --surface:            rgba(var(--rgb-ivory), 0.08);
+          --border:             rgba(var(--rgb-ivory), 0.16);
           --parchment:          var(--color-ivory);
-          --clay:               rgba(255,255,255,0.6);
-          --muted:              rgba(255,255,255,0.4);
-          --taupe:              rgba(250,249,244,0.5);
-          --overlay:            rgba(8,12,8,0.6);
+          --clay:               rgba(var(--rgb-ivory), 0.56);
+          --muted:              rgba(var(--rgb-ivory), 0.32);
+          --taupe:              rgba(var(--rgb-ivory), 0.56);
+          --overlay:            rgba(var(--rgb-ink), 0.56);
           --sage:               var(--color-ivory);
-          --cta:                rgba(250,249,244,0.08);
-          --color-ivory-shadow: rgba(255,255,255,0.06);
+          --cta:                rgba(var(--rgb-ivory), 0.08);
+          --color-ivory-shadow: rgba(var(--rgb-ivory), 0.08);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         input, select, textarea { outline: none; }
         input:focus, select:focus, textarea:focus { border-color: var(--sage) !important; }
-        input::placeholder, textarea::placeholder { color: rgba(250,249,244,0.4); opacity: 1; }
+        input::placeholder, textarea::placeholder { color: rgba(var(--rgb-ivory), 0.32); opacity: 1; }
         ::-webkit-scrollbar { display: none; }
         /* Keyboard focus: visible inky-moss ring for :focus-visible only, so
            mouse/touch interactions stay clean but keyboard navigation is
@@ -1962,20 +1962,20 @@ export default function App() {
           50%  { opacity: 0.75; }
           100% { opacity: 0.35; }
         }
-        option { background: #f7f4f0; color: #1c1c1a; }
+        option { background: var(--color-ivory); color: var(--color-ink); }
         input, select, textarea {
-          background: #f7f4f0;
-          color: #1c1c1a;
+          background: var(--color-ivory);
+          color: var(--color-ink);
         }
-        .modal-bg { background: rgba(232,226,217,0.55); }
+        .modal-bg { background: rgba(var(--rgb-ivory), 0.56); }
       `}</style>
 
       {/* Header — dark across every tab */}
       <div style={{
         position: "sticky", top: 0, zIndex: 50,
-        background: "rgba(45,61,43,0.94)",
+        background: "rgba(var(--rgb-moss), 0.82)",
         backdropFilter: "blur(16px)",
-        borderBottom: "1px solid rgba(250,249,244,0.12)",
+        borderBottom: "1px solid rgba(var(--rgb-ivory), 0.08)",
         padding: "0 var(--space-6)",
       }}>
         <div style={{ position: "relative", maxWidth: 600, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "flex-end", height: 76 }}>
@@ -2119,7 +2119,7 @@ export default function App() {
       </div>
 
       {/* Bottom nav — dark across every tab */}
-      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "rgba(45,61,43,0.97)", backdropFilter: "blur(16px)", borderTop: "1px solid rgba(250,249,244,0.12)", zIndex: 50 }}>
+      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "rgba(var(--rgb-moss), 0.82)", backdropFilter: "blur(16px)", borderTop: "1px solid rgba(var(--rgb-ivory), 0.08)", zIndex: 50 }}>
         <div style={{ maxWidth: 600, margin: "0 auto", display: "flex" }}>
           {tabs.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}

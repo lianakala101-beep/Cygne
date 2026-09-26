@@ -25,9 +25,9 @@ import { buildSkinIndex } from "../lib/skinIndex.js";
 // question; the tone signal still comes through via the pill's
 // outline color, which stays distinct per tone.
 const TONE_STYLES = {
-  caution:  { color: "var(--color-ivory, #faf9f4)", border: "rgba(139,115,85,0.45)" },
-  positive: { color: "var(--color-ivory, #faf9f4)", border: "rgba(110,138,114,0.4)" },
-  neutral:  { color: "var(--color-ivory, #faf9f4)", border: "rgba(250,249,244,0.32)" },
+  caution:  { color: "var(--color-ivory, #faf9f4)", border: "rgba(var(--rgb-bronze), 0.56)" },
+  positive: { color: "var(--color-ivory, #faf9f4)", border: "rgba(var(--rgb-sage), 0.32)" },
+  neutral:  { color: "var(--color-ivory, #faf9f4)", border: "rgba(var(--rgb-ivory), 0.32)" },
 };
 
 // Typography audit — one shared spec per role, reused everywhere that
@@ -126,8 +126,8 @@ function DailySkinIndexCard({ cyclePhaseName = null, cycleDay = null, weather = 
 
   return (
     <div style={{
-      background: "rgba(250,249,244,0.05)",
-      border: "1px solid rgba(250,249,244,0.16)",
+      background: "rgba(var(--rgb-ivory), 0.08)",
+      border: "1px solid rgba(var(--rgb-ivory), 0.16)",
       borderRadius: "var(--radius)",
       padding: "var(--space-5) var(--space-5)",
       marginBottom: "var(--space-5)",
@@ -170,7 +170,7 @@ function DailySkinIndexCard({ cyclePhaseName = null, cycleDay = null, weather = 
 
       {actions.length > 0 && (
         <>
-          <div style={{ height: 1, background: "rgba(250,249,244,0.14)", margin: "var(--space-4) 0" }} />
+          <div style={{ height: 1, background: "rgba(var(--rgb-ivory), 0.16)", margin: "var(--space-4) 0" }} />
           <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
             {actions.map((action, i) => (
               <div key={i} style={{ display: "flex", gap: "var(--space-2)", alignItems: "flex-start" }}>

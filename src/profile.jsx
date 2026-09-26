@@ -18,34 +18,34 @@ function ProfileInner({ user, products, onLogout, locationData, setLocationData,
   return (
     <div>
       <div style={{ marginBottom: "var(--space-8)" }}>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(255,255,255,0.6)", marginBottom: "var(--space-2)" }}>account</p>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.56)", marginBottom: "var(--space-2)" }}>account</p>
         <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-xl)", fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory)", margin: "0 0 2px" }}>{user.name}</h2>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(255,255,255,0.6)", letterSpacing: "0.04em" }}>{user.email}</p>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ivory), 0.56)", letterSpacing: "0.04em" }}>{user.email}</p>
       </div>
 
       {/* Your Skin section */}
       {(user.skinType || (user.concerns && user.concerns.length > 0) || user.skinAgeBracket) && (
         <div style={{ marginBottom: "var(--space-6)" }}>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(255,255,255,0.6)", marginBottom: "var(--space-3)" }}>Your Skin</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.56)", marginBottom: "var(--space-3)" }}>Your Skin</p>
           <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: "var(--radius)", padding: "var(--space-4) var(--space-5)" }}>
             {user.skinAgeBracket && (
               <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", marginBottom: "var(--space-3)", paddingBottom: "var(--space-3)", borderBottom: "1px solid var(--border)" }}>
-                <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "rgba(255,255,255,0.6)" }}>Age Bracket</span>
+                <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.56)" }}>Age Bracket</span>
                 <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-ivory, #faf9f4)", fontWeight: 400 }}>{user.skinAgeBracket}</span>
               </div>
             )}
             {user.skinType && (
               <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", marginBottom: user.concerns?.length > 0 ? "var(--space-3)" : 0, paddingBottom: user.concerns?.length > 0 ? "var(--space-3)" : 0, borderBottom: user.concerns?.length > 0 ? "1px solid var(--border)" : "none" }}>
-                <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "rgba(255,255,255,0.6)" }}>Skin Type</span>
-                <span style={{ padding: "var(--space-1) var(--space-3)", borderRadius: "var(--radius-pill)", background: "rgba(250,249,244,0.10)", border: "1px solid rgba(45,61,43,0.3)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-ivory, #faf9f4)", fontWeight: 400 }}>{user.skinType}</span>
+                <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.56)" }}>Skin Type</span>
+                <span style={{ padding: "var(--space-1) var(--space-3)", borderRadius: "var(--radius-pill)", background: "rgba(var(--rgb-ivory), 0.08)", border: "1px solid rgba(var(--rgb-moss), 0.32)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-ivory, #faf9f4)", fontWeight: 400 }}>{user.skinType}</span>
               </div>
             )}
             {user.concerns && user.concerns.length > 0 && (
               <div>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "rgba(255,255,255,0.6)", margin: "0 0 var(--space-2)" }}>Concerns</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.56)", margin: "0 0 var(--space-2)" }}>Concerns</p>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-2)" }}>
                   {user.concerns.map((c, i) => (
-                    <span key={i} style={{ padding: "var(--space-1) var(--space-3)", borderRadius: "var(--radius-pill)", background: "var(--ink)", border: "1px solid var(--border)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(255,255,255,0.6)" }}>{c}</span>
+                    <span key={i} style={{ padding: "var(--space-1) var(--space-3)", borderRadius: "var(--radius-pill)", background: "var(--ink)", border: "1px solid var(--border)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ivory), 0.56)" }}>{c}</span>
                   ))}
                 </div>
               </div>
@@ -58,31 +58,31 @@ function ProfileInner({ user, products, onLogout, locationData, setLocationData,
         {[["Products", safeProducts.length], ["Categories", new Set(safeProducts.map(p => p?.category).filter(Boolean)).size], ["Value", `$${spending.total.toFixed(0)}`]].map(([l, v]) => (
           <div key={l} style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: "var(--radius)", padding: "var(--space-5) var(--space-3)", textAlign: "center" }}>
             <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xl)", fontWeight: 200, color: "var(--color-ivory, #faf9f4)", margin: "0 0 var(--space-1)", letterSpacing: "-0.02em" }}>{v}</p>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "rgba(255,255,255,0.6)", margin: 0 }}>{l}</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.56)", margin: 0 }}>{l}</p>
           </div>
         ))}
       </div>
 
       {/* Location */}
       <div style={{ marginBottom: "var(--space-6)" }}>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(255,255,255,0.6)", marginBottom: "var(--space-3)" }}>Your Environment</p>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.56)", marginBottom: "var(--space-3)" }}>Your Environment</p>
         <LocationManager locationData={locationData} setLocationData={setLocationData} locationDenied={locationDenied} setLocationDenied={setLocationDenied} />
       </div>
 
       <Section title="About Cygne" icon="leaf">
         <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: "var(--radius)", padding: "var(--space-5) var(--space-5)" }}>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "rgba(255,255,255,0.6)", margin: "0 0 var(--space-4)", lineHeight: 1.7 }}>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "rgba(var(--rgb-ivory), 0.56)", margin: "0 0 var(--space-4)", lineHeight: 1.7 }}>
             Cygne transforms your product collection into a properly sequenced, conflict-free routine. Correct layering. Ingredient compatibility. Reduced redundancy.
           </p>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(255,255,255,0.6)", margin: 0, opacity: 0.6, lineHeight: 1.6 }}>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ivory), 0.56)", margin: 0, opacity: 0.6, lineHeight: 1.6 }}>
             All analysis is rule-based and logic-driven. Product identification uses AI vision on upload. No chat, no social, no telehealth.
           </p>
         </div>
       </Section>
 
       <button onClick={onLogout}
-        style={{ width: "100%", padding: "var(--space-3) 0", background: "none", color: "rgba(255,255,255,0.6)", border: "1px solid var(--border)", borderRadius: "var(--radius)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", cursor: "pointer", transition: "border-color 0.2s, color 0.2s" }}
-        onMouseEnter={e => { e.currentTarget.style.borderColor = "#2d3d2b"; e.currentTarget.style.color = "#2d3d2b"; }}
+        style={{ width: "100%", padding: "var(--space-3) 0", background: "none", color: "rgba(var(--rgb-ivory), 0.56)", border: "1px solid var(--border)", borderRadius: "var(--radius)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", cursor: "pointer", transition: "border-color 0.2s, color 0.2s" }}
+        onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--color-inky-moss)"; e.currentTarget.style.color = "var(--color-inky-moss)"; }}
         onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--clay)"; }}>
         Sign Out
       </button>
@@ -152,12 +152,12 @@ function IngredientProfile({ user, onUpdateUser }) {
   // Shared visual language with SkinProfileEditor — same card chrome,
   // header treatment, edit chrome, field labels, Save/Cancel buttons.
   const fieldLabel = (txt) => (
-    <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(255,255,255,0.6)", margin: "0 0 var(--space-2)" }}>{txt}</p>
+    <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.56)", margin: "0 0 var(--space-2)" }}>{txt}</p>
   );
   const editInputStyle = {
     width: "100%", boxSizing: "border-box",
-    background: "rgba(255,255,255,0.06)",
-    border: "1px solid rgba(250,249,244,0.3)",
+    background: "rgba(var(--rgb-ivory), 0.08)",
+    border: "1px solid rgba(var(--rgb-ivory), 0.32)",
     borderRadius: 0, padding: "var(--space-3) var(--space-4)",
     fontFamily: "var(--font-body)", fontSize: "var(--text-sm)",
     color: "var(--color-ivory, #faf9f4)",
@@ -173,9 +173,9 @@ function IngredientProfile({ user, onUpdateUser }) {
       <button type="button" onClick={onClick}
         style={{
           padding: "var(--space-2) var(--space-3)", borderRadius: "var(--radius-pill)",
-          border: `1px solid ${on ? "var(--color-ivory, #faf9f4)" : "rgba(250,249,244,0.3)"}`,
-          background: on ? "rgba(250,249,244,0.12)" : "transparent",
-          color: on ? "var(--color-ivory, #faf9f4)" : "rgba(250,249,244,0.5)",
+          border: `1px solid ${on ? "var(--color-ivory, #faf9f4)" : "rgba(var(--rgb-ivory), 0.32)"}`,
+          background: on ? "rgba(var(--rgb-ivory), 0.08)" : "transparent",
+          color: on ? "var(--color-ivory, #faf9f4)" : "rgba(var(--rgb-ivory), 0.56)",
           fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: on ? 700 : 400,
           cursor: "pointer", letterSpacing: "0.02em", transition: "all 0.18s",
           WebkitAppearance: "none", appearance: "none",
@@ -198,9 +198,9 @@ function IngredientProfile({ user, onUpdateUser }) {
       </div>
 
       {!editing ? (
-        <div style={{ background: "var(--color-ivory-shadow, #f0ebe0)", borderTop: "1px solid rgba(45,61,43,0.18)", padding: "var(--space-5) var(--space-4)" }}>
+        <div style={{ background: "var(--color-ivory-shadow, #f0ebe0)", borderTop: "1px solid rgba(var(--rgb-moss), 0.16)", padding: "var(--space-5) var(--space-4)" }}>
           {!hasAny ? (
-            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(255,255,255,0.6)", margin: 0 }}>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ivory), 0.56)", margin: 0 }}>
               No ingredients flagged yet. Tap Edit to mark allergens and loved ingredients — Cygne will cross-reference them on every product.
             </p>
           ) : (
@@ -208,16 +208,16 @@ function IngredientProfile({ user, onUpdateUser }) {
             // (clay = avoid, moss = love) is the only visual distinction.
             <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-1)" }}>
               {loved.map(l => (
-                <span key={`l-${l}`} style={{ padding: "var(--space-1) var(--space-3)", borderRadius: "var(--radius-pill)", background: "rgba(250,249,244,0.08)", border: "1px solid rgba(45,61,43,0.22)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-ivory, #faf9f4)" }}>{l}</span>
+                <span key={`l-${l}`} style={{ padding: "var(--space-1) var(--space-3)", borderRadius: "var(--radius-pill)", background: "rgba(var(--rgb-ivory), 0.08)", border: "1px solid rgba(var(--rgb-moss), 0.16)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-ivory, #faf9f4)" }}>{l}</span>
               ))}
               {allergens.map(a => (
-                <span key={`a-${a}`} style={{ padding: "var(--space-1) var(--space-3)", borderRadius: "var(--radius-pill)", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.22)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "#8b7355" }}>{a}</span>
+                <span key={`a-${a}`} style={{ padding: "var(--space-1) var(--space-3)", borderRadius: "var(--radius-pill)", background: "rgba(var(--rgb-bronze), 0.08)", border: "1px solid rgba(var(--rgb-bronze), 0.16)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-bronze)" }}>{a}</span>
               ))}
             </div>
           )}
         </div>
       ) : (
-        <div style={{ background: "var(--color-ivory-shadow, #f0ebe0)", borderTop: "1px solid rgba(45,61,43,0.18)", padding: "var(--space-5) var(--space-4)", display: "flex", flexDirection: "column", gap: "var(--space-5)" }}>
+        <div style={{ background: "var(--color-ivory-shadow, #f0ebe0)", borderTop: "1px solid rgba(var(--rgb-moss), 0.16)", padding: "var(--space-5) var(--space-4)", display: "flex", flexDirection: "column", gap: "var(--space-5)" }}>
           {/* Avoid / Allergic to */}
           <div>
             {fieldLabel("Avoid / Allergic to")}
@@ -225,7 +225,7 @@ function IngredientProfile({ user, onUpdateUser }) {
               {COMMON_ALLERGENS.map(s => tagButton({ on: draftAllergens.includes(s), tone: "avoid", onClick: () => toggleAllergen(s), children: s }))}
               {draftAllergens.filter(a => !COMMON_ALLERGENS.includes(a)).map(a => (
                 <button key={a} onClick={() => toggleAllergen(a)}
-                  style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-1)", padding: "var(--space-2) var(--space-3)", borderRadius: "var(--radius-pill)", border: "1px solid var(--color-ivory, #faf9f4)", background: "rgba(250,249,244,0.12)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-ivory, #faf9f4)", fontWeight: 700, cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
+                  style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-1)", padding: "var(--space-2) var(--space-3)", borderRadius: "var(--radius-pill)", border: "1px solid var(--color-ivory, #faf9f4)", background: "rgba(var(--rgb-ivory), 0.08)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-ivory, #faf9f4)", fontWeight: 700, cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
                   {a} <Icon name="x" size={9} />
                 </button>
               ))}
@@ -235,7 +235,7 @@ function IngredientProfile({ user, onUpdateUser }) {
                 value={customAllergen} onChange={e => setCustomAllergen(e.target.value)}
                 onKeyDown={e => e.key === "Enter" && addCustomAllergen()} />
               <button onClick={addCustomAllergen}
-                style={{ padding: "0 var(--space-5)", background: "transparent", border: "1.5px solid rgba(250,249,244,0.5)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
+                style={{ padding: "0 var(--space-5)", background: "transparent", border: "1.5px solid rgba(var(--rgb-ivory), 0.56)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
                 Add
               </button>
             </div>
@@ -248,7 +248,7 @@ function IngredientProfile({ user, onUpdateUser }) {
               {COMMON_LOVED.map(s => tagButton({ on: draftLoved.includes(s), tone: "love", onClick: () => toggleLoved(s), children: s }))}
               {draftLoved.filter(l => !COMMON_LOVED.includes(l)).map(l => (
                 <button key={l} onClick={() => toggleLoved(l)}
-                  style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-1)", padding: "var(--space-2) var(--space-3)", borderRadius: "var(--radius-pill)", border: "1px solid var(--color-ivory, #faf9f4)", background: "rgba(250,249,244,0.12)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-ivory, #faf9f4)", fontWeight: 700, cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
+                  style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-1)", padding: "var(--space-2) var(--space-3)", borderRadius: "var(--radius-pill)", border: "1px solid var(--color-ivory, #faf9f4)", background: "rgba(var(--rgb-ivory), 0.08)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-ivory, #faf9f4)", fontWeight: 700, cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
                   {l} <Icon name="x" size={9} />
                 </button>
               ))}
@@ -258,7 +258,7 @@ function IngredientProfile({ user, onUpdateUser }) {
                 value={customLoved} onChange={e => setCustomLoved(e.target.value)}
                 onKeyDown={e => e.key === "Enter" && addCustomLoved()} />
               <button onClick={addCustomLoved}
-                style={{ padding: "0 var(--space-5)", background: "transparent", border: "1.5px solid rgba(250,249,244,0.5)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
+                style={{ padding: "0 var(--space-5)", background: "transparent", border: "1.5px solid rgba(var(--rgb-ivory), 0.56)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
                 Add
               </button>
             </div>
@@ -266,7 +266,7 @@ function IngredientProfile({ user, onUpdateUser }) {
 
           <div style={{ display: "flex", gap: "var(--space-2)", marginTop: "var(--space-1)" }}>
             <button onClick={save}
-              style={{ flex: 1, padding: "var(--space-3) 0", background: "transparent", border: "1.5px solid rgba(250,249,244,0.5)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
+              style={{ flex: 1, padding: "var(--space-3) 0", background: "transparent", border: "1.5px solid rgba(var(--rgb-ivory), 0.56)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
               Save
             </button>
             <button onClick={cancel}
@@ -386,8 +386,8 @@ function SkinProfileEditor({ user, onUpdateUser }) {
     <button type="button" onClick={onClick}
       style={{
         padding: "var(--space-2) var(--space-4)", borderRadius: "var(--radius)",
-        border: `1px solid ${active ? "var(--color-inky-moss, #2d3d2b)" : "rgba(45,61,43,0.35)"}`,
-        background: active ? "rgba(45,61,43,0.12)" : "transparent",
+        border: `1px solid ${active ? "var(--color-inky-moss, #2d3d2b)" : "rgba(var(--rgb-moss), 0.32)"}`,
+        background: active ? "rgba(var(--rgb-moss), 0.08)" : "transparent",
         color: "var(--color-ivory, #faf9f4)",
         fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: active ? 700 : 400,
         cursor: "pointer", letterSpacing: "0.02em", transition: "all 0.18s",
@@ -398,7 +398,7 @@ function SkinProfileEditor({ user, onUpdateUser }) {
   );
 
   const summaryRow = (label, value) => (
-    <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "var(--space-4)", paddingBottom: "var(--space-2)", marginBottom: "var(--space-2)", borderBottom: "1px solid rgba(250,249,244,0.08)" }}>
+    <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "var(--space-4)", paddingBottom: "var(--space-2)", marginBottom: "var(--space-2)", borderBottom: "1px solid rgba(var(--rgb-ivory), 0.08)" }}>
       <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", flexShrink: 0 }}>{label}</span>
       <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-ivory, #faf9f4)", textAlign: "right", lineHeight: 1.5 }}>{value}</span>
     </div>
@@ -410,8 +410,8 @@ function SkinProfileEditor({ user, onUpdateUser }) {
 
   const editInputStyle = {
     width: "100%", boxSizing: "border-box",
-    background: "rgba(255,255,255,0.06)",
-    border: "1px solid rgba(250,249,244,0.2)",
+    background: "rgba(var(--rgb-ivory), 0.08)",
+    border: "1px solid rgba(var(--rgb-ivory), 0.16)",
     borderRadius: 0, padding: "var(--space-3) var(--space-4)",
     fontFamily: "var(--font-body)", fontSize: "var(--text-sm)",
     color: "var(--color-ivory, #faf9f4)",
@@ -436,7 +436,7 @@ function SkinProfileEditor({ user, onUpdateUser }) {
       </div>
 
       {!editing ? (
-        <div style={{ background: "var(--color-ivory-shadow, #f0ebe0)", borderTop: "1px solid rgba(45,61,43,0.18)", padding: "var(--space-5) var(--space-4)" }}>
+        <div style={{ background: "var(--color-ivory-shadow, #f0ebe0)", borderTop: "1px solid rgba(var(--rgb-moss), 0.16)", padding: "var(--space-5) var(--space-4)" }}>
           {SKIN_PROFILE_FIELDS.map(f => {
             const val = draft[f.key];
             const isEmpty = Array.isArray(val) ? val.length === 0 : !val;
@@ -469,7 +469,7 @@ function SkinProfileEditor({ user, onUpdateUser }) {
           )}
         </div>
       ) : (
-        <div style={{ background: "var(--color-ivory-shadow, #f0ebe0)", borderTop: "1px solid rgba(45,61,43,0.18)", padding: "var(--space-5) var(--space-4)", display: "flex", flexDirection: "column", gap: "var(--space-5)" }}>
+        <div style={{ background: "var(--color-ivory-shadow, #f0ebe0)", borderTop: "1px solid rgba(var(--rgb-moss), 0.16)", padding: "var(--space-5) var(--space-4)", display: "flex", flexDirection: "column", gap: "var(--space-5)" }}>
           {SKIN_PROFILE_FIELDS.map(f => (
             <div key={f.key}>
               {fieldLabel(f.label)}
@@ -516,7 +516,7 @@ function SkinProfileEditor({ user, onUpdateUser }) {
 
           <div style={{ display: "flex", gap: "var(--space-2)", marginTop: "var(--space-1)" }}>
             <button onClick={save}
-              style={{ flex: 1, padding: "var(--space-3) 0", background: "transparent", border: "1.5px solid rgba(250,249,244,0.5)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
+              style={{ flex: 1, padding: "var(--space-3) 0", background: "transparent", border: "1.5px solid rgba(var(--rgb-ivory), 0.56)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
               Save
             </button>
             <button onClick={cancel}
@@ -580,18 +580,18 @@ function SkinHistory({ user, onUpdateUser }) {
 
   // Shared visual language with SkinProfileEditor.
   const summaryRow = (label, value) => (
-    <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "var(--space-4)", paddingBottom: "var(--space-2)", marginBottom: "var(--space-2)", borderBottom: "1px solid rgba(250,249,244,0.08)" }}>
+    <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "var(--space-4)", paddingBottom: "var(--space-2)", marginBottom: "var(--space-2)", borderBottom: "1px solid rgba(var(--rgb-ivory), 0.08)" }}>
       <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", flexShrink: 0 }}>{label}</span>
       <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-ivory, #faf9f4)", textAlign: "right", lineHeight: 1.5 }}>{value}</span>
     </div>
   );
   const fieldLabel = (txt) => (
-    <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(255,255,255,0.6)", margin: "0 0 var(--space-2)" }}>{txt}</p>
+    <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.56)", margin: "0 0 var(--space-2)" }}>{txt}</p>
   );
   const editInputStyle = {
     width: "100%", boxSizing: "border-box",
-    background: "rgba(255,255,255,0.06)",
-    border: "1px solid rgba(250,249,244,0.3)",
+    background: "rgba(var(--rgb-ivory), 0.08)",
+    border: "1px solid rgba(var(--rgb-ivory), 0.32)",
     borderRadius: 0, padding: "var(--space-3) var(--space-4)",
     fontFamily: "var(--font-body)", fontSize: "var(--text-sm)",
     color: "var(--color-ivory, #faf9f4)",
@@ -607,9 +607,9 @@ function SkinHistory({ user, onUpdateUser }) {
       <button type="button" onClick={onClick}
         style={{
           padding: "var(--space-2) var(--space-3)", borderRadius: "var(--radius-pill)",
-          border: `1px solid ${on ? "var(--color-ivory, #faf9f4)" : "rgba(250,249,244,0.3)"}`,
-          background: on ? "rgba(250,249,244,0.12)" : "transparent",
-          color: on ? "var(--color-ivory, #faf9f4)" : "rgba(250,249,244,0.5)",
+          border: `1px solid ${on ? "var(--color-ivory, #faf9f4)" : "rgba(var(--rgb-ivory), 0.32)"}`,
+          background: on ? "rgba(var(--rgb-ivory), 0.08)" : "transparent",
+          color: on ? "var(--color-ivory, #faf9f4)" : "rgba(var(--rgb-ivory), 0.56)",
           fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: on ? 700 : 400,
           cursor: "pointer", letterSpacing: "0.02em", transition: "all 0.18s",
           WebkitAppearance: "none", appearance: "none",
@@ -618,7 +618,7 @@ function SkinHistory({ user, onUpdateUser }) {
   };
   const smallAddButton = {
     padding: "0 var(--space-5)", background: "transparent",
-    border: "1.5px solid rgba(250,249,244,0.5)", borderRadius: 0,
+    border: "1.5px solid rgba(var(--rgb-ivory), 0.56)", borderRadius: 0,
     fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 700,
     letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
     color: "var(--color-ivory, #faf9f4)", cursor: "pointer",
@@ -640,9 +640,9 @@ function SkinHistory({ user, onUpdateUser }) {
       </div>
 
       {!editing ? (
-        <div style={{ background: "var(--color-ivory-shadow, #f0ebe0)", borderTop: "1px solid rgba(45,61,43,0.18)", padding: "var(--space-5) var(--space-4)" }}>
+        <div style={{ background: "var(--color-ivory-shadow, #f0ebe0)", borderTop: "1px solid rgba(var(--rgb-moss), 0.16)", padding: "var(--space-5) var(--space-4)" }}>
           {!hasSomeHistory ? (
-            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(255,255,255,0.6)", margin: 0 }}>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ivory), 0.56)", margin: 0 }}>
               No history logged. Tap Edit to add prescriptions, sensitivities, or dermatologist visits.
             </p>
           ) : (
@@ -651,11 +651,11 @@ function SkinHistory({ user, onUpdateUser }) {
               {history.accutaneHistory && summaryRow("Accutane", history.accutaneEndYear ? `Ended ${history.accutaneEndYear}` : "On record")}
               {(history.prescriptions || []).map((rx, i) => summaryRow(i === 0 ? "Rx" : " ", rx.name))}
               {(history.sensitivities || []).length > 0 && (
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "var(--space-4)", paddingBottom: "var(--space-2)", marginBottom: "var(--space-2)", borderBottom: "1px solid rgba(250,249,244,0.08)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "var(--space-4)", paddingBottom: "var(--space-2)", marginBottom: "var(--space-2)", borderBottom: "1px solid rgba(var(--rgb-ivory), 0.08)" }}>
                   <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", flexShrink: 0, paddingTop: "var(--space-1)" }}>Sensitivities</span>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-1)", justifyContent: "flex-end" }}>
                     {history.sensitivities.map(s => (
-                      <span key={s} style={{ padding: "var(--space-1) var(--space-3)", borderRadius: "var(--radius-pill)", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.22)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "#8b7355" }}>{s}</span>
+                      <span key={s} style={{ padding: "var(--space-1) var(--space-3)", borderRadius: "var(--radius-pill)", background: "rgba(var(--rgb-bronze), 0.08)", border: "1px solid rgba(var(--rgb-bronze), 0.16)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-bronze)" }}>{s}</span>
                     ))}
                   </div>
                 </div>
@@ -665,7 +665,7 @@ function SkinHistory({ user, onUpdateUser }) {
           )}
         </div>
       ) : (
-        <div style={{ background: "var(--color-ivory-shadow, #f0ebe0)", borderTop: "1px solid rgba(45,61,43,0.18)", padding: "var(--space-5) var(--space-4)", display: "flex", flexDirection: "column", gap: "var(--space-5)" }}>
+        <div style={{ background: "var(--color-ivory-shadow, #f0ebe0)", borderTop: "1px solid rgba(var(--rgb-moss), 0.16)", padding: "var(--space-5) var(--space-4)", display: "flex", flexDirection: "column", gap: "var(--space-5)" }}>
           {/* Tretinoin */}
           <div>
             {fieldLabel("Currently On Tretinoin")}
@@ -702,7 +702,7 @@ function SkinHistory({ user, onUpdateUser }) {
                 <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-ivory, #faf9f4)" }}>{rx.name}</span>
                 <button onClick={() => setDraft(d => ({ ...d, prescriptions: d.prescriptions.filter((_, j) => j !== i) }))}
                   aria-label="Remove prescription"
-                  style={{ background: "none", border: "none", color: "rgba(255,255,255,0.6)", cursor: "pointer", padding: "0 var(--space-1)", display: "inline-flex", alignItems: "center" }}>
+                  style={{ background: "none", border: "none", color: "rgba(var(--rgb-ivory), 0.56)", cursor: "pointer", padding: "0 var(--space-1)", display: "inline-flex", alignItems: "center" }}>
                   <Icon name="x" size={11} />
                 </button>
               </div>
@@ -730,11 +730,11 @@ function SkinHistory({ user, onUpdateUser }) {
           <div>
             {fieldLabel("Dermatologist Visits")}
             {draft.dermaVisits.slice(0, 3).map((v, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "var(--space-1) 0", borderBottom: "1px solid rgba(250,249,244,0.08)" }}>
+              <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "var(--space-1) 0", borderBottom: "1px solid rgba(var(--rgb-ivory), 0.08)" }}>
                 <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-ivory, #faf9f4)" }}>{v.date}{v.note ? ` — ${v.note}` : ""}</span>
                 <button onClick={() => setDraft(d => ({ ...d, dermaVisits: d.dermaVisits.filter((_, j) => j !== i) }))}
                   aria-label="Remove visit"
-                  style={{ background: "none", border: "none", color: "rgba(255,255,255,0.6)", cursor: "pointer", padding: "0 var(--space-1)", display: "inline-flex", alignItems: "center" }}>
+                  style={{ background: "none", border: "none", color: "rgba(var(--rgb-ivory), 0.56)", cursor: "pointer", padding: "0 var(--space-1)", display: "inline-flex", alignItems: "center" }}>
                   <Icon name="x" size={11} />
                 </button>
               </div>
@@ -752,7 +752,7 @@ function SkinHistory({ user, onUpdateUser }) {
 
           <div style={{ display: "flex", gap: "var(--space-2)", marginTop: "var(--space-1)" }}>
             <button onClick={save}
-              style={{ flex: 1, padding: "var(--space-3) 0", background: "transparent", border: "1.5px solid rgba(250,249,244,0.5)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
+              style={{ flex: 1, padding: "var(--space-3) 0", background: "transparent", border: "1.5px solid rgba(var(--rgb-ivory), 0.56)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
               Save
             </button>
             <button onClick={cancel}
@@ -821,10 +821,10 @@ function ProfileSheetInner({ user, products, locationData, setLocationData, loca
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 400, display: "flex", alignItems: "flex-end", justifyContent: "center" }}
       >
-      <div style={{ position: "absolute", inset: 0, background: "rgba(28,28,26,0.45)", backdropFilter: "blur(10px)" }} onClick={onClose} />
+      <div style={{ position: "absolute", inset: 0, background: "rgba(var(--rgb-ink), 0.56)", backdropFilter: "blur(10px)" }} onClick={onClose} />
       <div style={{ position: "relative", background: "var(--color-inky-moss, #2d3d2b)", width: "100%", maxWidth: 520, borderRadius: 0, maxHeight: "88vh", overflowY: "auto", zIndex: 1 }}>
         <div style={{ display: "flex", justifyContent: "center", padding: "var(--space-3) 0 0" }}>
-          <div style={{ width: 32, height: 3, borderRadius: "var(--radius-pill)", background: "rgba(45,61,43,0.18)" }} />
+          <div style={{ width: 32, height: 3, borderRadius: "var(--radius-pill)", background: "rgba(var(--rgb-moss), 0.16)" }} />
         </div>
 
         <div style={{ padding: "var(--space-4) var(--space-6) calc(var(--space-1) * 13)" }}>
@@ -845,7 +845,7 @@ function ProfileSheetInner({ user, products, locationData, setLocationData, loca
                 </span>
                 <div>
                   <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-md)", fontWeight: 400, color: "var(--color-ivory, #faf9f4)", margin: "0 0 2px" }}>{user?.name || "—"}</p>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(255,255,255,0.6)", margin: 0 }}>{user?.email || ""}</p>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ivory), 0.56)", margin: 0 }}>{user?.email || ""}</p>
                 </div>
               </div>
               <div style={{ display: "flex", gap: "var(--space-2)", alignItems: "center" }}>
@@ -855,7 +855,7 @@ function ProfileSheetInner({ user, products, locationData, setLocationData, loca
                     Edit
                   </button>
                 )}
-                <button onClick={onClose} aria-label="Close" style={{ background: "none", border: "none", color: "rgba(255,255,255,0.6)", cursor: "pointer", padding: "var(--space-1)" }}><Icon name="x" size={18} /></button>
+                <button onClick={onClose} aria-label="Close" style={{ background: "none", border: "none", color: "rgba(var(--rgb-ivory), 0.56)", cursor: "pointer", padding: "var(--space-1)" }}><Icon name="x" size={18} /></button>
               </div>
             </div>
 
@@ -863,7 +863,7 @@ function ProfileSheetInner({ user, products, locationData, setLocationData, loca
               const inputStyle = {
                 width: "100%", boxSizing: "border-box",
                 background: "var(--color-ivory-shadow, #f0ebe0)",
-                border: "1px solid rgba(45,61,43,0.14)",
+                border: "1px solid rgba(var(--rgb-moss), 0.16)",
                 borderRadius: 0, padding: "var(--space-3) var(--space-4)",
                 fontFamily: "var(--font-body)", fontSize: "var(--text-sm)",
                 color: "var(--color-ivory, #faf9f4)",
@@ -874,7 +874,7 @@ function ProfileSheetInner({ user, products, locationData, setLocationData, loca
               };
               const labelStyle = { fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", display: "block", marginBottom: "var(--space-2)" };
               return (
-                <div style={{ background: "var(--color-ivory-shadow, #f0ebe0)", borderTop: "1px solid rgba(45,61,43,0.18)", padding: "var(--space-5) var(--space-4)", display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
+                <div style={{ background: "var(--color-ivory-shadow, #f0ebe0)", borderTop: "1px solid rgba(var(--rgb-moss), 0.16)", padding: "var(--space-5) var(--space-4)", display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
                   <div>
                     <label style={labelStyle}>Name</label>
                     <input value={accountDraft.name} onChange={e => setAccountDraft(d => ({ ...d, name: e.target.value }))} style={inputStyle} />
@@ -920,11 +920,11 @@ function ProfileSheetInner({ user, products, locationData, setLocationData, loca
                   </div>
                   <div style={{ display: "flex", gap: "var(--space-2)", marginTop: "var(--space-1)" }}>
                     <button onClick={saveAccount}
-                      style={{ flex: 1, padding: "var(--space-3) 0", background: "transparent", border: "1.5px solid rgba(250,249,244,0.5)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
+                      style={{ flex: 1, padding: "var(--space-3) 0", background: "transparent", border: "1.5px solid rgba(var(--rgb-ivory), 0.56)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
                       Save
                     </button>
                     <button onClick={() => setEditingAccount(false)}
-                      style={{ flex: 1, padding: "var(--space-3) 0", background: "transparent", border: "1px solid rgba(45,61,43,0.22)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 400, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(255,255,255,0.6)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
+                      style={{ flex: 1, padding: "var(--space-3) 0", background: "transparent", border: "1px solid rgba(var(--rgb-moss), 0.16)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 400, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.56)", cursor: "pointer", WebkitAppearance: "none", appearance: "none" }}>
                       Cancel
                     </button>
                   </div>
@@ -937,7 +937,7 @@ function ProfileSheetInner({ user, products, locationData, setLocationData, loca
             {[["Products", safeProducts.length], ["Value", `$${safeProducts.reduce((s, p) => s + (p?.price || 0), 0).toFixed(0)}`], ["Age Bracket", user?.skinAgeBracket || "—"]].map(([l, v]) => (
               <div key={l} style={{ background: "var(--ink)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: "var(--space-4) var(--space-3)", textAlign: "center" }}>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-lg)", fontWeight: 200, color: "var(--color-ivory, #faf9f4)", margin: "0 0 var(--space-1)", letterSpacing: "-0.02em" }}>{v}</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "rgba(255,255,255,0.6)", margin: 0 }}>{l}</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.56)", margin: 0 }}>{l}</p>
               </div>
             ))}
           </div>
@@ -954,13 +954,13 @@ function ProfileSheetInner({ user, products, locationData, setLocationData, loca
 
           {/* Location */}
           <div style={{ marginBottom: "var(--space-5)" }}>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(255,255,255,0.6)", margin: "0 0 var(--space-3)" }}>Your Environment</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.56)", margin: "0 0 var(--space-3)" }}>Your Environment</p>
             <LocationManager locationData={locationData} setLocationData={setLocationData} locationDenied={locationDenied} setLocationDenied={setLocationDenied} />
           </div>
 
           {/* Sign out */}
           <button onClick={onLogout}
-            style={{ width: "100%", padding: "var(--space-3) 0", background: "transparent", color: "var(--color-ivory, #faf9f4)", border: "1.5px solid rgba(250,249,244,0.5)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", cursor: "pointer", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" }}>
+            style={{ width: "100%", padding: "var(--space-3) 0", background: "transparent", color: "var(--color-ivory, #faf9f4)", border: "1.5px solid rgba(var(--rgb-ivory), 0.56)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", cursor: "pointer", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" }}>
             Sign Out
           </button>
 
@@ -972,7 +972,7 @@ function ProfileSheetInner({ user, products, locationData, setLocationData, loca
               setDeleteError(null);
               setShowDeleteModal(true);
             }}
-            style={{ width: "100%", marginTop: "var(--space-5)", padding: "var(--space-3) 0", background: "transparent", color: "rgba(255,255,255,0.4)", border: "none", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", cursor: "pointer", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent", textDecoration: "underline", textUnderlineOffset: 4 }}>
+            style={{ width: "100%", marginTop: "var(--space-5)", padding: "var(--space-3) 0", background: "transparent", color: "rgba(var(--rgb-ivory), 0.32)", border: "none", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", cursor: "pointer", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent", textDecoration: "underline", textUnderlineOffset: 4 }}>
             Delete Account
           </button>
 
@@ -983,14 +983,14 @@ function ProfileSheetInner({ user, products, locationData, setLocationData, loca
               cygne.skin/terms (vercel.json cleanUrls: true drops the .html).
               target="_blank" so the in-app context isn't lost when reading
               long-form legal copy. */}
-          <p style={{ marginTop: "var(--space-4)", textAlign: "center", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(255,255,255,0.4)" }}>
+          <p style={{ marginTop: "var(--space-4)", textAlign: "center", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ivory), 0.32)" }}>
             <a href="/privacy" target="_blank" rel="noopener noreferrer"
-              style={{ color: "rgba(255,255,255,0.4)", textDecoration: "none" }}>
+              style={{ color: "rgba(var(--rgb-ivory), 0.32)", textDecoration: "none" }}>
               Privacy Policy
             </a>
             <span style={{ margin: "0 var(--space-2)" }}>&middot;</span>
             <a href="/terms" target="_blank" rel="noopener noreferrer"
-              style={{ color: "rgba(255,255,255,0.4)", textDecoration: "none" }}>
+              style={{ color: "rgba(var(--rgb-ivory), 0.32)", textDecoration: "none" }}>
               Terms of Service
             </a>
           </p>
@@ -1021,13 +1021,13 @@ function ProfileSheetInner({ user, products, locationData, setLocationData, loca
 function DeleteAccountModal({ confirmText, setConfirmText, deleting, error, canDelete, onCancel, onConfirm }) {
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 500, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 var(--space-6)" }}>
-      <div style={{ position: "absolute", inset: 0, background: "rgba(8,10,9,0.7)", backdropFilter: "blur(14px)" }} onClick={onCancel} />
+      <div style={{ position: "absolute", inset: 0, background: "rgba(var(--rgb-ink), 0.82)", backdropFilter: "blur(14px)" }} onClick={onCancel} />
       <div onClick={e => e.stopPropagation()}
         style={{
           position: "relative", zIndex: 1,
           width: "100%", maxWidth: 360,
           background: "var(--color-inky-moss, #2d3d2b)",
-          border: "1px solid rgba(232,224,200,0.18)",
+          border: "1px solid rgba(var(--rgb-ivory), 0.16)",
           padding: "var(--space-8) calc(var(--space-1) * 7) var(--space-6)",
         }}>
         <p style={{
@@ -1041,7 +1041,7 @@ function DeleteAccountModal({ confirmText, setConfirmText, deleting, error, canD
         <p style={{
           fontFamily: "var(--font-body)",
           fontSize: "var(--text-sm)", fontWeight: 400, lineHeight: 1.6, letterSpacing: "0.01em",
-          color: "rgba(255,255,255,0.85)",
+          color: "rgba(var(--rgb-ivory), 0.82)",
           margin: "0 0 var(--space-6)", textAlign: "center",
         }}>
           This will permanently delete your account, all skin data, routine history, photos, and journal entries. This cannot be undone.
@@ -1050,7 +1050,7 @@ function DeleteAccountModal({ confirmText, setConfirmText, deleting, error, canD
         <p style={{
           fontFamily: "var(--font-body)",
           fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
-          color: "rgba(255,255,255,0.55)",
+          color: "rgba(var(--rgb-ivory), 0.56)",
           margin: "0 0 var(--space-2)",
         }}>
           Type DELETE to confirm
@@ -1067,8 +1067,8 @@ function DeleteAccountModal({ confirmText, setConfirmText, deleting, error, canD
           aria-label="Type DELETE to confirm"
           style={{
             width: "100%", boxSizing: "border-box",
-            background: "rgba(8,10,9,0.4)",
-            border: "1px solid rgba(232,224,200,0.28)",
+            background: "rgba(var(--rgb-ink), 0.32)",
+            border: "1px solid rgba(var(--rgb-ivory), 0.32)",
             borderRadius: 0,
             padding: "var(--space-3) var(--space-4)",
             fontFamily: "var(--font-body)", fontSize: "var(--text-sm)",
@@ -1097,7 +1097,7 @@ function DeleteAccountModal({ confirmText, setConfirmText, deleting, error, canD
             style={{
               flex: 1, padding: "var(--space-3) 0",
               background: "transparent",
-              border: "1px solid rgba(232,224,200,0.32)",
+              border: "1px solid rgba(var(--rgb-ivory), 0.32)",
               borderRadius: 0,
               fontFamily: "var(--font-display)",
               fontSize: "var(--text-xs)", fontWeight: 700,
@@ -1120,13 +1120,13 @@ function DeleteAccountModal({ confirmText, setConfirmText, deleting, error, canD
               // codebase for warning / remove states (#8b7355) but with a
               // slightly brighter base so it reads as the high-emphasis
               // action against the dark inky-moss panel.
-              background: "rgba(166, 110, 70, 0.18)",
-              border: "1px solid rgba(196, 130, 90, 0.55)",
+              background: "rgba(var(--rgb-bronze), 0.16)",
+              border: "1px solid rgba(var(--rgb-gold), 0.56)",
               borderRadius: 0,
               fontFamily: "var(--font-display)",
               fontSize: "var(--text-xs)", fontWeight: 700,
               letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
-              color: canDelete ? "#e8c7a8" : "rgba(232,199,168,0.45)",
+              color: canDelete ? "#e8c7a8" : "rgba(var(--rgb-ivory), 0.56)",
               cursor: canDelete ? "pointer" : "not-allowed",
               opacity: canDelete ? 1 : 0.55,
               WebkitAppearance: "none", appearance: "none",

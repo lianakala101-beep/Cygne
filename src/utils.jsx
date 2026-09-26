@@ -69,18 +69,18 @@ function SwanWelcomeScreen({ user, onDone }) {
           alt="Cygne"
           style={{ height: 48, width: "auto", display: "block", marginBottom: "var(--space-6)", filter: "brightness(0) invert(1)" }}
         />
-        <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(255, 255, 255, 0.6)", margin: "0 0 var(--space-4)" }}>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.56)", margin: "0 0 var(--space-4)" }}>
           {name ? "Welcome, " + name + "." : "Welcome."}
         </p>
         <h1 style={{ fontFamily: "var(--font-display)", fontSize: 38, fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 var(--space-5)", lineHeight: 1.2 }}>
           Your ritual starts here.
         </h1>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "rgba(255, 255, 255, 0.6)", lineHeight: 1.7, maxWidth: 320 }}>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "rgba(var(--rgb-ivory), 0.56)", lineHeight: 1.7, maxWidth: 320 }}>
           Add the products already on your shelf. Cygne will build your ritual, sequence your steps, and start learning your skin.
         </p>
       </div>
       <div style={{ width: "100%" }}>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(255, 255, 255, 0.4)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", marginBottom: "var(--space-4)", textAlign: "center" }}>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ivory), 0.32)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", marginBottom: "var(--space-4)", textAlign: "center" }}>
           Takes about 2 minutes
         </p>
         <button onClick={onDone}

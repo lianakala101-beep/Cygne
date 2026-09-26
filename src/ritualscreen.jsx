@@ -27,9 +27,9 @@ const RITUAL_MODES = {
   travel: {
     name: "Travel Ritual",
     tagline: "Simplified for the road.",
-    color: "#8b7355",
-    bg: "rgba(139,115,85,0.08)",
-    border: "rgba(139,115,85,0.22)",
+    color: "var(--color-bronze)",
+    bg: "rgba(var(--rgb-bronze), 0.08)",
+    border: "rgba(var(--rgb-bronze), 0.16)",
     filterSteps: (steps) => steps.filter(p =>
       ["Cleanser","Moisturizer","SPF","Eye Cream"].includes(p.category)
     ),
@@ -38,9 +38,9 @@ const RITUAL_MODES = {
   recovery: {
     name: "Recovery Ritual",
     tagline: "Let your barrier breathe.",
-    color: "#8b7355",
-    bg: "rgba(139,115,85,0.08)",
-    border: "rgba(139,115,85,0.22)",
+    color: "var(--color-bronze)",
+    bg: "rgba(var(--rgb-bronze), 0.08)",
+    border: "rgba(var(--rgb-bronze), 0.16)",
     filterSteps: (steps) => steps.filter(p =>
       !["Exfoliant","Toning Pad"].includes(p.category) &&
       !["retinol","AHA","BHA","benzoyl peroxide"].some(a =>
@@ -52,9 +52,9 @@ const RITUAL_MODES = {
   barrier_repair: {
     name: "Barrier Repair Ritual",
     tagline: "Rebuild, don't strip.",
-    color: "#8b7355",
-    bg: "rgba(139,115,85,0.08)",
-    border: "rgba(139,115,85,0.22)",
+    color: "var(--color-bronze)",
+    bg: "rgba(var(--rgb-bronze), 0.08)",
+    border: "rgba(var(--rgb-bronze), 0.16)",
     filterSteps: (steps) => steps.filter(p =>
       ["Cleanser","Essence","Moisturizer","Oil","Eye Cream"].includes(p.category) ||
       (p.ingredients||[]).some(i => /ceramide|hyaluronic|squalane|panthenol/i.test(i))
@@ -64,9 +64,9 @@ const RITUAL_MODES = {
   menstrual: {
     name: "Gentle Ritual",
     tagline: "Your skin is more sensitive right now.",
-    color: "#8b7355",
-    bg: "rgba(139,115,85,0.07)",
-    border: "rgba(139,115,85,0.2)",
+    color: "var(--color-bronze)",
+    bg: "rgba(var(--rgb-bronze), 0.08)",
+    border: "rgba(var(--rgb-bronze), 0.16)",
     filterSteps: (steps) => steps.filter(p =>
       !["Exfoliant","Toning Pad"].includes(p.category) &&
       !(p.ingredients||[]).some(i => /retinol|retinyl|tretinoin|glycolic|lactic|salicylic/i.test(i))
@@ -76,9 +76,9 @@ const RITUAL_MODES = {
   luteal: {
     name: "Oil Control Ritual",
     tagline: "Sebum is peaking. Get ahead of it.",
-    color: "#8b7355",
-    bg: "rgba(139,115,85,0.08)",
-    border: "rgba(139,115,85,0.22)",
+    color: "var(--color-bronze)",
+    bg: "rgba(var(--rgb-bronze), 0.08)",
+    border: "rgba(var(--rgb-bronze), 0.16)",
     filterSteps: (steps) => steps,
     guidance: "Progesterone is driving up sebum production this week. Prioritise your BHA if you have one, keep moisturiser lighter, and watch for congestion.",
   },
@@ -86,35 +86,35 @@ const RITUAL_MODES = {
     name: "Actives Ritual",
     tagline: "Your skin is resilient right now.",
     color: "var(--color-ivory, #faf9f4)",
-    bg: "rgba(250,249,244,0.08)",
-    border: "rgba(45,61,43,0.22)",
+    bg: "rgba(var(--rgb-ivory), 0.08)",
+    border: "rgba(var(--rgb-moss), 0.16)",
     filterSteps: (steps) => steps,
     guidance: "Rising estrogen means higher resilience and better absorption. This is your best window for retinol and AHA — your skin can handle it.",
   },
   winter: {
     name: "Winter Ritual",
     tagline: "Moisture in, barrier up.",
-    color: "#8b7355",
-    bg: "rgba(139,115,85,0.08)",
-    border: "rgba(139,115,85,0.22)",
+    color: "var(--color-bronze)",
+    bg: "rgba(var(--rgb-bronze), 0.08)",
+    border: "rgba(var(--rgb-bronze), 0.16)",
     filterSteps: (steps) => steps,
     guidance: "Cold strips moisture and weakens the barrier. Swap any foaming cleansers for cream formulas tonight if you can, and lock everything in with an occlusive.",
   },
   summer: {
     name: "Minimal Ritual",
     tagline: "Light layers, consistent SPF.",
-    color: "#8b7355",
-    bg: "rgba(139,115,85,0.07)",
-    border: "rgba(139,115,85,0.2)",
+    color: "var(--color-bronze)",
+    bg: "rgba(var(--rgb-bronze), 0.08)",
+    border: "rgba(var(--rgb-bronze), 0.16)",
     filterSteps: (steps) => steps.filter(p => p.category !== "Oil"),
     guidance: "Heat and humidity mean your skin retains more moisture naturally. Oils and heavy occlusives can congest — keep it light and make SPF the hero.",
   },
   reset: {
     name: "Reset Ritual",
     tagline: "Back to basics.",
-    color: "#8b7355",
-    bg: "rgba(139,115,85,0.08)",
-    border: "rgba(139,115,85,0.22)",
+    color: "var(--color-bronze)",
+    bg: "rgba(var(--rgb-bronze), 0.08)",
+    border: "rgba(var(--rgb-bronze), 0.16)",
     filterSteps: (steps) => steps.filter(p =>
       ["Cleanser","Moisturizer","SPF"].includes(p.category)
     ),
@@ -124,8 +124,8 @@ const RITUAL_MODES = {
     name: null, // no named mode — just show normal steps
     tagline: null,
     color: "var(--color-ivory, #faf9f4)",
-    bg: "rgba(45,61,43,0.07)",
-    border: "rgba(45,61,43,0.18)",
+    bg: "rgba(var(--rgb-moss), 0.08)",
+    border: "rgba(var(--rgb-moss), 0.16)",
     filterSteps: (steps) => steps,
     guidance: null,
   },
@@ -363,7 +363,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
 
       {/* -- Ritual Mode Card ---------------------------------------------- */}
       {ritualMode.name && (
-        <div style={{ background: "rgba(250, 249, 244, 0.82)", border: "1px solid rgba(250, 249, 244, 0.25)", borderRadius: "var(--radius)", padding: "var(--space-5) var(--space-5) var(--space-4)", marginBottom: "var(--space-6)", position: "relative" }}>
+        <div style={{ background: "rgba(var(--rgb-ivory), 0.82)", border: "1px solid rgba(var(--rgb-ivory), 0.32)", borderRadius: "var(--radius)", padding: "var(--space-5) var(--space-5) var(--space-4)", marginBottom: "var(--space-6)", position: "relative" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", marginBottom: "var(--space-2)" }}>
             <span style={{ color: "var(--color-stone, #5a5a5a)" }}><Icon name={timeOfDayIcon} size={13} /></span>
             <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-stone, #5a5a5a)" }}>{timeOfDayLabel.toLowerCase()}</span>
@@ -371,15 +371,15 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
               <span style={{ marginLeft: "auto", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--color-stone, #5a5a5a)" }}>{cyclePhase} phase</span>
             )}
           </div>
-          <p style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 700, letterSpacing: "var(--tracking-label)", color: "#1c1c1a", margin: "0 0 2px" }}>{ritualMode.name}</p>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "#5a5a5a", margin: "0 0 var(--space-3)" }}>{ritualMode.tagline}</p>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "#1c1c1a", margin: 0, lineHeight: 1.65 }}>{ritualMode.guidance}</p>
+          <p style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 700, letterSpacing: "var(--tracking-label)", color: "var(--color-ink)", margin: "0 0 2px" }}>{ritualMode.name}</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-stone)", margin: "0 0 var(--space-3)" }}>{ritualMode.tagline}</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-ink)", margin: 0, lineHeight: 1.65 }}>{ritualMode.guidance}</p>
           {filteredOut.length > 0 && (
-            <div style={{ marginTop: "var(--space-3)", paddingTop: "var(--space-3)", borderTop: "1px solid rgba(28,28,26,0.12)" }}>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "#5a5a5a", margin: "0 0 var(--space-2)", letterSpacing: "0.06em" }}>{"Paused " + getRitualTimeLabel(amCompleted).toLowerCase()}</p>
+            <div style={{ marginTop: "var(--space-3)", paddingTop: "var(--space-3)", borderTop: "1px solid rgba(var(--rgb-ink), 0.08)" }}>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-stone)", margin: "0 0 var(--space-2)", letterSpacing: "0.06em" }}>{"Paused " + getRitualTimeLabel(amCompleted).toLowerCase()}</p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-1)" }}>
                 {filteredOut.map(p => (
-                  <span key={p.id} style={{ padding: "var(--space-1) var(--space-3)", borderRadius: "var(--radius-pill)", background: "rgba(28,28,26,0.04)", border: "1px solid rgba(28,28,26,0.12)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "#5a5a5a" }}>{p.name}</span>
+                  <span key={p.id} style={{ padding: "var(--space-1) var(--space-3)", borderRadius: "var(--radius-pill)", background: "rgba(var(--rgb-ink), 0.08)", border: "1px solid rgba(var(--rgb-ink), 0.08)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-stone)" }}>{p.name}</span>
                 ))}
               </div>
             </div>
@@ -389,8 +389,8 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
 
       {/* Treatment recovery pause banner */}
       {pausedProducts.length > 0 && pauseTreatment && pausePhase && (
-        <div style={{ marginBottom: "var(--space-5)", padding: "var(--space-3) var(--space-4)", background: "rgba(139,115,85,0.07)", border: "1px solid rgba(139,115,85,0.22)", borderRadius: "var(--radius)" }}>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "#8b7355", margin: "0 0 var(--space-1)" }}>Paused during recovery</p>
+        <div style={{ marginBottom: "var(--space-5)", padding: "var(--space-3) var(--space-4)", background: "rgba(var(--rgb-bronze), 0.08)", border: "1px solid rgba(var(--rgb-bronze), 0.16)", borderRadius: "var(--radius)" }}>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-bronze)", margin: "0 0 var(--space-1)" }}>Paused during recovery</p>
           <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--parchment)", margin: "0 0 var(--space-2)", lineHeight: 1.55 }}>
             {pausedProducts.map(p => p.name).join(", ")} {pausedProducts.length === 1 ? "is" : "are"} held for your {pausePhase.label.toLowerCase()} phase. They'll return via Introduce Slowly once your skin is ready.
           </p>
@@ -406,7 +406,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
       <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", marginBottom: "var(--space-1)" }}>
         <span style={{ color: "var(--clay)", opacity: 0.55 }}><Icon name={sessionIcon} size={15} /></span>
         <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)" }}>{sessionLabel} Ritual</span>
-        <span style={{ fontSize: "var(--text-xs)", fontFamily: "var(--font-body)", fontWeight: 400, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", background: "rgba(45,61,43,0.14)", padding: "2px var(--space-2)", borderRadius: "var(--radius-pill)" }}>Now</span>
+        <span style={{ fontSize: "var(--text-xs)", fontFamily: "var(--font-body)", fontWeight: 400, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", background: "rgba(var(--rgb-moss), 0.16)", padding: "2px var(--space-2)", borderRadius: "var(--radius-pill)" }}>Now</span>
       </div>
       {/* Session toggle — segmented Morning / Evening pills. Replaces
           the earlier "Switch to Evening" text button which read as
@@ -421,7 +421,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
         style={{
           display: "inline-flex", alignItems: "stretch",
           margin: "0 0 var(--space-5) var(--space-6)",
-          border: "1px solid rgba(250,249,244,0.28)",
+          border: "1px solid rgba(var(--rgb-ivory), 0.32)",
           borderRadius: "var(--radius-pill)", overflow: "hidden",
         }}
       >
@@ -438,14 +438,14 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
               onClick={() => setManualPeriod(opt.key)}
               style={{
                 padding: "var(--space-2) var(--space-4)",
-                background: active ? "rgba(250,249,244,0.14)" : "transparent",
+                background: active ? "rgba(var(--rgb-ivory), 0.16)" : "transparent",
                 border: "none",
-                borderLeft: i === 0 ? "none" : "1px solid rgba(250,249,244,0.28)",
+                borderLeft: i === 0 ? "none" : "1px solid rgba(var(--rgb-ivory), 0.32)",
                 cursor: active ? "default" : "pointer",
                 fontFamily: "var(--font-display)",
                 fontSize: "var(--text-xs)", fontWeight: 400,
                 letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
-                color: active ? "var(--color-ivory, #faf9f4)" : "rgba(250,249,244,0.65)",
+                color: active ? "var(--color-ivory, #faf9f4)" : "rgba(var(--rgb-ivory), 0.56)",
                 WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
                 transition: "background 0.18s, color 0.18s",
               }}
@@ -490,7 +490,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
           </div>
         : <div style={{ padding: "var(--space-8) 0 var(--space-4)" }}><p style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-sm)", fontWeight: 400, letterSpacing: "0.05em", color: "var(--clay)", margin: 0, lineHeight: 1.6 }}>Your ritual is waiting. Add products to your vanity and they'll appear here.</p></div>}
       {allDone && steps.length > 0 && !todayJournaled && (
-        <div style={{ margin: "var(--space-4) 0", padding: "var(--space-5) var(--space-5)", background: "rgba(250,249,244,0.10)", border: "1px solid rgba(45,61,43,0.3)", borderRadius: "var(--radius)" }}>
+        <div style={{ margin: "var(--space-4) 0", padding: "var(--space-5) var(--space-5)", background: "rgba(var(--rgb-ivory), 0.08)", border: "1px solid rgba(var(--rgb-moss), 0.32)", borderRadius: "var(--radius)" }}>
           <div style={{ textAlign: "center", marginBottom: "var(--space-4)" }}>
             <p style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 400, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--parchment)", margin: "0 0 2px" }}>Ritual complete.</p>
             <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: 0 }}>
@@ -498,7 +498,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
             </p>
           </div>
           <button onClick={() => setShowSkinJournal(true)}
-            style={{ width: "100%", padding: "var(--space-4) var(--space-10)", background: "transparent", border: "1.5px solid rgba(250,249,244,0.5)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 400, color: "var(--color-ivory)", cursor: "pointer", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", transition: "all 0.3s ease" }}
+            style={{ width: "100%", padding: "var(--space-4) var(--space-10)", background: "transparent", border: "1.5px solid rgba(var(--rgb-ivory), 0.56)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 400, color: "var(--color-ivory)", cursor: "pointer", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", transition: "all 0.3s ease" }}
             onMouseEnter={e => { e.currentTarget.style.background = "var(--color-inky-moss)"; e.currentTarget.style.color = "var(--color-ivory)"; }}
             onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--color-inky-moss)"; }}>
             Log today's journal
@@ -531,14 +531,14 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
             {alternating.map(p => {
               const scheduledTonight = isScheduledToday(p);
               const label = scheduledTonight ? "Tonight" : "Tomorrow night";
-              const labelColor = scheduledTonight ? "#2d3d2b" : "var(--clay)";
+              const labelColor = scheduledTonight ? "var(--color-inky-moss)" : "var(--clay)";
               return (
-                <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "var(--space-3) var(--space-4)", background: "var(--surface)", border: `1px solid ${scheduledTonight ? "rgba(45,61,43,0.35)" : "var(--border)"}`, borderRadius: "var(--radius)", marginBottom: "var(--space-2)", opacity: scheduledTonight ? 1 : 0.6 }}>
+                <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "var(--space-3) var(--space-4)", background: "var(--surface)", border: `1px solid ${scheduledTonight ? "rgba(var(--rgb-moss), 0.32)" : "var(--border)"}`, borderRadius: "var(--radius)", marginBottom: "var(--space-2)", opacity: scheduledTonight ? 1 : 0.6 }}>
                   <div>
                     <p style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-md)", fontWeight: 400, letterSpacing: "var(--tracking-label)", color: "var(--parchment)", margin: "0 0 1px" }}>{p.name}</p>
                     <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: 0 }}>{p.brand}</p>
                   </div>
-                  <span style={{ fontSize: "var(--text-xs)", fontFamily: "var(--font-body)", fontWeight: 400, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: labelColor, background: scheduledTonight ? "rgba(45,61,43,0.12)" : "transparent", padding: "var(--space-1) var(--space-2)", borderRadius: "var(--radius-pill)", border: scheduledTonight ? "1px solid rgba(45,61,43,0.25)" : "none" }}>{label}</span>
+                  <span style={{ fontSize: "var(--text-xs)", fontFamily: "var(--font-body)", fontWeight: 400, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: labelColor, background: scheduledTonight ? "rgba(var(--rgb-moss), 0.08)" : "transparent", padding: "var(--space-1) var(--space-2)", borderRadius: "var(--radius-pill)", border: scheduledTonight ? "1px solid rgba(var(--rgb-moss), 0.32)" : "none" }}>{label}</span>
                 </div>
               );
             })}
@@ -617,10 +617,10 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
               { id: "refine",    label: "Refine",   count: refinements.length,    icon: "sparkle" },
             ].filter(t => t.count > 0).map(t => (
               <button key={t.id} onClick={() => setRecTab(t.id)}
-                style={{ display: "flex", alignItems: "center", gap: "var(--space-1)", padding: "var(--space-2) var(--space-3)", borderRadius: "var(--radius-pill)", border: `1px solid ${recTab === t.id ? "#2d3d2b" : "var(--border)"}`, background: recTab === t.id ? "rgba(45,61,43,0.11)" : "transparent", color: recTab === t.id ? "#2d3d2b" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: recTab === t.id ? 700 : 400, cursor: "pointer", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", transition: "all 0.16s" }}>
+                style={{ display: "flex", alignItems: "center", gap: "var(--space-1)", padding: "var(--space-2) var(--space-3)", borderRadius: "var(--radius-pill)", border: `1px solid ${recTab === t.id ? "var(--color-inky-moss)" : "var(--border)"}`, background: recTab === t.id ? "rgba(var(--rgb-moss), 0.08)" : "transparent", color: recTab === t.id ? "var(--color-inky-moss)" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: recTab === t.id ? 700 : 400, cursor: "pointer", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", transition: "all 0.16s" }}>
                 <Icon name={t.icon} size={11} />
                 {t.label}
-                <span style={{ fontSize: "var(--text-xs)", background: recTab === t.id ? "rgba(45,61,43,0.2)" : "rgba(255,255,255,0.05)", borderRadius: "var(--radius-pill)", padding: "1px var(--space-1)" }}>{t.count}</span>
+                <span style={{ fontSize: "var(--text-xs)", background: recTab === t.id ? "rgba(var(--rgb-moss), 0.16)" : "rgba(var(--rgb-ivory), 0.08)", borderRadius: "var(--radius-pill)", padding: "1px var(--space-1)" }}>{t.count}</span>
               </button>
             ))}
           </div>
@@ -641,7 +641,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
                   </div>
                   <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: 0, lineHeight: 1.65 }}>{r.body}</p>
                   {r.action && (
-                    <div style={{ display: "flex", gap: "var(--space-2)", padding: "var(--space-2) var(--space-3)", background: "rgba(45,61,43,0.06)", borderRadius: "var(--radius)", border: "1px solid rgba(45,61,43,0.15)", marginTop: "var(--space-3)" }}>
+                    <div style={{ display: "flex", gap: "var(--space-2)", padding: "var(--space-2) var(--space-3)", background: "rgba(var(--rgb-moss), 0.08)", borderRadius: "var(--radius)", border: "1px solid rgba(var(--rgb-moss), 0.16)", marginTop: "var(--space-3)" }}>
                       <span style={{ color: "var(--color-ivory, #faf9f4)", flexShrink: 0, marginTop: 1 }}><Icon name="check" size={11} /></span>
                       <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--parchment)", margin: 0, lineHeight: 1.55 }}>{r.action}</p>
                     </div>
@@ -650,7 +650,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-2)", marginTop: "var(--space-3)" }}>
                       {targets.map(p => (
                         <button key={p.id} onClick={() => onEditProduct(p)}
-                          style={{ padding: "var(--space-2) var(--space-3)", borderRadius: "var(--radius-pill)", background: "rgba(45,61,43,0.12)", border: "1px solid rgba(45,61,43,0.3)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400, color: "var(--color-ivory, #faf9f4)", cursor: "pointer", letterSpacing: "0.05em", display: "inline-flex", alignItems: "center", gap: "var(--space-1)" }}>
+                          style={{ padding: "var(--space-2) var(--space-3)", borderRadius: "var(--radius-pill)", background: "rgba(var(--rgb-moss), 0.08)", border: "1px solid rgba(var(--rgb-moss), 0.32)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400, color: "var(--color-ivory, #faf9f4)", cursor: "pointer", letterSpacing: "0.05em", display: "inline-flex", alignItems: "center", gap: "var(--space-1)" }}>
                           {p.name} <Icon name="chevron" size={10} />
                         </button>
                       ))}
@@ -659,7 +659,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
                   {targets.length === 0 && r.addCategory && onAddProduct && (
                     <div style={{ marginTop: "var(--space-3)" }}>
                       <button onClick={() => onAddProduct(r.addCategory)}
-                        style={{ padding: "var(--space-2) var(--space-4)", borderRadius: "var(--radius)", background: "rgba(45,61,43,0.15)", border: "1px solid rgba(45,61,43,0.35)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400, color: "var(--color-ivory, #faf9f4)", cursor: "pointer", letterSpacing: "0.05em" }}>
+                        style={{ padding: "var(--space-2) var(--space-4)", borderRadius: "var(--radius)", background: "rgba(var(--rgb-moss), 0.16)", border: "1px solid rgba(var(--rgb-moss), 0.32)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400, color: "var(--color-ivory, #faf9f4)", cursor: "pointer", letterSpacing: "0.05em" }}>
                         + Add {r.addCategory}
                       </button>
                     </div>

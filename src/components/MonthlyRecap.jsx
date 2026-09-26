@@ -305,7 +305,7 @@ export function MonthlyRecap({
         style={{
           position: "fixed", top: 18, right: 22, zIndex: 1,
           background: "none", border: "none", cursor: "pointer",
-          color: "rgba(255,255,255,0.6)", fontSize: "var(--text-lg)", lineHeight: 1, padding: "var(--space-2)",
+          color: "rgba(var(--rgb-ivory), 0.56)", fontSize: "var(--text-lg)", lineHeight: 1, padding: "var(--space-2)",
           fontFamily: "var(--font-display)",
         }}
       >×</button>
@@ -328,7 +328,7 @@ export function MonthlyRecap({
         <p style={{
           fontFamily: "var(--font-body)",
           fontSize: "var(--text-xs)", fontWeight: 400, letterSpacing: "var(--tracking-display)",
-          textTransform: "uppercase", color: "rgba(255,255,255,0.4)",
+          textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.32)",
           margin: "var(--space-2) 0 0",
         }}>
           {year}
@@ -350,7 +350,7 @@ export function MonthlyRecap({
         <div style={{
           width: 80, height: 1,
           margin: "var(--space-8) auto 0",
-          background: "linear-gradient(90deg, transparent 0%, rgba(192,192,192,0.55) 50%, transparent 100%)",
+          background: "linear-gradient(90deg, transparent 0%, rgba(var(--rgb-ivory), 0.56) 50%, transparent 100%)",
         }} />
 
         {/* Framing — at most one short, quiet sentence (or loading /
@@ -361,7 +361,7 @@ export function MonthlyRecap({
             <p style={{
               fontFamily: "var(--font-body)",
               fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
-              color: "rgba(255,255,255,0.6)", margin: 0,
+              color: "rgba(var(--rgb-ivory), 0.56)", margin: 0,
             }}>
               Gathering your month…
             </p>
@@ -370,7 +370,7 @@ export function MonthlyRecap({
           {!loading && failed && (
             <p style={{
               fontFamily: "var(--font-body)",
-              fontSize: "var(--text-sm)", color: "rgba(255,255,255,0.6)",
+              fontSize: "var(--text-sm)", color: "rgba(var(--rgb-ivory), 0.56)",
               margin: 0, lineHeight: 1.7,
             }}>
               Your recap will be ready soon.
@@ -402,15 +402,15 @@ export function MonthlyRecap({
             margin: "0 auto var(--space-4)",
             maxWidth: 420,
             padding: "var(--space-5) var(--space-5)",
-            background: "rgba(250,249,244,0.05)",
-            border: "1px solid rgba(250,249,244,0.16)",
+            background: "rgba(var(--rgb-ivory), 0.08)",
+            border: "1px solid rgba(var(--rgb-ivory), 0.16)",
             borderRadius: "var(--radius)",
             textAlign: "center",
           }}>
             <p style={{
               fontFamily: "var(--font-display)",
               fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)",
-              textTransform: "uppercase", color: "rgba(255,255,255,0.55)",
+              textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.56)",
               margin: "0 0 var(--space-3)",
             }}>
               {card.label}
@@ -437,15 +437,15 @@ export function MonthlyRecap({
             margin: "0 auto var(--space-10)",
             maxWidth: 420,
             padding: "var(--space-5) var(--space-5)",
-            background: "rgba(250,249,244,0.05)",
-            border: "1px solid rgba(250,249,244,0.16)",
+            background: "rgba(var(--rgb-ivory), 0.08)",
+            border: "1px solid rgba(var(--rgb-ivory), 0.16)",
             borderRadius: "var(--radius)",
             textAlign: "center",
           }}>
             <p style={{
               fontFamily: "var(--font-display)",
               fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)",
-              textTransform: "uppercase", color: "rgba(255,255,255,0.55)",
+              textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.56)",
               margin: "0 0 var(--space-3)",
             }}>
               Cycle Pattern
@@ -476,7 +476,7 @@ export function MonthlyRecap({
         <div style={{
           width: 80, height: 1,
           margin: "0 auto var(--space-8)",
-          background: "linear-gradient(90deg, transparent 0%, rgba(192,192,192,0.55) 50%, transparent 100%)",
+          background: "linear-gradient(90deg, transparent 0%, rgba(var(--rgb-ivory), 0.56) 50%, transparent 100%)",
         }} />
 
         {/* Closing signature */}

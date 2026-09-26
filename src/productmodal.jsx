@@ -12,7 +12,7 @@ function RoutineFitSheet({ product, assessment, onAddNow, onDefer, onClose }) {
   const tagCfg = isDefer ? DEFER_TAG_CONFIG[assessment.deferTag] : null;
 
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(8,10,9,0.82)", backdropFilter: "blur(10px)", zIndex: 110, display: "flex", alignItems: "flex-end", justifyContent: "center" }}
+    <div style={{ position: "fixed", inset: 0, background: "rgba(var(--rgb-ink), 0.82)", backdropFilter: "blur(10px)", zIndex: 110, display: "flex", alignItems: "flex-end", justifyContent: "center" }}
       onClick={e => e.target === e.currentTarget && onClose()}>
       <div style={{ background: "var(--ink)", width: "100%", maxWidth: 520, borderRadius: "var(--radius-sheet)", padding: "calc(var(--space-1) * 7) var(--space-6) var(--space-12)", border: "1px solid var(--border)", borderBottom: "none" }}>
 
@@ -27,9 +27,9 @@ function RoutineFitSheet({ product, assessment, onAddNow, onDefer, onClose }) {
 
         {/* Positive read — shown on both add and defer */}
         {assessment.positiveRead && (
-          <div style={{ background: "rgba(45,61,43,0.08)", border: "1px solid rgba(45,61,43,0.2)", borderRadius: "var(--radius)", padding: "var(--space-3) var(--space-4)", marginBottom: "var(--space-4)" }}>
+          <div style={{ background: "rgba(var(--rgb-moss), 0.08)", border: "1px solid rgba(var(--rgb-moss), 0.16)", borderRadius: "var(--radius)", padding: "var(--space-3) var(--space-4)", marginBottom: "var(--space-4)" }}>
             <div style={{ display: "flex", alignItems: "flex-start", gap: "var(--space-3)" }}>
-              <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#2d3d2b", marginTop: "var(--space-1)", flexShrink: 0 }} />
+              <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--color-inky-moss)", marginTop: "var(--space-1)", flexShrink: 0 }} />
               <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--parchment)", margin: 0, lineHeight: 1.6 }}>{assessment.positiveRead}</p>
             </div>
           </div>
@@ -53,7 +53,7 @@ function RoutineFitSheet({ product, assessment, onAddNow, onDefer, onClose }) {
           {isDefer ? (
             <>
               <button onClick={onDefer}
-                style={{ width: "100%", padding: "var(--space-4) 0", background: "#2d3d2b", color: "#fdfcf9", border: "none", borderRadius: "var(--radius)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", cursor: "pointer" }}>
+                style={{ width: "100%", padding: "var(--space-4) 0", background: "var(--color-inky-moss)", color: "var(--color-ivory)", border: "none", borderRadius: "var(--radius)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", cursor: "pointer" }}>
                 Save for Later
               </button>
               <button onClick={onAddNow}
@@ -63,7 +63,7 @@ function RoutineFitSheet({ product, assessment, onAddNow, onDefer, onClose }) {
             </>
           ) : (
             <button onClick={onAddNow}
-              style={{ width: "100%", padding: "var(--space-4) 0", background: "#2d3d2b", color: "#fdfcf9", border: "none", borderRadius: "var(--radius)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", cursor: "pointer" }}>
+              style={{ width: "100%", padding: "var(--space-4) 0", background: "var(--color-inky-moss)", color: "var(--color-ivory)", border: "none", borderRadius: "var(--radius)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", cursor: "pointer" }}>
               Add to Ritual
             </button>
           )}
@@ -293,7 +293,7 @@ function ShelfLifeSection({ form, set }) {
               const active = (form.paoMonths ?? null) === m;
               return (
                 <button key={m ?? "none"} onClick={() => set("paoMonths", m)}
-                  style={{ padding: "var(--space-2) var(--space-3)", borderRadius: "var(--radius-pill)", border: "1px solid " + (active ? "var(--sage)" : "var(--border)"), background: active ? "rgba(45,61,43,0.18)" : "transparent", color: active ? "var(--parchment)" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", cursor: "pointer" }}>
+                  style={{ padding: "var(--space-2) var(--space-3)", borderRadius: "var(--radius-pill)", border: "1px solid " + (active ? "var(--sage)" : "var(--border)"), background: active ? "rgba(var(--rgb-moss), 0.16)" : "transparent", color: active ? "var(--parchment)" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", cursor: "pointer" }}>
                   {m === null ? "—" : m + "M"}
                 </button>
               );
@@ -512,7 +512,7 @@ function ProductModal({ product, onSave, onClose, user }) {
                 {searchQuery && !searching && <button onClick={() => { setSearchQuery(""); setSearchResults([]); setSearchDone(false); }} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: 0 }}><Icon name="x" size={12} /></button>}
               </div>
               {searchResults.length > 0 && (
-                <div style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0, background: "var(--ink)", border: "1px solid var(--border)", borderRadius: "var(--radius)", overflow: "hidden", zIndex: 10, boxShadow: "0 8px 24px rgba(0,0,0,0.4)" }}>
+                <div style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0, background: "var(--ink)", border: "1px solid var(--border)", borderRadius: "var(--radius)", overflow: "hidden", zIndex: 10, boxShadow: "0 8px 24px rgba(var(--rgb-ink), 0.32)" }}>
                   {searchResults.map((p, idx) => (
                     <button key={idx} onClick={() => applyResult(p)}
                       style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "flex-start", padding: "var(--space-3) var(--space-4)", background: "none", border: "none", borderBottom: idx < searchResults.length - 1 ? "1px solid var(--border)" : "none", cursor: "pointer", textAlign: "left" }}
@@ -540,10 +540,10 @@ function ProductModal({ product, onSave, onClose, user }) {
 
             <div onClick={() => fileRef.current.click()}
               style={{ display: "flex", alignItems: "center", gap: "var(--space-4)", padding: "var(--space-5) var(--space-5)", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "var(--radius)", cursor: "pointer", marginBottom: "var(--space-3)" }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(45,61,43,0.5)"}
+              onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(var(--rgb-moss), 0.56)"}
               onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}>
               <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleFile} />
-              <div style={{ width: 40, height: 40, borderRadius: "var(--radius)", background: "rgba(45,61,43,0.12)", border: "1px solid rgba(45,61,43,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <div style={{ width: 40, height: 40, borderRadius: "var(--radius)", background: "rgba(var(--rgb-moss), 0.08)", border: "1px solid rgba(var(--rgb-moss), 0.16)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 {analyzing ? <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--sage)" }}>…</span> : <Icon name="camera" size={16} color="var(--sage)" />}
               </div>
               <div>
@@ -553,7 +553,7 @@ function ProductModal({ product, onSave, onClose, user }) {
             </div>
 
             {scanError && (
-              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "#8b7355", margin: "0 0 var(--space-3)", padding: "var(--space-2) var(--space-3)", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.2)", borderRadius: "var(--radius)" }}>{scanError}</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-bronze)", margin: "0 0 var(--space-3)", padding: "var(--space-2) var(--space-3)", background: "rgba(var(--rgb-bronze), 0.08)", border: "1px solid rgba(var(--rgb-bronze), 0.16)", borderRadius: "var(--radius)" }}>{scanError}</p>
             )}
 
             <button onClick={() => setModalStep("form")}
@@ -625,7 +625,7 @@ function ProductModal({ product, onSave, onClose, user }) {
                         const selected = getSelected(active.key);
                         const isOn = !!selected;
                         return (
-                          <div key={active.key} style={{ background: isOn ? "rgba(45,61,43,0.08)" : "var(--surface)", border: "1px solid " + (isOn ? "rgba(45,61,43,0.35)" : "var(--border)"), borderRadius: "var(--radius)", padding: "var(--space-3) var(--space-4)" }}>
+                          <div key={active.key} style={{ background: isOn ? "rgba(var(--rgb-moss), 0.08)" : "var(--surface)", border: "1px solid " + (isOn ? "rgba(var(--rgb-moss), 0.32)" : "var(--border)"), borderRadius: "var(--radius)", padding: "var(--space-3) var(--space-4)" }}>
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: isOn ? "var(--space-2)" : 0 }}>
                               <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: isOn ? "var(--parchment)" : "var(--clay)", fontWeight: 400 }}>{active.name}</span>
                               <button onClick={() => {
@@ -638,7 +638,7 @@ function ProductModal({ product, onSave, onClose, user }) {
                                   toggleActive(active.key, active.options[0]);
                                 }
                               }}
-                                style={{ width: 22, height: 22, borderRadius: "50%", border: "1px solid " + (isOn ? "#2d3d2b" : "var(--border)"), background: isOn ? "#2d3d2b" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0, color: "var(--ink)" }}>
+                                style={{ width: 22, height: 22, borderRadius: "50%", border: "1px solid " + (isOn ? "var(--color-inky-moss)" : "var(--border)"), background: isOn ? "var(--color-inky-moss)" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0, color: "var(--ink)" }}>
                                 {isOn && <Icon name="check" size={11} />}
                               </button>
                             </div>
@@ -646,7 +646,7 @@ function ProductModal({ product, onSave, onClose, user }) {
                               <div style={{ display: "flex", gap: "var(--space-2)", flexWrap: "wrap", alignItems: "center" }}>
                                 {active.options.map(pct => (
                                   <button key={pct} onClick={() => toggleActive(active.key, pct)}
-                                    style={{ padding: "var(--space-1) var(--space-3)", borderRadius: "var(--radius-pill)", border: "1px solid " + (selected === pct ? "#2d3d2b" : "var(--border)"), background: selected === pct ? "rgba(45,61,43,0.18)" : "transparent", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: selected === pct ? "var(--parchment)" : "var(--clay)", cursor: "pointer" }}>
+                                    style={{ padding: "var(--space-1) var(--space-3)", borderRadius: "var(--radius-pill)", border: "1px solid " + (selected === pct ? "var(--color-inky-moss)" : "var(--border)"), background: selected === pct ? "rgba(var(--rgb-moss), 0.16)" : "transparent", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: selected === pct ? "var(--parchment)" : "var(--clay)", cursor: "pointer" }}>
                                     {pct}
                                   </button>
                                 ))}
@@ -684,7 +684,7 @@ function ProductModal({ product, onSave, onClose, user }) {
                   const isSuggested = f.id === freqSuggestion.id && !active;
                   return (
                     <button key={f.id} onClick={() => { setFreqTouched(true); set("frequency", f.id); }}
-                      style={{ padding: "var(--space-2) var(--space-4)", borderRadius: "var(--radius)", border: "1px solid " + (active ? "var(--sage)" : isSuggested ? "rgba(45,61,43,0.35)" : "var(--border)"), background: active ? "rgba(45,61,43,0.18)" : "transparent", color: active ? "var(--parchment)" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", cursor: "pointer", position: "relative" }}>
+                      style={{ padding: "var(--space-2) var(--space-4)", borderRadius: "var(--radius)", border: "1px solid " + (active ? "var(--sage)" : isSuggested ? "rgba(var(--rgb-moss), 0.32)" : "var(--border)"), background: active ? "rgba(var(--rgb-moss), 0.16)" : "transparent", color: active ? "var(--parchment)" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", cursor: "pointer", position: "relative" }}>
                       {f.label}
                     </button>
                   );
@@ -696,9 +696,9 @@ function ProductModal({ product, onSave, onClose, user }) {
                 </p>
               )}
               {overuseWarning && (
-                <div style={{ display: "flex", gap: "var(--space-3)", marginTop: "var(--space-3)", padding: "var(--space-3) var(--space-4)", background: "rgba(139,115,85,0.08)", border: "1px solid rgba(139,115,85,0.25)", borderRadius: "var(--radius)" }}>
-                  <span style={{ color: "#8b7355", flexShrink: 0, marginTop: 1, display: "inline-flex" }}><Icon name="warning" size={13} /></span>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "#8b7355", margin: 0, lineHeight: 1.6 }}>{overuseWarning}</p>
+                <div style={{ display: "flex", gap: "var(--space-3)", marginTop: "var(--space-3)", padding: "var(--space-3) var(--space-4)", background: "rgba(var(--rgb-bronze), 0.08)", border: "1px solid rgba(var(--rgb-bronze), 0.32)", borderRadius: "var(--radius)" }}>
+                  <span style={{ color: "var(--color-bronze)", flexShrink: 0, marginTop: 1, display: "inline-flex" }}><Icon name="warning" size={13} /></span>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-bronze)", margin: 0, lineHeight: 1.6 }}>{overuseWarning}</p>
                 </div>
               )}
             </div>
@@ -708,7 +708,7 @@ function ProductModal({ product, onSave, onClose, user }) {
               {locked ? (
                 <div>
                   <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", marginBottom: "var(--space-2)" }}>
-                    <span style={{ padding: "var(--space-1) var(--space-4)", borderRadius: "var(--radius-pill)", background: locked.session === "am" ? "rgba(45,61,43,0.14)" : "rgba(232,226,217,0.10)", border: "1px solid " + (locked.session === "am" ? "rgba(45,61,43,0.4)" : "rgba(232,226,217,0.3)"), fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400, color: locked.session === "am" ? "var(--sage)" : "#e8e2d9" }}>{locked.session === "am" ? "AM only" : "PM only"}</span>
+                    <span style={{ padding: "var(--space-1) var(--space-4)", borderRadius: "var(--radius-pill)", background: locked.session === "am" ? "rgba(var(--rgb-moss), 0.16)" : "rgba(var(--rgb-ivory), 0.08)", border: "1px solid " + (locked.session === "am" ? "rgba(var(--rgb-moss), 0.32)" : "rgba(var(--rgb-ivory), 0.32)"), fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400, color: locked.session === "am" ? "var(--sage)" : "#e8e2d9" }}>{locked.session === "am" ? "AM only" : "PM only"}</span>
                     <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", opacity: 0.6 }}>locked by ingredients</span>
                   </div>
                   <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: 0, lineHeight: 1.5, opacity: 0.7 }}>{locked.reason}</p>
@@ -720,7 +720,7 @@ function ProductModal({ product, onSave, onClose, user }) {
                       const active = effectiveSession === s.id;
                       return (
                         <button key={s.id} onClick={() => { setSessionTouched(true); set("session", s.id); }}
-                          style={{ flex: 1, padding: "var(--space-2) 0", borderRadius: "var(--radius)", border: "1px solid " + (active ? "var(--sage)" : "var(--border)"), background: active ? "rgba(45,61,43,0.18)" : "transparent", color: active ? "var(--parchment)" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400, cursor: "pointer" }}>
+                          style={{ flex: 1, padding: "var(--space-2) 0", borderRadius: "var(--radius)", border: "1px solid " + (active ? "var(--sage)" : "var(--border)"), background: active ? "rgba(var(--rgb-moss), 0.16)" : "transparent", color: active ? "var(--parchment)" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400, cursor: "pointer" }}>
                           {s.label}
                         </button>
                       );

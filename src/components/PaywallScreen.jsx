@@ -17,12 +17,12 @@ import { logDebugEvent } from "../supabase.js";
 
 const IVORY = "var(--color-ivory, #faf9f4)";
 const INKY_MOSS = "var(--color-inky-moss, #2d3d2b)";
-const CARD_BG = "rgba(250, 249, 244, 0.06)";
-const CARD_BG_SELECTED = "rgba(250, 249, 244, 0.14)";
-const BORDER_DIM = "rgba(250, 249, 244, 0.18)";
-const BORDER_SELECTED = "rgba(250, 249, 244, 0.85)";
-const MUTED = "rgba(255, 255, 255, 0.7)";
-const FAINT = "rgba(255, 255, 255, 0.5)";
+const CARD_BG = "rgba(var(--rgb-ivory), 0.08)";
+const CARD_BG_SELECTED = "rgba(var(--rgb-ivory), 0.16)";
+const BORDER_DIM = "rgba(var(--rgb-ivory), 0.16)";
+const BORDER_SELECTED = "rgba(var(--rgb-ivory), 0.82)";
+const MUTED = "rgba(var(--rgb-ivory), 0.82)";
+const FAINT = "rgba(var(--rgb-ivory), 0.56)";
 
 // Format a period into a short human label. RC's SubscriptionPeriod comes
 // as either `.unit` ("MONTH"/"YEAR"/etc) + `.numberOfUnits`, or as a raw

@@ -40,9 +40,9 @@ const SEASON_CONFIG = {
   winter: {
     label: "Winter",
     iconName: "snow",
-    accent: "#8b7355",
-    bg: "rgba(139,115,85,0.07)",
-    border: "rgba(139,115,85,0.2)",
+    accent: "var(--color-bronze)",
+    bg: "rgba(var(--rgb-bronze), 0.08)",
+    border: "rgba(var(--rgb-bronze), 0.16)",
     headline: "Your barrier works hardest now.",
     body: "Cold air and heating strip moisture faster than any other season. Skin needs more occlusion, less exfoliation.",
     shelfNudge: (products, activeMap) => {
@@ -59,9 +59,9 @@ const SEASON_CONFIG = {
   spring: {
     label: "Spring",
     iconName: "leaf",
-    accent: "#2d3d2b",
-    bg: "rgba(45,61,43,0.07)",
-    border: "rgba(45,61,43,0.2)",
+    accent: "var(--color-inky-moss)",
+    bg: "rgba(var(--rgb-moss), 0.08)",
+    border: "rgba(var(--rgb-moss), 0.16)",
     headline: "Skin is recovering. UV is rising.",
     body: "Barrier resilience returns as humidity climbs. Spring is the right window to reintroduce or increase actives — but SPF becomes non-negotiable.",
     shelfNudge: (products, activeMap) => {
@@ -77,9 +77,9 @@ const SEASON_CONFIG = {
   summer: {
     label: "Summer",
     iconName: "sun",
-    accent: "#8b7355",
-    bg: "rgba(139,115,85,0.07)",
-    border: "rgba(139,115,85,0.2)",
+    accent: "var(--color-bronze)",
+    bg: "rgba(var(--rgb-bronze), 0.08)",
+    border: "rgba(var(--rgb-bronze), 0.16)",
     headline: "Heat changes everything.",
     body: "Humidity is up and sebum production rises with temperature. Heavier textures can clog. SPF degrades faster in heat.",
     shelfNudge: (products, activeMap) => {
@@ -96,9 +96,9 @@ const SEASON_CONFIG = {
   fall: {
     label: "Fall",
     iconName: "moon",
-    accent: "#8b7355",
-    bg: "rgba(139,115,85,0.07)",
-    border: "rgba(139,115,85,0.2)",
+    accent: "var(--color-bronze)",
+    bg: "rgba(var(--rgb-bronze), 0.08)",
+    border: "rgba(var(--rgb-bronze), 0.16)",
     headline: "The transition window.",
     body: "Skin shifts from oily summer mode back toward dry. This is the most strategic season to reintroduce or strengthen actives before winter.",
     shelfNudge: (products, activeMap) => {
@@ -172,7 +172,7 @@ function SeasonalNudgeCard({ products, activeMap, user, lineMode = false }) {
   // eyebrow above it so the visual weight lands on the headline.
   if (lineMode) {
     return (
-      <div style={{ borderTop: "1px solid rgba(250,249,244,0.25)", borderBottom: "1px solid rgba(250,249,244,0.25)", marginTop: -1, padding: "var(--space-8) 0" }}>
+      <div style={{ borderTop: "1px solid rgba(var(--rgb-ivory), 0.32)", borderBottom: "1px solid rgba(var(--rgb-ivory), 0.32)", marginTop: -1, padding: "var(--space-8) 0" }}>
         <button
           type="button"
           onClick={() => setOpen(o => !o)}
@@ -189,7 +189,7 @@ function SeasonalNudgeCard({ products, activeMap, user, lineMode = false }) {
           <span style={{
             fontFamily: "var(--font-body)", fontWeight: 400, fontSize: "var(--text-xs)",
             letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
-            color: "#F4F3EF", opacity: 0.7,
+            color: "var(--color-ivory)", opacity: 0.7,
             whiteSpace: "nowrap",
           }}>{cfg.label}</span>
           {/* Pull-quote headline — display-face uppercase at editorial
@@ -200,20 +200,20 @@ function SeasonalNudgeCard({ products, activeMap, user, lineMode = false }) {
             width: "100%",
             fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 700,
             letterSpacing: "var(--tracking-label)", textTransform: "uppercase",
-            color: "#F4F3EF",
+            color: "var(--color-ivory)",
             lineHeight: 1.25,
           }}>{cfg.headline}</span>
           <span style={{
             position: "absolute", right: 0, top: "50%", transform: `translateY(-50%) ${open ? "rotate(90deg)" : "none"}`,
-            color: "#F4F3EF", opacity: 0.6,
+            color: "var(--color-ivory)", opacity: 0.6,
             transition: "transform 0.2s",
             display: "inline-flex",
           }}><Icon name="chevron" size={11} /></span>
         </button>
         {open && (
-          <div style={{ marginTop: "var(--space-5)", paddingTop: "var(--space-5)", borderTop: "1px solid rgba(250,249,244,0.18)", textAlign: "center" }}>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "#F4F3EF", margin: "0 0 var(--space-2)", lineHeight: 1.65 }}>{cfg.body}</p>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "#F4F3EF", margin: 0, lineHeight: 1.65 }}>{nudge}</p>
+          <div style={{ marginTop: "var(--space-5)", paddingTop: "var(--space-5)", borderTop: "1px solid rgba(var(--rgb-ivory), 0.16)", textAlign: "center" }}>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-ivory)", margin: "0 0 var(--space-2)", lineHeight: 1.65 }}>{cfg.body}</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-ivory)", margin: 0, lineHeight: 1.65 }}>{nudge}</p>
           </div>
         )}
       </div>
@@ -246,7 +246,7 @@ function SeasonalNudgeCard({ products, activeMap, user, lineMode = false }) {
           fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-xs)",
           letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
           color: "var(--color-ivory, #faf9f4)",
-          background: "rgba(250,249,244,0.15)",
+          background: "rgba(var(--rgb-ivory), 0.16)",
           padding: "var(--space-1) var(--space-2)", borderRadius: "var(--radius-pill)",
           flexShrink: 0, whiteSpace: "nowrap",
         }}>{cfg.label}</span>
@@ -266,7 +266,7 @@ function SeasonalNudgeCard({ products, activeMap, user, lineMode = false }) {
         }}><Icon name="chevron" size={11} /></span>
       </button>
       {open && (
-        <div style={{ marginTop: "var(--space-3)", paddingTop: "var(--space-3)", borderTop: "1px solid rgba(250,249,244,0.18)" }}>
+        <div style={{ marginTop: "var(--space-3)", paddingTop: "var(--space-3)", borderTop: "1px solid rgba(var(--rgb-ivory), 0.16)" }}>
           <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-ivory, #faf9f4)", margin: "0 0 var(--space-2)", lineHeight: 1.65 }}>{cfg.body}</p>
           <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-ivory, #faf9f4)", margin: 0, lineHeight: 1.65 }}>{nudge}</p>
         </div>

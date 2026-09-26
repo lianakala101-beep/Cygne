@@ -36,7 +36,7 @@ export function RampCheckinModal({ products, deepLink, onSave, onDone, onClose }
       style={{
         position: "fixed",
         inset: 0,
-        background: "rgba(8,10,9,0.88)",
+        background: "rgba(var(--rgb-ink), 0.82)",
         backdropFilter: "blur(12px)",
         WebkitBackdropFilter: "blur(12px)",
         zIndex: 200,

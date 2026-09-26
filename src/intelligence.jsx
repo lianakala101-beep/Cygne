@@ -333,10 +333,10 @@ function RecommendationCard({ rec, onAdd, onDismiss }) {
   return (
     <div onClick={() => setExpanded(e => !e)}
       style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: "var(--radius)", padding: "var(--space-4) var(--space-4)", marginBottom: "var(--space-2)", cursor: "pointer", transition: "border-color 0.2s" }}
-      onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(122,144,112,0.4)"}
+      onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(var(--rgb-sage), 0.32)"}
       onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}>
       <div style={{ display: "flex", alignItems: "flex-start", gap: "var(--space-3)" }}>
-        <div style={{ width: 26, height: 26, borderRadius: "50%", background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.18)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "#7a9070", marginTop: 1 }}>
+        <div style={{ width: 26, height: 26, borderRadius: "50%", background: "rgba(var(--rgb-sage), 0.08)", border: "1px solid rgba(var(--rgb-sage), 0.16)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "var(--color-sage)", marginTop: 1 }}>
           <Icon name={typeIcon[rec.type]} size={12} />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
@@ -361,8 +361,8 @@ function RecommendationCard({ rec, onAdd, onDismiss }) {
         <div style={{ marginTop: "var(--space-3)", paddingTop: "var(--space-3)", borderTop: "1px solid var(--border)" }}>
           <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--clay)", margin: "0 0 var(--space-3)", lineHeight: 1.65 }}>{rec.body}</p>
           {rec.action && (
-            <div style={{ display: "flex", gap: "var(--space-2)", padding: "var(--space-2) var(--space-3)", background: "rgba(122,144,112,0.06)", borderRadius: "var(--radius)", border: "1px solid rgba(122,144,112,0.14)", marginBottom: "var(--space-2)" }}>
-              <span style={{ color: "#7a9070", flexShrink: 0, marginTop: 1 }}><Icon name="check" size={11} /></span>
+            <div style={{ display: "flex", gap: "var(--space-2)", padding: "var(--space-2) var(--space-3)", background: "rgba(var(--rgb-sage), 0.08)", borderRadius: "var(--radius)", border: "1px solid rgba(var(--rgb-sage), 0.16)", marginBottom: "var(--space-2)" }}>
+              <span style={{ color: "var(--color-sage)", flexShrink: 0, marginTop: 1 }}><Icon name="check" size={11} /></span>
               <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--parchment)", margin: 0, lineHeight: 1.6 }}>{rec.action}</p>
             </div>
           )}
@@ -375,11 +375,11 @@ function RecommendationCard({ rec, onAdd, onDismiss }) {
           {rec.type === "addition" && rec.category && onAdd && (
             <button
               onClick={e => { e.stopPropagation(); onAdd(rec.category); }}
-              style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", marginTop: "var(--space-1)", padding: "var(--space-2) var(--space-4)", background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.30)", borderRadius: "var(--radius)", cursor: "pointer", transition: "background 0.15s" }}
-              onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.18)"}
-              onMouseLeave={e => e.currentTarget.style.background = "rgba(122,144,112,0.10)"}>
+              style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", marginTop: "var(--space-1)", padding: "var(--space-2) var(--space-4)", background: "rgba(var(--rgb-sage), 0.08)", border: "1px solid rgba(var(--rgb-sage), 0.32)", borderRadius: "var(--radius)", cursor: "pointer", transition: "background 0.15s" }}
+              onMouseEnter={e => e.currentTarget.style.background = "rgba(var(--rgb-sage), 0.16)"}
+              onMouseLeave={e => e.currentTarget.style.background = "rgba(var(--rgb-sage), 0.08)"}>
               <Icon name="plus" size={11} color="#7a9070" />
-              <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, color: "#7a9070", letterSpacing: "var(--tracking-label)", textTransform: "uppercase" }}>Add {rec.category} to vanity</span>
+              <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, color: "var(--color-sage)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase" }}>Add {rec.category} to vanity</span>
             </button>
           )}
         </div>
@@ -404,7 +404,7 @@ function buildRefinements(products, activeMap, conflicts) {
     if (prods.length > 1 && !["Serum"].includes(cat)) {
       const names = prods.map(p => pName(p)).filter(Boolean);
       refinements.push({
-        verb: "Remove", verbColor: "#c06060", icon: "trash",
+        verb: "Remove", verbColor: "var(--color-alert)", icon: "trash",
         title: `You have ${prods.length} ${cat.toLowerCase()}s`,
         body: `${names.join(" and ")} are both ${cat.toLowerCase()}s in your ritual. Layering two adds no benefit and can overload the skin — one is always enough.`,
         action: `Keep the one you prefer. Remove the other, or save it for travel.`,
@@ -423,7 +423,7 @@ function buildRefinements(products, activeMap, conflicts) {
     const p0Label = pName(p0) || c.pair[0];
     const p1Label = pName(p1) || c.pair[1];
     refinements.push({
-      verb: "Remove", verbColor: "#c06060", icon: "trash",
+      verb: "Remove", verbColor: "var(--color-alert)", icon: "trash",
       title: `${p0Label} and ${p1Label} are fighting each other`,
       body: `${c.pair[0]} and ${c.pair[1]} used in the same ritual reduce each other's efficacy and risk barrier damage. ${c.reason}`,
       action: `Move one to a separate session or remove it entirely — they work much better apart.`,
@@ -441,7 +441,7 @@ function buildRefinements(products, activeMap, conflicts) {
         .map(a => { const p = (activeMap[a] || [])[0]; return pName(p) ? `${pName(p)} (${a})` : a; })
         .join(", ");
       refinements.push({
-        verb: "Remove", verbColor: "#c06060", icon: "trash",
+        verb: "Remove", verbColor: "var(--color-alert)", icon: "trash",
         title: `${activeCount} potent actives running simultaneously`,
         body: `You're running ${activeSummary}. That's more than most barriers can recover from between sessions — even without obvious day-to-day reactions.`,
         action: "Run 1–2 actives per session. Rotate the others on separate days or evenings.",
@@ -465,7 +465,7 @@ function buildRefinements(products, activeMap, conflicts) {
       const retinolName = pName(retinolProduct) || "your retinoid";
       const exfoliantName = pName(exfoliantProduct) || `your ${exfoliantKey}`;
       refinements.push({
-        verb: "Reduce Frequency", verbColor: "#c49040", icon: "clock",
+        verb: "Reduce Frequency", verbColor: "var(--color-gold)", icon: "clock",
         title: `${retinolName} and ${exfoliantName} are both PM`,
         body: `Using a retinoid and an exfoliant in the same session — or on back-to-back nights — is the most common cause of barrier compromise. Each needs recovery time before the next use.`,
         action: `${retinolName}: Mon / Wed / Fri. ${exfoliantName}: Tue / Thu. Weekends: cleanser and moisturizer only.`,
@@ -482,7 +482,7 @@ function buildRefinements(products, activeMap, conflicts) {
       const ahaName = pName(ahaProduct) || "your AHA";
       const bhaName = pName(bhaProduct) || "your BHA";
       refinements.push({
-        verb: "Reduce Frequency", verbColor: "#c49040", icon: "clock",
+        verb: "Reduce Frequency", verbColor: "var(--color-gold)", icon: "clock",
         title: `${ahaName} (AHA) and ${bhaName} (BHA) — pick one`,
         body: `AHA resurfaces the top layer of skin. BHA penetrates pores. Using both routinely is excessive for most skin types and causes chronic low-grade barrier disruption.`,
         action: `Oily or acne-prone: lean on ${bhaName}. Texture or dullness: lean on ${ahaName}. Use the other max 1× per week.`,
@@ -495,7 +495,7 @@ function buildRefinements(products, activeMap, conflicts) {
     if (exfoliantProds.length > 1 && exfoliantProds.every(isDailyOrUnset)) {
       const names = exfoliantProds.map(p => pName(p)).filter(Boolean);
       refinements.push({
-        verb: "Reduce Frequency", verbColor: "#c49040", icon: "clock",
+        verb: "Reduce Frequency", verbColor: "var(--color-gold)", icon: "clock",
         title: `${names.join(" and ")} — two exfoliant products`,
         body: `Multiple exfoliant products used regularly causes chronic low-grade barrier disruption. Each exfoliant session needs recovery time before the next.`,
         action: `Pick one. Use it 2–3× per week and let your barrier fully recover between sessions.`,
@@ -514,7 +514,7 @@ function buildRefinements(products, activeMap, conflicts) {
         .map(a => { const p = (activeMap[a] || [])[0]; return pName(p) || a; })
         .join(", ");
       refinements.push({
-        verb: "Reduce Frequency", verbColor: "#c49040", icon: "clock",
+        verb: "Reduce Frequency", verbColor: "var(--color-gold)", icon: "clock",
         title: `${activeCount} actives in rotation — schedule rest nights`,
         body: `Between ${intensityNames}, your skin is processing something potent most evenings. Chronic over-activing accumulates slowly — no dramatic reaction needed for the barrier to degrade.`,
         action: "Pick 2 nights per week to go barrier-only: cleanser, moisturizer, SPF — nothing potent. Your actives will absorb better on the days you use them.",
@@ -533,7 +533,7 @@ function buildRefinements(products, activeMap, conflicts) {
     if (overlap.length > 0) {
       const overlapNames = overlap.map(p => pName(p)).filter(Boolean);
       refinements.push({
-        verb: "Replace", verbColor: "#7a9070", icon: "layers",
+        verb: "Replace", verbColor: "var(--color-sage)", icon: "layers",
         title: `${overlapNames.join(" and ")} share actives`,
         body: `${overlapNames.join(", ")} contain overlapping ingredients. A single well-formulated serum covering the same ground would simplify your ritual and reduce stacking risk.`,
         action: "Look for one serum that combines your key actives. Retire the duplicates.",
@@ -548,7 +548,7 @@ function buildRefinements(products, activeMap, conflicts) {
     const vitcProduct = (activeMap["vitamin C"] || [])[0];
     const vitcName = pName(vitcProduct) || "your Vitamin C";
     refinements.push({
-      verb: "Replace", verbColor: "#7a9070", icon: "layers",
+      verb: "Replace", verbColor: "var(--color-sage)", icon: "layers",
       title: `${vitcName} may not be delivering`,
       body: `L-Ascorbic acid degrades when exposed to heat, air, and especially alongside retinol. If ${vitcName} isn't AM-only in a sealed, opaque bottle, its potency is likely compromised.`,
       action: "Swap to a stabilized derivative (ascorbyl glucoside or SAP), or confirm it's used AM-only in an airtight formula.",
@@ -564,7 +564,7 @@ function buildRefinements(products, activeMap, conflicts) {
   const hasCleanser = !!cats["Cleanser"];
 
   if (!hasSPF) refinements.push({
-    verb: "Add", verbColor: "#7a9070", icon: "plus",
+    verb: "Add", verbColor: "var(--color-sage)", icon: "plus",
     title: "No SPF in your AM ritual",
     body: "SPF is non-negotiable. Every active you apply — retinol, AHA, Vitamin C — becomes significantly less effective without UV protection the following morning.",
     action: "Add a broad-spectrum SPF 30–50 as your final AM step, every day.",
@@ -572,7 +572,7 @@ function buildRefinements(products, activeMap, conflicts) {
   });
 
   if (!hasMoisturizer) refinements.push({
-    verb: "Add", verbColor: "#7a9070", icon: "plus",
+    verb: "Add", verbColor: "var(--color-sage)", icon: "plus",
     title: "No moisturizer in your ritual",
     body: "Actives thin the barrier — moisturizer rebuilds it. Skipping it while using exfoliants or retinoids puts you in a constant cycle of damage without recovery.",
     action: "Apply a ceramide or hyaluronic acid moisturizer after serums, before SPF.",
@@ -580,7 +580,7 @@ function buildRefinements(products, activeMap, conflicts) {
   });
 
   if (!hasCleanser) refinements.push({
-    verb: "Add", verbColor: "#7a9070", icon: "plus",
+    verb: "Add", verbColor: "var(--color-sage)", icon: "plus",
     title: "No cleanser in your ritual",
     body: "Starting with unwashed skin means actives are layering on top of pollution, sebum, and residue — blocking absorption and increasing irritation risk.",
     action: "Add a gentle, pH-balanced cleanser as step one, AM and PM.",
@@ -603,10 +603,10 @@ function RefinementsCard({ products, activeMap, conflicts }) {
 
   // Verb style map
   const verbStyle = {
-    "Remove":           { color: "#c06060", bg: "rgba(192,96,96,0.08)",  border: "rgba(192,96,96,0.28)" },
-    "Reduce Frequency": { color: "#c49040", bg: "rgba(196,144,64,0.08)", border: "rgba(196,144,64,0.28)" },
-    "Replace":          { color: "#7a9070", bg: "rgba(122,144,112,0.08)",border: "rgba(122,144,112,0.28)" },
-    "Add":              { color: "#7a9070", bg: "rgba(122,144,112,0.08)", border: "rgba(122,144,112,0.28)" },
+    "Remove":           { color: "#c06060", bg: "rgba(var(--rgb-bronze), 0.08)",  border: "rgba(var(--rgb-bronze), 0.32)" },
+    "Reduce Frequency": { color: "#c49040", bg: "rgba(var(--rgb-gold), 0.08)", border: "rgba(var(--rgb-gold), 0.32)" },
+    "Replace":          { color: "#7a9070", bg: "rgba(var(--rgb-sage), 0.08)",border: "rgba(var(--rgb-sage), 0.32)" },
+    "Add":              { color: "#7a9070", bg: "rgba(var(--rgb-sage), 0.08)", border: "rgba(var(--rgb-sage), 0.32)" },
   };
 
   return (
@@ -614,12 +614,12 @@ function RefinementsCard({ products, activeMap, conflicts }) {
       {/* Header trigger */}
       <button onClick={() => setOpen(o => !o)}
         style={{ width: "100%", background: open ? "var(--surface)" : "var(--ink)", border: `1px solid ${open ? "var(--border)" : "var(--border)"}`, borderRadius: open ? "var(--radius) var(--radius) 0 0" : "var(--radius)", padding: "var(--space-4) var(--space-5)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", transition: "all 0.2s" }}
-        onMouseEnter={e => { if (!open) e.currentTarget.style.borderColor = "rgba(122,144,112,0.4)"; }}
+        onMouseEnter={e => { if (!open) e.currentTarget.style.borderColor = "rgba(var(--rgb-sage), 0.32)"; }}
         onMouseLeave={e => { if (!open) e.currentTarget.style.borderColor = "var(--border)"; }}>
         <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
-          <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#c49040", flexShrink: 0 }} />
+          <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--color-gold)", flexShrink: 0 }} />
           <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, color: "var(--parchment)", letterSpacing: "0.02em" }}>Refine Your Ritual</span>
-          <span style={{ fontSize: "var(--text-xs)", fontFamily: "var(--font-body), sans-serif", background: "rgba(196,144,64,0.14)", color: "#c49040", padding: "2px var(--space-2)", borderRadius: "var(--radius-pill)", letterSpacing: "0.06em" }}>{refinements.length}</span>
+          <span style={{ fontSize: "var(--text-xs)", fontFamily: "var(--font-body), sans-serif", background: "rgba(var(--rgb-gold), 0.16)", color: "var(--color-gold)", padding: "2px var(--space-2)", borderRadius: "var(--radius-pill)", letterSpacing: "0.06em" }}>{refinements.length}</span>
         </div>
         <span style={{ color: "var(--clay)", opacity: 0.6, display: "inline-block", transform: open ? "rotate(90deg)" : "none", transition: "transform 0.22s" }}>
           <Icon name="chevron" size={14} />
@@ -632,7 +632,7 @@ function RefinementsCard({ products, activeMap, conflicts }) {
           {/* Verb filter pills */}
           <div style={{ display: "flex", gap: "var(--space-2)", marginBottom: "var(--space-4)", flexWrap: "wrap" }}>
             <button onClick={() => setActiveVerb(null)}
-              style={{ padding: "var(--space-1) var(--space-3)", borderRadius: "var(--radius-pill)", border: `1px solid ${activeVerb === null ? "var(--sage)" : "var(--border)"}`, background: activeVerb === null ? "rgba(122,144,112,0.10)" : "transparent", color: activeVerb === null ? "var(--parchment)" : "var(--clay)", fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, cursor: "pointer", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", transition: "all 0.15s" }}>
+              style={{ padding: "var(--space-1) var(--space-3)", borderRadius: "var(--radius-pill)", border: `1px solid ${activeVerb === null ? "var(--sage)" : "var(--border)"}`, background: activeVerb === null ? "rgba(var(--rgb-sage), 0.08)" : "transparent", color: activeVerb === null ? "var(--parchment)" : "var(--clay)", fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, cursor: "pointer", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", transition: "all 0.15s" }}>
               All
             </button>
             {verbs.map(v => {
@@ -693,10 +693,10 @@ function RefinementItem({ r, vs, onEdit, onDismiss }) {
           {r.product && onEdit && (
             <button
               onClick={e => { e.stopPropagation(); onEdit(r.product); }}
-              style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", marginTop: "var(--space-1)", padding: "var(--space-2) var(--space-4)", background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.30)", borderRadius: "var(--radius)", cursor: "pointer", transition: "background 0.15s" }}
-              onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.18)"}
-              onMouseLeave={e => e.currentTarget.style.background = "rgba(122,144,112,0.10)"}>
-              <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, color: "#7a9070", letterSpacing: "var(--tracking-label)", textTransform: "uppercase" }}>Edit {r.product.brand ? `${r.product.brand} ${r.product.name}` : r.product.name}</span>
+              style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", marginTop: "var(--space-1)", padding: "var(--space-2) var(--space-4)", background: "rgba(var(--rgb-sage), 0.08)", border: "1px solid rgba(var(--rgb-sage), 0.32)", borderRadius: "var(--radius)", cursor: "pointer", transition: "background 0.15s" }}
+              onMouseEnter={e => e.currentTarget.style.background = "rgba(var(--rgb-sage), 0.16)"}
+              onMouseLeave={e => e.currentTarget.style.background = "rgba(var(--rgb-sage), 0.08)"}>
+              <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, color: "var(--color-sage)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase" }}>Edit {r.product.brand ? `${r.product.brand} ${r.product.name}` : r.product.name}</span>
               <Icon name="chevron" size={11} color="#7a9070" />
             </button>
           )}

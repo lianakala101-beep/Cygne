@@ -8,8 +8,8 @@ const RAMP_SCHEDULES = {
   retinol: {
     label: "Retinol",
     color: "#8b7355",
-    colorBg: "rgba(139,115,85,0.08)",
-    colorBorder: "rgba(139,115,85,0.22)",
+    colorBg: "rgba(var(--rgb-bronze), 0.08)",
+    colorBorder: "rgba(var(--rgb-bronze), 0.16)",
     phases: [
       {
         name: "Patch",
@@ -48,8 +48,8 @@ const RAMP_SCHEDULES = {
   AHA: {
     label: "AHA Exfoliant",
     color: "#8b7355",
-    colorBg: "rgba(139,115,85,0.08)",
-    colorBorder: "rgba(139,115,85,0.22)",
+    colorBg: "rgba(var(--rgb-bronze), 0.08)",
+    colorBorder: "rgba(var(--rgb-bronze), 0.16)",
     phases: [
       {
         name: "Patch",
@@ -91,8 +91,8 @@ const RAMP_SCHEDULES = {
     // the ivory Progress band. Moss reads on both surfaces (dark green
     // on ivory, dark green on the dark-canvas card's ivory-tinted wash).
     color: "#2d3d2b",
-    colorBg: "rgba(45,61,43,0.06)",
-    colorBorder: "rgba(45,61,43,0.22)",
+    colorBg: "rgba(var(--rgb-moss), 0.08)",
+    colorBorder: "rgba(var(--rgb-moss), 0.16)",
     phases: [
       {
         name: "Patch",
@@ -131,8 +131,8 @@ const RAMP_SCHEDULES = {
   "vitamin C": {
     label: "Vitamin C",
     color: "#8b7355",
-    colorBg: "rgba(139,115,85,0.06)",
-    colorBorder: "rgba(139,115,85,0.18)",
+    colorBg: "rgba(var(--rgb-bronze), 0.08)",
+    colorBorder: "rgba(var(--rgb-bronze), 0.16)",
     phases: [
       {
         name: "Patch",
@@ -171,8 +171,8 @@ const RAMP_SCHEDULES = {
   "toning pad": {
     label: "Toning Pad (BHA/AHA)",
     color: "#8b7355",
-    colorBg: "rgba(139,115,85,0.08)",
-    colorBorder: "rgba(139,115,85,0.22)",
+    colorBg: "rgba(var(--rgb-bronze), 0.08)",
+    colorBorder: "rgba(var(--rgb-bronze), 0.16)",
     phases: [
       { name: "Patch", weeks: [1], frequency: "Patch test first", instruction: "Apply to your jawline or cheek for 2 nights before using all over. Daily-dose actives are gentler but still worth checking.", onTrack: "No reaction — you're clear to start daily use.", backOff: "Any irritation — give skin 3 days rest before trying again." },
       { name: "Introduce", weeks: [2, 3], frequency: "Daily — PM only", instruction: "Use once daily in the evening. Apply after cleansing, before serum. BHA pads can be used AM too once tolerated.", onTrack: "Skin feels smooth, no flaking or redness.", backOff: "Stinging or peeling — drop to every other night for a week." },
@@ -403,8 +403,8 @@ function IntroduceSlowlyCard({
     // the ivory band.
     <div style={{
       padding: "var(--space-4) 0",
-      borderTop: "1px solid rgba(28,28,26,0.25)",
-      borderBottom: isLast ? "1px solid rgba(28,28,26,0.25)" : "none",
+      borderTop: "1px solid rgba(var(--rgb-ink), 0.32)",
+      borderBottom: isLast ? "1px solid rgba(var(--rgb-ink), 0.32)" : "none",
     }}>
       {/* Header row: WK badge (when check-in due) + expand chevron */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "var(--space-3)", marginBottom: "var(--space-3)" }}>
@@ -414,7 +414,7 @@ function IntroduceSlowlyCard({
               <span style={{
                 display: "inline-flex", alignItems: "center",
                 padding: "var(--space-1) var(--space-3)",
-                border: "1px solid rgba(45,61,43,0.42)",
+                border: "1px solid rgba(var(--rgb-moss), 0.32)",
                 borderRadius: "var(--radius-pill)",
                 fontFamily: "var(--font-display)",
                 fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)",
@@ -475,7 +475,7 @@ function IntroduceSlowlyCard({
         <span style={{
           fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)",
           textTransform: "uppercase",
-          color: isHeld ? "#8b7355" : "var(--clay)", opacity: 0.85,
+          color: isHeld ? "var(--color-bronze)" : "var(--clay)", opacity: 0.85,
         }}>Week {Math.min(weekNumber, maxWeek)} of {maxWeek} · {isHeld ? "Holding" : phase.name}</span>
       </div>
 
@@ -516,7 +516,7 @@ function IntroduceSlowlyCard({
         <p style={{
           fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400,
           fontStyle: "italic",
-          color: "#8b7355", margin: "var(--space-3) 0 0",
+          color: "var(--color-bronze)", margin: "var(--space-3) 0 0",
           letterSpacing: "0.02em",
         }}>
           Paused — repeat this week
@@ -546,7 +546,7 @@ function IntroduceSlowlyCard({
           <span style={{
             fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400,
             fontStyle: "italic",
-            color: "#8b7355",
+            color: "var(--color-bronze)",
             letterSpacing: "0.02em", lineHeight: 1.55,
           }}>
             {holdSuggestion.message}
@@ -556,7 +556,7 @@ function IntroduceSlowlyCard({
 
       {/* Check-in section — inline when a new ramp week is due */}
       {showCheckin && (
-        <div style={{ marginTop: "var(--space-4)", paddingTop: "var(--space-4)", borderTop: "1px solid rgba(28,28,26,0.18)" }}>
+        <div style={{ marginTop: "var(--space-4)", paddingTop: "var(--space-4)", borderTop: "1px solid rgba(var(--rgb-ink), 0.16)" }}>
           <p style={{
             fontFamily: "var(--font-body)", fontSize: "var(--text-xs)",
             color: "var(--clay, var(--color-stone))", margin: "0 0 var(--space-3)",
@@ -584,15 +584,15 @@ function IntroduceSlowlyCard({
                   disabled={saving || saved}
                   style={{
                     padding: "var(--space-3) var(--space-2)",
-                    background: "rgba(250, 249, 244, 0.82)",
+                    background: "rgba(var(--rgb-ivory), 0.82)",
                     border: isSelected
-                      ? "1px solid rgba(28, 28, 26, 0.70)"
-                      : "1px solid rgba(28, 28, 26, 0.18)",
+                      ? "1px solid rgba(var(--rgb-ink), 0.82)"
+                      : "1px solid rgba(var(--rgb-ink), 0.16)",
                     borderRadius: "var(--radius)",
                     fontFamily: "var(--font-body)",
                     fontSize: "var(--text-xs)", fontWeight: 400,
                     letterSpacing: "var(--tracking-label)", textTransform: "uppercase",
-                    color: "#1c1c1a",
+                    color: "var(--color-ink)",
                     cursor: (saving || saved) ? "default" : "pointer",
                     transition: "border-color 0.18s",
                   }}
@@ -615,8 +615,8 @@ function IntroduceSlowlyCard({
                   width: "100%",
                   boxSizing: "border-box",
                   padding: "var(--space-2) var(--space-3)",
-                  background: "rgba(250,249,244,0.06)",
-                  border: "1px solid rgba(45,61,43,0.20)",
+                  background: "rgba(var(--rgb-ivory), 0.08)",
+                  border: "1px solid rgba(var(--rgb-moss), 0.16)",
                   borderRadius: "var(--radius)",
                   fontFamily: "var(--font-body)",
                   fontSize: "var(--text-xs)",
@@ -631,7 +631,7 @@ function IntroduceSlowlyCard({
 
               {checkinStatus === "error" && checkinError && (
                 <p role="alert" style={{
-                  fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "#8b7355",
+                  fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-bronze)",
                   margin: "0 0 var(--space-3)", lineHeight: 1.5, letterSpacing: "0.01em",
                 }}>{checkinError}</p>
               )}
@@ -643,13 +643,13 @@ function IntroduceSlowlyCard({
                 style={{
                   width: "100%",
                   padding: "var(--space-3) 0",
-                  background: saved ? "rgba(250, 249, 244, 0.82)" : "rgba(45,61,43,0.12)",
-                  border: saved ? "1px solid rgba(28, 28, 26, 0.70)" : "1px solid rgba(45,61,43,0.35)",
+                  background: saved ? "rgba(var(--rgb-ivory), 0.82)" : "rgba(var(--rgb-moss), 0.08)",
+                  border: saved ? "1px solid rgba(var(--rgb-ink), 0.82)" : "1px solid rgba(var(--rgb-moss), 0.32)",
                   borderRadius: "var(--radius)",
                   fontFamily: "var(--font-body)",
                   fontSize: "var(--text-xs)", fontWeight: 400,
                   letterSpacing: "var(--tracking-label)", textTransform: "uppercase",
-                  color: saved ? "#1c1c1a" : "var(--sage, #2d3d2b)",
+                  color: saved ? "var(--color-ink)" : "var(--sage, #2d3d2b)",
                   cursor: (saving || saved) ? "default" : "pointer",
                   opacity: saving ? 0.7 : 1,
                   transition: "background 0.18s, border-color 0.18s, color 0.18s, opacity 0.18s",
@@ -671,7 +671,7 @@ function IntroduceSlowlyCard({
       {/* Expanded phase detail — chevron-toggled, so the always-visible
           card stays compact until the user opts in. */}
       {expanded && (
-        <div style={{ marginTop: "var(--space-4)", paddingTop: "var(--space-4)", borderTop: "1px solid rgba(28,28,26,0.18)" }}>
+        <div style={{ marginTop: "var(--space-4)", paddingTop: "var(--space-4)", borderTop: "1px solid rgba(var(--rgb-ink), 0.16)" }}>
           <p style={{
             fontFamily: "var(--font-body)", fontSize: "var(--text-xs)",
             color: "var(--clay)", margin: "0 0 var(--space-4)", lineHeight: 1.7,
@@ -685,7 +685,7 @@ function IntroduceSlowlyCard({
               <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>{phase.onTrack}</p>
             </div>
             <div>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "#8b7355", margin: "0 0 var(--space-1)" }}>Back off</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--color-bronze)", margin: "0 0 var(--space-1)" }}>Back off</p>
               <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: 0, lineHeight: 1.55 }}>{phase.backOff}</p>
             </div>
           </div>
@@ -703,19 +703,19 @@ function IntroduceSlowlyCard({
                 onClick={() => onAdvance?.(product.id)}
                 style={{
                   width: "100%", padding: "var(--space-3) 0",
-                  background: "rgba(45,61,43,0.10)",
-                  border: "1px solid rgba(45,61,43,0.35)",
+                  background: "rgba(var(--rgb-moss), 0.08)",
+                  border: "1px solid rgba(var(--rgb-moss), 0.32)",
                   borderRadius: "var(--radius)",
                   display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "var(--space-2)",
                   fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400,
                   letterSpacing: "var(--tracking-label)", textTransform: "uppercase",
-                  color: "#2d3d2b", cursor: "pointer",
+                  color: "var(--color-inky-moss)", cursor: "pointer",
                   marginBottom: "var(--space-4)",
                   WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
                   transition: "background 0.18s",
                 }}
-                onMouseEnter={e => { e.currentTarget.style.background = "rgba(45,61,43,0.18)"; }}
-                onMouseLeave={e => { e.currentTarget.style.background = "rgba(45,61,43,0.10)"; }}
+                onMouseEnter={e => { e.currentTarget.style.background = "rgba(var(--rgb-moss), 0.16)"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "rgba(var(--rgb-moss), 0.08)"; }}
               >
                 Skin handled it — advance <Icon name="check" size={10} />
               </button>
@@ -726,18 +726,18 @@ function IntroduceSlowlyCard({
                   onClick={() => onAdvance?.(product.id)}
                   style={{
                     flex: 1, padding: "var(--space-3) 0",
-                    background: "rgba(45,61,43,0.10)",
-                    border: "1px solid rgba(45,61,43,0.35)",
+                    background: "rgba(var(--rgb-moss), 0.08)",
+                    border: "1px solid rgba(var(--rgb-moss), 0.32)",
                     borderRadius: "var(--radius)",
                     display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "var(--space-2)",
                     fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400,
                     letterSpacing: "var(--tracking-label)", textTransform: "uppercase",
-                    color: "#2d3d2b", cursor: "pointer",
+                    color: "var(--color-inky-moss)", cursor: "pointer",
                     WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
                     transition: "background 0.18s",
                   }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "rgba(45,61,43,0.18)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "rgba(45,61,43,0.10)"; }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "rgba(var(--rgb-moss), 0.16)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "rgba(var(--rgb-moss), 0.08)"; }}
                 >
                   Skin handled it <Icon name="check" size={10} />
                 </button>
@@ -746,17 +746,17 @@ function IntroduceSlowlyCard({
                   onClick={() => onHold?.(product.id)}
                   style={{
                     flex: 1, padding: "var(--space-3) 0",
-                    background: "rgba(139,115,85,0.08)",
-                    border: "1px solid rgba(139,115,85,0.28)",
+                    background: "rgba(var(--rgb-bronze), 0.08)",
+                    border: "1px solid rgba(var(--rgb-bronze), 0.32)",
                     borderRadius: "var(--radius)",
                     fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400,
                     letterSpacing: "var(--tracking-label)", textTransform: "uppercase",
-                    color: "#8b7355", cursor: "pointer",
+                    color: "var(--color-bronze)", cursor: "pointer",
                     WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
                     transition: "background 0.18s",
                   }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "rgba(139,115,85,0.16)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "rgba(139,115,85,0.08)"; }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "rgba(var(--rgb-bronze), 0.16)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "rgba(var(--rgb-bronze), 0.08)"; }}
                 >
                   Backing off
                 </button>
@@ -781,7 +781,7 @@ function IntroduceSlowlyCard({
                   <button
                     disabled={!pickedDate}
                     onClick={(e) => { e.stopPropagation(); if (!pickedDate) return; onResetStart?.(product.id, pickedDate); setConfirmReset(false); setPickedDate(""); }}
-                    style={{ padding: "var(--space-2) var(--space-3)", background: pickedDate ? "rgba(139,115,85,0.12)" : "transparent", border: `1px solid ${pickedDate ? "rgba(139,115,85,0.35)" : "var(--border)"}`, borderRadius: "var(--radius)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: pickedDate ? "#8b7355" : "var(--clay)", cursor: pickedDate ? "pointer" : "not-allowed", opacity: pickedDate ? 1 : 0.5 }}>
+                    style={{ padding: "var(--space-2) var(--space-3)", background: pickedDate ? "rgba(var(--rgb-bronze), 0.08)" : "transparent", border: `1px solid ${pickedDate ? "rgba(var(--rgb-bronze), 0.32)" : "var(--border)"}`, borderRadius: "var(--radius)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: pickedDate ? "var(--color-bronze)" : "var(--clay)", cursor: pickedDate ? "pointer" : "not-allowed", opacity: pickedDate ? 1 : 0.5 }}>
                     Save
                   </button>
                   <button onClick={(e) => { e.stopPropagation(); setConfirmReset(false); setPickedDate(""); }}
@@ -918,14 +918,14 @@ function WeeklyRitualCalendar({ rampProducts, products }) {
                 display: "flex", flexDirection: "column", alignItems: "center",
                 padding: "var(--space-3) var(--space-1) var(--space-3)",
                 background: selected
-                  ? "rgba(45,61,43,0.15)"
+                  ? "rgba(var(--rgb-moss), 0.16)"
                   : active
-                  ? "rgba(45,61,43,0.07)"
+                  ? "rgba(var(--rgb-moss), 0.08)"
                   : "var(--surface)",
                 border: selected
-                  ? "1px solid rgba(45,61,43,0.45)"
+                  ? "1px solid rgba(var(--rgb-moss), 0.56)"
                   : active
-                  ? "1px solid rgba(45,61,43,0.25)"
+                  ? "1px solid rgba(var(--rgb-moss), 0.32)"
                   : "1px solid var(--border)",
                 borderRadius: "var(--radius)",
                 cursor: "pointer",

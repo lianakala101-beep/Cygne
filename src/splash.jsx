@@ -40,7 +40,7 @@ function SwanVideoBackdrop({ fadingOut = false }) {
       <div style={{
         position: "absolute",
         inset: 0,
-        background: "rgba(0,0,0,0.3)",
+        background: "rgba(var(--rgb-ink), 0.32)",
       }} />
     </div>
   );

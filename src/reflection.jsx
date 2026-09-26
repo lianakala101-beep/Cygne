@@ -21,7 +21,7 @@ const TEXT_SOFT  = "var(--clay)";
 const BORDER     = "var(--border)";
 const OVERLAY    = "var(--overlay)";
 const CTA_BG     = "var(--cta)";
-const CTA_BORDER = "rgba(160,160,160,0.40)";
+const CTA_BORDER = "rgba(var(--rgb-sage), 0.32)";
 const CURSIVE    = "var(--font-display)";
 const SANS       = "var(--font-body)";
 
@@ -364,7 +364,7 @@ function CaptureFlow({ onClose, onComplete }) {
               {ANGLES.map((a, i) => (
                 <div key={a.key} style={{
                   width: 9, height: 9, borderRadius: "50%",
-                  background: i < step ? "var(--sage)" : i === step ? "rgba(45,61,43,0.45)" : "transparent",
+                  background: i < step ? "var(--sage)" : i === step ? "rgba(var(--rgb-moss), 0.56)" : "transparent",
                   border: `1px solid ${i <= step ? "var(--sage)" : BORDER}`,
                   transition: "all 0.2s",
                 }} />
@@ -375,7 +375,7 @@ function CaptureFlow({ onClose, onComplete }) {
               style={{
                 display: "inline-flex", alignItems: "center", gap: "var(--space-3)",
                 padding: "var(--space-4) var(--space-10)", borderRadius: 0,
-                background: "transparent", color: "var(--color-ivory)", border: "1.5px solid rgba(250,249,244,0.5)",
+                background: "transparent", color: "var(--color-ivory)", border: "1.5px solid rgba(var(--rgb-ivory), 0.56)",
                 cursor: busy ? "default" : "pointer",
                 fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 400,
                 letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
@@ -415,7 +415,7 @@ function CaptureFlow({ onClose, onComplete }) {
               style={{
                 display: "inline-flex", alignItems: "center", gap: "var(--space-3)",
                 padding: "var(--space-4) var(--space-10)", borderRadius: 0,
-                background: "transparent", color: "var(--color-ivory)", border: "1.5px solid rgba(250,249,244,0.5)",
+                background: "transparent", color: "var(--color-ivory)", border: "1.5px solid rgba(var(--rgb-ivory), 0.56)",
                 cursor: busy ? "default" : "pointer",
                 fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 400,
                 letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
@@ -589,7 +589,7 @@ function ExpandedEntry({ entry, onClose }) {
           width: "100%", maxWidth: 720,
           borderTop: `1px solid ${BORDER}`,
           borderBottom: `1px solid ${BORDER}`,
-          boxShadow: "0 30px 80px rgba(0,0,0,0.3)",
+          boxShadow: "0 30px 80px rgba(var(--rgb-ink), 0.32)",
         }}>
         <TriptychImage src={src} fallbackSrc={entry.inline} alt={`Reflection for week ${entry.weekNumber}`} placeholderFontSize="var(--text-xs)" />
       </div>
@@ -664,20 +664,20 @@ function GalleryEntry({ entry, onExpand, onRemove, caption }) {
           background: "none", border: "none", padding: 0, cursor: "pointer",
           textAlign: "center", color: TEXT,
         }}>
-        <p style={{ fontFamily: SANS, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(250,249,244,0.6)", margin: "0 0 var(--space-1)" }}>
+        <p style={{ fontFamily: SANS, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.56)", margin: "0 0 var(--space-1)" }}>
           Week {entry.weekNumber}
         </p>
         <h3 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-md)", fontWeight: 700, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 var(--space-1)", lineHeight: 1.2 }}>
           {getMoonPhase(new Date(entry.date))}
         </h3>
-        <p style={{ fontFamily: SANS, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(250,249,244,0.6)", margin: "0 0 var(--space-5)" }}>
+        <p style={{ fontFamily: SANS, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.56)", margin: "0 0 var(--space-5)" }}>
           {formatDateLong(entry.date)}
         </p>
         <div style={{
           width: "100%", maxWidth: 520, margin: "0 auto",
           borderTop: `1px solid ${BORDER}`,
           borderBottom: `1px solid ${BORDER}`,
-          boxShadow: "0 18px 44px rgba(0,0,0,0.2)",
+          boxShadow: "0 18px 44px rgba(var(--rgb-ink), 0.16)",
         }}>
           <TriptychImage
             src={src}
@@ -687,7 +687,7 @@ function GalleryEntry({ entry, onExpand, onRemove, caption }) {
           />
         </div>
         {caption && (
-          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", fontWeight: 400, color: "rgba(250,249,244,0.6)", textAlign: "center", margin: "var(--space-3) 0 0", letterSpacing: "0.02em", lineHeight: 1.4 }}>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", fontWeight: 400, color: "rgba(var(--rgb-ivory), 0.56)", textAlign: "center", margin: "var(--space-3) 0 0", letterSpacing: "0.02em", lineHeight: 1.4 }}>
             {caption}
           </p>
         )}
@@ -700,8 +700,8 @@ function GalleryEntry({ entry, onExpand, onRemove, caption }) {
           style={{
             position: "absolute",
             top: 72, right: 8,
-            background: "rgba(28,28,26,0.65)",
-            border: "1px solid rgba(250,249,244,0.4)",
+            background: "rgba(var(--rgb-ink), 0.56)",
+            border: "1px solid rgba(var(--rgb-ivory), 0.32)",
             borderRadius: "var(--radius-pill)",
             width: 30, height: 30,
             display: "inline-flex", alignItems: "center", justifyContent: "center",
@@ -1010,7 +1010,7 @@ function Reflection({ reflections = [], onAddReflection, onReplaceReflections, p
             display: "inline-flex", alignItems: "center", gap: "var(--space-3)",
             padding: "var(--space-4) var(--space-10)", borderRadius: "var(--radius-pill)",
             background: "transparent", color: "var(--color-ivory)",
-            border: "1.5px solid rgba(250,249,244,0.5)",
+            border: "1.5px solid rgba(var(--rgb-ivory), 0.56)",
             cursor: saving ? "default" : "pointer",
             fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 400,
             letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
@@ -1027,7 +1027,7 @@ function Reflection({ reflections = [], onAddReflection, onReplaceReflections, p
               : "Capture This Week"}
         </button>
         {justCaptured && (
-          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "rgba(250,249,244,0.6)", margin: "var(--space-3) 0 0", letterSpacing: "0.02em", transition: "opacity 600ms ease" }}>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "rgba(var(--rgb-ivory), 0.56)", margin: "var(--space-3) 0 0", letterSpacing: "0.02em", transition: "opacity 600ms ease" }}>
             Captured — return on your next reset day
           </p>
         )}
@@ -1047,7 +1047,7 @@ function Reflection({ reflections = [], onAddReflection, onReplaceReflections, p
               cursor: sharingSkinStatus ? "default" : "pointer",
               fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 400,
               letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
-              color: "rgba(250,249,244,0.75)",
+              color: "rgba(var(--rgb-ivory), 0.82)",
               opacity: sharingSkinStatus ? 0.5 : 1,
               WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
               transition: "opacity 0.18s",

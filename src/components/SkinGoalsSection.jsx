@@ -80,7 +80,7 @@ export function SkinGoalsSection({
       <p style={{
         fontFamily: "var(--font-body)",
         fontSize: "var(--text-sm)", fontWeight: 400, lineHeight: 1.6,
-        color: "rgba(255,255,255,0.7)",
+        color: "rgba(var(--rgb-ivory), 0.82)",
         margin: "0 0 var(--space-6)", textAlign: "center",
       }}>
         Do you feel your skin goals have been met this month?
@@ -96,8 +96,8 @@ export function SkinGoalsSection({
             style={{
               display: "flex", alignItems: "center", justifyContent: "space-between",
               padding: "var(--space-3) var(--space-4)",
-              background: "rgba(250,249,244,0.06)",
-              border: "1px solid rgba(250,249,244,0.18)",
+              background: "rgba(var(--rgb-ivory), 0.08)",
+              border: "1px solid rgba(var(--rgb-ivory), 0.16)",
               borderRadius: "var(--radius)",
             }}
           >
@@ -114,7 +114,7 @@ export function SkinGoalsSection({
                 style={{
                   padding: "var(--space-2) var(--space-3)",
                   background: "transparent",
-                  border: "1px solid rgba(250,249,244,0.6)",
+                  border: "1px solid rgba(var(--rgb-ivory), 0.56)",
                   borderRadius: "var(--radius-pill)",
                   fontFamily: "var(--font-body)",
                   fontSize: "var(--text-xs)", fontWeight: 400, letterSpacing: "var(--tracking-label)",
@@ -123,7 +123,7 @@ export function SkinGoalsSection({
                   opacity: busy === g.id ? 0.5 : 1,
                   transition: "background 0.18s",
                 }}
-                onMouseEnter={(e) => { if (busy == null) e.currentTarget.style.background = "rgba(250,249,244,0.12)"; }}
+                onMouseEnter={(e) => { if (busy == null) e.currentTarget.style.background = "rgba(var(--rgb-ivory), 0.08)"; }}
                 onMouseLeave={(e) => { if (busy == null) e.currentTarget.style.background = "transparent"; }}
               >
                 {busy === g.id ? "Saving…" : "Met"}
@@ -134,7 +134,7 @@ export function SkinGoalsSection({
                 aria-label={`Remove ${labelFor(g.goal)}`}
                 style={{
                   background: "none", border: "none",
-                  color: "rgba(255,255,255,0.45)",
+                  color: "rgba(var(--rgb-ivory), 0.56)",
                   cursor: busy != null ? "default" : "pointer",
                   fontSize: "var(--text-lg)", lineHeight: 1, padding: "var(--space-1)",
                 }}
@@ -156,7 +156,7 @@ export function SkinGoalsSection({
                 background: "none", border: "none",
                 fontFamily: "var(--font-body)",
                 fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase",
-                color: "rgba(255,255,255,0.55)",
+                color: "rgba(var(--rgb-ivory), 0.56)",
                 cursor: "pointer", padding: "var(--space-1) var(--space-2)",
               }}
             >
@@ -177,8 +177,8 @@ export function SkinGoalsSection({
                     disabled={busy != null}
                     style={{
                       padding: "var(--space-2) var(--space-3)",
-                      background: active ? "rgba(250,249,244,0.18)" : "rgba(250,249,244,0.06)",
-                      border: "1px solid rgba(250,249,244,0.24)",
+                      background: active ? "rgba(var(--rgb-ivory), 0.16)" : "rgba(var(--rgb-ivory), 0.08)",
+                      border: "1px solid rgba(var(--rgb-ivory), 0.16)",
                       borderRadius: "var(--radius-pill)",
                       fontFamily: "var(--font-body)",
                       fontSize: "var(--text-xs)", color: IVORY,
@@ -195,7 +195,7 @@ export function SkinGoalsSection({
                 disabled={busy != null}
                 style={{
                   background: "none", border: "none",
-                  color: "rgba(255,255,255,0.4)",
+                  color: "rgba(var(--rgb-ivory), 0.32)",
                   fontFamily: "var(--font-body)", fontSize: "var(--text-xs)",
                   letterSpacing: "var(--tracking-label)", textTransform: "uppercase",
                   cursor: busy != null ? "default" : "pointer", padding: "var(--space-2) var(--space-2)",

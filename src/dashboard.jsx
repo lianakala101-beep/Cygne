@@ -112,11 +112,11 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
               </p>
             )}
             {welcomeBackLine ? (
-              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", letterSpacing: "0.02em", color: "#F4F3EF", margin: "var(--space-4) 0 0", lineHeight: 1.55, maxWidth: 360 }}>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", letterSpacing: "0.02em", color: "var(--color-ivory)", margin: "var(--space-4) 0 0", lineHeight: 1.55, maxWidth: 360 }}>
                 {welcomeBackLine}
               </p>
             ) : products.length === 0 && (
-              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", letterSpacing: "0.04em", color: "#F4F3EF", margin: "var(--space-3) 0 0", lineHeight: 1.5 }}>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", letterSpacing: "0.04em", color: "var(--color-ivory)", margin: "var(--space-3) 0 0", lineHeight: 1.5 }}>
                 Welcome.
               </p>
             )}
@@ -134,7 +134,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         return (
           <div>
             <div style={{ marginBottom: "calc(var(--space-1) * 7)" }}>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "#F4F3EF", margin: 0, lineHeight: 1.6 }}>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "var(--color-ivory)", margin: 0, lineHeight: 1.6 }}>
                 Your ritual lives here. Let's build it around you.
               </p>
             </div>
@@ -148,7 +148,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
                   <span style={{
                     fontFamily: "var(--font-display)",
                     fontSize: "var(--text-xl)", fontWeight: 700, letterSpacing: "0.04em",
-                    color: "rgba(255,255,255,0.4)",
+                    color: "rgba(var(--rgb-ivory), 0.32)",
                     lineHeight: 1,
                     flexShrink: 0,
                     minWidth: 36,
@@ -158,10 +158,10 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
                     {String(i + 1).padStart(2, "0")}
                   </span>
                   <div style={{ flex: 1 }}>
-                    <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-sm)", fontWeight: 400, color: "#F4F3EF", margin: "0 0 var(--space-1)", lineHeight: 1.3 }}>{s.label}</p>
-                    <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "#F4F3EF", opacity: 0.75, margin: s.cta ? "0 0 var(--space-3)" : 0, lineHeight: 1.6 }}>{s.sub}</p>
+                    <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-sm)", fontWeight: 400, color: "var(--color-ivory)", margin: "0 0 var(--space-1)", lineHeight: 1.3 }}>{s.label}</p>
+                    <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--color-ivory)", opacity: 0.75, margin: s.cta ? "0 0 var(--space-3)" : 0, lineHeight: 1.6 }}>{s.sub}</p>
                     {s.cta && (
-                      <button onClick={s.action} style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-2)", fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, color: "#6e8a72", background: "rgba(122,144,112,0.1)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: "var(--radius-pill)", padding: "var(--space-2) var(--space-4)", cursor: "pointer" }}>
+                      <button onClick={s.action} style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-2)", fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, color: "var(--color-sage)", background: "rgba(var(--rgb-sage), 0.08)", border: "1px solid rgba(var(--rgb-sage), 0.32)", borderRadius: "var(--radius-pill)", padding: "var(--space-2) var(--space-4)", cursor: "pointer" }}>
                         {s.cta} <Icon name="arrow-right" size={11} />
                       </button>
                     )}
@@ -196,14 +196,14 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
                 {steps.map((s, i) => (
                   <div key={i} style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}
                     onClick={s.action || undefined}>
-                    <div style={{ width: 20, height: 20, borderRadius: "50%", flexShrink: 0, background: s.done ? "#6e8a72" : "var(--ink)", border: "1px solid " + (s.done ? "#6e8a72" : "var(--border)"), display: "flex", alignItems: "center", justifyContent: "center", color: s.done ? "var(--ink)" : "var(--clay)" }}>
+                    <div style={{ width: 20, height: 20, borderRadius: "50%", flexShrink: 0, background: s.done ? "var(--color-sage)" : "var(--ink)", border: "1px solid " + (s.done ? "var(--color-sage)" : "var(--border)"), display: "flex", alignItems: "center", justifyContent: "center", color: s.done ? "var(--ink)" : "var(--clay)" }}>
                       {s.done && <Icon name="check" size={10} />}
                       {!s.done && <span style={{ fontSize: "var(--text-xs)", opacity: 0.5 }}>{i + 1}</span>}
                     </div>
                     <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: s.done ? "var(--clay)" : "var(--parchment)", margin: 0, flex: 1, textDecoration: s.done ? "line-through" : "none", opacity: s.done ? 0.5 : 1 }}>{s.label}</p>
                     {!s.done && s.cta && (
                       <button onClick={e => { e.stopPropagation(); s.action(); }}
-                        style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-1)", fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, color: "#6e8a72", background: "rgba(122,144,112,0.1)", border: "1px solid rgba(122,144,112,0.3)", borderRadius: "var(--radius-pill)", padding: "var(--space-1) var(--space-3)", cursor: "pointer", whiteSpace: "nowrap" }}>
+                        style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-1)", fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, color: "var(--color-sage)", background: "rgba(var(--rgb-sage), 0.08)", border: "1px solid rgba(var(--rgb-sage), 0.32)", borderRadius: "var(--radius-pill)", padding: "var(--space-1) var(--space-3)", cursor: "pointer", whiteSpace: "nowrap" }}>
                         {s.cta} <Icon name="arrow-right" size={10} />
                       </button>
                     )}
@@ -220,7 +220,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             like the interior of a magazine. */}
 
         {/* Swan Sense — fully transparent, divides greeting from action list */}
-        <div style={{ height: 1, background: "rgba(250,249,244,0.18)", marginBottom: "var(--space-5)" }} />
+        <div style={{ height: 1, background: "rgba(var(--rgb-ivory), 0.16)", marginBottom: "var(--space-5)" }} />
         <div style={{ marginBottom: "var(--space-5)" }}>
           <SwanSongCard currentSession={currentSession} asPopup={false} user={user} predictions={swanSensePredictions} dailyLine={swanDailyLine} dailyLoading={swanLoading} dailyFailed={swanFailed} variant="ivory-flat" />
         </div>
@@ -292,13 +292,13 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             return (
               <div style={{
                 width: "100%", padding: "var(--space-5) 0", marginBottom: "var(--space-4)",
-                borderTop: "1px solid rgba(250,249,244,0.25)",
-                borderBottom: "1px solid rgba(250,249,244,0.25)",
+                borderTop: "1px solid rgba(var(--rgb-ivory), 0.32)",
+                borderBottom: "1px solid rgba(var(--rgb-ivory), 0.32)",
               }}>
                 <p style={{
                   fontFamily: "var(--font-body)",
                   fontSize: "var(--text-xs)", letterSpacing: "0.06em", lineHeight: 1.6,
-                  color: "rgba(255,255,255,0.6)",
+                  color: "rgba(var(--rgb-ivory), 0.56)",
                   margin: 0,
                 }}>
                   Add your birth year in Profile to unlock Ask Cygne.
@@ -313,8 +313,8 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
                 display: "flex", width: "100%", alignItems: "center", justifyContent: "space-between",
                 padding: "var(--space-5) 0", marginBottom: "var(--space-4)",
                 background: "transparent", border: "none",
-                borderTop: "1px solid rgba(250,249,244,0.25)",
-                borderBottom: "1px solid rgba(250,249,244,0.25)",
+                borderTop: "1px solid rgba(var(--rgb-ivory), 0.32)",
+                borderBottom: "1px solid rgba(var(--rgb-ivory), 0.32)",
                 cursor: "pointer",
                 WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
               }}>
@@ -335,7 +335,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
               <p key={i} style={{
                 fontFamily: "var(--font-body)", fontSize: "var(--text-xs)",
                 letterSpacing: "0.02em",
-                color: "#F4F3EF",
+                color: "var(--color-ivory)",
                 lineHeight: 1.6,
                 margin: i === 0 ? 0 : "var(--space-2) 0 0",
               }}>{c.reason}</p>
@@ -354,8 +354,8 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           <button
             onClick={() => setFlightOpen(true)}
             style={{
-              background: "rgba(250,249,244,0.06)",
-              border: "1px solid rgba(250,249,244,0.35)",
+              background: "rgba(var(--rgb-ivory), 0.08)",
+              border: "1px solid rgba(var(--rgb-ivory), 0.32)",
               borderRadius: "var(--radius-pill)",
               padding: "var(--space-3) var(--space-6)",
               cursor: "pointer",
@@ -365,16 +365,16 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
               WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
               transition: "background 0.18s",
             }}
-            onMouseEnter={e => { e.currentTarget.style.background = "rgba(250,249,244,0.14)"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "rgba(250,249,244,0.06)"; }}
+            onMouseEnter={e => { e.currentTarget.style.background = "rgba(var(--rgb-ivory), 0.16)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "rgba(var(--rgb-ivory), 0.08)"; }}
           >
             Travel Edit
           </button>
           <button
             onClick={() => setShopScanOpen(true)}
             style={{
-              background: "rgba(250,249,244,0.06)",
-              border: "1px solid rgba(250,249,244,0.35)",
+              background: "rgba(var(--rgb-ivory), 0.08)",
+              border: "1px solid rgba(var(--rgb-ivory), 0.32)",
               borderRadius: "var(--radius-pill)",
               padding: "var(--space-3) var(--space-6)",
               cursor: "pointer",
@@ -384,8 +384,8 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
               WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
               transition: "background 0.18s",
             }}
-            onMouseEnter={e => { e.currentTarget.style.background = "rgba(250,249,244,0.14)"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "rgba(250,249,244,0.06)"; }}
+            onMouseEnter={e => { e.currentTarget.style.background = "rgba(var(--rgb-ivory), 0.16)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "rgba(var(--rgb-ivory), 0.08)"; }}
           >
             Shop Scan
           </button>
@@ -394,14 +394,14 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
         {/* 6. Notification nudge — actionable prompt, transitional between
             top-of-page actions and bottom-of-page context. */}
         {!notifDismissed && notifPermission === "default" && (
-          <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", background: "rgba(122,144,112,0.10)", border: "1px solid rgba(122,144,112,0.25)", borderRadius: "var(--radius)", padding: "var(--space-3) var(--space-4)", marginBottom: "var(--space-5)" }}>
-            <span style={{ color: "#6e8a72", flexShrink: 0, display: "inline-flex" }}><Icon name="bell" size={16} /></span>
+          <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", background: "rgba(var(--rgb-sage), 0.08)", border: "1px solid rgba(var(--rgb-sage), 0.32)", borderRadius: "var(--radius)", padding: "var(--space-3) var(--space-4)", marginBottom: "var(--space-5)" }}>
+            <span style={{ color: "var(--color-sage)", flexShrink: 0, display: "inline-flex" }}><Icon name="bell" size={16} /></span>
             <div style={{ flex: 1 }}>
               <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, color: "var(--parchment)", margin: "0 0 2px" }}>Stay on ritual</p>
               <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--clay)", margin: 0 }}>Get AM & PM reminders so your ritual stays consistent.</p>
             </div>
             <div style={{ display: "flex", gap: "var(--space-2)", flexShrink: 0 }}>
-              <button onClick={onRequestNotif} style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, background: "rgba(122,144,112,0.25)", border: "1px solid rgba(122,144,112,0.4)", borderRadius: "var(--radius-pill)", color: "var(--parchment)", padding: "var(--space-2) var(--space-3)", cursor: "pointer" }}>Enable</button>
+              <button onClick={onRequestNotif} style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, background: "rgba(var(--rgb-sage), 0.32)", border: "1px solid rgba(var(--rgb-sage), 0.32)", borderRadius: "var(--radius-pill)", color: "var(--parchment)", padding: "var(--space-2) var(--space-3)", cursor: "pointer" }}>Enable</button>
               <button onClick={onDismissNotif} aria-label="Dismiss notification prompt" style={{ background: "transparent", border: "none", color: "var(--clay)", cursor: "pointer", padding: "var(--space-2) var(--space-1)", display: "inline-flex" }}><Icon name="x" size={12} /></button>
             </div>
           </div>
@@ -414,8 +414,8 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           const parts = [amOn && `${amTime}am`, pmOn && `${pmTime}pm`].filter(Boolean);
           const label = parts.length > 0 ? `Reminders on — ${parts.join(" & ")} daily.` : "Reminders enabled.";
           return (
-            <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.2)", borderRadius: "var(--radius)", padding: "var(--space-3) var(--space-4)", marginBottom: "var(--space-5)" }}>
-              <span style={{ color: "#6e8a72", display: "inline-flex" }}><Icon name="sparkle" size={12} /></span>
+            <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", background: "rgba(var(--rgb-sage), 0.08)", border: "1px solid rgba(var(--rgb-sage), 0.16)", borderRadius: "var(--radius)", padding: "var(--space-3) var(--space-4)", marginBottom: "var(--space-5)" }}>
+              <span style={{ color: "var(--color-sage)", display: "inline-flex" }}><Icon name="sparkle" size={12} /></span>
               <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--clay)", margin: 0 }}>{label}</p>
               <button onClick={onDismissNotif} aria-label="Dismiss" style={{ marginLeft: "auto", background: "transparent", border: "none", color: "var(--clay)", cursor: "pointer", display: "inline-flex", padding: "var(--space-1)" }}><Icon name="x" size={12} /></button>
             </div>
@@ -465,7 +465,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
               rowGap: "var(--space-2)",
               columnGap: "var(--space-4)",
               padding: "var(--space-4) 0 0",
-              borderTop: "1px solid rgba(250,249,244,0.18)",
+              borderTop: "1px solid rgba(var(--rgb-ivory), 0.16)",
               marginBottom: "var(--space-5)",
               fontFamily: "var(--font-body)",
             }}>
@@ -506,7 +506,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
                   <button onClick={() => setCycleExpanded(false)} aria-label="Close cycle detail" style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", marginLeft: "var(--space-2)", display: "inline-flex", padding: 2 }}><Icon name="x" size={14} /></button>
                 </div>
                 <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--clay)", margin: "0 0 var(--space-4)", lineHeight: 1.65 }}>{phase.description}</p>
-                <div style={{ padding: "var(--space-3) var(--space-4)", background: "rgba(0,0,0,0.2)", borderRadius: "var(--radius)" }}>
+                <div style={{ padding: "var(--space-3) var(--space-4)", background: "rgba(var(--rgb-ink), 0.16)", borderRadius: "var(--radius)" }}>
                   <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--parchment)", margin: 0, lineHeight: 1.6 }}>{phase.nudge}</p>
                 </div>
               </div>

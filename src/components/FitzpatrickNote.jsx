@@ -71,10 +71,10 @@ export function FitzpatrickNote({ variant = "dark" }) {
   // the ivory-shadow card (ink text on inky-moss-tinted fill). Same
   // copy, tone-matched to the surrounding surface.
   const isDark = variant === "dark";
-  const bg     = isDark ? "rgba(250,249,244,0.08)" : "rgba(45,61,43,0.08)";
-  const border = isDark ? "1px solid rgba(250,249,244,0.22)" : "1px solid rgba(45,61,43,0.22)";
-  const color  = isDark ? IVORY : "#1c1c1a";
-  const mutedX = isDark ? "rgba(255,255,255,0.55)" : "rgba(28,28,26,0.55)";
+  const bg     = isDark ? "rgba(var(--rgb-ivory), 0.08)" : "rgba(var(--rgb-moss), 0.08)";
+  const border = isDark ? "1px solid rgba(var(--rgb-ivory), 0.16)" : "1px solid rgba(var(--rgb-moss), 0.16)";
+  const color  = isDark ? IVORY : "var(--color-ink)";
+  const mutedX = isDark ? "rgba(var(--rgb-ivory), 0.56)" : "rgba(var(--rgb-ink), 0.56)";
 
   return (
     <div style={{

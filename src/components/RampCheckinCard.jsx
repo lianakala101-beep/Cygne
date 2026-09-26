@@ -40,15 +40,15 @@ const RESPONSES = [
 // clear one, keeping layout stable (no border-width change).
 const BUTTON_STYLE = {
   base: {
-    background: "rgba(250, 249, 244, 0.82)",
-    border:     "1px solid rgba(28, 28, 26, 0.18)",
-    color:      "#1c1c1a",
+    background: "rgba(var(--rgb-ivory), 0.82)",
+    border:     "1px solid rgba(var(--rgb-ink), 0.16)",
+    color:      "var(--color-ink)",
   },
   hover: {
-    border: "1px solid rgba(28, 28, 26, 0.35)",
+    border: "1px solid rgba(var(--rgb-ink), 0.32)",
   },
   selected: {
-    border: "1px solid rgba(28, 28, 26, 0.70)",
+    border: "1px solid rgba(var(--rgb-ink), 0.82)",
   },
 };
 
@@ -107,8 +107,8 @@ export function RampCheckinCard({ productName, weekNumber, onSave, onDone, onDis
 
   return (
     <div style={{
-      background: "rgba(45,61,43,0.06)",
-      border: "1px solid rgba(45,61,43,0.22)",
+      background: "rgba(var(--rgb-moss), 0.08)",
+      border: "1px solid rgba(var(--rgb-moss), 0.16)",
       borderRadius: "var(--radius)",
       marginBottom: "var(--space-3)",
       padding: "var(--space-4) var(--space-4) var(--space-4)",
@@ -122,7 +122,7 @@ export function RampCheckinCard({ productName, weekNumber, onSave, onDone, onDis
             <span style={{
               display: "inline-flex", alignItems: "center",
               padding: "var(--space-1) var(--space-3)",
-              border: "1px solid rgba(45,61,43,0.42)",
+              border: "1px solid rgba(var(--rgb-moss), 0.32)",
               borderRadius: "var(--radius-pill)",
               fontFamily: "var(--font-display)",
               fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)",
@@ -212,8 +212,8 @@ export function RampCheckinCard({ productName, weekNumber, onSave, onDone, onDis
               width: "100%",
               boxSizing: "border-box",
               padding: "var(--space-2) var(--space-3)",
-              background: "rgba(250,249,244,0.06)",
-              border: "1px solid rgba(45,61,43,0.20)",
+              background: "rgba(var(--rgb-ivory), 0.08)",
+              border: "1px solid rgba(var(--rgb-moss), 0.16)",
               borderRadius: "var(--radius)",
               fontFamily: "var(--font-body)",
               fontSize: "var(--text-xs)",
@@ -235,7 +235,7 @@ export function RampCheckinCard({ productName, weekNumber, onSave, onDone, onDis
               style={{
                 fontFamily: "var(--font-body)",
                 fontSize: "var(--text-xs)",
-                color: "#8b7355",
+                color: "var(--color-bronze)",
                 margin: "0 0 var(--space-3)",
                 lineHeight: 1.5,
                 letterSpacing: "0.01em",
@@ -258,25 +258,25 @@ export function RampCheckinCard({ productName, weekNumber, onSave, onDone, onDis
               // the card; error uses the same idle style so "Try again"
               // reads as a normal next action, not an ongoing alert.
               background:
-                saved ? "rgba(250, 249, 244, 0.82)" :
-                       "rgba(45,61,43,0.12)",
+                saved ? "rgba(var(--rgb-ivory), 0.82)" :
+                       "rgba(var(--rgb-moss), 0.08)",
               border:
-                saved ? "1px solid rgba(28, 28, 26, 0.70)" :
-                       "1px solid rgba(45,61,43,0.35)",
+                saved ? "1px solid rgba(var(--rgb-ink), 0.82)" :
+                       "1px solid rgba(var(--rgb-moss), 0.32)",
               borderRadius: "var(--radius)",
               fontFamily: "var(--font-body)",
               fontSize: "var(--text-xs)",
               fontWeight: 400,
               letterSpacing: "var(--tracking-label)",
               textTransform: "uppercase",
-              color: saved ? "#1c1c1a" : "var(--sage, #2d3d2b)",
+              color: saved ? "var(--color-ink)" : "var(--sage, #2d3d2b)",
               cursor: (saving || saved) ? "default" : "pointer",
               opacity: saving ? 0.7 : 1,
               transition: "background 0.18s, border-color 0.18s, color 0.18s, opacity 0.18s",
               display: "inline-flex", alignItems: "center", justifyContent: "center",
             }}
-            onMouseEnter={e => { if (!saving && !saved) e.currentTarget.style.background = "rgba(45,61,43,0.2)"; }}
-            onMouseLeave={e => { if (!saving && !saved) e.currentTarget.style.background = "rgba(45,61,43,0.12)"; }}
+            onMouseEnter={e => { if (!saving && !saved) e.currentTarget.style.background = "rgba(var(--rgb-moss), 0.16)"; }}
+            onMouseLeave={e => { if (!saving && !saved) e.currentTarget.style.background = "rgba(var(--rgb-moss), 0.08)"; }}
           >
             {buttonLabel}
             {saved && <CheckGlyph />}

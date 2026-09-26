@@ -84,10 +84,10 @@ function AuthScreen({ onAuth, initialNotice = null }) {
         width: "100%",
         maxWidth: 360,
         padding: "var(--space-8) calc(var(--space-1) * 7) calc(var(--space-1) * 7)",
-        background: "rgba(250, 249, 244, 0.15)",
+        background: "rgba(var(--rgb-ivory), 0.16)",
         backdropFilter: "blur(16px)",
         WebkitBackdropFilter: "blur(16px)",
-        border: "1px solid rgba(250, 249, 244, 0.25)",
+        border: "1px solid rgba(var(--rgb-ivory), 0.32)",
         borderRadius: "var(--radius)",
         display: "flex",
         flexDirection: "column",
@@ -137,9 +137,9 @@ function AuthScreen({ onAuth, initialNotice = null }) {
             style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", width: "100%", marginBottom: "var(--space-5)", cursor: "pointer", userSelect: "none" }}>
             <div style={{
               width: 14, height: 14, flexShrink: 0,
-              border: "1px solid rgba(250,249,244,0.6)",
+              border: "1px solid rgba(var(--rgb-ivory), 0.56)",
               borderRadius: 2,
-              background: rememberMe ? "rgba(250,249,244,0.9)" : "transparent",
+              background: rememberMe ? "rgba(var(--rgb-ivory), 0.82)" : "transparent",
               display: "flex", alignItems: "center", justifyContent: "center",
               transition: "background 0.15s",
             }}>
@@ -189,7 +189,7 @@ function AuthScreen({ onAuth, initialNotice = null }) {
             transition: "opacity 0.2s, background 0.2s",
             WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
           }}
-          onMouseEnter={e => { if (!loading) e.currentTarget.style.background = "rgba(250,249,244,0.12)"; }}
+          onMouseEnter={e => { if (!loading) e.currentTarget.style.background = "rgba(var(--rgb-ivory), 0.08)"; }}
           onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
           {loading ? "..." : mode === "login" ? "Sign In" : "Create Account"}
         </button>
@@ -251,7 +251,7 @@ function AuthScreen({ onAuth, initialNotice = null }) {
       {/* Ivory placeholder styling — inline style can't reach :placeholder so
           a small scoped <style> block is the cleanest way to tint them. */}
       <style>{`
-        .cygne-auth-input::placeholder { color: rgba(250,249,244,0.55); }
+        .cygne-auth-input::placeholder { color: rgba(var(--rgb-ivory), 0.56); }
       `}</style>
     </div>
   );
@@ -260,8 +260,8 @@ function AuthScreen({ onAuth, initialNotice = null }) {
 const inputStyle = {
   width: "100%",
   padding: "var(--space-4) var(--space-4)",
-  background: "rgba(250,249,244,0.06)",
-  border: "1px solid rgba(250,249,244,0.25)",
+  background: "rgba(var(--rgb-ivory), 0.08)",
+  border: "1px solid rgba(var(--rgb-ivory), 0.32)",
   borderRadius: "var(--radius)",
   fontFamily: "var(--font-body)",
   fontSize: "var(--text-sm)",

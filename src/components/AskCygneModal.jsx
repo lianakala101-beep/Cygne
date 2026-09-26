@@ -184,7 +184,7 @@ export function AskCygneModal({
       <div
         style={{
           position: "fixed", inset: 0, zIndex: 300,
-          background: "rgba(0,0,0,0.7)",
+          background: "rgba(var(--rgb-ink), 0.82)",
           display: "flex", alignItems: "center", justifyContent: "center",
           padding: "0 var(--space-6)",
         }}
@@ -193,7 +193,7 @@ export function AskCygneModal({
           style={{
             width: "100%", maxWidth: 440,
             background: "var(--color-inky-moss, #2d3d2b)",
-            border: "1px solid rgba(250,249,244,0.25)",
+            border: "1px solid rgba(var(--rgb-ivory), 0.32)",
             borderRadius: "var(--radius)",
             padding: "var(--space-8) calc(var(--space-1) * 7) calc(var(--space-1) * 7)",
             color: "var(--color-ivory, #faf9f4)",
@@ -222,7 +222,7 @@ export function AskCygneModal({
           <p style={{
             fontFamily: "var(--font-body, 'Fungis Normal', sans-serif)",
             fontSize: "var(--text-sm)", lineHeight: 1.65,
-            color: "rgba(255,255,255,0.7)",
+            color: "rgba(var(--rgb-ivory), 0.82)",
             margin: "0 0 calc(var(--space-1) * 7)",
           }}>
             Ask Cygne is an AI assistant for informational purposes only. It
@@ -236,7 +236,7 @@ export function AskCygneModal({
               width: "100%",
               padding: "var(--space-4) 0",
               background: "transparent",
-              border: "1.5px solid rgba(250,249,244,0.5)",
+              border: "1.5px solid rgba(var(--rgb-ivory), 0.56)",
               color: "var(--color-ivory, #faf9f4)",
               borderRadius: 0,
               fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
@@ -259,7 +259,7 @@ export function AskCygneModal({
       onClick={onClose}
       style={{
         position: "fixed", inset: 0, zIndex: 300,
-        background: "rgba(28,28,26,0.45)",
+        background: "rgba(var(--rgb-ink), 0.56)",
         backdropFilter: "blur(10px)",
         display: "flex", alignItems: "flex-end", justifyContent: "center",
       }}
@@ -282,7 +282,7 @@ export function AskCygneModal({
           style={{
             position: "absolute", top: 18, right: 22,
             background: "none", border: "none", cursor: "pointer",
-            color: "rgba(250,249,244,0.6)",
+            color: "rgba(var(--rgb-ivory), 0.56)",
             fontSize: "var(--text-lg)", lineHeight: 1, padding: "var(--space-1)",
             WebkitTapHighlightColor: "transparent",
             WebkitAppearance: "none", appearance: "none",
@@ -329,8 +329,8 @@ export function AskCygneModal({
               style={{
                 width: "100%", boxSizing: "border-box",
                 padding: "var(--space-4) var(--space-4)",
-                background: "rgba(255,255,255,0.06)",
-                border: "1px solid rgba(250,249,244,0.2)",
+                background: "rgba(var(--rgb-ivory), 0.08)",
+                border: "1px solid rgba(var(--rgb-ivory), 0.16)",
                 borderRadius: 0,
                 fontFamily: "var(--font-body, 'Fungis Normal', 'Fungis Normal', sans-serif)",
                 fontSize: "var(--text-sm)", lineHeight: 1.55,
@@ -350,7 +350,7 @@ export function AskCygneModal({
                 marginTop: "var(--space-4)", width: "100%",
                 padding: "var(--space-4) 0",
                 background: "transparent",
-                border: "1.5px solid rgba(250,249,244,0.5)",
+                border: "1.5px solid rgba(var(--rgb-ivory), 0.56)",
                 color: "var(--color-ivory, #faf9f4)",
                 borderRadius: 0,
                 fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
@@ -372,7 +372,7 @@ export function AskCygneModal({
             marginTop: "var(--space-5)",
             fontFamily: "var(--font-body, 'Fungis Normal', sans-serif)",
             fontSize: "var(--text-xs)", lineHeight: 1.55,
-            color: "#8b7355",
+            color: "var(--color-bronze)",
           }}>
             {error}
           </p>
@@ -381,8 +381,8 @@ export function AskCygneModal({
         {answer && (
           <div style={{
             marginTop: "var(--space-6)", padding: "var(--space-5) var(--space-5)",
-            background: "rgba(255,255,255,0.06)",
-            borderTop: "1px solid rgba(250,249,244,0.18)",
+            background: "rgba(var(--rgb-ivory), 0.08)",
+            borderTop: "1px solid rgba(var(--rgb-ivory), 0.16)",
             borderRadius: 0,
             fontFamily: "var(--font-body, 'Fungis Normal', 'Fungis Normal', sans-serif)",
             fontSize: "var(--text-sm)", lineHeight: 1.7,

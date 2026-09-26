@@ -148,7 +148,7 @@ body {
 
 /* Cards that need a surface should use ivory-shadow at partial opacity so texture shows through */
 .surface-card {
-  background-color: rgba(240, 235, 224, 0.6) !important;
+  background-color: rgba(var(--rgb-ivory), 0.56) !important;
 }
 
 /* Navigation bar — texture must show through */
@@ -156,10 +156,10 @@ nav,
 [class*="nav"],
 [class*="bottom-bar"],
 [class*="tab-bar"] {
-  background-color: rgba(250, 249, 244, 0.85) !important;
+  background-color: rgba(var(--rgb-ivory), 0.82) !important;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border-top: 1px solid rgba(192, 192, 192, 0.2);
+  border-top: 1px solid rgba(var(--rgb-ivory), 0.16);
 }
 
 /* Header — texture must show through */

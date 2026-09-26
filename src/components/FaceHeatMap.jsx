@@ -54,10 +54,10 @@ function daysAgoIso(n) {
 
 function fillForScore(s) {
   if (s <= 0) return "none";
-  if (s <= 0.25) return "rgba(250,249,244,0.08)";
-  if (s <= 0.50) return "rgba(45,61,43,0.20)";
-  if (s <= 0.75) return "rgba(45,61,43,0.40)";
-  return "rgba(45,61,43,0.65)";
+  if (s <= 0.25) return "rgba(var(--rgb-ivory), 0.08)";
+  if (s <= 0.50) return "rgba(var(--rgb-moss), 0.16)";
+  if (s <= 0.75) return "rgba(var(--rgb-moss), 0.32)";
+  return "rgba(var(--rgb-moss), 0.56)";
 }
 
 function cycleDayForDate(dateStr, cycleStartDate, cycleLength = 28) {
@@ -110,10 +110,10 @@ export function FaceHeatMap({ checkIns = [], products = [], user = {} }) {
 
   return (
     <div style={{
-      background: "rgba(250, 249, 244, 0.92)",
+      background: "rgba(var(--rgb-ivory), 0.82)",
       borderRadius: "var(--radius)",
       padding: "var(--space-6) var(--space-5) calc(var(--space-1) * 7)",
-      border: "1px solid rgba(250,249,244,0.25)",
+      border: "1px solid rgba(var(--rgb-ivory), 0.32)",
     }}>
       {/* Time filter */}
       <div style={{ display: "flex", justifyContent: "center", gap: 0, marginBottom: "var(--space-5)" }}>
@@ -159,7 +159,7 @@ export function FaceHeatMap({ checkIns = [], products = [], user = {} }) {
               key={z.id}
               d={z.d}
               fill={fill}
-              stroke={isActive ? "rgba(45,61,43,0.85)" : STROKE_DEFAULT}
+              stroke={isActive ? "rgba(var(--rgb-moss), 0.82)" : STROKE_DEFAULT}
               strokeOpacity={isActive ? 1 : 0.55}
               strokeWidth="1.4"
               onClick={isEmpty ? undefined : () => setActiveZone(z.id)}
@@ -275,7 +275,7 @@ function ZoneInsightDrawer({ zoneId, checkIns, products, user, onClose, onAskCyg
       onClick={onClose}
       style={{
         position: "fixed", inset: 0, zIndex: 250,
-        background: "rgba(28,28,26,0.5)",
+        background: "rgba(var(--rgb-ink), 0.56)",
         backdropFilter: "blur(8px)",
         display: "flex", alignItems: "flex-end", justifyContent: "center",
       }}
@@ -353,7 +353,7 @@ function ZoneInsightDrawer({ zoneId, checkIns, products, user, onClose, onAskCyg
                     fontFamily: "var(--font-body, 'Fungis Normal', 'Fungis Normal', sans-serif)",
                     fontSize: "var(--text-sm)", color: INK,
                     padding: "var(--space-2) 0",
-                    borderBottom: "1px solid rgba(28,28,26,0.10)",
+                    borderBottom: "1px solid rgba(var(--rgb-ink), 0.08)",
                   }}
                 >
                   {p.name || "(unnamed)"}{p.brand ? <span style={{ color: PEBBLE }}> · {p.brand}</span> : null}
@@ -369,7 +369,7 @@ function ZoneInsightDrawer({ zoneId, checkIns, products, user, onClose, onAskCyg
           style={{
             width: "100%", padding: "var(--space-4) 0",
             background: "transparent",
-            border: "1px solid rgba(28,28,26,0.25)",
+            border: "1px solid rgba(var(--rgb-ink), 0.32)",
             color: INK,
             borderRadius: "var(--radius)",
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",

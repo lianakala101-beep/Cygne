@@ -141,7 +141,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
         const active = single ? selected === opt : selected.includes(opt);
         return (
           <button key={opt} onClick={() => onToggle(opt)}
-            style={{ padding: "var(--space-3) var(--space-5)", borderRadius: "var(--radius)", border: `1px solid ${active ? "var(--color-ivory, #faf9f4)" : "rgba(250,249,244,0.25)"}`, background: active ? "rgba(250,249,244,0.12)" : "transparent", color: "var(--color-ivory, #faf9f4)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: active ? 700 : 400, cursor: "pointer", transition: "all 0.18s", letterSpacing: "0.02em" }}>
+            style={{ padding: "var(--space-3) var(--space-5)", borderRadius: "var(--radius)", border: `1px solid ${active ? "var(--color-ivory, #faf9f4)" : "rgba(var(--rgb-ivory), 0.32)"}`, background: active ? "rgba(var(--rgb-ivory), 0.08)" : "transparent", color: "var(--color-ivory, #faf9f4)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: active ? 700 : 400, cursor: "pointer", transition: "all 0.18s", letterSpacing: "0.02em" }}>
             {opt}
           </button>
         );
@@ -176,9 +176,9 @@ function OnboardingScreen({ onComplete, setLocationData }) {
         </div>
       </div>
       {skinAge && (
-        <div style={{ marginTop: "var(--space-5)", padding: "var(--space-3) var(--space-4)", background: "rgba(250,249,244,0.08)", border: "1px solid rgba(250,249,244,0.25)", borderRadius: "var(--radius)" }}>
-          <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(255, 255, 255, 0.6)", margin: "0 0 var(--space-1)" }}>{skinAge.bracket}</p>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(255, 255, 255, 0.6)", margin: 0, lineHeight: 1.65 }}>{skinAge.note}</p>
+        <div style={{ marginTop: "var(--space-5)", padding: "var(--space-3) var(--space-4)", background: "rgba(var(--rgb-ivory), 0.08)", border: "1px solid rgba(var(--rgb-ivory), 0.32)", borderRadius: "var(--radius)" }}>
+          <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.56)", margin: "0 0 var(--space-1)" }}>{skinAge.bracket}</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ivory), 0.56)", margin: 0, lineHeight: 1.65 }}>{skinAge.note}</p>
         </div>
       )}
     </div>,
@@ -228,12 +228,12 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       <p style={obSub}>Cygne uses local humidity, UV index, and temperature to adjust your daily ritual advice. Your location is never shared.</p>
       <div style={{ marginTop: "var(--space-8)" }}>
         {locationSet ? (
-          <div style={{ padding: "var(--space-4) var(--space-5)", background: "rgba(250,249,244,0.08)", border: "1px solid rgba(250,249,244,0.25)", borderRadius: "var(--radius)" }}>
+          <div style={{ padding: "var(--space-4) var(--space-5)", background: "rgba(var(--rgb-ivory), 0.08)", border: "1px solid rgba(var(--rgb-ivory), 0.32)", borderRadius: "var(--radius)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
               <div style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--color-ivory, #faf9f4)" }} />
               <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "var(--color-ivory, #faf9f4)", margin: 0, fontWeight: 400 }}>Location enabled</p>
             </div>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(255, 255, 255, 0.6)", margin: "var(--space-2) 0 0" }}>Your environment data will appear on the home screen.</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ivory), 0.56)", margin: "var(--space-2) 0 0" }}>Your environment data will appear on the home screen.</p>
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
@@ -243,7 +243,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
               {locationLoading ? "Requesting..." : "Enable Location"}
             </button>
             <button onClick={() => advance(1)}
-              style={{ background: "none", border: "none", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(255, 255, 255, 0.6)", cursor: "pointer", padding: "var(--space-2) 0", letterSpacing: "0.06em" }}>
+              style={{ background: "none", border: "none", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ivory), 0.56)", cursor: "pointer", padding: "var(--space-2) 0", letterSpacing: "0.06em" }}>
               Skip for now
             </button>
           </div>
@@ -271,8 +271,8 @@ function OnboardingScreen({ onComplete, setLocationData }) {
             <button key={d} onClick={() => setResetDay(d)}
               style={{
                 padding: "var(--space-4) 0", borderRadius: "var(--radius)",
-                border: `1px solid ${active ? "var(--color-ivory, #faf9f4)" : "rgba(250,249,244,0.25)"}`,
-                background: active ? "rgba(250,249,244,0.12)" : "transparent",
+                border: `1px solid ${active ? "var(--color-ivory, #faf9f4)" : "rgba(var(--rgb-ivory), 0.32)"}`,
+                background: active ? "rgba(var(--rgb-ivory), 0.08)" : "transparent",
                 color: "var(--color-ivory, #faf9f4)",
                 fontFamily: "var(--font-body)", fontSize: "var(--text-xs)",
                 fontWeight: active ? 700 : 400, letterSpacing: "var(--tracking-label)",
@@ -333,7 +333,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
             onChange={e => setOccasionDate(e.target.value)}
             style={inputSt}
           />
-          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(255, 255, 255, 0.6)", margin: "var(--space-2) 0 0", lineHeight: 1.55 }}>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ivory), 0.56)", margin: "var(--space-2) 0 0", lineHeight: 1.55 }}>
             Cygne will pace your ritual toward this date — holding new actives in the final four weeks, leaning into hydration as it approaches.
           </p>
         </div>
@@ -469,8 +469,8 @@ function OnboardingScreen({ onComplete, setLocationData }) {
               style={{
                 padding: "var(--space-4) var(--space-5)",
                 borderRadius: "var(--radius)",
-                border: `1px solid ${active ? "var(--color-ivory, #faf9f4)" : "rgba(250,249,244,0.25)"}`,
-                background: active ? "rgba(250,249,244,0.12)" : "transparent",
+                border: `1px solid ${active ? "var(--color-ivory, #faf9f4)" : "rgba(var(--rgb-ivory), 0.32)"}`,
+                background: active ? "rgba(var(--rgb-ivory), 0.08)" : "transparent",
                 color: "var(--color-ivory, #faf9f4)",
                 fontFamily: "var(--font-body)",
                 fontSize: "var(--text-sm)",
@@ -504,7 +504,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
           alt="Cygne"
           style={{ height: 170, width: "auto", display: "block", opacity: 1, filter: "brightness(0) invert(1)" }}
         />
-        <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(255, 255, 255, 0.6)", margin: "var(--space-2) 0 0 130px", lineHeight: 1 }}>built around you</p>
+        <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.56)", margin: "var(--space-2) 0 0 130px", lineHeight: 1 }}>built around you</p>
       </div>
 
       {/* Bottom — welcome message + skin age + Enter button */}
@@ -512,11 +512,11 @@ function OnboardingScreen({ onComplete, setLocationData }) {
         <p style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-xl)", fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 var(--space-2)", lineHeight: 1.2 }}>
           {name ? `Welcome, ${name}.` : "Welcome."}
         </p>
-        <p style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-sm)", fontWeight: 400, letterSpacing: "var(--tracking-label)", color: "rgba(255, 255, 255, 0.6)", margin: "0 0 var(--space-6)" }}>Your ritual begins.</p>
+        <p style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-sm)", fontWeight: 400, letterSpacing: "var(--tracking-label)", color: "rgba(var(--rgb-ivory), 0.56)", margin: "0 0 var(--space-6)" }}>Your ritual begins.</p>
         {skinAge && (
-          <div style={{ padding: "var(--space-3) var(--space-4)", background: "rgba(250,249,244,0.08)", border: "1px solid rgba(250,249,244,0.25)", borderRadius: "var(--radius)", marginBottom: "calc(var(--space-1) * 7)", width: "100%" }}>
-            <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(255, 255, 255, 0.6)", margin: "0 0 var(--space-1)" }}>{skinAge.bracket}</p>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(255, 255, 255, 0.6)", margin: 0, lineHeight: 1.7 }}>{skinAge.note}</p>
+          <div style={{ padding: "var(--space-3) var(--space-4)", background: "rgba(var(--rgb-ivory), 0.08)", border: "1px solid rgba(var(--rgb-ivory), 0.32)", borderRadius: "var(--radius)", marginBottom: "calc(var(--space-1) * 7)", width: "100%" }}>
+            <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.56)", margin: "0 0 var(--space-1)" }}>{skinAge.bracket}</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ivory), 0.56)", margin: 0, lineHeight: 1.7 }}>{skinAge.note}</p>
           </div>
         )}
         <button onClick={handleComplete}
@@ -555,7 +555,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
           against the dark inky-moss canvas. */}
       {step < TOTAL_STEPS - 1 && (
         <div style={{ position: "sticky", top: 0, zIndex: 10, paddingTop: "calc(var(--space-1) * 13)", paddingBottom: "var(--space-4)", background: "var(--color-inky-moss, #2d3d2b)" }}>
-          <div style={{ height: 1.5, background: "rgba(250,249,244,0.15)", borderRadius: "var(--radius-pill)", overflow: "hidden" }}>
+          <div style={{ height: 1.5, background: "rgba(var(--rgb-ivory), 0.16)", borderRadius: "var(--radius-pill)", overflow: "hidden" }}>
             <div style={{ height: "100%", width: `${progress}%`, background: "var(--color-ivory, #faf9f4)", borderRadius: "var(--radius)", transition: "width 0.4s ease" }} />
           </div>
         </div>
@@ -585,7 +585,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
             Continue
           </button>
           {step === 3 || step === 4 ? (
-            <button onClick={() => advance(1)} style={{ width: "100%", marginTop: "var(--space-3)", background: "none", border: "none", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(255, 255, 255, 0.6)", cursor: "pointer", padding: "var(--space-2) 0", letterSpacing: "0.06em" }}>Skip</button>
+            <button onClick={() => advance(1)} style={{ width: "100%", marginTop: "var(--space-3)", background: "none", border: "none", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ivory), 0.56)", cursor: "pointer", padding: "var(--space-2) 0", letterSpacing: "0.06em" }}>Skip</button>
           ) : null}
         </div>
       )}
@@ -611,7 +611,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
           </button>
           {step === 16 && (
             <button onClick={() => { setFitzpatrickType(null); advance(1); }}
-              style={{ width: "100%", marginTop: "var(--space-3)", background: "none", border: "none", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(255, 255, 255, 0.6)", cursor: "pointer", padding: "var(--space-2) 0", letterSpacing: "0.06em" }}>
+              style={{ width: "100%", marginTop: "var(--space-3)", background: "none", border: "none", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ivory), 0.56)", cursor: "pointer", padding: "var(--space-2) 0", letterSpacing: "0.06em" }}>
               Skip
             </button>
           )}
@@ -625,11 +625,11 @@ function OnboardingScreen({ onComplete, setLocationData }) {
 // drop to rgba(255,255,255,0.6) so the heading carries primary emphasis;
 // input fields read as low-alpha ivory wells so they're visible on the dark
 // background without competing with the heading.
-const obEyebrow = { fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(255, 255, 255, 0.6)", margin: "0 0 var(--space-3)" };
+const obEyebrow = { fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.56)", margin: "0 0 var(--space-3)" };
 const obHeading = { fontFamily: "var(--font-display)", fontSize: "var(--text-xl)", fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", margin: "0 0 var(--space-3)", lineHeight: 1.2 };
-const obSub = { fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "rgba(255, 255, 255, 0.6)", margin: 0, lineHeight: 1.7 };
-const inputSt = { width: "100%", padding: "var(--space-3) var(--space-4)", background: "rgba(250,249,244,0.08)", border: "1px solid rgba(250,249,244,0.25)", borderRadius: "var(--radius)", fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "var(--color-ivory, #faf9f4)", outline: "none", boxSizing: "border-box" };
-const labelSt = { fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "rgba(255, 255, 255, 0.6)", display: "block", marginBottom: "var(--space-2)" };
+const obSub = { fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "rgba(var(--rgb-ivory), 0.56)", margin: 0, lineHeight: 1.7 };
+const inputSt = { width: "100%", padding: "var(--space-3) var(--space-4)", background: "rgba(var(--rgb-ivory), 0.08)", border: "1px solid rgba(var(--rgb-ivory), 0.32)", borderRadius: "var(--radius)", fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "var(--color-ivory, #faf9f4)", outline: "none", boxSizing: "border-box" };
+const labelSt = { fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.56)", display: "block", marginBottom: "var(--space-2)" };
 
 
 export { OnboardingScreen };

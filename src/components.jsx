@@ -55,7 +55,7 @@ const inputSt = { width: "100%", padding: "var(--space-3) var(--space-4)", backg
 
 function Pill({ children, active, onClick }) {
   return (
-    <button onClick={onClick} style={{ flexShrink: 0, padding: "var(--space-2) var(--space-4)", borderRadius: 0, border: `1px solid ${active ? "rgba(160,160,160,0.7)" : "var(--border)"}`, background: active ? "var(--cta)" : "transparent", color: active ? "#F5F0E8" : "var(--clay)", fontFamily: "var(--heading)", fontSize: "var(--text-xs)", cursor: "pointer", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", whiteSpace: "nowrap", transition: "all 0.18s" }}>
+    <button onClick={onClick} style={{ flexShrink: 0, padding: "var(--space-2) var(--space-4)", borderRadius: 0, border: `1px solid ${active ? "rgba(var(--rgb-sage), 0.82)" : "var(--border)"}`, background: active ? "var(--cta)" : "transparent", color: active ? "#F5F0E8" : "var(--clay)", fontFamily: "var(--heading)", fontSize: "var(--text-xs)", cursor: "pointer", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", whiteSpace: "nowrap", transition: "all 0.18s" }}>
       {children}
     </button>
   );
@@ -87,11 +87,11 @@ function FlagCard({ f }) {
     missing: "Note",
   };
   const SEVERITY_TONE = {
-    warning: { color: "#8b7355", bg: "rgba(139,115,85,0.12)" },
-    high:    { color: "#8b7355", bg: "rgba(139,115,85,0.12)" },
-    caution: { color: "#8b7355", bg: "rgba(139,115,85,0.08)" },
-    medium:  { color: "#8b7355", bg: "rgba(139,115,85,0.08)" },
-    missing: { color: "var(--color-ivory, #faf9f4)", bg: "rgba(45,61,43,0.08)" },
+    warning: { color: "var(--color-bronze)", bg: "rgba(var(--rgb-bronze), 0.08)" },
+    high:    { color: "var(--color-bronze)", bg: "rgba(var(--rgb-bronze), 0.08)" },
+    caution: { color: "var(--color-bronze)", bg: "rgba(var(--rgb-bronze), 0.08)" },
+    medium:  { color: "var(--color-bronze)", bg: "rgba(var(--rgb-bronze), 0.08)" },
+    missing: { color: "var(--color-ivory, #faf9f4)", bg: "rgba(var(--rgb-moss), 0.08)" },
   };
   const label = SEVERITY_LABEL[f.severity] || "Note";
   const tone = SEVERITY_TONE[f.severity] || SEVERITY_TONE.caution;
@@ -141,7 +141,7 @@ function FlagCard({ f }) {
         }}>{f.label}</span>
         {hasDetail && (
           <span style={{
-            color: "rgba(250,249,244,0.6)", opacity: 0.5,
+            color: "rgba(var(--rgb-ivory), 0.56)", opacity: 0.5,
             transform: open ? "rotate(90deg)" : "none",
             transition: "transform 0.2s",
             display: "inline-flex", flexShrink: 0,
@@ -149,7 +149,7 @@ function FlagCard({ f }) {
         )}
       </div>
       {open && hasDetail && (
-        <div style={{ marginTop: "var(--space-3)", paddingTop: "var(--space-3)", borderTop: "1px solid rgba(45,61,43,0.08)" }}>
+        <div style={{ marginTop: "var(--space-3)", paddingTop: "var(--space-3)", borderTop: "1px solid rgba(var(--rgb-moss), 0.08)" }}>
           {f.detail && (
             <p style={{
               fontFamily: "var(--font-body)", fontSize: "var(--text-xs)",
@@ -167,7 +167,7 @@ function FlagCard({ f }) {
                   <span key={p?.id || name + i} style={{
                     padding: "var(--space-1) var(--space-2)", borderRadius: "var(--radius-pill)",
                     background: "var(--color-ivory-shadow, #f0ebe0)",
-                    border: "1px solid rgba(45,61,43,0.14)",
+                    border: "1px solid rgba(var(--rgb-moss), 0.16)",
                     fontFamily: "var(--font-body)", fontSize: "var(--text-xs)",
                     color: "var(--color-ivory, #faf9f4)",
                     whiteSpace: "nowrap",
@@ -256,14 +256,14 @@ class ErrorBoundary extends Component {
           <p style={{
             fontFamily: "var(--font-body)",
             fontSize: "var(--text-sm)", lineHeight: 1.7, margin: "0 0 var(--space-6)",
-            color: "rgba(250,249,244,0.75)",
+            color: "rgba(var(--rgb-ivory), 0.82)",
           }}>This page hit an error. Try refreshing the app — your data is safe.</p>
           <button onClick={() => window.location.reload()}
             style={{
               padding: "var(--space-3) var(--space-6)",
               background: "transparent",
               color: "var(--color-ivory, #faf9f4)",
-              border: "1px solid rgba(250,249,244,0.5)",
+              border: "1px solid rgba(var(--rgb-ivory), 0.56)",
               borderRadius: 0,
               fontFamily: "var(--font-display)",
               fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase",

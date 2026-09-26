@@ -19,7 +19,7 @@ function SessionPicker({ productId, product, initial, onSession }) {
       <div onClick={e => e.stopPropagation()} style={{ marginTop: "var(--space-3)" }}>
         <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 var(--space-2)", opacity: 0.6 }}>Session</p>
         <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
-          <span style={{ padding: "var(--space-1) var(--space-3)", borderRadius: "var(--radius-pill)", background: isAM ? "rgba(122,144,112,0.14)" : "rgba(232,226,217,0.10)", border: "1px solid " + (isAM ? "rgba(122,144,112,0.4)" : "rgba(232,226,217,0.3)"), fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, color: isAM ? "var(--sage)" : "#e8e2d9" }}>{isAM ? "AM only" : "PM only"}</span>
+          <span style={{ padding: "var(--space-1) var(--space-3)", borderRadius: "var(--radius-pill)", background: isAM ? "rgba(var(--rgb-sage), 0.16)" : "rgba(var(--rgb-ivory), 0.08)", border: "1px solid " + (isAM ? "rgba(var(--rgb-sage), 0.32)" : "rgba(var(--rgb-ivory), 0.32)"), fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, color: isAM ? "var(--sage)" : "#e8e2d9" }}>{isAM ? "AM only" : "PM only"}</span>
           <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--clay)", opacity: 0.5 }}>locked by ingredients</span>
         </div>
         <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--clay)", margin: "var(--space-2) 0 0", lineHeight: 1.5, opacity: 0.6 }}>{locked.reason}</p>
@@ -36,7 +36,7 @@ function SessionPicker({ productId, product, initial, onSession }) {
           const active = selected === s.id;
           return (
             <button key={s.id} onClick={e => { e.stopPropagation(); setSelected(s.id); if (onSession) onSession(productId, s.id); }}
-              style={{ flex: 1, padding: "var(--space-2) 0", borderRadius: "var(--radius)", border: "1px solid " + (active ? "rgba(122,144,112,0.55)" : "var(--border)"), background: active ? "rgba(122,144,112,0.18)" : "transparent", color: active ? "var(--parchment)" : "var(--clay)", fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, cursor: "pointer" }}>
+              style={{ flex: 1, padding: "var(--space-2) 0", borderRadius: "var(--radius)", border: "1px solid " + (active ? "rgba(var(--rgb-sage), 0.56)" : "var(--border)"), background: active ? "rgba(var(--rgb-sage), 0.16)" : "transparent", color: active ? "var(--parchment)" : "var(--clay)", fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, cursor: "pointer" }}>
               {s.label}
             </button>
           );
@@ -86,8 +86,8 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
     if (product.expiryDate) {
       const exp = new Date(product.expiryDate);
       const days = Math.ceil((exp - now) / 86400000);
-      if (days <= 0) return { label: `Expired ${Math.abs(days)}d ago`, color: "#8b7355", bg: "rgba(139,115,85,0.08)", border: "rgba(139,115,85,0.25)" };
-      if (days <= 30) return { label: `Expires in ${days}d`, color: "#8b7355", bg: "rgba(139,115,85,0.08)", border: "rgba(139,115,85,0.25)" };
+      if (days <= 0) return { label: `Expired ${Math.abs(days)}d ago`, color: "var(--color-bronze)", bg: "rgba(var(--rgb-bronze), 0.08)", border: "rgba(var(--rgb-bronze), 0.32)" };
+      if (days <= 30) return { label: `Expires in ${days}d`, color: "var(--color-bronze)", bg: "rgba(var(--rgb-bronze), 0.08)", border: "rgba(var(--rgb-bronze), 0.32)" };
     }
     // Check PAO + opened date
     if (product.paoMonths && product.openedDate) {
@@ -95,8 +95,8 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
       const paoExp = new Date(opened);
       paoExp.setMonth(paoExp.getMonth() + product.paoMonths);
       const days = Math.ceil((paoExp - now) / 86400000);
-      if (days <= 0) return { label: `PAO expired ${Math.abs(days)}d ago`, color: "#8b7355", bg: "rgba(139,115,85,0.08)", border: "rgba(139,115,85,0.25)" };
-      if (days <= 30) return { label: `PAO: ${days}d left`, color: "#8b7355", bg: "rgba(139,115,85,0.08)", border: "rgba(139,115,85,0.25)" };
+      if (days <= 0) return { label: `PAO expired ${Math.abs(days)}d ago`, color: "var(--color-bronze)", bg: "rgba(var(--rgb-bronze), 0.08)", border: "rgba(var(--rgb-bronze), 0.32)" };
+      if (days <= 30) return { label: `PAO: ${days}d left`, color: "var(--color-bronze)", bg: "rgba(var(--rgb-bronze), 0.08)", border: "rgba(var(--rgb-bronze), 0.32)" };
     }
     return null;
   })();
@@ -114,12 +114,12 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
         <div ref={menuRef} style={{ position: "relative", flexShrink: 0, marginLeft: "var(--space-2)" }}>
           <button onClick={() => setMenuOpen(o => !o)} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: "var(--space-2) var(--space-2)", opacity: 0.6, transition: "opacity 0.15s", fontSize: "var(--text-md)", lineHeight: 1, fontFamily: "sans-serif" }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0.6} aria-label="Product options">⋯</button>
           {menuOpen && (
-            <div style={{ position: "absolute", right: 0, top: "100%", zIndex: 50, minWidth: 180, background: "var(--ink)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: "var(--space-2) 0", boxShadow: "0 8px 28px rgba(0,0,0,0.45)" }}>
-              <button onClick={() => { setMenuOpen(false); onEdit(product); }} style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", width: "100%", padding: "var(--space-3) var(--space-4)", background: "none", border: "none", cursor: "pointer", color: "var(--parchment)", fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", textAlign: "left", transition: "background 0.12s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(122,144,112,0.1)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>
+            <div style={{ position: "absolute", right: 0, top: "100%", zIndex: 50, minWidth: 180, background: "var(--ink)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: "var(--space-2) 0", boxShadow: "0 8px 28px rgba(var(--rgb-ink), 0.56)" }}>
+              <button onClick={() => { setMenuOpen(false); onEdit(product); }} style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", width: "100%", padding: "var(--space-3) var(--space-4)", background: "none", border: "none", cursor: "pointer", color: "var(--parchment)", fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", textAlign: "left", transition: "background 0.12s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(var(--rgb-sage), 0.08)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>
                 <Icon name="edit" size={12} /><span>Edit product</span>
               </button>
               <div style={{ height: 1, background: "var(--border)", margin: "var(--space-1) var(--space-3)" }} />
-              <button onClick={() => { setMenuOpen(false); setConfirmDelete(true); }} style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", width: "100%", padding: "var(--space-3) var(--space-4)", background: "none", border: "none", cursor: "pointer", color: "#8b7355", fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", textAlign: "left", transition: "background 0.12s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(139,115,85,0.08)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>
+              <button onClick={() => { setMenuOpen(false); setConfirmDelete(true); }} style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", width: "100%", padding: "var(--space-3) var(--space-4)", background: "none", border: "none", cursor: "pointer", color: "var(--color-bronze)", fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", textAlign: "left", transition: "background 0.12s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(var(--rgb-bronze), 0.08)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>
                 <Icon name="trash" size={12} /><span>Remove from vanity</span>
               </button>
             </div>
@@ -149,19 +149,19 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
       {(allergenHits.length > 0 || lovedHits.length > 0) && (
         <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-1)", marginTop: activeKeys.length > 0 ? "var(--space-1)" : 0 }}>
           {allergenHits.map(a => (
-            <span key={a} style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-1)", fontSize: "var(--text-xs)", fontFamily: "var(--font-body), sans-serif", letterSpacing: "var(--tracking-label)", color: "#8b7355", background: "rgba(139,115,85,0.08)", padding: "var(--space-1) var(--space-2)", borderRadius: "var(--radius-pill)", border: "1px solid rgba(139,115,85,0.22)" }}><Icon name="warning" size={9} /> {a}</span>
+            <span key={a} style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-1)", fontSize: "var(--text-xs)", fontFamily: "var(--font-body), sans-serif", letterSpacing: "var(--tracking-label)", color: "var(--color-bronze)", background: "rgba(var(--rgb-bronze), 0.08)", padding: "var(--space-1) var(--space-2)", borderRadius: "var(--radius-pill)", border: "1px solid rgba(var(--rgb-bronze), 0.16)" }}><Icon name="warning" size={9} /> {a}</span>
           ))}
           {lovedHits.map(l => (
-            <span key={l} style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-1)", fontSize: "var(--text-xs)", fontFamily: "var(--font-body), sans-serif", letterSpacing: "var(--tracking-label)", color: "#6e8a72", background: "rgba(122,144,112,0.08)", padding: "var(--space-1) var(--space-2)", borderRadius: "var(--radius-pill)", border: "1px solid rgba(122,144,112,0.2)" }}><Icon name="sparkle" size={9} /> {l}</span>
+            <span key={l} style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-1)", fontSize: "var(--text-xs)", fontFamily: "var(--font-body), sans-serif", letterSpacing: "var(--tracking-label)", color: "var(--color-sage)", background: "rgba(var(--rgb-sage), 0.08)", padding: "var(--space-1) var(--space-2)", borderRadius: "var(--radius-pill)", border: "1px solid rgba(var(--rgb-sage), 0.16)" }}><Icon name="sparkle" size={9} /> {l}</span>
           ))}
         </div>
       )}
 
       {/* In-ritual toggle */}
       <button onClick={() => onToggleRoutine(product.id)}
-        style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "var(--space-2) var(--space-4)", background: inRoutine ? "rgba(122,144,112,0.08)" : "var(--ink)", border: `1px solid ${inRoutine ? "rgba(122,144,112,0.3)" : "var(--border)"}`, borderRadius: "var(--radius)", cursor: "pointer", transition: "all 0.18s" }}
-        onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(122,144,112,0.5)"}
-        onMouseLeave={e => e.currentTarget.style.borderColor = inRoutine ? "rgba(122,144,112,0.3)" : "var(--border)"}>
+        style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "var(--space-2) var(--space-4)", background: inRoutine ? "rgba(var(--rgb-sage), 0.08)" : "var(--ink)", border: `1px solid ${inRoutine ? "rgba(var(--rgb-sage), 0.32)" : "var(--border)"}`, borderRadius: "var(--radius)", cursor: "pointer", transition: "all 0.18s" }}
+        onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(var(--rgb-sage), 0.56)"}
+        onMouseLeave={e => e.currentTarget.style.borderColor = inRoutine ? "rgba(var(--rgb-sage), 0.32)" : "var(--border)"}>
         <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: inRoutine ? "var(--sage)" : "var(--clay)", fontWeight: 400 }}>
           {inRoutine ? "In ritual" : "Not in ritual"}
         </span>
@@ -177,15 +177,15 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
 
       {/* Delete confirmation */}
       {confirmDelete && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(8,10,8,0.75)", backdropFilter: "blur(8px)", padding: "0 calc(var(--space-1) * 7)" }} onClick={() => setConfirmDelete(false)}>
-          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 320, background: "var(--ink)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: "calc(var(--space-1) * 7) var(--space-6) var(--space-6)", boxShadow: "0 16px 48px rgba(0,0,0,0.55)" }}>
+        <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(var(--rgb-ink), 0.82)", backdropFilter: "blur(8px)", padding: "0 calc(var(--space-1) * 7)" }} onClick={() => setConfirmDelete(false)}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 320, background: "var(--ink)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: "calc(var(--space-1) * 7) var(--space-6) var(--space-6)", boxShadow: "0 16px 48px rgba(var(--rgb-ink), 0.56)" }}>
             <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 var(--space-3)" }}>Confirm</p>
             <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-sm)", color: "var(--parchment)", margin: "0 0 var(--space-6)", lineHeight: 1.65 }}>
               Remove <strong>{product.name}</strong> from your vanity? This cannot be undone.
             </p>
             <div style={{ display: "flex", gap: "var(--space-3)" }}>
               <button onClick={() => setConfirmDelete(false)} style={{ flex: 1, padding: "var(--space-3) 0", borderRadius: "var(--radius)", border: "1px solid var(--border)", background: "transparent", color: "var(--parchment)", fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, cursor: "pointer", transition: "background 0.15s" }} onMouseEnter={e => e.currentTarget.style.background = "var(--surface)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>Cancel</button>
-              <button onClick={() => { setConfirmDelete(false); onDelete(product.id); }} style={{ flex: 1, padding: "var(--space-3) 0", borderRadius: "var(--radius)", border: "1px solid rgba(139,115,85,0.35)", background: "rgba(139,115,85,0.12)", color: "#8b7355", fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, cursor: "pointer", transition: "background 0.15s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(139,115,85,0.2)"} onMouseLeave={e => e.currentTarget.style.background = "rgba(139,115,85,0.12)"}>Remove</button>
+              <button onClick={() => { setConfirmDelete(false); onDelete(product.id); }} style={{ flex: 1, padding: "var(--space-3) 0", borderRadius: "var(--radius)", border: "1px solid rgba(var(--rgb-bronze), 0.32)", background: "rgba(var(--rgb-bronze), 0.08)", color: "var(--color-bronze)", fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, cursor: "pointer", transition: "background 0.15s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(var(--rgb-bronze), 0.16)"} onMouseLeave={e => e.currentTarget.style.background = "rgba(var(--rgb-bronze), 0.08)"}>Remove</button>
             </div>
           </div>
         </div>
@@ -300,7 +300,7 @@ function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }
         <span style={{
           display: "inline-flex", alignItems: "center",
           padding: "var(--space-1) var(--space-3)",
-          border: "1px solid rgba(250,249,244,0.38)",
+          border: "1px solid rgba(var(--rgb-ivory), 0.32)",
           borderRadius: "var(--radius-pill)",
           fontFamily: "var(--font-display)",
           fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)",
@@ -325,7 +325,7 @@ function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }
         margin: "0 0 var(--space-2)",
         textDecoration: checked ? "line-through" : "none",
         textDecorationThickness: "2px",
-        textDecorationColor: "rgba(45,61,43,0.45)",
+        textDecorationColor: "rgba(var(--rgb-moss), 0.56)",
         transition: "text-decoration-color 280ms ease",
       }}>
         {verb}
@@ -343,7 +343,7 @@ function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }
       <p style={{
         fontFamily: "var(--font-body)",
         fontSize: "var(--text-xs)", fontWeight: 400,
-        color: "rgba(255,255,255,0.6)",
+        color: "rgba(var(--rgb-ivory), 0.56)",
         margin: 0,
         lineHeight: 1.4,
       }}>
@@ -364,7 +364,7 @@ function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }
         <p style={{
           fontFamily: "var(--font-body)",
           fontSize: "var(--text-xs)",
-          color: "rgba(139,115,85,0.85)",
+          color: "rgba(var(--rgb-bronze), 0.82)",
           margin: "var(--space-2) 0 0",
         }}>
           Apply on damp skin for best absorption
@@ -503,7 +503,7 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
       <div style={{
         position: "fixed", inset: 0, zIndex: 200,
         display: "flex", alignItems: "center", justifyContent: "center",
-        background: "rgba(8,10,8,0.72)", backdropFilter: "blur(10px)",
+        background: "rgba(var(--rgb-ink), 0.82)", backdropFilter: "blur(10px)",
         padding: "0 calc(var(--space-1) * 7)",
         animation: "fadeUp 0.38s ease",
       }}>
@@ -514,8 +514,8 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
           padding: "calc(var(--space-1) * 7) calc(var(--space-1) * 7) var(--space-6)",
           overflow: "hidden",
           isolation: "isolate",
-          boxShadow: "0 24px 60px rgba(0,0,0,0.7), 0 1px 0 rgba(232,220,180,0.06) inset",
-          border: "1px solid rgba(139,115,85,0.22)",
+          boxShadow: "0 24px 60px rgba(var(--rgb-ink), 0.82), 0 1px 0 rgba(var(--rgb-ivory), 0.08) inset",
+          border: "1px solid rgba(var(--rgb-bronze), 0.16)",
         }}>
           <img
             src="/cygne-logo.png"
@@ -529,31 +529,31 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
             }}
           />
           <div style={{ position: "absolute", inset: 0, borderRadius: "var(--radius)", pointerEvents: "none", backgroundImage: grain, backgroundSize: "180px 180px", opacity: 0.7 }} />
-          <div style={{ position: "absolute", inset: 0, borderRadius: "var(--radius)", pointerEvents: "none", background: "radial-gradient(ellipse at 85% 15%, rgba(139,115,85,0.12) 0%, transparent 65%)" }} />
+          <div style={{ position: "absolute", inset: 0, borderRadius: "var(--radius)", pointerEvents: "none", background: "radial-gradient(ellipse at 85% 15%, rgba(var(--rgb-bronze), 0.08) 0%, transparent 65%)" }} />
 
           <div style={{ textAlign: "center", marginBottom: "var(--space-5)" }}>
-            <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(232,226,217,0.65)", margin: 0 }}>
+            <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.56)", margin: 0 }}>
               Swan Song
             </p>
           </div>
-          <div style={{ height: 1, background: "rgba(232,226,217,0.12)", marginBottom: "var(--space-5)" }} />
+          <div style={{ height: 1, background: "rgba(var(--rgb-ivory), 0.08)", marginBottom: "var(--space-5)" }} />
 
           <p style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 700, lineHeight: 1.35, color: "#e8e3d6", letterSpacing: "0.04em", textTransform: "uppercase", margin: "0 0 var(--space-5)" }}>{renderInsightLines(line)}</p>
 
           {/* Show first prediction detail in popup */}
           {hasMeaningful && meaningfulPredictions[0].detail && (
-            <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "rgba(232,226,217,0.5)", margin: "0 0 var(--space-6)", lineHeight: 1.65 }}>{meaningfulPredictions[0].detail}</p>
+            <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ivory), 0.56)", margin: "0 0 var(--space-6)", lineHeight: 1.65 }}>{meaningfulPredictions[0].detail}</p>
           )}
 
           <button onClick={onDismissPopup} style={{
             width: "100%", padding: "var(--space-3) 0",
-            background: "rgba(232,226,217,0.08)", border: "1px solid rgba(232,226,217,0.18)",
+            background: "rgba(var(--rgb-ivory), 0.08)", border: "1px solid rgba(var(--rgb-ivory), 0.16)",
             borderRadius: "var(--radius)", cursor: "pointer",
             fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)",
-            textTransform: "uppercase", color: "rgba(232,226,217,0.55)", transition: "all 0.2s",
+            textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.56)", transition: "all 0.2s",
           }}
-            onMouseEnter={e => { e.currentTarget.style.background = "rgba(232,226,217,0.14)"; e.currentTarget.style.color = "rgba(232,226,217,0.85)"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "rgba(232,226,217,0.08)"; e.currentTarget.style.color = "rgba(232,226,217,0.55)"; }}>
+            onMouseEnter={e => { e.currentTarget.style.background = "rgba(var(--rgb-ivory), 0.16)"; e.currentTarget.style.color = "rgba(var(--rgb-ivory), 0.82)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "rgba(var(--rgb-ivory), 0.08)"; e.currentTarget.style.color = "rgba(var(--rgb-ivory), 0.56)"; }}>
             Carry on
           </button>
         </div>
@@ -779,23 +779,23 @@ function FlightModeModal({ products, activeMap, onClose }) {
   const [tab, setTab] = useState("edit"); // "edit" | "tips"
 
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(8,10,8,0.85)", backdropFilter: "blur(12px)", zIndex: 200, display: "flex", alignItems: "flex-end", justifyContent: "center" }}
+    <div style={{ position: "fixed", inset: 0, background: "rgba(var(--rgb-ink), 0.82)", backdropFilter: "blur(12px)", zIndex: 200, display: "flex", alignItems: "flex-end", justifyContent: "center" }}
       >
       <div style={{ background: "var(--ink)", width: "100%", maxWidth: 520, borderRadius: "var(--radius-sheet)", padding: "calc(var(--space-1) * 7) var(--space-6) calc(var(--space-1) * 13)", maxHeight: "88vh", overflowY: "auto", border: "1px solid var(--border)", borderBottom: "none" }}>
 
         {/* Header — eyebrow letter-spacing standardized to 0.15em to
             match the section eyebrows below (and the "IN REVIEW"
-            treatment elsewhere). Text colors brightened to #F4F3EF so
+            treatment elsewhere). Text colors brightened to var(--color-ivory) so
             the header reads crisply on the dark modal canvas. */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "var(--space-2)" }}>
           <div>
-            <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "#F4F3EF", opacity: 0.7, margin: "0 0 var(--space-1)" }}>Flight Day</p>
-            <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-md)", fontWeight: 700, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "#F4F3EF", margin: 0, lineHeight: 1.2 }}>Your Ritual, Anywhere</h2>
+            <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory)", opacity: 0.7, margin: "0 0 var(--space-1)" }}>Flight Day</p>
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-md)", fontWeight: 700, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--color-ivory)", margin: 0, lineHeight: 1.2 }}>Your Ritual, Anywhere</h2>
           </div>
           <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: "var(--space-1)" }}><Icon name="x" size={17} /></button>
         </div>
 
-        <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "#F4F3EF", opacity: 0.85, margin: "0 0 var(--space-6)", lineHeight: 1.6 }}>
+        <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--color-ivory)", opacity: 0.85, margin: "0 0 var(--space-6)", lineHeight: 1.6 }}>
           What to pack, what to skip, and how to land without losing your skin.
         </p>
 
@@ -811,7 +811,7 @@ function FlightModeModal({ products, activeMap, onClose }) {
           aria-label="Travel edit tab"
           style={{
             display: "flex", alignItems: "stretch",
-            border: "1px solid rgba(250,249,244,0.28)",
+            border: "1px solid rgba(var(--rgb-ivory), 0.32)",
             borderRadius: "var(--radius-pill)", overflow: "hidden",
             marginBottom: "var(--space-6)",
           }}
@@ -827,14 +827,14 @@ function FlightModeModal({ products, activeMap, onClose }) {
                 style={{
                   flex: 1,
                   padding: "var(--space-2) 0",
-                  background: active ? "rgba(250,249,244,0.14)" : "transparent",
+                  background: active ? "rgba(var(--rgb-ivory), 0.16)" : "transparent",
                   border: "none",
-                  borderLeft: i === 0 ? "none" : "1px solid rgba(250,249,244,0.28)",
+                  borderLeft: i === 0 ? "none" : "1px solid rgba(var(--rgb-ivory), 0.32)",
                   cursor: active ? "default" : "pointer",
                   fontFamily: "var(--font-display)",
                   fontSize: "var(--text-xs)", fontWeight: 400,
                   letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
-                  color: active ? "#F4F3EF" : "rgba(250,249,244,0.65)",
+                  color: active ? "var(--color-ivory)" : "rgba(var(--rgb-ivory), 0.56)",
                   WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
                   transition: "background 0.18s, color 0.18s",
                 }}
@@ -861,11 +861,11 @@ function FlightModeModal({ products, activeMap, onClose }) {
                 ? unique.join(" and ")
                 : unique.slice(0, -1).join(", ") + " and " + unique.slice(-1);
               return (
-                <div style={{ display: "flex", gap: "var(--space-3)", padding: "var(--space-3) var(--space-4)", background: "rgba(139,115,85,0.07)", border: "1px solid rgba(139,115,85,0.22)", borderRadius: "var(--radius)", marginBottom: "var(--space-5)" }}>
-                  <span style={{ color: "#8b7355", flexShrink: 0, marginTop: 2, display: "inline-flex" }}><Icon name="plane" size={16} /></span>
+                <div style={{ display: "flex", gap: "var(--space-3)", padding: "var(--space-3) var(--space-4)", background: "rgba(var(--rgb-bronze), 0.08)", border: "1px solid rgba(var(--rgb-bronze), 0.16)", borderRadius: "var(--radius)", marginBottom: "var(--space-5)" }}>
+                  <span style={{ color: "var(--color-bronze)", flexShrink: 0, marginTop: 2, display: "inline-flex" }}><Icon name="plane" size={16} /></span>
                   <div>
-                    <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-sm)", fontWeight: 700, letterSpacing: "0.02em", color: "#F4F3EF", margin: "0 0 var(--space-1)", lineHeight: 1.35 }}>Check your sizes before packing.</p>
-                    <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "#F4F3EF", opacity: 0.85, margin: 0, lineHeight: 1.6 }}>
+                    <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-sm)", fontWeight: 700, letterSpacing: "0.02em", color: "var(--color-ivory)", margin: "0 0 var(--space-1)", lineHeight: 1.35 }}>Check your sizes before packing.</p>
+                    <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--color-ivory)", opacity: 0.85, margin: 0, lineHeight: 1.6 }}>
                       Your {listed} {unique.length === 1 ? "is" : "are"} often over 100ml. Decant into travel bottles or pick up minis — carry-on limit is 100ml per liquid.
                     </p>
                   </div>
@@ -880,14 +880,14 @@ function FlightModeModal({ products, activeMap, onClose }) {
             {keep.length > 0 && (
               <div style={{ marginBottom: "var(--space-5)" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", marginBottom: "var(--space-3)" }}>
-                  <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#6e8a72" }} />
-                  <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "#6e8a72" }}>Pack These</span>
+                  <div style={{ width: 5, height: 5, borderRadius: "50%", background: "var(--color-sage)" }} />
+                  <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-sage)" }}>Pack These</span>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
                   {keep.map((item, i) => (
-                    <div key={i} style={{ padding: "var(--space-3) var(--space-4)", background: "rgba(122,144,112,0.06)", border: "1px solid rgba(122,144,112,0.2)", borderRadius: "var(--radius)" }}>
-                      <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-sm)", fontWeight: 700, letterSpacing: "0.02em", color: "#F4F3EF", margin: "0 0 var(--space-1)", lineHeight: 1.3 }}>{item.name}</p>
-                      <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "#F4F3EF", opacity: 0.75, margin: 0, lineHeight: 1.55 }}>{item.reason}</p>
+                    <div key={i} style={{ padding: "var(--space-3) var(--space-4)", background: "rgba(var(--rgb-sage), 0.08)", border: "1px solid rgba(var(--rgb-sage), 0.16)", borderRadius: "var(--radius)" }}>
+                      <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-sm)", fontWeight: 700, letterSpacing: "0.02em", color: "var(--color-ivory)", margin: "0 0 var(--space-1)", lineHeight: 1.3 }}>{item.name}</p>
+                      <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--color-ivory)", opacity: 0.75, margin: 0, lineHeight: 1.55 }}>{item.reason}</p>
                     </div>
                   ))}
                 </div>
@@ -899,14 +899,14 @@ function FlightModeModal({ products, activeMap, onClose }) {
             {skip.length > 0 && (
               <div style={{ marginBottom: "var(--space-5)" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", marginBottom: "var(--space-3)" }}>
-                  <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#8b7355" }} />
-                  <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "#8b7355" }}>Leave Behind</span>
+                  <div style={{ width: 5, height: 5, borderRadius: "50%", background: "var(--color-bronze)" }} />
+                  <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-bronze)" }}>Leave Behind</span>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
                   {skip.map((item, i) => (
-                    <div key={i} style={{ padding: "var(--space-3) var(--space-4)", background: "rgba(139,115,85,0.06)", border: "1px solid rgba(139,115,85,0.18)", borderRadius: "var(--radius)" }}>
-                      <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-sm)", fontWeight: 700, letterSpacing: "0.02em", color: "#F4F3EF", margin: "0 0 var(--space-1)", lineHeight: 1.3 }}>{item.name}</p>
-                      <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "#F4F3EF", opacity: 0.75, margin: 0, lineHeight: 1.55 }}>{item.reason}</p>
+                    <div key={i} style={{ padding: "var(--space-3) var(--space-4)", background: "rgba(var(--rgb-bronze), 0.08)", border: "1px solid rgba(var(--rgb-bronze), 0.16)", borderRadius: "var(--radius)" }}>
+                      <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-sm)", fontWeight: 700, letterSpacing: "0.02em", color: "var(--color-ivory)", margin: "0 0 var(--space-1)", lineHeight: 1.3 }}>{item.name}</p>
+                      <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--color-ivory)", opacity: 0.75, margin: 0, lineHeight: 1.55 }}>{item.reason}</p>
                     </div>
                   ))}
                 </div>
@@ -914,7 +914,7 @@ function FlightModeModal({ products, activeMap, onClose }) {
             )}
 
             {keep.length === 0 && skip.length === 0 && (
-              <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "#F4F3EF", opacity: 0.85, textAlign: "center", padding: "var(--space-6) 0" }}>Add products to your vanity to generate your travel edit.</p>
+              <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--color-ivory)", opacity: 0.85, textAlign: "center", padding: "var(--space-6) 0" }}>Add products to your vanity to generate your travel edit.</p>
             )}
           </div>
         )}
@@ -930,12 +930,12 @@ function FlightModeModal({ products, activeMap, onClose }) {
             ))}
 
             {/* Recovery note — sits on a sage-tinted dark card, so
-                body text brightens to #F4F3EF like the rest of the
+                body text brightens to var(--color-ivory) like the rest of the
                 dark-canvas copy. Eyebrow letter-spacing standardized
                 to 0.15em. */}
-            <div style={{ padding: "var(--space-4) var(--space-5)", background: "rgba(122,144,112,0.08)", border: "1px solid rgba(122,144,112,0.25)", borderRadius: "var(--radius)", marginTop: "var(--space-1)" }}>
-              <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "#6e8a72", margin: "0 0 var(--space-2)" }}>Landing Day</p>
-              <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "#F4F3EF", margin: 0, lineHeight: 1.65 }}>
+            <div style={{ padding: "var(--space-4) var(--space-5)", background: "rgba(var(--rgb-sage), 0.08)", border: "1px solid rgba(var(--rgb-sage), 0.32)", borderRadius: "var(--radius)", marginTop: "var(--space-1)" }}>
+              <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-sage)", margin: "0 0 var(--space-2)" }}>Landing Day</p>
+              <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--color-ivory)", margin: 0, lineHeight: 1.65 }}>
                 Give your skin 24h to re-acclimate before reintroducing actives. Cleanse, moisturize, SPF. Nothing else the first night.
               </p>
             </div>
