@@ -8,17 +8,13 @@
 // Dates are compared as "YYYY-MM-DD" strings, the same shape journal
 // entries store in `date`.
 //
-// Running long: the app never auto-wraps the current cycle (see
-// getCurrentCycleDay in utils.jsx), so when today is past cycleLength
-// the ring grows to today's day instead of wrapping back to day 1. The
-// phase windows still end at cycleLength; the extra days sit past them.
-// computeCycleDay is called with the 45-day maximum so it returns the
-// un-wrapped day for any date inside that window.
+// Running long: cycle days never wrap (see computeCycleDay), so when
+// today is past cycleLength the ring grows to today's day. The phase
+// windows still end at cycleLength; the extra days sit past them.
 
-import { CYCLE_PHASES, computeCycleDay } from "./cycle.js";
+import { CYCLE_PHASES, MAX_CYCLE_DAY, computeCycleDay } from "./cycle.js";
 
 const CALENDAR_DAYS = 28;
-const MAX_CYCLE_DAYS = 45;
 const BASE_CYCLE_LENGTH = 28;
 const PATTERN_THRESHOLD = 5;
 
@@ -69,7 +65,7 @@ function latestEntryByDate(entries) {
 // keeping phases contiguous, at least one day each, and ending exactly
 // on cycleLength.
 export function scalePhases(cycleLength) {
-  const len = Math.max(21, Math.min(MAX_CYCLE_DAYS, cycleLength || BASE_CYCLE_LENGTH));
+  const len = Math.max(21, Math.min(MAX_CYCLE_DAY, cycleLength || BASE_CYCLE_LENGTH));
   let start = 1;
   return CYCLE_PHASES.map((phase, i) => {
     const isLast = i === CYCLE_PHASES.length - 1;
@@ -99,15 +95,15 @@ export function buildCycleRing({ journalEntries = [], cycleStartDate = null, cyc
   const byDate = latestEntryByDate(entries);
   const loggedDates = [...byDate.keys()].filter(d => d <= todayKey).sort();
   const firstEntryDate = loggedDates[0] || null;
-  const len = Math.max(21, Math.min(MAX_CYCLE_DAYS, parseInt(cycleLength, 10) || BASE_CYCLE_LENGTH));
+  const len = Math.max(21, Math.min(MAX_CYCLE_DAY, parseInt(cycleLength, 10) || BASE_CYCLE_LENGTH));
 
-  // Cycle mode needs a usable start date on or before today, within the
-  // 45-day window. A start date older than that is stale (the user hasn't
-  // logged a new period), so the ring falls back to calendar mode.
+  // Cycle mode needs a usable start date on or before today, within
+  // MAX_CYCLE_DAY days. computeCycleDay returns null otherwise (a start
+  // older than that is stale — no new period logged), so the ring falls
+  // back to calendar mode.
   const startKey = toDateKey(cycleStartDate);
-  const todayDay = startKey ? computeCycleDay(startKey, MAX_CYCLE_DAYS, todayKey) : null;
-  const staleStart = startKey && todayDay != null && addDays(startKey, todayDay - 1) !== todayKey;
-  const mode = todayDay != null && !staleStart ? "cycle" : "calendar";
+  const todayDay = startKey ? computeCycleDay(startKey, len, todayKey) : null;
+  const mode = todayDay != null ? "cycle" : "calendar";
 
   const ctx = { todayKey, firstEntryDate, byDate };
   let days;
@@ -117,7 +113,7 @@ export function buildCycleRing({ journalEntries = [], cycleStartDate = null, cyc
     const total = Math.max(len, todayDay);
     days = Array.from({ length: total }, (_, i) => {
       const date = addDays(startKey, i);
-      return { day: computeCycleDay(startKey, MAX_CYCLE_DAYS, date), date, state: stateFor(date, ctx) };
+      return { day: computeCycleDay(startKey, len, date), date, state: stateFor(date, ctx) };
     });
     todayIndex = todayDay - 1;
     phases = scalePhases(len);

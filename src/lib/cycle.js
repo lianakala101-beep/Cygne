@@ -41,17 +41,20 @@ export function getCyclePhase(day) {
 // (which is only ever called for "today" from the edge function).
 //
 // UTC-normalized on both endpoints so the result is deterministic.
-// Cycle length is clamped to [21, 45] (matches the CycleTracker
-// slider bounds in progress.jsx).
 //
-// Returns null on unusable inputs (missing / malformed start date,
-// event before the recorded start). Never wraps into negatives.
+// Cycle day is 1-indexed and never wraps: a cycle only restarts when
+// the user logs a new cycleStartDate. Past the cycle length it keeps
+// counting (day 30 of a 28-day cycle is day 30, Luteal), up to
+// MAX_CYCLE_DAY — the same "running long" rule as getCurrentCycleDay in
+// utils.jsx. cycleLength is accepted for signature compatibility but no
+// longer changes the result.
 //
-// Cycle day is 1-indexed and wraps within the length. Days past the
-// length (running long) map to (daysSince % length) + 1 so a user
-// on day 30 with a 28-day length reads as day 3 — matches how
-// getCurrentCycleDay in utils.jsx handles the wrap for the current
-// day, only extended to arbitrary event dates.
+// Returns null on unusable inputs (missing / malformed dates), for an
+// event before the recorded start, and for an event more than
+// MAX_CYCLE_DAY days after it — the start date is stale at that point,
+// and callers treat null as "no usable cycle day".
+export const MAX_CYCLE_DAY = 45;
+
 export function computeCycleDay(cycleStartDateIso, cycleLength, eventIso) {
   if (!cycleStartDateIso || typeof cycleStartDateIso !== "string") return null;
   const startParsed = new Date(cycleStartDateIso);
@@ -62,8 +65,8 @@ export function computeCycleDay(cycleStartDateIso, cycleLength, eventIso) {
   const eventUtc = Date.UTC(eventParsed.getUTCFullYear(), eventParsed.getUTCMonth(), eventParsed.getUTCDate());
   const daysSince = Math.floor((eventUtc - startUtc) / 86400000);
   if (daysSince < 0) return null;
-  const len = Math.max(21, Math.min(45, cycleLength || 28));
-  return (daysSince % len) + 1;
+  const day = daysSince + 1;
+  return day > MAX_CYCLE_DAY ? null : day;
 }
 
 // Convenience: compose computeCycleDay + getCyclePhase. Returns the

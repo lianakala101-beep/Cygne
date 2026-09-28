@@ -26,14 +26,23 @@ export function getCyclePhase(day: number): CyclePhase {
     ?? CYCLE_PHASES[CYCLE_PHASES.length - 1];
 }
 
-// Compute the user's current cycle day from a start date + cycle
-// length. Same logic as src/utils.jsx getCurrentCycleDay, ported to
-// UTC because edge functions have no user-local timezone. UTC vs
-// local slop at midnight boundaries is fine — the alert fires at
-// 15:00 UTC, well clear of most timezones' midnight.
+// Compute the user's current cycle day from a start date. Same rule as
+// src/lib/cycle.js computeCycleDay, ported to UTC because edge functions
+// have no user-local timezone. UTC vs local slop at midnight boundaries
+// is fine — the alert fires at 15:00 UTC, well clear of most timezones'
+// midnight.
 //
-// Returns null if the inputs are unusable (missing / malformed).
-export function computeCycleDay(cycleStartDate: string | null | undefined, cycleLength: number): number | null {
+// Cycle day is 1-indexed and never wraps: past the cycle length it keeps
+// counting (day 30 of a 28-day cycle is day 30, Luteal) up to
+// MAX_CYCLE_DAY. cycleLength is accepted for signature compatibility but
+// no longer changes the result.
+//
+// Returns null if the inputs are unusable (missing / malformed), the
+// start is in the future, or the start is more than MAX_CYCLE_DAY days
+// ago (stale — the caller skips the user).
+export const MAX_CYCLE_DAY = 45;
+
+export function computeCycleDay(cycleStartDate: string | null | undefined, _cycleLength?: number): number | null {
   if (!cycleStartDate || typeof cycleStartDate !== "string") return null;
   const parsed = new Date(cycleStartDate);
   if (Number.isNaN(parsed.getTime())) return null;
@@ -45,10 +54,6 @@ export function computeCycleDay(cycleStartDate: string | null | undefined, cycle
   const now = Date.now();
   const daysSince = Math.floor((now - startUtc) / 86400000);
   if (daysSince < 0) return null;
-  const len = Math.max(21, Math.min(45, cycleLength || 28));
-  // Cycle day is 1-indexed and wraps within the length. Days past the
-  // length (running long) show as > cycleLength so the client's
-  // "running long" state applies; here we clamp to 45 for phase
-  // lookup since CYCLE_PHASES doesn't extend past that.
-  return Math.min(45, (daysSince % len) + 1);
+  const day = daysSince + 1;
+  return day > MAX_CYCLE_DAY ? null : day;
 }
