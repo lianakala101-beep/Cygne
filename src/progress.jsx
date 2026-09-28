@@ -7,6 +7,7 @@ import { getCurrentCycleDay, getTreatmentElapsed, daysBetweenLocal } from "./uti
 import { CYCLE_PHASES as CANONICAL_CYCLE_PHASES, getCyclePhase as getCanonicalCyclePhase } from "./lib/cycle.js";
 import { FaceHeatMap } from "./components/FaceHeatMap.jsx";
 import { AskCygneModal } from "./components/AskCygneModal.jsx";
+import { CycleRing } from "./components/CycleRing.jsx";
 
 
 function computeStabilityScore(products, checkIns, activeMap) {
@@ -1839,6 +1840,17 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
       {/* -- Header ----------------------------------------------------------- */}
       <div style={{ marginBottom: "var(--space-5)", paddingTop: "calc(var(--space-1) * 11)" }}>
         <h1 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-2xl)", fontWeight: 500, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory)", margin: 0, lineHeight: 1.15 }}>Your Progress</h1>
+      </div>
+
+      {/* -- Cycle Ring -------------------------------------------------------- */}
+      <div style={{ marginBottom: "var(--space-8)" }}>
+        <CycleRing
+          journalEntries={journals}
+          cycleStartDate={user?.cycleTrackingEnabled ? user?.cycleStartDate : null}
+          cycleLength={user?.cycleLength}
+          today={new Date()}
+          consistency={consistencyPct}
+        />
       </div>
 
       {/* -- Skin Journal ------------------------------------------------------ */}

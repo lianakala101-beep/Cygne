@@ -57,6 +57,7 @@
   --color-sage: #7a9070;
   --color-gold: #c49040;
   --color-alert: #c06060;
+  --color-rose: #d9a6a0;
 
   /* RGB channels — for alpha variants: rgba(var(--rgb-moss), 0.32).
      Pair with one of the opacity steps: 0.08, 0.16, 0.32, 0.56, 0.82, 0.94. */
@@ -69,6 +70,7 @@
   --rgb-silver: 192, 192, 192;
   --rgb-pebble: 122, 122, 122;
   --rgb-alert: 192, 96, 96;
+  --rgb-rose: 217, 166, 160;
 
   /* Type scale — 1.25 ratio */
   --text-xs: 11px;
