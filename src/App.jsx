@@ -8,7 +8,7 @@ import { MyRoutine } from "./ritualscreen.jsx";
 import { Shelf } from "./vanity.jsx";
 import { Progress } from "./progress.jsx";
 import { SwanWelcomeScreen, useLocalStorage, getCurrentCycleDay, daysBetweenLocal, toLocalMidnight, isoWeekNumber, isoWeekYear } from "./utils.jsx";
-import { getCyclePhase } from "./lib/cycle.js";
+import { getCyclePhase, parseCycleLength } from "./lib/cycle.js";
 import { WeekendNudgeCard } from "./weekend.jsx";
 import { SeasonalNudgeCard } from "./seasonal.jsx";
 import { supabase, logDebugEvent } from "./supabase.js";
@@ -624,6 +624,7 @@ export default function App() {
         bodyAcneZones: meta.bodyAcneZones || [],
         cycleTrackingEnabled: meta.cycleTrackingEnabled || false,
         cycleStartDate: meta.cycleStartDate || null,
+        cycleLength: parseCycleLength(meta.cycleLength),
         cycleDay: getCurrentCycleDay({ cycleStartDate: meta.cycleStartDate, cycleDay: meta.cycleDay }),
         tempUnit: meta.tempUnit || null,
         notifEnabled: meta.notifEnabled || false,

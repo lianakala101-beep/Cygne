@@ -18,6 +18,15 @@ export const CYCLE_PHASES = [
   { name: "Luteal",     days: [17, 35] },
 ];
 
+// Parse a stored cycle length (user_metadata may hold a number or a
+// numeric string). Returns the length clamped to [21, 45], or null when
+// nothing usable is stored so callers keep their 28-day default.
+export function parseCycleLength(value) {
+  const n = typeof value === "number" ? value : parseInt(String(value ?? ""), 10);
+  if (!Number.isFinite(n) || n <= 0) return null;
+  return Math.max(21, Math.min(45, Math.round(n)));
+}
+
 // Look up the phase for a given cycle day. Days past the last phase
 // window (e.g. cycle running long) fall back to Luteal, matching the
 // pre-extraction behavior in progress.jsx's original getCyclePhase.
