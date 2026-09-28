@@ -19,7 +19,7 @@ describe("buildCycleRing", () => {
     // Cycle started 2026-09-08, so today (09-20) is day 13.
     const START = "2026-09-08";
     const journalEntries = dailyEntries(START, 13, ["glowing", "good", "okay", "dull", "rough"]);
-    const ring = buildCycleRing({ journalEntries, cycleStartDate: START, cycleLength: 28, today: TODAY, consistency: 87 });
+    const ring = buildCycleRing({ journalEntries, cycleStartDate: START, cycleLength: 28, today: TODAY });
 
     it("is in cycle mode with one dot per cycle day", () => {
       expect(ring.mode).toBe("cycle");
@@ -50,14 +50,15 @@ describe("buildCycleRing", () => {
       ]);
     });
 
-    it("shows consistency once there are 5+ entries", () => {
-      expect(ring.center).toEqual({ value: "87%", label: "Consistency" });
+    it("shows journal consistency once there are 5+ entries", () => {
+      // Logged every day from day 1 through today: 13 of 13.
+      expect(ring.center).toEqual({ value: "100%", label: "Consistency" });
     });
   });
 
   describe("45-day cycle", () => {
     const START = "2026-09-01";
-    const ring = buildCycleRing({ journalEntries: dailyEntries(START, 20), cycleStartDate: START, cycleLength: 45, today: TODAY, consistency: 72 });
+    const ring = buildCycleRing({ journalEntries: dailyEntries(START, 20), cycleStartDate: START, cycleLength: 45, today: TODAY });
 
     it("has 45 dots with today on day 20", () => {
       expect(ring.days).toHaveLength(45);
@@ -77,7 +78,7 @@ describe("buildCycleRing", () => {
 
   describe("calendar mode", () => {
     const journalEntries = dailyEntries(dayOffset(TODAY, -9), 10);
-    const ring = buildCycleRing({ journalEntries, cycleStartDate: null, today: TODAY, consistency: 90 });
+    const ring = buildCycleRing({ journalEntries, cycleStartDate: null, today: TODAY });
 
     it("shows the last 28 calendar days ending today, without phases", () => {
       expect(ring.mode).toBe("calendar");
@@ -108,7 +109,7 @@ describe("buildCycleRing", () => {
       { date: dayOffset(TODAY, -1), condition: "okay" },
       { date: TODAY, condition: "good" },
     ];
-    const ring = buildCycleRing({ journalEntries, cycleStartDate: "2026-09-08", cycleLength: 28, today: TODAY, consistency: 100 });
+    const ring = buildCycleRing({ journalEntries, cycleStartDate: "2026-09-08", cycleLength: 28, today: TODAY });
 
     it("counts toward the first pattern instead of showing consistency", () => {
       expect(ring.center).toEqual({ value: "2 of 5", label: "Days to your first pattern" });
@@ -140,8 +141,9 @@ describe("buildCycleRing", () => {
       expect(r.days[r.todayIndex].state).toBe("future");
     });
 
-    it("shows a dash when consistency isn't available yet", () => {
-      expect(ring.center).toEqual({ value: "—", label: "Consistency" });
+    it("counts the missed day against consistency", () => {
+      // 12 logged of 13 elapsed days (day 1 through today).
+      expect(ring.center).toEqual({ value: "92%", label: "Consistency" });
     });
   });
 
@@ -189,6 +191,51 @@ describe("buildCycleRing", () => {
       ];
       expect(buildCycleRing({ journalEntries, today: TODAY }).center.value).toBe("2 of 5");
     });
+  });
+});
+
+describe("journal consistency", () => {
+  const START = "2026-09-08"; // today (09-20) is day 13
+
+  it("doesn't count today as missed when it isn't logged yet", () => {
+    // Logged day 1 through yesterday: 12 of 12 elapsed.
+    const journalEntries = dailyEntries(START, 12);
+    const ring = buildCycleRing({ journalEntries, cycleStartDate: START, cycleLength: 28, today: TODAY });
+    expect(ring.center).toEqual({ value: "100%", label: "Consistency" });
+  });
+
+  it("measures from cycle day 1 in cycle mode, even if logging started later", () => {
+    // Logged 09-14 through today (7 days) of 13 elapsed since day 1.
+    const journalEntries = dailyEntries("2026-09-14", 7);
+    const ring = buildCycleRing({ journalEntries, cycleStartDate: START, cycleLength: 28, today: TODAY });
+    expect(ring.center.value).toBe("54%");
+  });
+
+  it("ignores entries from before the current cycle", () => {
+    // 10 entries last cycle, then 6 of this cycle's 13 days.
+    const journalEntries = [...dailyEntries("2026-08-20", 10), ...dailyEntries("2026-09-15", 6)];
+    const ring = buildCycleRing({ journalEntries, cycleStartDate: START, cycleLength: 28, today: TODAY });
+    expect(ring.center.value).toBe("46%");
+  });
+
+  it("measures from the first entry in calendar mode when it's inside the window", () => {
+    // First entry 09-11; 9 of the 10 days to today logged (09-15 missed).
+    const journalEntries = dailyEntries("2026-09-11", 10).filter(e => e.date !== "2026-09-15");
+    const ring = buildCycleRing({ journalEntries, today: TODAY });
+    expect(ring.center.value).toBe("90%");
+  });
+
+  it("measures from the window start in calendar mode when entries predate it", () => {
+    // Every other day from 60 days back: 14 of the 28 window days logged.
+    const journalEntries = Array.from({ length: 31 }, (_, i) => ({ date: dayOffset(TODAY, -60 + i * 2), condition: "good" }));
+    const ring = buildCycleRing({ journalEntries, today: TODAY });
+    expect(ring.center.value).toBe("50%");
+  });
+
+  it("shows a dash on cycle day 1 before today is logged", () => {
+    const journalEntries = dailyEntries("2026-09-10", 10);
+    const ring = buildCycleRing({ journalEntries, cycleStartDate: TODAY, cycleLength: 28, today: TODAY });
+    expect(ring.center).toEqual({ value: "—", label: "Consistency" });
   });
 });
 

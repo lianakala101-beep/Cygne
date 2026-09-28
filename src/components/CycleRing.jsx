@@ -1,7 +1,7 @@
 // Cycle Ring — one dot per day of the current cycle (or the last 28
 // calendar days), day 1 at the top running clockwise. Phase arcs and
 // phase names sit just outside the dots in cycle mode; the center shows
-// consistency (or progress toward the first pattern). Data comes from
+// journal consistency (or progress toward the first pattern). Data comes from
 // buildCycleRing in src/lib/cycleRing.js.
 //
 // The numbers below are SVG geometry in viewBox units (the SVG scales to
@@ -62,8 +62,8 @@ function Dot({ state, x, y, r, maxHaloR }) {
   return <circle cx={x} cy={y} r={r} style={{ fill: DOT_FILL[state] }} />;
 }
 
-export function CycleRing({ journalEntries, cycleStartDate, cycleLength, today, consistency }) {
-  const ring = buildCycleRing({ journalEntries, cycleStartDate, cycleLength, today, consistency });
+export function CycleRing({ journalEntries, cycleStartDate, cycleLength, today }) {
+  const ring = buildCycleRing({ journalEntries, cycleStartDate, cycleLength, today });
   const n = ring.days.length;
   const step = (2 * Math.PI) / n;
   const angleOf = (index) => index * step;

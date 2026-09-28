@@ -11,6 +11,9 @@
 // Running long: cycle days never wrap (see computeCycleDay), so when
 // today is past cycleLength the ring grows to today's day. The phase
 // windows still end at cycleLength; the extra days sit past them.
+//
+// The center shows journal consistency (see journalConsistency) once
+// the user has 5 logged days, and "N of 5" before that.
 
 import { CYCLE_PHASES, MAX_CYCLE_DAY, computeCycleDay } from "./cycle.js";
 
@@ -89,7 +92,22 @@ function stateFor(date, { todayKey, firstEntryDate, byDate }) {
   return "missed";
 }
 
-export function buildCycleRing({ journalEntries = [], cycleStartDate = null, cycleLength = BASE_CYCLE_LENGTH, today = new Date(), consistency = null } = {}) {
+// Journal consistency: distinct logged dates ÷ days elapsed in the ring
+// window (windowStart through today). Today only counts once it's
+// logged, so an open day never drags the score down. Returns a rounded
+// percentage, or null when no day has elapsed yet (a cycle that started
+// today and isn't logged).
+function journalConsistency({ windowStart, todayKey, loggedDates }) {
+  const logged = loggedDates.filter(d => d >= windowStart && d <= todayKey);
+  const loggedToday = logged.includes(todayKey);
+  let elapsed = 0;
+  for (let d = windowStart; d < todayKey; d = addDays(d, 1)) elapsed++;
+  if (loggedToday) elapsed++;
+  if (elapsed === 0) return null;
+  return Math.round((logged.length / elapsed) * 100);
+}
+
+export function buildCycleRing({ journalEntries = [], cycleStartDate = null, cycleLength = BASE_CYCLE_LENGTH, today = new Date() } = {}) {
   const entries = Array.isArray(journalEntries) ? journalEntries : [];
   const todayKey = toDateKey(today) || toDateKey(new Date());
   const byDate = latestEntryByDate(entries);
@@ -109,7 +127,9 @@ export function buildCycleRing({ journalEntries = [], cycleStartDate = null, cyc
   let days;
   let todayIndex;
   let phases = [];
+  let windowStart;
   if (mode === "cycle") {
+    windowStart = startKey;
     const total = Math.max(len, todayDay);
     days = Array.from({ length: total }, (_, i) => {
       const date = addDays(startKey, i);
@@ -119,6 +139,7 @@ export function buildCycleRing({ journalEntries = [], cycleStartDate = null, cyc
     phases = scalePhases(len);
   } else {
     const firstDate = addDays(todayKey, -(CALENDAR_DAYS - 1));
+    windowStart = firstEntryDate && firstEntryDate > firstDate ? firstEntryDate : firstDate;
     days = Array.from({ length: CALENDAR_DAYS }, (_, i) => {
       const date = addDays(firstDate, i);
       return { day: i + 1, date, state: stateFor(date, ctx) };
@@ -126,8 +147,9 @@ export function buildCycleRing({ journalEntries = [], cycleStartDate = null, cyc
     todayIndex = CALENDAR_DAYS - 1;
   }
 
+  const consistency = journalConsistency({ windowStart, todayKey, loggedDates });
   const center = loggedDates.length >= PATTERN_THRESHOLD
-    ? { value: Number.isFinite(consistency) ? `${Math.round(consistency)}%` : "—", label: "Consistency" }
+    ? { value: consistency == null ? "—" : `${consistency}%`, label: "Consistency" }
     : { value: `${loggedDates.length} of ${PATTERN_THRESHOLD}`, label: "Days to your first pattern" };
 
   return {

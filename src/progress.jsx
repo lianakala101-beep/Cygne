@@ -1849,7 +1849,6 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
           cycleStartDate={user?.cycleTrackingEnabled ? user?.cycleStartDate : null}
           cycleLength={user?.cycleLength}
           today={new Date()}
-          consistency={consistencyPct}
         />
       </div>
 
