@@ -12,6 +12,7 @@ import { getNextUseLabel } from "./constants.js";
 import { getSeason } from "./seasonal.jsx";
 import { getRitualPeriod, getRitualTimeLabel } from "./utils/ritualPeriod.js";
 import { isCycleStale, CYCLE_STALE_MESSAGE } from "./utils.jsx";
+import { localDateKey, upsertJournalEntry } from "./lib/journal.js";
 
 // Actives that are never paused during treatment recovery — same set
 // buildTreatmentRoutineAdvice (src/progress.jsx:804) uses to keep SPF
@@ -313,7 +314,10 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
   //
   // The weekly check-in flow still exists, but lives in the Progress tab;
   // it is no longer triggered by daily ritual completion.
-  const todayJournaled = journals.some(j => j?.date === today);
+  // Journal dates are the user's LOCAL date (see src/lib/journal.js); `today`
+  // above is the UTC key the ritual-completion state uses.
+  const journalToday = localDateKey(now);
+  const todayJournaled = journals.some(j => j?.date === journalToday);
   const [hintVisible, setHintVisible] = useState(() => !localStorage.getItem("ritual_hint_dismissed"));
 
   const isStepChecked = (id) => completedSteps.includes(id);
@@ -509,14 +513,11 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
 
       {showSkinJournal && (
         <SkinJournalModal
-          existing={journals.find(j => j?.date === today) || null}
+          existing={journals.find(j => j?.date === journalToday) || null}
           onSubmit={data => {
             // De-dupe by date — matches the existing journal flow in
             // progress.jsx so editing today's entry overwrites cleanly.
-            setJournals(prev => {
-              const filtered = prev.filter(j => j?.date !== data.date);
-              return [...filtered, data].sort((a, b) => String(a.date).localeCompare(String(b.date)));
-            });
+            setJournals(prev => upsertJournalEntry(prev, data));
             setShowSkinJournal(false);
           }}
           onClose={() => setShowSkinJournal(false)}

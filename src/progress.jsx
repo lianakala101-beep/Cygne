@@ -9,6 +9,7 @@ import { FaceHeatMap } from "./components/FaceHeatMap.jsx";
 import { AskCygneModal } from "./components/AskCygneModal.jsx";
 import { CycleRing } from "./components/CycleRing.jsx";
 import { ProgressIndex } from "./components/ProgressIndex.jsx";
+import { localDateKey, upsertJournalEntry } from "./lib/journal.js";
 import { buildProgressIndex } from "./lib/progressIndex.js";
 
 
@@ -241,7 +242,7 @@ const SKIN_CONDITIONS = [
 ];
 
 function SkinJournalModal({ onSubmit, onClose, existing = null }) {
-  const today = new Date().toISOString().split("T")[0];
+  const today = localDateKey();
   const [condition, setCondition] = useState(existing?.condition || null);
   const [sleep,     setSleep]     = useState(existing?.sleep     ?? null); // "good"|"poor"|null
   const [stress,    setStress]    = useState(existing?.stress    ?? null); // "low"|"high"|null
@@ -1565,7 +1566,7 @@ function BodyAcneTracker({ products: productsProp = [], activeMap, user = {}, on
 
 function JournalFullView({ journals: journalsProp = [], onClose, onEditToday }) {
   const journals = Array.isArray(journalsProp) ? journalsProp : [];
-  const today = new Date().toISOString().split("T")[0];
+  const today = localDateKey();
   const sorted = [...journals].sort((a, b) => b.date.localeCompare(a.date));
 
   // Group by month
@@ -1891,7 +1892,7 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
       {/* -- Skin Journal ------------------------------------------------------ */}
       <SectionShell text="Your Journal" tone="dark">
       {(() => {
-        const today = new Date().toISOString().split("T")[0];
+        const today = localDateKey();
         const todayEntry = journals.find(j => j.date === today);
         const pastEntries = [...journals].filter(j => j.date !== today).sort((a, b) => b.date.localeCompare(a.date));
         const visiblePast = pastEntries.slice(0, 3);
@@ -2178,12 +2179,9 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
 
       {showJournal && (
         <SkinJournalModal
-          existing={journals.find(j => j.date === new Date().toISOString().split("T")[0]) || null}
+          existing={journals.find(j => j.date === localDateKey()) || null}
           onSubmit={data => {
-            setJournals(prev => {
-              const filtered = prev.filter(j => j.date !== data.date);
-              return [...filtered, data].sort((a, b) => a.date.localeCompare(b.date));
-            });
+            setJournals(prev => upsertJournalEntry(prev, data));
             setShowJournal(false);
           }}
           onClose={() => setShowJournal(false)}

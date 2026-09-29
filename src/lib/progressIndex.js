@@ -13,6 +13,7 @@
 
 import { MAX_CYCLE_DAY, computeCycleDay, estimateCycleDayForDate } from "./cycle.js";
 import { scalePhases, toDateKey, addDays, latestEntryByDate } from "./cycleRing.js";
+import { withLegacyTodayTolerance } from "./journal.js";
 
 const CONDITION_SCORE = { glowing: 2, good: 1, okay: 0, dull: -1, rough: -2 };
 const TREND_WINDOW = 7;
@@ -129,7 +130,8 @@ export function buildProgressIndex({
   const checks = Array.isArray(checkIns) ? checkIns : [];
   const todayKey = toDateKey(today) || toDateKey(new Date());
   const len = Math.max(21, Math.min(MAX_CYCLE_DAY, parseInt(cycleLength, 10) || 28));
-  const byDate = latestEntryByDate(journals);
+  // Entries saved this evening under the old UTC key count as today.
+  const byDate = latestEntryByDate(withLegacyTodayTolerance(journals, today));
 
   // Cycle mode: tracking on and today resolves to a cycle day (null when
   // the start is missing, in the future, or stale past day 45).
@@ -149,10 +151,7 @@ export function buildProgressIndex({
     cycleDay != null ? breakoutPatternInsight({ checkIns: checks, todayKey, cycleStartKey, cycleLength: len, phases }) : null,
   ].filter(Boolean);
 
-  // Journal dates are written from toISOString() (UTC). When `today` is a
-  // Date, accept its UTC date too so an evening entry still counts as today.
-  const utcTodayKey = today instanceof Date && !Number.isNaN(today.getTime()) ? today.toISOString().split("T")[0] : null;
-  const loggedToday = byDate.has(todayKey) || (utcTodayKey != null && byDate.has(utcTodayKey));
+  const loggedToday = byDate.has(todayKey);
 
   const now = !loggedToday
     ? { kind: "journal", text: "Log today's skin" }

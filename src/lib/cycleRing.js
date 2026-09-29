@@ -16,6 +16,7 @@
 // the user has 5 logged days, and "N of 5" before that.
 
 import { CYCLE_PHASES, MAX_CYCLE_DAY, computeCycleDay } from "./cycle.js";
+import { withLegacyTodayTolerance } from "./journal.js";
 
 const CALENDAR_DAYS = 28;
 const BASE_CYCLE_LENGTH = 28;
@@ -108,8 +109,9 @@ function journalConsistency({ windowStart, todayKey, loggedDates }) {
 }
 
 export function buildCycleRing({ journalEntries = [], cycleStartDate = null, cycleLength = BASE_CYCLE_LENGTH, today = new Date() } = {}) {
-  const entries = Array.isArray(journalEntries) ? journalEntries : [];
   const todayKey = toDateKey(today) || toDateKey(new Date());
+  // Entries saved this evening under the old UTC key count as today.
+  const entries = withLegacyTodayTolerance(journalEntries, today);
   const byDate = latestEntryByDate(entries);
   const loggedDates = [...byDate.keys()].filter(d => d <= todayKey).sort();
   const firstEntryDate = loggedDates[0] || null;
