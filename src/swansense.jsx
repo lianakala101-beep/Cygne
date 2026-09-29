@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Icon, SwanIcon } from "./components.jsx";
 import { analyzeShelf } from "./engine.js";
 import { getSeason } from "./seasonal.jsx";
-import { getCurrentCycleDay } from "./utils.jsx";
+import { getCurrentCycleDay, isCycleStale, CYCLE_STALE_MESSAGE } from "./utils.jsx";
 
 // --- SWAN SENSE — PREDICTIVE SKIN ENGINE -------------------------------------
 
@@ -234,10 +234,15 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
     const ritualProducts = products.filter(p => p.inRoutine !== false);
     const hasActives = hasRetinol || hasAHA || hasBHA || onTretinoin;
     if (!cycleDay && hasActives) {
+      // A stale start date (45+ days) asks for a period log; a missing
+      // one asks for the cycle day.
+      const stale = isCycleStale(user);
       predictions.push({
         id: "baseline_cycle",
-        headline: "Set your cycle day to unlock predictions.",
-        detail: "Swan Sense can predict sensitivity windows, oil surges, and ideal active nights — but needs your cycle day to do it. Add it in the Progress tab.",
+        headline: stale ? `${CYCLE_STALE_MESSAGE}.` : "Set your cycle day to unlock predictions.",
+        detail: stale
+          ? "Swan Sense can predict sensitivity windows, oil surges, and ideal active nights — but your last period was logged more than 45 days ago. Update it in the Progress tab."
+          : "Swan Sense can predict sensitivity windows, oil surges, and ideal active nights — but needs your cycle day to do it. Add it in the Progress tab.",
         level: "positive",
         color: "var(--color-ivory, #faf9f4)",
         bg: "rgba(var(--rgb-moss), 0.08)",

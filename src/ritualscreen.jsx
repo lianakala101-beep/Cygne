@@ -11,6 +11,7 @@ import { getCyclePhase, getActivePauseState } from "./progress.jsx";
 import { getNextUseLabel } from "./constants.js";
 import { getSeason } from "./seasonal.jsx";
 import { getRitualPeriod, getRitualTimeLabel } from "./utils/ritualPeriod.js";
+import { isCycleStale, CYCLE_STALE_MESSAGE } from "./utils.jsx";
 
 // Actives that are never paused during treatment recovery — same set
 // buildTreatmentRoutineAdvice (src/progress.jsx:804) uses to keep SPF
@@ -367,8 +368,8 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
           <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", marginBottom: "var(--space-2)" }}>
             <span style={{ color: "var(--color-stone, #5a5a5a)" }}><Icon name={timeOfDayIcon} size={13} /></span>
             <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-stone, #5a5a5a)" }}>{timeOfDayLabel.toLowerCase()}</span>
-            {cyclePhase && (
-              <span style={{ marginLeft: "auto", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--color-stone, #5a5a5a)" }}>{cyclePhase} phase</span>
+            {(cyclePhase || isCycleStale(user)) && (
+              <span style={{ marginLeft: "auto", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--color-stone, #5a5a5a)" }}>{cyclePhase ? `${cyclePhase} phase` : CYCLE_STALE_MESSAGE}</span>
             )}
           </div>
           <p style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 700, letterSpacing: "var(--tracking-label)", color: "var(--color-ink)", margin: "0 0 2px" }}>{ritualMode.name}</p>

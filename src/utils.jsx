@@ -135,10 +135,17 @@ function daysBetweenLocal(startIso, nowDate = new Date()) {
 }
 // Current cycle day from user.cycleStartDate. Parsed as LOCAL date.
 // Day 1 = cycle start date. No auto-wrap — when a period runs late the
-// day count keeps climbing past user.cycleLength, capped at 45 so the
-// input/display can't run away. The user explicitly resets (set day 1 →
-// new cycleStartDate) when their next period actually starts. The
-// CycleTracker UI surfaces a "running long" note once day > cycleLength.
+// day count keeps climbing past user.cycleLength, up to day 45. The user
+// explicitly resets (set day 1 → new cycleStartDate) when their next
+// period actually starts. The CycleTracker UI surfaces a "running long"
+// note once day > cycleLength.
+//
+// Past day 45 the start date is stale, so this returns null — the same
+// rule as computeCycleDay in src/lib/cycle.js. Callers treat null as "no
+// cycle day"; displays use isCycleStale() to show CYCLE_STALE_MESSAGE.
+const MAX_CYCLE_DAY = 45;
+const CYCLE_STALE_MESSAGE = "Log your period to update your cycle";
+
 function getCurrentCycleDay(user) {
   if (!user) return null;
   if (user.cycleStartDate) {
@@ -149,7 +156,7 @@ function getCurrentCycleDay(user) {
     const todayLocal = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     const diffDays = Math.floor((todayLocal.getTime() - startLocal.getTime()) / (1000 * 60 * 60 * 24));
     const rawDay = diffDays + 1;
-    const day = Math.min(Math.max(rawDay, 1), 45);
+    const day = rawDay > MAX_CYCLE_DAY ? null : Math.max(rawDay, 1);
     // eslint-disable-next-line no-console
     console.log("[Cygne cycle]", {
       cycleStartDate: user.cycleStartDate,
@@ -162,6 +169,12 @@ function getCurrentCycleDay(user) {
     return day;
   }
   return user.cycleDay || null;
+}
+
+// True when cycle tracking is on and a start date is set, but it's more
+// than MAX_CYCLE_DAY days old — the user needs to log their period.
+function isCycleStale(user) {
+  return !!(user?.cycleTrackingEnabled && user?.cycleStartDate && getCurrentCycleDay(user) == null);
 }
 // Days elapsed since treatment (1-indexed: day 1 = day of treatment).
 function getTreatmentElapsed(treatmentDate) {
@@ -238,4 +251,4 @@ function getAskCygneAccess(user) {
 // opacity steps from src/index.css.
 const withAlpha = (tokenName, alpha) => `rgba(var(--rgb-${tokenName}), ${alpha})`;
 
-export { SwanWelcomeScreen, useLocalStorage, daysBetweenLocal, getCurrentCycleDay, getTreatmentElapsed, toLocalMidnight, isoWeekNumber, isoWeekYear, getAskCygneAccess, withAlpha };
+export { SwanWelcomeScreen, useLocalStorage, daysBetweenLocal, getCurrentCycleDay, isCycleStale, CYCLE_STALE_MESSAGE, getTreatmentElapsed, toLocalMidnight, isoWeekNumber, isoWeekYear, getAskCygneAccess, withAlpha };

@@ -4,7 +4,7 @@ import { detectActives, analyzeShelf, buildRoutine, isDampSkinProduct, hasSPFCov
 import { FREQUENCIES } from "./constants.js";
 import { getLockedSession, getAutoSession } from "./productmodal.jsx";
 import { getCyclePhase } from "./lib/cycle.js";
-import { getCurrentCycleDay } from "./utils.jsx";
+import { getCurrentCycleDay, isCycleStale, CYCLE_STALE_MESSAGE } from "./utils.jsx";
 import { shareCycleCard } from "./lib/cycleShare.js";
 
 function SessionPicker({ productId, product, initial, onSession }) {
@@ -572,9 +572,11 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
     // optional cycle data. Format: "FOLLICULAR · DAY 7".
     const cycleDay = user?.cycleTrackingEnabled ? getCurrentCycleDay(user) : null;
     const cyclePhaseName = cycleDay ? getCyclePhase(cycleDay)?.name : null;
-    const cycleLabel = cyclePhaseName && cycleDay
+    const cyclePhaseLabel = cyclePhaseName && cycleDay
       ? `${String(cyclePhaseName).toUpperCase()} · DAY ${cycleDay}`
       : null;
+    // Stale start date (45+ days) — ask for a period log instead.
+    const cycleLabel = cyclePhaseLabel || (isCycleStale(user) ? CYCLE_STALE_MESSAGE : null);
 
     // Loading state: LLM daily line hasn't landed yet AND we're not on
     // one of the fallback paths. A soft breathing dash replaces the
@@ -588,7 +590,7 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
     // powers the label above resolves. If the user hasn't enabled
     // cycle tracking (or no start date exists) the button is omitted
     // entirely rather than falling back to an empty share.
-    const shareEnabled = !!cycleLabel;
+    const shareEnabled = !!cyclePhaseLabel;
     const handleShareCycle = async () => {
       if (!shareEnabled || sharingCycle) return;
       setSharingCycle(true);

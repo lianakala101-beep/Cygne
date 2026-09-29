@@ -8,7 +8,7 @@ import { useWeather } from "./environment.jsx";
 import { WeekendNudgeCard } from "./weekend.jsx";
 import { SeasonalNudgeCard } from "./seasonal.jsx";
 import { getTreatmentPhase, TreatmentRecoveryCard, getCyclePhase } from "./progress.jsx";
-import { getCurrentCycleDay, daysBetweenLocal, getAskCygneAccess } from "./utils.jsx";
+import { getCurrentCycleDay, isCycleStale, CYCLE_STALE_MESSAGE, daysBetweenLocal, getAskCygneAccess } from "./utils.jsx";
 import { AskCygneButton } from "./AskCygne.jsx";
 import { useSwanSenseDaily } from "./hooks/useSwanSenseDaily.js";
 import { DailySkinIndexCard } from "./components/DailySkinIndexCard.jsx";
@@ -55,6 +55,9 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
     setRecapOpen(true);
   }, []);
   const currentCycleDay = getCurrentCycleDay(user);
+  // Tracking is on but the start date is more than 45 days old — cycle
+  // displays show CYCLE_STALE_MESSAGE instead of a day/phase.
+  const cycleStale = isCycleStale(user);
   const { activeMap } = analyzeShelf(products);
   const swanSensePredictions = getSwanSensePredictions(products, checkIns, user, locationData, journals);
   const { env: weather } = useWeather(locationData, user?.tempUnit || "C");
@@ -234,7 +237,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             Renders nothing (no wrapper margin either — the component
             owns its own spacing) when neither cycle phase nor
             weather resolves — see DailySkinIndexCard. */}
-        <DailySkinIndexCard cyclePhaseName={cyclePhase?.name || null} cycleDay={currentCycleDay} weather={weather} locationData={locationData} />
+        <DailySkinIndexCard cyclePhaseName={cyclePhase?.name || null} cycleDay={currentCycleDay} cycleStale={cycleStale} weather={weather} locationData={locationData} />
 
         {_now.getDate() >= 14 && (
           <div style={{ textAlign: "right", marginBottom: "var(--space-6)" }}>
@@ -453,7 +456,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           const tempUnit = user?.tempUnit || "C";
           const hasWeather = weather && (weather.temp !== null || weather.uvIndex !== null || weather.humidity !== null);
 
-          if (!phase && !hasWeather && daysSince === null) return null;
+          if (!phase && !cycleStale && !hasWeather && daysSince === null) return null;
 
           const txtSt = { fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", opacity: 0.75, whiteSpace: "nowrap" };
           const btnSt = { display: "inline-flex", alignItems: "center", gap: "var(--space-2)", padding: 0, background: "none", border: "none", cursor: "pointer", fontFamily: "var(--font-body)", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" };
@@ -474,6 +477,12 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
                 <button onClick={() => setCycleExpanded(true)} style={btnSt}>
                   <span style={{ width: 5, height: 5, borderRadius: "50%", background: "var(--color-ivory, #faf9f4)", opacity: 0.7, display: "inline-block", flexShrink: 0 }} />
                   <span style={txtSt}>{phase.name} · Day {currentCycleDay}</span>
+                </button>
+              )}
+              {cycleStale && (
+                <button onClick={() => setTab("progress")} style={btnSt}>
+                  <span style={{ width: 5, height: 5, borderRadius: "50%", background: "var(--color-ivory, #faf9f4)", opacity: 0.7, display: "inline-block", flexShrink: 0 }} />
+                  <span style={txtSt}>{CYCLE_STALE_MESSAGE}</span>
                 </button>
               )}
               <button onClick={() => setTab("progress")} style={btnSt}>

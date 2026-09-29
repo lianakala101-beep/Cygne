@@ -3,7 +3,7 @@ import { Icon, Section, ErrorBoundary } from "./components.jsx";
 import { detectActives, detectActivesFromProduct, analyzeShelf, detectConflicts, buildRoutine, hasSPFCoverage } from "./engine.js";
 import { getAutoSession } from "./productmodal.jsx";
 import { RAMP_ACTIVES, IntroduceSlowlyCard, getRampWeek, getRampSchedule, isSchedulePaced } from "./ramp.jsx";
-import { getCurrentCycleDay, getTreatmentElapsed, daysBetweenLocal } from "./utils.jsx";
+import { getCurrentCycleDay, isCycleStale, CYCLE_STALE_MESSAGE, getTreatmentElapsed, daysBetweenLocal } from "./utils.jsx";
 import { CYCLE_PHASES as CANONICAL_CYCLE_PHASES, getCyclePhase as getCanonicalCyclePhase } from "./lib/cycle.js";
 import { FaceHeatMap } from "./components/FaceHeatMap.jsx";
 import { AskCygneModal } from "./components/AskCygneModal.jsx";
@@ -428,16 +428,19 @@ function getCyclePhase(day) {
 function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycledayProp = 14, onSetCycleDay, user = {}, onUpdateUser = () => {} }) {
   const products = Array.isArray(productsProp) ? productsProp : [];
   const enabled = user.cycleTrackingEnabled || false;
-  // Compute cycle day dynamically from cycleStartDate (LOCAL date, not UTC)
-  const computedDay = getCurrentCycleDay(user) || cycledayProp || 14;
+  // Compute cycle day dynamically from cycleStartDate (LOCAL date, not UTC).
+  // A start date more than 45 days old is stale: no day or phase is shown
+  // (and no Day 14 fallback) until the user logs their period.
+  const stale = isCycleStale(user);
+  const computedDay = stale ? null : (getCurrentCycleDay(user) || cycledayProp || 14);
   const cycleDay = computedDay;
   const cycleLen = Math.max(21, Math.min(45, parseInt(user.cycleLength, 10) || 28));
   // Period is "running long" once the day count passes the user's chosen
   // cycle length — we show a quiet normalizing note in that case rather
   // than capping or auto-wrapping the day display.
-  const runningLong = cycleDay > cycleLen;
+  const runningLong = !stale && cycleDay > cycleLen;
   const [editing, setEditing] = useState(false);
-  const [inputVal, setInputVal] = useState(String(computedDay));
+  const [inputVal, setInputVal] = useState(String(computedDay ?? 1));
   const [editingLength, setEditingLength] = useState(false);
   const [lengthInputVal, setLengthInputVal] = useState(String(cycleLen));
 
@@ -445,9 +448,9 @@ function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycled
   const hasAHA = !!(activeMap["AHA"]?.length);
   const hasBHA = !!(activeMap["BHA"]?.length);
 
-  const phase = getCyclePhase(cycleDay);
-  const daysUntilNext = phase.days[1] - cycleDay + 1;
-  const advice = phase.activeAdvice(hasRetinol, hasAHA, hasBHA);
+  const phase = stale ? null : getCyclePhase(cycleDay);
+  const daysUntilNext = phase ? phase.days[1] - cycleDay + 1 : null;
+  const advice = phase ? phase.activeAdvice(hasRetinol, hasAHA, hasBHA) : null;
 
   const handleSetDay = () => {
     const d = Math.max(1, Math.min(45, parseInt(inputVal) || 1));
@@ -504,11 +507,15 @@ function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycled
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "var(--space-4)" }}>
           <div>
             <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 var(--space-1)" }}>Sync Your Ritual With Your Rhythm</p>
-            <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
-              <div style={{ width: 7, height: 7, borderRadius: "50%", background: phase.dot, flexShrink: 0 }} />
-              <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-md)", fontWeight: 400, color: "var(--parchment)", letterSpacing: "0.02em" }}>{phase.name}</span>
-              <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)" }}>Phase</span>
-            </div>
+            {phase ? (
+              <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
+                <div style={{ width: 7, height: 7, borderRadius: "50%", background: phase.dot, flexShrink: 0 }} />
+                <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-md)", fontWeight: 400, color: "var(--parchment)", letterSpacing: "0.02em" }}>{phase.name}</span>
+                <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)" }}>Phase</span>
+              </div>
+            ) : (
+              <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-md)", fontWeight: 400, color: "var(--parchment)", letterSpacing: "0.02em" }}>{CYCLE_STALE_MESSAGE}</span>
+            )}
           </div>
 
           {/* Day editor — button retains its border as a tap target */}
@@ -526,17 +533,21 @@ function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycled
                 <button onClick={handleSetDay} style={{ padding: "var(--space-1) var(--space-3)", background: "transparent", border: "1px solid var(--color-ink)", borderRadius: "var(--radius-pill)", color: "var(--color-ink)", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-xs)", cursor: "pointer", letterSpacing: "var(--tracking-display)", textTransform: "uppercase" }}>Set</button>
               </div>
             ) : (
-              <button onClick={() => { setInputVal(String(cycleDay)); setEditing(true); }}
+              <button onClick={() => { setInputVal(String(cycleDay ?? 1)); setEditing(true); }}
                 style={{ background: "transparent", border: "1px solid rgba(var(--rgb-ink), 0.32)", borderRadius: "var(--radius-pill)", padding: "var(--space-1) var(--space-3)", cursor: "pointer", display: "flex", alignItems: "center", gap: "var(--space-1)" }}>
-                <span style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: "var(--text-sm)", letterSpacing: "var(--tracking-label)", color: "var(--color-ink)", lineHeight: 1.6 }}>Day {cycleDay}</span>
+                <span style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: "var(--text-sm)", letterSpacing: "var(--tracking-label)", color: "var(--color-ink)", lineHeight: 1.6, whiteSpace: "nowrap" }}>{phase ? `Day ${cycleDay}` : "Set day"}</span>
               </button>
             )}
-            <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ink), 0.56)", opacity: 0.85, letterSpacing: "0.04em" }}>{daysUntilNext}d in phase</span>
+            {phase && (
+              <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ink), 0.56)", opacity: 0.85, letterSpacing: "0.04em" }}>{daysUntilNext}d in phase</span>
+            )}
           </div>
         </div>
 
         {/* Phase description */}
-        <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: "var(--text-sm)", letterSpacing: "0.02em", color: "var(--color-ink)", margin: "0 0 var(--space-3)", lineHeight: 1.6 }}>{phase.description}</p>
+        {phase && (
+          <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: "var(--text-sm)", letterSpacing: "0.02em", color: "var(--color-ink)", margin: "0 0 var(--space-3)", lineHeight: 1.6 }}>{phase.description}</p>
+        )}
 
         {/* Quiet "running long" note — italic, no chip */}
         {runningLong && (
@@ -546,14 +557,20 @@ function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycled
         )}
 
         {/* Nudge — plain body copy, no box. */}
-        <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: "var(--text-sm)", letterSpacing: "0.02em", color: "var(--color-ink)", margin: 0, lineHeight: 1.6 }}>{phase.nudge}</p>
+        {phase && (
+          <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: "var(--text-sm)", letterSpacing: "0.02em", color: "var(--color-ink)", margin: 0, lineHeight: 1.6 }}>{phase.nudge}</p>
+        )}
       </div>
 
       {/* Shelf-specific advice — separated from the phase block by a soft
           rule. Container is flat; the eyebrow carries the section title. */}
       <div style={{ paddingTop: "var(--space-4)", borderTop: "1px solid rgba(var(--rgb-ink), 0.16)" }}>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(var(--rgb-ink), 0.56)", margin: "0 0 var(--space-2)" }}>Your Vanity This Week</p>
-        <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: "var(--text-sm)", letterSpacing: "0.02em", color: "var(--color-ink)", margin: "0 0 var(--space-3)", lineHeight: 1.6 }}>{advice}</p>
+        {advice && (
+          <>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(var(--rgb-ink), 0.56)", margin: "0 0 var(--space-2)" }}>Your Vanity This Week</p>
+            <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: "var(--text-sm)", letterSpacing: "0.02em", color: "var(--color-ink)", margin: "0 0 var(--space-3)", lineHeight: 1.6 }}>{advice}</p>
+          </>
+        )}
 
         {/* Cycle length setting — accepts 21–45 days. */}
         <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", marginBottom: "var(--space-3)" }}>
@@ -589,7 +606,7 @@ function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycled
       {/* Compact cycle arc */}
       <div style={{ display: "flex", gap: "var(--space-1)", marginTop: "var(--space-3)" }}>
         {CYCLE_PHASES.map((p, i) => {
-          const isActive = phase.name === p.name;
+          const isActive = phase?.name === p.name;
           const width = ((p.days[1] - p.days[0] + 1) / 35) * 100;
           return (
             <div key={i} style={{ flex: p.days[1] - p.days[0] + 1, height: 3, borderRadius: "var(--radius-pill)", background: isActive ? p.dot : "rgba(var(--rgb-ink), 0.08)", transition: "background 0.3s" }} />
@@ -598,7 +615,7 @@ function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycled
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", marginTop: "var(--space-1)" }}>
         {CYCLE_PHASES.map((p, i) => (
-          <span key={i} style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", color: phase.name === p.name ? "var(--parchment)" : "var(--clay)", opacity: phase.name === p.name ? 1 : 0.4 }}>{p.name.slice(0, 3).toUpperCase()}</span>
+          <span key={i} style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", color: phase?.name === p.name ? "var(--parchment)" : "var(--clay)", opacity: phase?.name === p.name ? 1 : 0.4 }}>{p.name.slice(0, 3).toUpperCase()}</span>
         ))}
       </div>
     </div>

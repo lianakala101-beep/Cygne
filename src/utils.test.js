@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { isoWeekNumber, isoWeekYear, getAskCygneAccess } from "./utils.jsx";
+import { isoWeekNumber, isoWeekYear, getAskCygneAccess, getCurrentCycleDay, isCycleStale } from "./utils.jsx";
 
 describe("isoWeekNumber", () => {
   it("returns 1 for a Thursday in early January", () => {
@@ -103,5 +103,59 @@ describe("getAskCygneAccess", () => {
     expect(getAskCygneAccess(user)).toBe("underage"); // June 15 = day before
     vi.setSystemTime(new Date(2026, 5, 16));
     expect(getAskCygneAccess(user)).toBe("available"); // June 16 = birthday
+  });
+});
+
+describe("getCurrentCycleDay", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 8, 20, 10, 0, 0)); // Sep 20 2026, local
+    vi.spyOn(console, "log").mockImplementation(() => {});
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  it("counts day 1 on the start date", () => {
+    expect(getCurrentCycleDay({ cycleStartDate: "2026-09-20" })).toBe(1);
+    expect(getCurrentCycleDay({ cycleStartDate: "2026-09-08" })).toBe(13);
+  });
+
+  it("keeps counting past the cycle length", () => {
+    expect(getCurrentCycleDay({ cycleStartDate: "2026-08-22", cycleLength: 28 })).toBe(30);
+  });
+
+  it("returns day 45 at the cap and null after it", () => {
+    expect(getCurrentCycleDay({ cycleStartDate: "2026-08-07" })).toBe(45);
+    expect(getCurrentCycleDay({ cycleStartDate: "2026-08-06" })).toBeNull();
+  });
+
+  it("falls back to a stored cycleDay only when there's no start date", () => {
+    expect(getCurrentCycleDay({ cycleDay: 9 })).toBe(9);
+    expect(getCurrentCycleDay({ cycleStartDate: "2026-07-01", cycleDay: 9 })).toBeNull();
+  });
+});
+
+describe("isCycleStale", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 8, 20, 10, 0, 0));
+    vi.spyOn(console, "log").mockImplementation(() => {});
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  it("is true when tracking is on and the start date is more than 45 days old", () => {
+    expect(isCycleStale({ cycleTrackingEnabled: true, cycleStartDate: "2026-07-01" })).toBe(true);
+  });
+
+  it("is false inside the 45-day window, with tracking off, or with no start date", () => {
+    expect(isCycleStale({ cycleTrackingEnabled: true, cycleStartDate: "2026-09-08" })).toBe(false);
+    expect(isCycleStale({ cycleTrackingEnabled: false, cycleStartDate: "2026-07-01" })).toBe(false);
+    expect(isCycleStale({ cycleTrackingEnabled: true })).toBe(false);
+    expect(isCycleStale(null)).toBe(false);
   });
 });

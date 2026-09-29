@@ -10,6 +10,7 @@
 // this is a flat 1px-bordered card of scannable data points, meant
 // to read in ~5 seconds like a weather app rather than a paragraph.
 import { buildSkinIndex } from "../lib/skinIndex.js";
+import { CYCLE_STALE_MESSAGE } from "../utils.jsx";
 
 // Tone → { label color, pill border } pairs. The pill sits on a
 // near-transparent wash over the dashboard's dark inky-moss canvas,
@@ -108,21 +109,23 @@ const ACTION_LINE_STYLE = {
 // the app today), so this uses the same "city, country" format
 // already established at progress.jsx:2190 rather than inventing a
 // state field that doesn't exist in the data model.
-function buildContextLine({ locationData, cyclePhaseName, cycleDay }) {
+function buildContextLine({ locationData, cyclePhaseName, cycleDay, cycleStale }) {
   const locationPart = locationData?.city
     ? `${locationData.city}${locationData.country ? `, ${locationData.country}` : ""}`
     : null;
-  const phasePart = cyclePhaseName && cycleDay
-    ? `Day ${cycleDay} (${cyclePhaseName} Phase)`
-    : null;
+  const phasePart = cycleStale
+    ? CYCLE_STALE_MESSAGE
+    : cyclePhaseName && cycleDay
+      ? `Day ${cycleDay} (${cyclePhaseName} Phase)`
+      : null;
   return [locationPart, phasePart].filter(Boolean).join(" • ") || null;
 }
 
-function DailySkinIndexCard({ cyclePhaseName = null, cycleDay = null, weather = null, locationData = null }) {
+function DailySkinIndexCard({ cyclePhaseName = null, cycleDay = null, cycleStale = false, weather = null, locationData = null }) {
   const { items, actions } = buildSkinIndex({ cyclePhaseName, weather });
   if (items.length === 0) return null;
 
-  const contextLine = buildContextLine({ locationData, cyclePhaseName, cycleDay });
+  const contextLine = buildContextLine({ locationData, cyclePhaseName, cycleDay, cycleStale });
 
   return (
     <div style={{
