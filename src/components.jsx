@@ -41,6 +41,10 @@ const Icon = ({ name, size = 20 }) => {
     "arrow-up":    "M12 19V5M5 12l7-7 7 7",
     "arrow-down":  "M12 5v14M19 12l-7 7-7-7",
     reflection:   "M12 3a7 7 0 100 14 7 7 0 000-14z M12 17v4 M9 21h6 M12 7v6 M10 10h4",
+    face:    "M12 21a9 9 0 100-18 9 9 0 000 18z M9 10h.01 M15 10h.01 M9 15c1 1 2 1.5 3 1.5s2-.5 3-1.5",
+    flask:   "M10 2h4 M10 2v6.5l-5.2 9.2A2 2 0 006.5 21h11a2 2 0 001.7-3.3L14 8.5V2 M8 15h8",
+    medical: "M12 22a10 10 0 100-20 10 10 0 000 20z M12 8v8 M8 12h8",
+    body:    "M12 2a3 3 0 100 6 3 3 0 000-6z M6 22v-6a6 6 0 0112 0v6",
   };
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">

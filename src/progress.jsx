@@ -9,8 +9,11 @@ import { FaceHeatMap } from "./components/FaceHeatMap.jsx";
 import { AskCygneModal } from "./components/AskCygneModal.jsx";
 import { CycleRing } from "./components/CycleRing.jsx";
 import { ProgressIndex } from "./components/ProgressIndex.jsx";
+import { TrackerGrid } from "./components/TrackerGrid.jsx";
+import { DetailSheet } from "./components/DetailSheet.jsx";
 import { localDateKey, upsertJournalEntry } from "./lib/journal.js";
 import { buildProgressIndex } from "./lib/progressIndex.js";
+import { buildTrackerAttention } from "./lib/trackerAttention.js";
 
 
 function computeStabilityScore(products, checkIns, activeMap) {
@@ -1707,6 +1710,12 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
   const [showJournal, setShowJournal] = useState(false);
   const [askCygneQuestion, setAskCygneQuestion] = useState(null);
   const [journalFullView, setJournalFullView] = useState(false);
+  // Which tracker-grid detail sheet is open, if any: "journal" | "face" |
+  // "cycle" | "introduce" | "treatments" | "body" | null.
+  const [openSheet, setOpenSheet] = useState(null);
+  // Set alongside openSheet("introduce") from the Now card's ramp action —
+  // scrolled to once the sheet (and its content) has actually mounted.
+  const [pendingScrollId, setPendingScrollId] = useState(null);
   const { activeMap } = analyzeShelf(products);
   const conflicts = detectConflicts(products);
 
@@ -1744,6 +1753,45 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
     : [];
 
   const rampProducts = [...primaryRamp, ...reintroRamp];
+
+  // Tracker-grid attention dots — pure computation in
+  // src/lib/trackerAttention.js. treatmentActive reuses pauseTreatment
+  // from getActivePauseState above rather than recomputing "is a
+  // treatment in active recovery": a non-null pauseTreatment already
+  // means exactly that (the most recent non-cleared treatment).
+  const todayKey = localDateKey();
+  const loggedToday = journals.some(j => j.date === todayKey);
+  const trackerAttention = buildTrackerAttention({
+    journalLoggedToday: loggedToday,
+    rampProducts,
+    rampCheckins,
+    treatmentActive: !!pauseTreatment,
+    today: new Date(),
+  });
+  const introduceDimmed = /acute/i.test(pausePhase?.label);
+
+  const SHEET_TITLES = {
+    journal: "Journal",
+    face: "Face Map",
+    cycle: "Cycle",
+    introduce: "Introduce",
+    treatments: "Treatments",
+    body: "Body",
+  };
+
+  // Scrolls to a ramp product's card once the Introduce sheet (opened via
+  // the Now card's ramp action) has actually mounted its content — a
+  // synchronous scrollIntoView right after setOpenSheet would run before
+  // the sheet's children exist.
+  useEffect(() => {
+    if (openSheet !== "introduce" || !pendingScrollId) return;
+    const id = pendingScrollId;
+    const raf = requestAnimationFrame(() => {
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      setPendingScrollId(null);
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [openSheet, pendingScrollId]);
 
   // Section header: plain caps title beside a hair rule. Tone-aware
   // so it reads on both the dark canvas and the ivory band. The
@@ -1844,10 +1892,16 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
             if (item.kind === "journal") setShowJournal(true);
             else if (item.kind === "checkin") setShowCheckIn(true);
             else if (item.kind === "ramp") {
-              document.getElementById(`ramp-${item.productId}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+              setOpenSheet("introduce");
+              setPendingScrollId(`ramp-${item.productId}`);
             }
           }}
         />
+      </div>
+
+      {/* -- Tracker grid -------------------------------------------------- */}
+      <div style={{ marginBottom: "calc(var(--space-1) * 7)" }}>
+        <TrackerGrid attention={trackerAttention} onOpen={setOpenSheet} introduceDimmed={introduceDimmed} />
       </div>
 
       {/* -- Skin Journal ------------------------------------------------------ */}
@@ -2172,6 +2226,17 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
           context={askCygneQuestion.ctx}
           onClose={() => setAskCygneQuestion(null)}
         />
+      )}
+
+      {/* -- Tracker detail sheets ------------------------------------------ */}
+      {/* Placeholder bodies for now — Phase 3b moves each existing section's
+          real content in here unchanged. */}
+      {openSheet && (
+        <DetailSheet title={SHEET_TITLES[openSheet]} onClose={() => setOpenSheet(null)}>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "var(--color-ivory)", opacity: 0.6, margin: "var(--space-6) 0 0" }}>
+            {SHEET_TITLES[openSheet]} content coming here.
+          </p>
+        </DetailSheet>
       )}
     </div>
   );
