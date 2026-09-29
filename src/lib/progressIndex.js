@@ -142,15 +142,6 @@ export function buildProgressIndex({
   const lastCheckIn = lastCheckInKey(checks, todayKey);
   const checkInDue = !lastCheckIn || daysBetween(lastCheckIn, todayKey) >= CHECKIN_INTERVAL_DAYS;
 
-  const pills = [
-    skinTrendPill(byDate, todayKey),
-    cycleDay != null ? nextPhasePill(cycleDay, phases, len) : checkInPill(lastCheckIn, todayKey),
-  ].filter(Boolean);
-
-  const insights = [
-    cycleDay != null ? breakoutPatternInsight({ checkIns: checks, todayKey, cycleStartKey, cycleLength: len, phases }) : null,
-  ].filter(Boolean);
-
   const loggedToday = byDate.has(todayKey);
 
   const now = !loggedToday
@@ -158,6 +149,19 @@ export function buildProgressIndex({
     : checkInDue
       ? { kind: "checkin", text: "Weekly check-in due" }
       : null;
+
+  // The Next pill shows the weekly check-in outside cycle mode. When the
+  // Now card already says the check-in is due, drop that pill so it isn't
+  // said twice; cycle-phase pills always stay.
+  const nextPill = cycleDay != null
+    ? nextPhasePill(cycleDay, phases, len)
+    : now?.kind === "checkin" ? null : checkInPill(lastCheckIn, todayKey);
+
+  const pills = [skinTrendPill(byDate, todayKey), nextPill].filter(Boolean);
+
+  const insights = [
+    cycleDay != null ? breakoutPatternInsight({ checkIns: checks, todayKey, cycleStartKey, cycleLength: len, phases }) : null,
+  ].filter(Boolean);
 
   return { pills, insights, now };
 }

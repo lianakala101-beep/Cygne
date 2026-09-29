@@ -109,6 +109,46 @@ describe("buildProgressIndex", () => {
     });
   });
 
+  describe("next pill dedupe against the Now card", () => {
+    // Today logged, last check-in 8 days ago → Now is the weekly check-in.
+    const checkInIsNow = { journalEntries: entries("good", 1, 0), checkIns: [checkIn(-8)], today: TODAY };
+
+    it("omits the check-in Next pill when Now is the weekly check-in", () => {
+      const index = buildProgressIndex(checkInIsNow);
+      expect(index.now.kind).toBe("checkin");
+      expect(pill(index, "next")).toBeUndefined();
+    });
+
+    it("keeps the cycle-phase pill when Now is the weekly check-in", () => {
+      const index = buildProgressIndex({ ...checkInIsNow, cycleTrackingOn: true, cycleStartDate: dayOffset(TODAY, -7), cycleLength: 28 });
+      expect(index.now.kind).toBe("checkin");
+      expect(pill(index, "next").value).toBe("Ovulation · 6 days");
+    });
+
+    it("keeps the check-in pill when Now is something else", () => {
+      const index = buildProgressIndex({ checkIns: [checkIn(-8)], today: TODAY });
+      expect(index.now.kind).toBe("journal");
+      expect(pill(index, "next").value).toBe("Check-in · due");
+    });
+
+    it("keeps the check-in pill when Now is empty", () => {
+      const index = buildProgressIndex({ journalEntries: entries("good", 1, 0), checkIns: [checkIn(-2)], today: TODAY });
+      expect(index.now).toBeNull();
+      expect(pill(index, "next").value).toBe("Check-in · Friday");
+    });
+
+    it("leaves only the trend pill when it is the sole survivor", () => {
+      const journalEntries = [...entries("glowing", 4, 0), ...entries("okay", 4, 7)];
+      const index = buildProgressIndex({ journalEntries, checkIns: [checkIn(-9)], today: TODAY });
+      expect(index.now.kind).toBe("checkin");
+      expect(index.pills).toEqual([{ key: "trend", label: "Skin trend", value: "Improving" }]);
+    });
+
+    it("can leave no pills at all", () => {
+      expect(buildProgressIndex(checkInIsNow).pills).toEqual([]);
+    });
+  });
+
   describe("breakout pattern insight", () => {
     // Cycle started 2026-09-08 (today is day 13); luteal in the previous
     // 28-day cycle ran 2026-08-27 → 2026-09-07.
