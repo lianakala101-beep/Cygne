@@ -55,11 +55,11 @@ const Icon = ({ name, size = 20 }) => {
 
 // --- SHARED -------------------------------------------------------------------
 const labelSt = { display: "block", fontFamily: "var(--heading)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)", marginBottom: "var(--space-2)" };
-const inputSt = { width: "100%", padding: "var(--space-3) var(--space-4)", background: "var(--ink)", border: "1px solid var(--border)", borderRadius: 0, color: "var(--parchment)", fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", outline: "none", boxSizing: "border-box" };
+const inputSt = { width: "100%", padding: "var(--space-3) var(--space-4)", background: "var(--ink)", border: "1px solid var(--border)", borderRadius: "var(--radius)", color: "var(--parchment)", fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", outline: "none", boxSizing: "border-box" };
 
 function Pill({ children, active, onClick }) {
   return (
-    <button onClick={onClick} style={{ flexShrink: 0, padding: "var(--space-2) var(--space-4)", borderRadius: 0, border: `1px solid ${active ? "rgba(var(--rgb-pebble), 0.94)" : "var(--border)"}`, background: active ? "var(--cta)" : "transparent", color: active ? "#F5F0E8" : "var(--clay)", fontFamily: "var(--heading)", fontSize: "var(--text-xs)", cursor: "pointer", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", whiteSpace: "nowrap", transition: "all 0.18s" }}>
+    <button onClick={onClick} style={{ flexShrink: 0, padding: "var(--space-2) var(--space-4)", borderRadius: "var(--radius-pill)", border: `1px solid ${active ? "rgba(var(--rgb-pebble), 0.94)" : "var(--border)"}`, background: active ? "var(--cta)" : "transparent", color: active ? "#F5F0E8" : "var(--clay)", fontFamily: "var(--heading)", fontSize: "var(--text-xs)", cursor: "pointer", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", whiteSpace: "nowrap", transition: "all 0.18s" }}>
       {children}
     </button>
   );
@@ -170,7 +170,7 @@ function FlagCard({ f }) {
                 return (
                   <span key={p?.id || name + i} style={{
                     padding: "var(--space-1) var(--space-2)", borderRadius: "var(--radius-pill)",
-                    background: "var(--color-ivory-shadow, #f0ebe0)",
+                    background: "rgba(var(--rgb-ivory), 0.08)",
                     border: "1px solid rgba(var(--rgb-moss), 0.16)",
                     fontFamily: "var(--font-body)", fontSize: "var(--text-xs)",
                     color: "var(--color-ivory, #faf9f4)",
@@ -268,7 +268,7 @@ class ErrorBoundary extends Component {
               background: "transparent",
               color: "var(--color-ivory, #faf9f4)",
               border: "1px solid rgba(var(--rgb-ivory), 0.56)",
-              borderRadius: 0,
+              borderRadius: "var(--radius-pill)",
               fontFamily: "var(--font-display)",
               fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
               cursor: "pointer",

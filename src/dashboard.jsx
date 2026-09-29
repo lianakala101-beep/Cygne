@@ -12,6 +12,7 @@ import { getCurrentCycleDay, isCycleStale, CYCLE_STALE_MESSAGE, daysBetweenLocal
 import { AskCygneButton } from "./AskCygne.jsx";
 import { useSwanSenseDaily } from "./hooks/useSwanSenseDaily.js";
 import { DailySkinIndexCard } from "./components/DailySkinIndexCard.jsx";
+import { glassCard } from "./lib/ui.js";
 
 // Code-split: both overlays only render on user action, so let Vite ship them
 // in their own chunks instead of in the dashboard's initial paint bundle.
@@ -144,7 +145,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)", marginBottom: "calc(var(--space-1) * 7)" }}>
               {emptySteps.map((s, i) => (
-                <div key={i} style={{ display: "flex", gap: "var(--space-4)", padding: "var(--space-4) var(--space-5)", background: "var(--color-ivory-shadow)", border: "none", borderRadius: "var(--radius)" }}>
+                <div key={i} style={{ display: "flex", gap: "var(--space-4)", padding: "var(--space-4) var(--space-5)", ...glassCard }}>
                   {/* Step numeral sits where the icon used to be. Fungis
                       Heavy, helper-alpha ivory — large enough to read as
                       structural numbering without competing with the
@@ -192,7 +193,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             { label: "Swan Sense activates", done: hasProducts && hasCheckin, action: null, cta: null },
           ];
           return (
-            <div style={{ marginBottom: "var(--space-6)", background: "var(--color-ivory-shadow)", border: "none", borderRadius: "var(--radius)", padding: "var(--space-4) var(--space-5)" }}>
+            <div style={{ marginBottom: "var(--space-6)", ...glassCard, padding: "var(--space-4) var(--space-5)" }}>
               <div style={{ marginBottom: "var(--space-4)" }}>
                 <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)", margin: 0 }}>Getting started</p>
               </div>

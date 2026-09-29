@@ -374,7 +374,7 @@ function CaptureFlow({ onClose, onComplete }) {
             <button onClick={pick} disabled={busy}
               style={{
                 display: "inline-flex", alignItems: "center", gap: "var(--space-3)",
-                padding: "var(--space-4) var(--space-10)", borderRadius: 0,
+                padding: "var(--space-4) var(--space-10)", borderRadius: "var(--radius-pill)",
                 background: "transparent", color: "var(--color-ivory)", border: "1.5px solid rgba(var(--rgb-ivory), 0.56)",
                 cursor: busy ? "default" : "pointer",
                 fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 400,
@@ -414,7 +414,7 @@ function CaptureFlow({ onClose, onComplete }) {
             <button onClick={finish} disabled={busy}
               style={{
                 display: "inline-flex", alignItems: "center", gap: "var(--space-3)",
-                padding: "var(--space-4) var(--space-10)", borderRadius: 0,
+                padding: "var(--space-4) var(--space-10)", borderRadius: "var(--radius-pill)",
                 background: "transparent", color: "var(--color-ivory)", border: "1.5px solid rgba(var(--rgb-ivory), 0.56)",
                 cursor: busy ? "default" : "pointer",
                 fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 400,

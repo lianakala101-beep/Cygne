@@ -1829,7 +1829,7 @@ export default function App() {
   // -- Needs onboarding (new signup) ------------------------------------------
   if (needsOnboarding || (!user && authSession)) {
     return (
-      <Suspense fallback={<div style={{ minHeight: "100vh", background: "var(--color-ivory)" }} />}>
+      <Suspense fallback={<div style={{ minHeight: "100vh", background: "var(--color-inky-moss)" }} />}>
         <OnboardingScreen onComplete={handleOnboardingComplete} setLocationData={setLocationData} />
       </Suspense>
     );
@@ -1910,9 +1910,13 @@ export default function App() {
           --surface:            rgba(var(--rgb-ivory), 0.08);
           --border:             rgba(var(--rgb-ivory), 0.16);
           --parchment:          var(--color-ivory);
-          --clay:               rgba(var(--rgb-ivory), 0.56);
+          /* 0.56 measured ~3.98:1 against a glass card (rgba(ivory,0.08)
+             over the moss canvas) — under the 4.5:1 minimum for body
+             text. Raised to 0.7 (~5.2:1) rather than shrinking type,
+             per the softening-pass contrast check. */
+          --clay:               rgba(var(--rgb-ivory), 0.7);
           --muted:              rgba(var(--rgb-ivory), 0.32);
-          --taupe:              rgba(var(--rgb-ivory), 0.56);
+          --taupe:              rgba(var(--rgb-ivory), 0.7);
           --overlay:            rgba(var(--rgb-ink), 0.56);
           --sage:               var(--color-ivory);
           --cta:                rgba(var(--rgb-ivory), 0.08);

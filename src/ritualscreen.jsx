@@ -14,6 +14,7 @@ import { getRitualPeriod, getRitualTimeLabel } from "./utils/ritualPeriod.js";
 import { isCycleStale, CYCLE_STALE_MESSAGE } from "./utils.jsx";
 import { localDateKey, upsertJournalEntry } from "./lib/journal.js";
 import { ritualCompleteKey, readManualOverride, isManualOverrideStale } from "./lib/ritualKeys.js";
+import { glassCard } from "./lib/ui.js";
 
 // Actives that are never paused during treatment recovery — same set
 // buildTreatmentRoutineAdvice (src/progress.jsx:804) uses to keep SPF
@@ -464,7 +465,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
                   display: "block", width: "100%", margin: "0 0 var(--space-4)",
                   padding: "var(--space-3) var(--space-4)", textAlign: "center",
                   background: "transparent", border: "none",
-                  borderRadius: 0, cursor: "pointer",
+                  borderRadius: "var(--radius)", cursor: "pointer",
                   fontFamily: "var(--font-display)", fontWeight: 400, fontSize: "var(--text-xs)",
                   letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
                   color: "var(--color-ivory, #faf9f4)",
@@ -496,7 +497,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
             </p>
           </div>
           <button onClick={() => setShowSkinJournal(true)}
-            style={{ width: "100%", padding: "var(--space-4) var(--space-10)", background: "transparent", border: "1.5px solid rgba(var(--rgb-ivory), 0.56)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 400, color: "var(--color-ivory)", cursor: "pointer", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", transition: "all 0.3s ease" }}
+            style={{ width: "100%", padding: "var(--space-4) var(--space-10)", background: "transparent", border: "1.5px solid rgba(var(--rgb-ivory), 0.56)", borderRadius: "var(--radius-pill)", fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 400, color: "var(--color-ivory)", cursor: "pointer", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", transition: "all 0.3s ease" }}
             onMouseEnter={e => { e.currentTarget.style.background = "var(--color-inky-moss)"; e.currentTarget.style.color = "var(--color-ivory)"; }}
             onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--color-inky-moss)"; }}>
             Log today's journal
@@ -557,12 +558,12 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
             // even when the user has chosen a different cadence.
             const freqReason = getSuggestedFrequency(p, user)?.reason || null;
             return (
-              <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "var(--space-3) var(--space-4)", background: "var(--color-ivory-shadow)", border: "none", borderRadius: "var(--radius)", marginBottom: "var(--space-2)" }}>
+              <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "var(--space-3) var(--space-4)", ...glassCard, marginBottom: "var(--space-2)" }}>
                 <div style={{ flex: 1, marginRight: "var(--space-3)" }}>
                   <p style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-md)", fontWeight: 400, letterSpacing: "var(--tracking-label)", color: "var(--parchment)", margin: "0 0 1px" }}>{p.name}</p>
                   <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: 0 }}>{p.brand} · {freqLabel}</p>
                   {freqReason && (
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: "var(--space-1) 0 0", lineHeight: 1.5, opacity: 0.7 }}>{freqReason}</p>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: "var(--space-1) 0 0", lineHeight: 1.5 }}>{freqReason}</p>
                   )}
                 </div>
                 <span style={{ fontSize: "var(--text-xs)", fontFamily: "var(--font-body)", fontWeight: 400, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--clay)", marginTop: "var(--space-1)", flexShrink: 0 }}>{nextLabel}</span>
@@ -629,7 +630,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
                 .map(id => products.find(p => p.id === id))
                 .filter(Boolean);
               return (
-                <div key={i} style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: "var(--radius)", padding: "var(--space-3) var(--space-4)", marginBottom: "var(--space-2)" }}>
+                <div key={i} style={{ ...glassCard, padding: "var(--space-3) var(--space-4)", marginBottom: "var(--space-2)" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", marginBottom: "var(--space-2)" }}>
                     <span style={{ fontSize: "var(--text-xs)", fontFamily: "var(--font-body)", fontWeight: 400, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--parchment)", opacity: 0.7 }}>{r.verb}</span>
                     <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--parchment)", margin: 0, flex: 1, fontWeight: 400, lineHeight: 1.3 }}>{r.title}</p>

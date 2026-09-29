@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Icon, Section } from "./components.jsx";
 import { detectActives, analyzeShelf } from "./engine.js";
+import { glassCard } from "./lib/ui.js";
 
 
 function buildRecommendations(products, activeMap, conflicts, user = {}) {
@@ -332,7 +333,7 @@ function RecommendationCard({ rec, onAdd, onDismiss }) {
 
   return (
     <div onClick={() => setExpanded(e => !e)}
-      style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: "var(--radius)", padding: "var(--space-4) var(--space-4)", marginBottom: "var(--space-2)", cursor: "pointer", transition: "border-color 0.2s" }}
+      style={{ ...glassCard, padding: "var(--space-4) var(--space-4)", marginBottom: "var(--space-2)", cursor: "pointer", transition: "border-color 0.2s" }}
       onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(var(--rgb-sage), 0.32)"}
       onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}>
       <div style={{ display: "flex", alignItems: "flex-start", gap: "var(--space-3)" }}>
@@ -627,7 +628,7 @@ function RefinementsCard({ products, activeMap, conflicts }) {
       </button>
 
       {open && (
-        <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderTop: "none", borderRadius: "0 0 var(--radius) var(--radius)", padding: "var(--space-4) var(--space-4) var(--space-5)" }}>
+        <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderTop: "none", borderRadius: "0 0 var(--radius) var(--radius)", padding: "var(--space-4) var(--space-4) var(--space-5)" }}>
 
           {/* Verb filter pills */}
           <div style={{ display: "flex", gap: "var(--space-2)", marginBottom: "var(--space-4)", flexWrap: "wrap" }}>

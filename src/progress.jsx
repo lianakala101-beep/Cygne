@@ -14,7 +14,7 @@ import { DetailSheet } from "./components/DetailSheet.jsx";
 import { localDateKey, upsertJournalEntry } from "./lib/journal.js";
 import { buildProgressIndex } from "./lib/progressIndex.js";
 import { buildTrackerAttention } from "./lib/trackerAttention.js";
-import { glassCard } from "./lib/ui.js";
+import { glassCard, inputStyle } from "./lib/ui.js";
 
 
 function computeStabilityScore(products, checkIns, activeMap) {
@@ -342,7 +342,7 @@ function SkinJournalModal({ onSubmit, onClose, existing = null }) {
             value={notes}
             onChange={e => setNotes(e.target.value)}
             placeholder="Anything worth noting today..."
-            style={{ width: "100%", minHeight: 72, background: "var(--color-ivory-shadow)", border: "none", borderRadius: "var(--radius)", padding: "var(--space-3) var(--space-4)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--parchment)", resize: "none", outline: "none", boxSizing: "border-box", lineHeight: 1.6 }}
+            style={{ ...inputStyle, width: "100%", minHeight: 72, padding: "var(--space-3) var(--space-4)", fontSize: "var(--text-xs)", resize: "none", boxSizing: "border-box", lineHeight: 1.6 }}
           />
         </div>
 
@@ -546,7 +546,7 @@ function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycled
               </button>
             )}
             {phase && (
-              <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ivory), 0.56)", opacity: 0.85, letterSpacing: "0.04em" }}>{daysUntilNext}d in phase</span>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ivory), 0.7)", letterSpacing: "0.04em" }}>{daysUntilNext}d in phase</span>
             )}
           </div>
         </div>
@@ -558,7 +558,7 @@ function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycled
 
         {/* Quiet "running long" note — italic, no chip */}
         {runningLong && (
-          <p style={{ fontFamily: "var(--font-body)", fontStyle: "italic", fontSize: "var(--text-xs)", letterSpacing: "0.02em", color: "rgba(var(--rgb-ivory), 0.56)", margin: "0 0 var(--space-3)", lineHeight: 1.55 }}>
+          <p style={{ fontFamily: "var(--font-body)", fontStyle: "italic", fontSize: "var(--text-xs)", letterSpacing: "0.02em", color: "rgba(var(--rgb-ivory), 0.7)", margin: "0 0 var(--space-3)", lineHeight: 1.55 }}>
             Your cycle is running long — this is normal.
           </p>
         )}
@@ -574,14 +574,14 @@ function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycled
       <div style={{ paddingTop: "var(--space-4)", borderTop: "1px solid rgba(var(--rgb-ivory), 0.16)" }}>
         {advice && (
           <>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.56)", margin: "0 0 var(--space-2)" }}>Your Vanity This Week</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.7)", margin: "0 0 var(--space-2)" }}>Your Vanity This Week</p>
             <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: "var(--text-sm)", letterSpacing: "0.02em", color: "var(--color-ivory, #faf9f4)", margin: "0 0 var(--space-3)", lineHeight: 1.6 }}>{advice}</p>
           </>
         )}
 
         {/* Cycle length setting — accepts 21–45 days. */}
         <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", marginBottom: "var(--space-3)" }}>
-          <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.56)" }}>Cycle length</span>
+          <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.7)" }}>Cycle length</span>
           {editingLength ? (
             <>
               <input
@@ -848,7 +848,7 @@ function buildTreatmentRoutineAdvice(phase, products, activeMap) {
   return { paused, cleared };
 }
 
-const inputSt = { width: "100%", padding: "var(--space-3) var(--space-4)", background: "var(--color-ivory-shadow)", border: "none", borderRadius: "var(--radius)", fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "var(--parchment)", outline: "none" };
+const inputSt = { ...inputStyle, width: "100%", padding: "var(--space-3) var(--space-4)", fontSize: "var(--text-sm)" };
 const labelSt = { fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--clay)", display: "block", marginBottom: "var(--space-2)" };
 
 function AddTreatmentModal({ onSave, onClose }) {
@@ -1054,7 +1054,7 @@ function TreatmentSection({ treatments: treatmentsProp = [], saveTreatment, remo
   return (
     <div style={{ marginBottom: "calc(var(--space-1) * 7)" }}>
       <button onClick={() => setAddOpen(true)}
-        style={{ width: "100%", padding: "var(--space-3) 0", marginBottom: "var(--space-4)", background: "transparent", color: "var(--color-ivory, #faf9f4)", border: "1px solid var(--color-ivory, #faf9f4)", borderRadius: 0, fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", cursor: "pointer", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" }}>
+        style={{ width: "100%", padding: "var(--space-3) 0", marginBottom: "var(--space-4)", background: "transparent", color: "var(--color-ivory, #faf9f4)", border: "1px solid var(--color-ivory, #faf9f4)", borderRadius: "var(--radius-pill)", fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", cursor: "pointer", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent" }}>
         Log
       </button>
 
@@ -1300,10 +1300,10 @@ function BodyAcneTracker({ products: productsProp = [], activeMap, user = {}, on
 
   if (!enabled) {
     return (
-      <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: "var(--radius)", padding: "var(--space-5) var(--space-5)", marginBottom: "calc(var(--space-1) * 7)" }}>
+      <div style={{ ...glassCard, padding: "var(--space-5) var(--space-5)", marginBottom: "calc(var(--space-1) * 7)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", marginBottom: "var(--space-3)" }}>
           <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)" }}>Body Acne</span>
-          <span style={{ fontSize: "var(--text-xs)", fontFamily: "var(--font-body)", color: "var(--clay)", background: "var(--color-ivory-shadow)", border: "none", padding: "2px var(--space-2)", borderRadius: "var(--radius-pill)", letterSpacing: "0.06em" }}>Optional</span>
+          <span style={{ fontSize: "var(--text-xs)", fontFamily: "var(--font-body)", color: "var(--clay)", background: "rgba(var(--rgb-ivory), 0.08)", border: "1px solid rgba(var(--rgb-ivory), 0.16)", padding: "2px var(--space-2)", borderRadius: "var(--radius-pill)", letterSpacing: "0.06em" }}>Optional</span>
         </div>
         <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: "0 0 var(--space-4)", lineHeight: 1.65 }}>
           Track body acne zones, identify triggers, and get advice drawn from what's already on your vanity.
@@ -1408,7 +1408,7 @@ function BodyAcneTracker({ products: productsProp = [], activeMap, user = {}, on
           {[...FACE_TRACKER_ZONES, ...BODY_ZONES].filter(z => zones.includes(z.id)).map(zone => {
             const open = expandedZone === zone.id;
             return (
-              <div key={zone.id} style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: "var(--radius)", overflow: "hidden", transition: "all 0.2s" }}>
+              <div key={zone.id} style={{ ...glassCard, overflow: "hidden", transition: "all 0.2s" }}>
                 <button onClick={() => setExpandedZone(open ? null : zone.id)}
                   style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "var(--space-4) var(--space-5)", background: "none", border: "none", cursor: "pointer", textAlign: "left" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
@@ -1449,7 +1449,7 @@ function BodyAcneTracker({ products: productsProp = [], activeMap, user = {}, on
 
       {/* Shelf integration */}
       {zones.length > 0 && (gaps.length > 0 || doubles.length > 0) && (
-        <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: "var(--radius)", padding: "var(--space-4) var(--space-5)", marginBottom: "var(--space-3)" }}>
+        <div style={{ ...glassCard, padding: "var(--space-4) var(--space-5)", marginBottom: "var(--space-3)" }}>
           <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 var(--space-3)" }}>Your Vanity</p>
 
           {doubles.length > 0 && (
@@ -1486,7 +1486,7 @@ function BodyAcneTracker({ products: productsProp = [], activeMap, user = {}, on
 
       {/* Trigger log */}
       {triggerLog.length > 0 && (
-        <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: "var(--radius)", padding: "var(--space-4) var(--space-5)" }}>
+        <div style={{ ...glassCard, padding: "var(--space-4) var(--space-5)" }}>
           <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 var(--space-3)" }}>Recent Triggers</p>
           {triggerLog.slice(-5).reverse().map((entry, i) => (
             <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "var(--space-3)", marginBottom: i < triggerLog.slice(-5).length - 1 ? "var(--space-3)" : 0, paddingBottom: i < triggerLog.slice(-5).length - 1 ? "var(--space-3)" : 0, borderBottom: i < triggerLog.slice(-5).length - 1 ? "1px solid var(--border)" : "none" }}>
@@ -1616,7 +1616,7 @@ function JournalFullView({ journals: journalsProp = [], onClose, onEditToday }) 
               const isToday = j.date === today;
               const dateLabel = isToday ? "Today" : d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
               return (
-                <div key={j.date} style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: "var(--radius)", padding: "var(--space-4) var(--space-4)", marginBottom: "var(--space-2)" }}>
+                <div key={j.date} style={{ ...glassCard, padding: "var(--space-4) var(--space-4)", marginBottom: "var(--space-2)" }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: j.notes ? "var(--space-2)" : 0 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
                       <div style={{ width: 8, height: 8, borderRadius: "50%", background: c ? c.color : "var(--clay)", flexShrink: 0 }} />
@@ -2017,7 +2017,7 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
                       </button>
                     ) : (
                       <div onClick={() => setShowJournal(true)}
-                        style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "var(--space-3) var(--space-5)", background: "var(--color-ivory-shadow)", border: "none", borderRadius: "var(--radius)", cursor: "pointer" }}>
+                        style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "var(--space-3) var(--space-5)", background: "rgba(var(--rgb-ivory), 0.08)", border: "1px solid rgba(var(--rgb-ivory), 0.16)", borderRadius: "var(--radius)", cursor: "pointer" }}>
                         <div>
                           <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 var(--space-1)" }}>Today</p>
                           <p style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-md)", fontWeight: 400, letterSpacing: "var(--tracking-label)", color: cond ? cond.color : "var(--parchment)", margin: 0 }}>{cond ? cond.label : todayEntry.condition}</p>
@@ -2038,7 +2038,7 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
                       const d = new Date(j.date + "T12:00:00");
                       const label = d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
                       return (
-                        <div key={j.date} style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", padding: "var(--space-3) var(--space-5)", background: "var(--color-ivory-shadow)", border: "none", marginTop: -1, borderRadius: 0 }}>
+                        <div key={j.date} style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", padding: "var(--space-3) var(--space-5)", background: "rgba(var(--rgb-ivory), 0.08)", border: "none", marginTop: -1, borderRadius: 0 }}>
                           <div style={{ width: 7, height: 7, borderRadius: "50%", background: c ? c.color : "var(--clay)", flexShrink: 0 }} />
                           <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", flex: 1 }}>{label}</span>
                           <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: c ? c.color : "var(--parchment)", fontWeight: 400 }}>{c ? c.label : j.condition}</span>
@@ -2050,7 +2050,7 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
                     {/* View all link — arrow-only affordance, text left, arrow flush right */}
                     {pastEntries.length > 0 && (
                       <button onClick={() => setJournalFullView(true)}
-                        style={{ width: "100%", padding: "var(--space-3) var(--space-5)", background: "var(--color-ivory-shadow)", border: "none", borderTop: "none", marginTop: -1, borderRadius: "0 0 var(--radius) var(--radius)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)" }}>
+                        style={{ width: "100%", padding: "var(--space-3) var(--space-5)", background: "rgba(var(--rgb-ivory), 0.08)", border: "none", borderTop: "none", marginTop: -1, borderRadius: "0 0 var(--radius) var(--radius)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)" }}>
                         <span>All {journals.length} entries</span>
                         <span aria-hidden="true" style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 400, lineHeight: 1 }}>→</span>
                       </button>
@@ -2280,7 +2280,7 @@ function LocationManager({ locationData, setLocationData, locationDenied, setLoc
 
   if (locationData) {
     return (
-      <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: "var(--radius)", padding: "var(--space-4) var(--space-5)" }}>
+      <div style={{ ...glassCard, padding: "var(--space-4) var(--space-5)" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
             <span style={{ color: "var(--clay)", opacity: 0.6, display: "inline-flex" }}><Icon name="target" size={14} /></span>
@@ -2302,7 +2302,7 @@ function LocationManager({ locationData, setLocationData, locationDenied, setLoc
   }
 
   return (
-    <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: "var(--radius)", padding: "var(--space-4) var(--space-5)" }}>
+    <div style={{ ...glassCard, padding: "var(--space-4) var(--space-5)" }}>
       <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: "0 0 var(--space-4)", lineHeight: 1.65 }}>
         {locationDenied
           ? "Location was previously denied. You can grant access in your browser settings, then try again."

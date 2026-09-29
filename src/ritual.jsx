@@ -6,6 +6,7 @@ import { getLockedSession, getAutoSession } from "./productmodal.jsx";
 import { getCyclePhase } from "./lib/cycle.js";
 import { getCurrentCycleDay, isCycleStale, CYCLE_STALE_MESSAGE } from "./utils.jsx";
 import { shareCycleCard } from "./lib/cycleShare.js";
+import { glassCard } from "./lib/ui.js";
 
 function SessionPicker({ productId, product, initial, onSession }) {
   const locked = product ? getLockedSession(product) : null;
@@ -102,7 +103,7 @@ function ProductCard({ product, onEdit, onDelete, onToggleRoutine, onSession, us
   })();
 
   return (
-    <div style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: "var(--radius)", padding: "var(--space-4)", display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+    <div style={{ ...glassCard, padding: "var(--space-4)", display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
 
       {/* Header row */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
@@ -925,7 +926,7 @@ function FlightModeModal({ products, activeMap, onClose }) {
         {tab === "tips" && (
           <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
             {tips.map((tip, i) => (
-              <div key={i} style={{ display: "flex", gap: "var(--space-3)", padding: "var(--space-4) var(--space-4)", background: "var(--color-ivory-shadow)", border: "none", borderRadius: "var(--radius)" }}>
+              <div key={i} style={{ display: "flex", gap: "var(--space-3)", padding: "var(--space-4) var(--space-4)", ...glassCard }}>
                 <span style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-sm)", color: "var(--clay)", flexShrink: 0, marginTop: 1 }}>{i + 1}.</span>
                 <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--parchment)", margin: 0, lineHeight: 1.65 }}>{tip}</p>
               </div>

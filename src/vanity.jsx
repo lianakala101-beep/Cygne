@@ -6,6 +6,7 @@ import { assessRoutineFit, DEFER_TAG_CONFIG } from "./modals.jsx";
 import { ProductModal } from "./productmodal.jsx";
 import { getAskCygneAccess } from "./utils.jsx";
 import { CATEGORIES, FREQUENCIES } from "./constants.js";
+import { glassCard } from "./lib/ui.js";
 
 
 // Bottle silhouette shapes — decorative container outlines mapped by
@@ -163,8 +164,8 @@ function ProductBottle({ product, onEdit, onDelete, onToggleRoutine, onSession, 
             <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-stone)", margin: "0 0 var(--space-3)" }}>Confirm</p>
             <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "var(--color-ink)", margin: "0 0 var(--space-6)", lineHeight: 1.65 }}>Remove <strong>{product.name}</strong> from your vanity? This cannot be undone.</p>
             <div style={{ display: "flex", gap: "var(--space-3)" }}>
-              <button onClick={() => setConfirmDelete(false)} style={{ flex: 1, padding: "var(--space-3) 0", borderRadius: 0, border: "1px solid rgba(var(--rgb-silver), 0.32)", background: "transparent", color: "var(--color-ink)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", cursor: "pointer" }}>Cancel</button>
-              <button onClick={() => { setConfirmDelete(false); onDelete(product.id); }} style={{ flex: 1, padding: "var(--space-3) 0", borderRadius: 0, border: "1px solid rgba(var(--rgb-bronze), 0.32)", background: "rgba(var(--rgb-bronze), 0.08)", color: "var(--color-bronze)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", cursor: "pointer" }}>Remove</button>
+              <button onClick={() => setConfirmDelete(false)} style={{ flex: 1, padding: "var(--space-3) 0", borderRadius: "var(--radius-pill)", border: "1px solid rgba(var(--rgb-silver), 0.32)", background: "transparent", color: "var(--color-ink)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => { setConfirmDelete(false); onDelete(product.id); }} style={{ flex: 1, padding: "var(--space-3) 0", borderRadius: "var(--radius-pill)", border: "1px solid rgba(var(--rgb-bronze), 0.32)", background: "rgba(var(--rgb-bronze), 0.08)", color: "var(--color-bronze)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", cursor: "pointer" }}>Remove</button>
             </div>
           </div>
         </div>
@@ -706,7 +707,7 @@ function Shelf({ products, onEdit, onDelete, onAdd, onToggleRoutine, onClearAll,
                   { label: "Categories", value: new Set(products.map(p => p.category)).size },
                   { label: "Value", value: `$${(spending.total || 0).toFixed(0)}` },
                 ].map(({ label, value }) => (
-                  <div key={label} style={{ background: "var(--color-ivory-shadow)", border: "none", borderRadius: "var(--radius)", padding: "var(--space-4) var(--space-4)", textAlign: "center" }}>
+                  <div key={label} style={{ ...glassCard, padding: "var(--space-4) var(--space-4)", textAlign: "center" }}>
                     <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-lg)", fontWeight: 200, color: "var(--parchment)", margin: "0 0 var(--space-1)", letterSpacing: "-0.02em" }}>{value}</p>
                     <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--clay)", margin: 0 }}>{label}</p>
                   </div>
