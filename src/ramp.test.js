@@ -108,9 +108,27 @@ describe("isReadyToAdvance", () => {
     expect(isReadyToAdvance(product, [checkIn("loving_it", "2026-09-15"), checkIn("no_reaction", "2026-09-18")], TODAY)).toBe(true);
   });
 
-  it("is not ready with fewer than 7 days at the current week", () => {
-    expect(isReadyToAdvance(product, calm, "2026-09-19")).toBe(false); // day 6
+  it("needs 5 days at the current week: day 4 is not ready, day 5 is", () => {
     expect(isReadyToAdvance(product, calm, "2026-09-14")).toBe(false); // day 1
+    expect(isReadyToAdvance(product, calm, "2026-09-17")).toBe(false); // day 4
+    expect(isReadyToAdvance(product, calm, "2026-09-18")).toBe(true);  // day 5
+    expect(isReadyToAdvance(product, calm, "2026-09-19")).toBe(true);  // day 6
+    expect(isReadyToAdvance(product, calm, "2026-09-20")).toBe(true);  // day 7
+  });
+
+  it("still applies the other conditions on day 5", () => {
+    const DAY5 = "2026-09-18";
+    expect(isReadyToAdvance(product, calm, DAY5)).toBe(true);
+    // No check-in during the stretch (this one is from the previous week).
+    expect(isReadyToAdvance(product, [checkIn("no_reaction", "2026-09-10", { week_number: 1 })], DAY5)).toBe(false);
+    // Irritation earlier in the stretch, latest calm — only the irritation rule fails.
+    const irritated = [checkIn("no_reaction", "2026-09-17"), checkIn("mild_irritation", "2026-09-15")];
+    expect(deriveRampSignals(irritated, "p1", 2).suggestHold).toBe(false);
+    expect(isReadyToAdvance(product, irritated, DAY5)).toBe(false);
+    // Latest is a breakout — only suggestHold fails.
+    const breakout = [checkIn("breakout", "2026-09-17"), checkIn("no_reaction", "2026-09-15")];
+    expect(deriveRampSignals(breakout, "p1", 2).suggestHold).toBe(true);
+    expect(isReadyToAdvance(product, breakout, DAY5)).toBe(false);
   });
 
   it("is not ready the day after rolling into a new week, even with last week's calm check-ins", () => {

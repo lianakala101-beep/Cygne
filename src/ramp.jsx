@@ -336,14 +336,15 @@ function getRampDaysAtWeek(product, today = new Date()) {
 // Whether a product's skin has handled its current week well enough to
 // advance. `checkIns` are the ramp_checkins rows ({ product_id,
 // week_number, response_state, created_at }). Ready only when ALL hold:
-//   1. at least 7 days at the current week (today counts, so this is the
-//      week's 7th day — weeks are calendar-driven and roll over after it);
+//   1. at least 5 days at the current week (today counts, so this holds
+//      on days 5–7 of a week; weeks are calendar-driven and roll over
+//      after day 7);
 //   2. at least one of this product's check-ins during that stretch;
 //   3. none of the check-ins in the stretch reported irritation
 //      (mild_irritation);
 //   4. deriveRampSignals' suggestHold is false (the most recent check-in
 //      for the current week isn't a breakout or irritation).
-const READY_MIN_DAYS_AT_WEEK = 7;
+const READY_MIN_DAYS_AT_WEEK = 5;
 
 function isReadyToAdvance(product, checkIns, today = new Date()) {
   if (!product?.id) return false;

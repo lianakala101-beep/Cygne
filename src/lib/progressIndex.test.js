@@ -271,9 +271,8 @@ describe("buildProgressIndex", () => {
       expect(index.insights).toEqual([]);
     });
 
-    it("picks one product when several are ready: the one that started its ramp earliest", () => {
-      // Weeks are calendar-driven, so every ready product is on its 7th day
-      // at the week and the tie falls through to the earlier start.
+    it("picks one product when several are ready and equally long at their week: the earliest ramp start", () => {
+      // Both are on day 7 of their week, so the earlier start wins.
       const tretinoin = { id: "b", name: "Tretinoin", routineStartDate: "2026-08-31" }; // week 3, day 7
       const checkIns = [rampCheckIn("a", "no_reaction"), { ...rampCheckIn("b", "loving_it"), week_number: 3 }];
       const index = buildProgressIndex({ ...upToDate, rampProducts: [adapalene, tretinoin], rampCheckins: checkIns });
@@ -281,8 +280,19 @@ describe("buildProgressIndex", () => {
       expect(index.now.text).toBe("Tretinoin is ready to advance");
     });
 
+    it("prefers the product longest at its current week over the one that started earlier", () => {
+      const earlier = { id: "e", name: "Glycolic Toner", routineStartDate: "2026-08-25" }; // week 4, day 6
+      const later = { id: "l", name: "Tretinoin", routineStartDate: "2026-09-07" };        // week 2, day 7
+      const checkIns = [
+        { ...rampCheckIn("e", "no_reaction"), week_number: 4 },
+        { ...rampCheckIn("l", "no_reaction"), week_number: 2 },
+      ];
+      const index = buildProgressIndex({ ...upToDate, rampProducts: [earlier, later], rampCheckins: checkIns });
+      expect(index.now.productId).toBe("l");
+    });
+
     it("skips products that aren't ready when choosing", () => {
-      const notYet = { id: "c", name: "Glycolic Toner", routineStartDate: "2026-09-16" }; // day 5
+      const notYet = { id: "c", name: "Glycolic Toner", routineStartDate: "2026-09-17" }; // day 4
       const index = buildProgressIndex({ ...upToDate, rampProducts: [notYet, adapalene], rampCheckins: [...calm, rampCheckIn("c", "no_reaction")] });
       expect(index.now.productId).toBe("a");
     });
