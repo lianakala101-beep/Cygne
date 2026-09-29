@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { getRampWeek, getRampPhase, RAMP_SCHEDULES } from "./ramp.jsx";
+import { getRampWeek, getRampPhase, RAMP_SCHEDULES, getRampDaysAtWeek, isReadyToAdvance, deriveRampSignals } from "./ramp.jsx";
 
 // Force "today" to a fixed local date so daysBetweenLocal is deterministic.
 function setToday(year, monthIndex, day) {
@@ -71,5 +71,83 @@ describe("getRampPhase", () => {
 
   it("clamps weeks beyond the schedule to the final phase (Maintain forever)", () => {
     expect(getRampPhase(retinol, 99).name).toBe("Maintain");
+  });
+});
+
+describe("getRampDaysAtWeek", () => {
+  const product = { id: "p1", routineStartDate: "2026-09-07" };
+
+  it("counts today as a day at the week", () => {
+    expect(getRampDaysAtWeek(product, "2026-09-07")).toBe(1);  // week 1, day 1
+    expect(getRampDaysAtWeek(product, "2026-09-13")).toBe(7);  // week 1, day 7
+    expect(getRampDaysAtWeek(product, "2026-09-14")).toBe(1);  // week 2, day 1
+    expect(getRampDaysAtWeek(product, "2026-09-20")).toBe(7);  // week 2, day 7
+  });
+
+  it("is null without a start date or before it", () => {
+    expect(getRampDaysAtWeek({ id: "p1" }, "2026-09-20")).toBeNull();
+    expect(getRampDaysAtWeek(product, "2026-09-06")).toBeNull();
+  });
+});
+
+describe("isReadyToAdvance", () => {
+  // Week 2 of a product started 2026-09-07; today (Sun 2026-09-20) is day 7
+  // of it, so the current stretch runs 2026-09-14 → today.
+  const TODAY = "2026-09-20";
+  const product = { id: "p1", name: "Adapalene Gel", routineStartDate: "2026-09-07" };
+  // created_at is built from LOCAL time, so the fixtures hold in any timezone.
+  const at = (day, hour = 12, minute = 0) => {
+    const [y, m, d] = day.split("-").map(Number);
+    return new Date(y, m - 1, d, hour, minute).toISOString();
+  };
+  const checkIn = (state, day, extra = {}) => ({ product_id: "p1", week_number: 2, response_state: state, created_at: at(day), ...extra });
+  const calm = [checkIn("no_reaction", "2026-09-16")];
+
+  it("is ready when all four conditions hold", () => {
+    expect(isReadyToAdvance(product, calm, TODAY)).toBe(true);
+    expect(isReadyToAdvance(product, [checkIn("loving_it", "2026-09-15"), checkIn("no_reaction", "2026-09-18")], TODAY)).toBe(true);
+  });
+
+  it("is not ready with fewer than 7 days at the current week", () => {
+    expect(isReadyToAdvance(product, calm, "2026-09-19")).toBe(false); // day 6
+    expect(isReadyToAdvance(product, calm, "2026-09-14")).toBe(false); // day 1
+  });
+
+  it("is not ready the day after rolling into a new week, even with last week's calm check-ins", () => {
+    expect(isReadyToAdvance(product, [checkIn("no_reaction", "2026-09-18")], "2026-09-21")).toBe(false);
+  });
+
+  it("is not ready without a check-in during the stretch", () => {
+    expect(isReadyToAdvance(product, [], TODAY)).toBe(false);
+    expect(isReadyToAdvance(product, [checkIn("no_reaction", "2026-09-10", { week_number: 1 })], TODAY)).toBe(false);
+    expect(isReadyToAdvance(product, [checkIn("no_reaction", "2026-09-16", { product_id: "other" })], TODAY)).toBe(false);
+    expect(isReadyToAdvance(product, null, TODAY)).toBe(false);
+  });
+
+  it("is not ready when any check-in in the stretch reported irritation", () => {
+    // The latest check-in is calm, so suggestHold is false — only this rule fails.
+    const checkIns = [checkIn("no_reaction", "2026-09-18"), checkIn("mild_irritation", "2026-09-15")];
+    expect(deriveRampSignals(checkIns, "p1", 2).suggestHold).toBe(false);
+    expect(isReadyToAdvance(product, checkIns, TODAY)).toBe(false);
+  });
+
+  it("is not ready when suggestHold is true", () => {
+    // A breakout isn't irritation, so only suggestHold blocks this one.
+    const checkIns = [checkIn("breakout", "2026-09-18"), checkIn("no_reaction", "2026-09-15")];
+    expect(deriveRampSignals(checkIns, "p1", 2).suggestHold).toBe(true);
+    expect(isReadyToAdvance(product, checkIns, TODAY)).toBe(false);
+  });
+
+  it("is not ready without a usable start date", () => {
+    expect(isReadyToAdvance({ id: "p1" }, calm, TODAY)).toBe(false);
+    expect(isReadyToAdvance({ id: "p1", routineStartDate: "2026-09-25" }, calm, TODAY)).toBe(false);
+    expect(isReadyToAdvance(null, calm, TODAY)).toBe(false);
+  });
+
+  it("draws the stretch at local midnight of the week's first day", () => {
+    const justAfter = { ...checkIn("no_reaction", "2026-09-14"), created_at: at("2026-09-14", 0, 30) };
+    const justBefore = { ...checkIn("no_reaction", "2026-09-13"), created_at: at("2026-09-13", 23, 30) };
+    expect(isReadyToAdvance(product, [justAfter], TODAY)).toBe(true);
+    expect(isReadyToAdvance(product, [justBefore], TODAY)).toBe(false);
   });
 });

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Icon, Section, ErrorBoundary } from "./components.jsx";
 import { detectActives, detectActivesFromProduct, analyzeShelf, detectConflicts, buildRoutine, hasSPFCoverage } from "./engine.js";
 import { getAutoSession } from "./productmodal.jsx";
-import { RAMP_ACTIVES, IntroduceSlowlyCard, getRampWeek, getRampSchedule, isSchedulePaced } from "./ramp.jsx";
+import { RAMP_ACTIVES, IntroduceSlowlyCard, getRampWeek, getRampSchedule, isSchedulePaced, deriveRampSignals } from "./ramp.jsx";
 import { getCurrentCycleDay, isCycleStale, CYCLE_STALE_MESSAGE, getTreatmentElapsed, daysBetweenLocal } from "./utils.jsx";
 import { CYCLE_PHASES as CANONICAL_CYCLE_PHASES, getCyclePhase as getCanonicalCyclePhase } from "./lib/cycle.js";
 import { FaceHeatMap } from "./components/FaceHeatMap.jsx";
@@ -1660,49 +1660,6 @@ function getProductSession(product) {
   return getAutoSession(product).session;
 }
 
-// Derive per-product suggestion signals from the ramp_checkins history.
-// This is the read-side counterpart to saveRampCheckin — the system
-// listens to what the user reports each week and surfaces a hint
-// rather than auto-changing pacing.
-//
-//   suggestHold — true when the most recent check-in FOR THE CURRENT
-//     WEEK reported irritation (mild_irritation) or a breakout. Only
-//     the current week is checked; older weeks are past guidance.
-//
-//   recentTrend — { consecutivePositive: N } — walk back from the
-//     current week counting how many consecutive weeks had a positive
-//     most-recent response (no_reaction or loving_it). Breaks on the
-//     first week with no entry or a non-positive entry. Not surfaced
-//     visually yet; kept accessible for future "safe to progress
-//     faster" logic.
-const NEGATIVE_RESPONSE_STATES = new Set(["breakout", "mild_irritation"]);
-const POSITIVE_RESPONSE_STATES = new Set(["no_reaction", "loving_it"]);
-
-function deriveRampSignals(rampCheckins, productId, currentWeek) {
-  const empty = { suggestHold: false, recentTrend: { consecutivePositive: 0 } };
-  if (!Array.isArray(rampCheckins) || !productId || !currentWeek) return empty;
-  const forProduct = rampCheckins.filter(c => c && c.product_id === productId);
-  if (forProduct.length === 0) return empty;
-  const sortDesc = (a, b) => String(b?.created_at || "").localeCompare(String(a?.created_at || ""));
-
-  const mostRecentThisWeek = forProduct
-    .filter(c => c.week_number === currentWeek)
-    .sort(sortDesc)[0] || null;
-  const suggestHold = !!mostRecentThisWeek && NEGATIVE_RESPONSE_STATES.has(mostRecentThisWeek.response_state);
-
-  let consecutivePositive = 0;
-  for (let w = currentWeek; w >= 1; w--) {
-    const latest = forProduct.filter(c => c.week_number === w).sort(sortDesc)[0];
-    if (latest && POSITIVE_RESPONSE_STATES.has(latest.response_state)) {
-      consecutivePositive++;
-    } else {
-      break;
-    }
-  }
-
-  return { suggestHold, recentTrend: { consecutivePositive } };
-}
-
 // Merge the two hold-suggestion signals into one message per card.
 // The check-in signal fires when the current week's most-recent
 // response reported irritation. The cycle signal fires when the user
@@ -1877,14 +1834,18 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
             journalEntries: journals,
             checkIns,
             rampProducts,
+            rampCheckins,
             cycleStartDate: user?.cycleStartDate,
             cycleLength: user?.cycleLength,
             cycleTrackingOn: !!user?.cycleTrackingEnabled,
             today: new Date(),
           })}
-          onNow={(kind) => {
-            if (kind === "journal") setShowJournal(true);
-            else if (kind === "checkin") setShowCheckIn(true);
+          onNow={(item) => {
+            if (item.kind === "journal") setShowJournal(true);
+            else if (item.kind === "checkin") setShowCheckIn(true);
+            else if (item.kind === "ramp") {
+              document.getElementById(`ramp-${item.productId}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
           }}
         />
       </div>
@@ -2123,8 +2084,10 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
               // flattening pass; each product now reads as an editorial
               // section separated by hair rules from its neighbours.
               return (
+                // scrollMarginTop clears the sticky header when the Now
+                // card scrolls here.
+                <div key={p.id} id={`ramp-${p.id}`} style={{ scrollMarginTop: "calc(var(--space-16) + var(--space-4))" }}>
                 <IntroduceSlowlyCard
-                  key={p.id}
                   product={p}
                   schedule={schedule}
                   weekNumber={weekNumber}
@@ -2139,6 +2102,7 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
                   recentTrend={recentTrend}
                   schedulePaced={schedulePaced}
                 />
+                </div>
               );
             })
           ) : (

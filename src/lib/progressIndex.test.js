@@ -233,11 +233,73 @@ describe("buildProgressIndex", () => {
   });
 
   describe("ramp readiness", () => {
-    it("produces no ramp insight or ramp Now item (no readiness rule exists yet)", () => {
-      const rampProducts = [{ id: "p1", name: "Adapalene Gel", routineStartDate: "2026-08-01", rampWeek: 5, rampHeld: true }];
-      const index = buildProgressIndex({ journalEntries: entries("good", 1, 0), checkIns: [checkIn(-1)], rampProducts, today: TODAY });
+    // Week 2 of a product started 2026-09-07: today (09-20) is day 7 of it.
+    const adapalene = { id: "a", name: "Adapalene Gel", routineStartDate: "2026-09-07" };
+    const at = (day) => { const [y, m, d] = day.split("-").map(Number); return new Date(y, m - 1, d, 12).toISOString(); };
+    const rampCheckIn = (productId, state, day = "2026-09-16") => ({ product_id: productId, week_number: 2, response_state: state, created_at: at(day) });
+    const calm = [rampCheckIn("a", "no_reaction")];
+    // Today logged and a recent check-in, so nothing outranks the ramp item.
+    const upToDate = { journalEntries: entries("good", 1, 0), checkIns: [checkIn(-2)], today: TODAY };
+
+    it("makes a ready product the Now item and drops its insight", () => {
+      const index = buildProgressIndex({ ...upToDate, rampProducts: [adapalene], rampCheckins: calm });
+      expect(index.now).toEqual({ kind: "ramp", productId: "a", text: "Adapalene Gel is ready to advance" });
+      expect(index.insights).toEqual([]);
+    });
+
+    it("shows the insight when something higher-priority holds the Now card", () => {
+      const notLogged = buildProgressIndex({ ...upToDate, journalEntries: [], rampProducts: [adapalene], rampCheckins: calm });
+      expect(notLogged.now.kind).toBe("journal");
+      expect(notLogged.insights).toEqual(["Adapalene Gel has been calm for a week. Ready to advance."]);
+
+      const checkInDue = buildProgressIndex({ ...upToDate, checkIns: [checkIn(-9)], rampProducts: [adapalene], rampCheckins: calm });
+      expect(checkInDue.now.kind).toBe("checkin");
+      expect(checkInDue.insights).toEqual(["Adapalene Gel has been calm for a week. Ready to advance."]);
+    });
+
+    it("sits below the journal and check-in items in the Now order", () => {
+      const both = { rampProducts: [adapalene], rampCheckins: calm };
+      expect(buildProgressIndex({ ...upToDate, journalEntries: [], ...both }).now.kind).toBe("journal");
+      expect(buildProgressIndex({ ...upToDate, checkIns: [], ...both }).now.kind).toBe("checkin");
+      expect(buildProgressIndex({ ...upToDate, ...both }).now.kind).toBe("ramp");
+    });
+
+    it("says nothing when no product is ready", () => {
+      const irritated = [rampCheckIn("a", "mild_irritation")];
+      const index = buildProgressIndex({ ...upToDate, rampProducts: [adapalene], rampCheckins: irritated });
       expect(index.now).toBeNull();
       expect(index.insights).toEqual([]);
+    });
+
+    it("picks one product when several are ready: the one that started its ramp earliest", () => {
+      // Weeks are calendar-driven, so every ready product is on its 7th day
+      // at the week and the tie falls through to the earlier start.
+      const tretinoin = { id: "b", name: "Tretinoin", routineStartDate: "2026-08-31" }; // week 3, day 7
+      const checkIns = [rampCheckIn("a", "no_reaction"), { ...rampCheckIn("b", "loving_it"), week_number: 3 }];
+      const index = buildProgressIndex({ ...upToDate, rampProducts: [adapalene, tretinoin], rampCheckins: checkIns });
+      expect(index.now.productId).toBe("b");
+      expect(index.now.text).toBe("Tretinoin is ready to advance");
+    });
+
+    it("skips products that aren't ready when choosing", () => {
+      const notYet = { id: "c", name: "Glycolic Toner", routineStartDate: "2026-09-16" }; // day 5
+      const index = buildProgressIndex({ ...upToDate, rampProducts: [notYet, adapalene], rampCheckins: [...calm, rampCheckIn("c", "no_reaction")] });
+      expect(index.now.productId).toBe("a");
+    });
+
+    it("shortens long product names and keeps the sentence under ~70 characters", () => {
+      const long = { ...adapalene, name: "The Ordinary Granactive Retinoid 2% in Squalane" };
+      const index = buildProgressIndex({ ...upToDate, journalEntries: [], rampProducts: [long], rampCheckins: calm });
+      const [sentence] = index.insights;
+      expect(sentence).toMatch(/^The Ordinary Granactive R… has been calm/);
+      expect(sentence.length).toBeLessThanOrEqual(70);
+    });
+
+    it("falls back to a generic name and tolerates missing ramp data", () => {
+      const unnamed = { id: "a", routineStartDate: "2026-09-07" };
+      expect(buildProgressIndex({ ...upToDate, rampProducts: [unnamed], rampCheckins: calm }).now.text).toBe("Your product is ready to advance");
+      expect(() => buildProgressIndex({ ...upToDate, rampProducts: null, rampCheckins: null })).not.toThrow();
+      expect(buildProgressIndex({ ...upToDate, rampProducts: [adapalene] }).now).toBeNull();
     });
   });
 

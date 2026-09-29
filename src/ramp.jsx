@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Icon } from "./components.jsx";
 import { detectActives } from "./engine.js";
-import { daysBetweenLocal } from "./utils.jsx";
+import { daysBetweenLocal, toLocalMidnight } from "./utils.jsx";
 
 
 const RAMP_SCHEDULES = {
@@ -270,13 +270,98 @@ function getRampPhase(schedule, week) {
 // routineStartDate. Week 1 starts on the start date; each subsequent week
 // begins exactly 7 local days later. Falls back to stored rampWeek only
 // when no start date is set.
-function getRampWeek(product) {
+function getRampWeek(product, today = new Date()) {
   if (!product) return 1;
   if (product.routineStartDate) {
-    const days = daysBetweenLocal(product.routineStartDate);
+    const days = daysBetweenLocal(product.routineStartDate, today);
     return Math.max(1, Math.floor(days / 7) + 1);
   }
   return product.rampWeek || 1;
+}
+
+// Derive per-product suggestion signals from the ramp_checkins history.
+// This is the read-side counterpart to saveRampCheckin — the system
+// listens to what the user reports each week and surfaces a hint
+// rather than auto-changing pacing.
+//
+//   suggestHold — true when the most recent check-in FOR THE CURRENT
+//     WEEK reported irritation (mild_irritation) or a breakout. Only
+//     the current week is checked; older weeks are past guidance.
+//
+//   recentTrend — { consecutivePositive: N } — walk back from the
+//     current week counting how many consecutive weeks had a positive
+//     most-recent response (no_reaction or loving_it). Breaks on the
+//     first week with no entry or a non-positive entry. Not surfaced
+//     visually yet; kept accessible for future "safe to progress
+//     faster" logic.
+const NEGATIVE_RESPONSE_STATES = new Set(["breakout", "mild_irritation"]);
+const POSITIVE_RESPONSE_STATES = new Set(["no_reaction", "loving_it"]);
+
+function deriveRampSignals(rampCheckins, productId, currentWeek) {
+  const empty = { suggestHold: false, recentTrend: { consecutivePositive: 0 } };
+  if (!Array.isArray(rampCheckins) || !productId || !currentWeek) return empty;
+  const forProduct = rampCheckins.filter(c => c && c.product_id === productId);
+  if (forProduct.length === 0) return empty;
+  const sortDesc = (a, b) => String(b?.created_at || "").localeCompare(String(a?.created_at || ""));
+
+  const mostRecentThisWeek = forProduct
+    .filter(c => c.week_number === currentWeek)
+    .sort(sortDesc)[0] || null;
+  const suggestHold = !!mostRecentThisWeek && NEGATIVE_RESPONSE_STATES.has(mostRecentThisWeek.response_state);
+
+  let consecutivePositive = 0;
+  for (let w = currentWeek; w >= 1; w--) {
+    const latest = forProduct.filter(c => c.week_number === w).sort(sortDesc)[0];
+    if (latest && POSITIVE_RESPONSE_STATES.has(latest.response_state)) {
+      consecutivePositive++;
+    } else {
+      break;
+    }
+  }
+
+  return { suggestHold, recentTrend: { consecutivePositive } };
+}
+
+// Days the product has been on its current ramp week, counting today
+// (day 1 of a week is the day it starts, day 7 the last day before the
+// calendar rolls it into the next). null without a usable start date, or
+// before the start.
+function getRampDaysAtWeek(product, today = new Date()) {
+  if (!product?.routineStartDate) return null;
+  const days = daysBetweenLocal(product.routineStartDate, today);
+  if (days < 0) return null;
+  return days - 7 * Math.floor(days / 7) + 1;
+}
+
+// Whether a product's skin has handled its current week well enough to
+// advance. `checkIns` are the ramp_checkins rows ({ product_id,
+// week_number, response_state, created_at }). Ready only when ALL hold:
+//   1. at least 7 days at the current week (today counts, so this is the
+//      week's 7th day — weeks are calendar-driven and roll over after it);
+//   2. at least one of this product's check-ins during that stretch;
+//   3. none of the check-ins in the stretch reported irritation
+//      (mild_irritation);
+//   4. deriveRampSignals' suggestHold is false (the most recent check-in
+//      for the current week isn't a breakout or irritation).
+const READY_MIN_DAYS_AT_WEEK = 7;
+
+function isReadyToAdvance(product, checkIns, today = new Date()) {
+  if (!product?.id) return false;
+  const daysAtWeek = getRampDaysAtWeek(product, today);
+  if (daysAtWeek == null || daysAtWeek < READY_MIN_DAYS_AT_WEEK) return false;
+
+  // The stretch: from local midnight of the current week's first day.
+  const weekStart = new Date(toLocalMidnight(today));
+  weekStart.setDate(weekStart.getDate() - (daysAtWeek - 1));
+  const stretchStartMs = weekStart.getTime();
+
+  const inStretch = (Array.isArray(checkIns) ? checkIns : []).filter(c =>
+    c?.product_id === product.id && Date.parse(c.created_at) >= stretchStartMs
+  );
+  if (inStretch.length === 0) return false;
+  if (inStretch.some(c => c.response_state === "mild_irritation")) return false;
+
+  return !deriveRampSignals(checkIns, product.id, getRampWeek(product, today)).suggestHold;
 }
 
 function formatStartedLabel(iso) {
@@ -1061,4 +1146,4 @@ function WeeklyRitualCalendar({ rampProducts, products }) {
 
 // --- PROGRESS ----------------------------------------------------------------
 
-export { RAMP_SCHEDULES, RAMP_ACTIVES, IntroduceSlowlyCard, WeeklyRitualCalendar, getRampWeek, getRampPhase, getRampSchedule, isSchedulePaced };
+export { RAMP_SCHEDULES, RAMP_ACTIVES, IntroduceSlowlyCard, WeeklyRitualCalendar, getRampWeek, getRampPhase, getRampSchedule, isSchedulePaced, deriveRampSignals, getRampDaysAtWeek, isReadyToAdvance };

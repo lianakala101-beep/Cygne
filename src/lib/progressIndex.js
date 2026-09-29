@@ -5,15 +5,14 @@
 // Dates compare as "YYYY-MM-DD" strings (journal `date`, or the date part
 // of a check-in's ISO timestamp).
 //
-// Ramp readiness is intentionally absent. ramp.jsx / progress.jsx have no
-// "ready to advance" rule (advancing is a manual choice; the only derived
-// signal is suggestHold), so neither the ramp insight nor the ramp Now
-// item is produced. `rampProducts` is accepted for the call signature
-// and currently unused.
+// Ramp readiness comes from isReadyToAdvance in src/ramp.jsx; this file
+// only picks the product and words it. `checkIns` are the skin check-ins;
+// `rampCheckins` are the per-product Introduce Slowly ramp_checkins rows.
 
 import { MAX_CYCLE_DAY, computeCycleDay, estimateCycleDayForDate } from "./cycle.js";
 import { scalePhases, toDateKey, addDays, latestEntryByDate } from "./cycleRing.js";
 import { withLegacyTodayTolerance } from "./journal.js";
+import { isReadyToAdvance, getRampDaysAtWeek } from "../ramp.jsx";
 
 const CONDITION_SCORE = { glowing: 2, good: 1, okay: 0, dull: -1, rough: -2 };
 const TREND_WINDOW = 7;
@@ -24,6 +23,9 @@ const BREAKOUT_WINDOW_DAYS = 90;
 const BREAKOUT_MIN = 3;
 const PHASE_SHARE = 0.6;
 const ZONE_SHARE = 0.5;
+
+// Keeps "<name> has been calm for a week. Ready to advance." within ~70 characters.
+const MAX_PRODUCT_NAME = 26;
 
 const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -115,12 +117,31 @@ function breakoutPatternInsight({ checkIns, todayKey, cycleStartKey, cycleLength
   return `${subject} clustered in your ${topPhase.toLowerCase()} phase lately.`;
 }
 
+// --- Ramp readiness ----------------------------------------------------------
+
+const shortName = (name) => {
+  const n = String(name || "").trim() || "Your product";
+  return n.length > MAX_PRODUCT_NAME ? `${n.slice(0, MAX_PRODUCT_NAME - 1).trimEnd()}…` : n;
+};
+
+// The ready product to talk about: the one longest at its current week,
+// then the one that started its ramp earliest, then list order.
+function pickReadyProduct(rampProducts, rampCheckins, today) {
+  const ready = rampProducts
+    .map((product, order) => ({ product, order }))
+    .filter(({ product }) => isReadyToAdvance(product, rampCheckins, today))
+    .map(({ product, order }) => ({ product, order, days: getRampDaysAtWeek(product, today), start: String(product.routineStartDate).split("T")[0] }));
+  ready.sort((a, b) => b.days - a.days || a.start.localeCompare(b.start) || a.order - b.order);
+  return ready[0]?.product || null;
+}
+
 // --- Builder ---------------------------------------------------------------
 
 export function buildProgressIndex({
   journalEntries = [],
   checkIns = [],
-  rampProducts = [], // eslint-disable-line no-unused-vars -- see header: no readiness rule exists
+  rampProducts = [],
+  rampCheckins = [],
   cycleStartDate = null,
   cycleLength = 28,
   cycleTrackingOn = false,
@@ -144,11 +165,15 @@ export function buildProgressIndex({
 
   const loggedToday = byDate.has(todayKey);
 
+  const readyProduct = pickReadyProduct(Array.isArray(rampProducts) ? rampProducts : [], rampCheckins, today);
+
   const now = !loggedToday
     ? { kind: "journal", text: "Log today's skin" }
     : checkInDue
       ? { kind: "checkin", text: "Weekly check-in due" }
-      : null;
+      : readyProduct
+        ? { kind: "ramp", productId: readyProduct.id, text: `${shortName(readyProduct.name)} is ready to advance` }
+        : null;
 
   // The Next pill shows the weekly check-in outside cycle mode. When the
   // Now card already says the check-in is due, drop that pill so it isn't
@@ -159,8 +184,10 @@ export function buildProgressIndex({
 
   const pills = [skinTrendPill(byDate, todayKey), nextPill].filter(Boolean);
 
+  // The ramp insight is dropped when the Now card already says it.
   const insights = [
     cycleDay != null ? breakoutPatternInsight({ checkIns: checks, todayKey, cycleStartKey, cycleLength: len, phases }) : null,
+    readyProduct && now?.kind !== "ramp" ? `${shortName(readyProduct.name)} has been calm for a week. Ready to advance.` : null,
   ].filter(Boolean);
 
   return { pills, insights, now };

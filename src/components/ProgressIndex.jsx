@@ -49,7 +49,7 @@ export function ProgressIndex({ index, onNow }) {
       {now && (
         <button
           type="button"
-          onClick={() => onNow?.(now.kind)}
+          onClick={() => onNow?.(now)}
           style={{
             display: "flex", alignItems: "center", justifyContent: "space-between", gap: "var(--space-3)",
             width: "100%", padding: "var(--space-4) var(--space-5)",
