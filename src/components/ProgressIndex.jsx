@@ -3,6 +3,27 @@
 // "Now" card. Data comes from buildProgressIndex in src/lib/progressIndex.js.
 
 import { Icon } from "../components.jsx";
+import { glassCard } from "../lib/ui.js";
+
+// The Now card is one of exactly two solid-ivory-family surfaces left
+// after the softening pass (the other is the primary action pill) —
+// everything else on the moss canvas is glass. "veil" is the glass
+// alternative, kept behind this single flag so it can be previewed
+// without touching layout, copy, or behavior anywhere else.
+const NOW_CARD_STYLE = "pearl"; // "pearl" | "veil"
+
+const NOW_CARD_VARIANTS = {
+  pearl: {
+    card: { background: "var(--color-pearl)", borderRadius: "var(--radius-card)", boxShadow: "var(--shadow-card)" },
+    textColor: "var(--color-inky-moss)",
+    eyebrowColor: "var(--color-bronze)",
+  },
+  veil: {
+    card: glassCard,
+    textColor: "var(--color-ivory)",
+    eyebrowColor: "var(--color-gold)",
+  },
+};
 
 function Pill({ label, value }) {
   return (
@@ -46,28 +67,32 @@ export function ProgressIndex({ index, onNow }) {
         </div>
       )}
 
-      {now && (
-        <button
-          type="button"
-          onClick={() => onNow?.(now)}
-          style={{
-            display: "flex", alignItems: "center", justifyContent: "space-between", gap: "var(--space-3)",
-            width: "100%", padding: "var(--space-4) var(--space-5)",
-            background: "rgba(var(--rgb-ivory), 0.94)", border: "none", borderRadius: "var(--radius)",
-            color: "var(--color-inky-moss)", textAlign: "left", cursor: "pointer",
-            WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
-          }}
-        >
-          <span style={{ display: "flex", flexDirection: "column", gap: "var(--space-1)", minWidth: 0 }}>
-            <span style={{
-              fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)",
-              textTransform: "uppercase", color: "var(--color-bronze)",
-            }}>Now</span>
-            <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-md)", color: "var(--color-inky-moss)" }}>{now.text}</span>
-          </span>
-          <span aria-hidden="true" style={{ display: "inline-flex", flexShrink: 0 }}><Icon name="arrow-right" size={16} /></span>
-        </button>
-      )}
+      {now && (() => {
+        const variant = NOW_CARD_VARIANTS[NOW_CARD_STYLE] || NOW_CARD_VARIANTS.pearl;
+        return (
+          <button
+            type="button"
+            onClick={() => onNow?.(now)}
+            style={{
+              display: "flex", alignItems: "center", justifyContent: "space-between", gap: "var(--space-3)",
+              width: "100%", padding: "var(--space-4) var(--space-5)",
+              border: "none",
+              ...variant.card,
+              color: variant.textColor, textAlign: "left", cursor: "pointer",
+              WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
+            }}
+          >
+            <span style={{ display: "flex", flexDirection: "column", gap: "var(--space-1)", minWidth: 0 }}>
+              <span style={{
+                fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)",
+                textTransform: "uppercase", color: variant.eyebrowColor,
+              }}>Now</span>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-md)", color: variant.textColor }}>{now.text}</span>
+            </span>
+            <span aria-hidden="true" style={{ display: "inline-flex", flexShrink: 0 }}><Icon name="arrow-right" size={16} /></span>
+          </button>
+        );
+      })()}
     </div>
   );
 }

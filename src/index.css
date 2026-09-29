@@ -45,6 +45,10 @@
   /* Backgrounds */
   --color-ivory: #faf9f4;
   --color-ivory-shadow: #f0ebe0;
+  /* Pearl — the ONE solid-ivory surface family left standing after the
+     softening pass (the Now card's default style, and the primary
+     action pill). Everything else on the moss canvas is glass. */
+  --color-pearl: #f4f0e6;
 
   /* Text */
   --color-ink: #1c1c1a;
@@ -97,8 +101,13 @@
 
   /* Radius */
   --radius: 12px;
+  --radius-card: 16px;
   --radius-sheet: 20px 20px 0 0;
   --radius-pill: 999px;
+
+  /* Shadow — used only by solid-surface cards (the Now card's pearl
+     style); glass cards don't cast one. */
+  --shadow-card: 0 8px 24px rgba(var(--rgb-ink), 0.18);
 
   /* Tracking */
   --tracking-label: 0.12em;
