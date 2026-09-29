@@ -1269,7 +1269,7 @@ function buildBodyShelfAdvice(zones, products, activeMap) {
   return { gaps, doubles };
 }
 
-function BodyAcneTracker({ products: productsProp = [], activeMap, user = {}, onUpdateUser = () => {}, triggerLog: triggerLogProp = [], setTriggerLog = () => {} }) {
+function BodyAcneTracker({ products: productsProp = [], activeMap, user = {}, onUpdateUser = () => {}, triggerLog: triggerLogProp = [], setTriggerLog = () => {}, forceZonesExpanded = false, hideZonesHeader = false }) {
   const products   = Array.isArray(productsProp)   ? productsProp   : [];
   const triggerLog = Array.isArray(triggerLogProp) ? triggerLogProp : [];
   const enabled = user.bodyAcneEnabled || false;
@@ -1280,8 +1280,11 @@ function BodyAcneTracker({ products: productsProp = [], activeMap, user = {}, on
   const [expandedZone, setExpandedZone] = useState(null);
   // Body Acne section owns two independent collapsible rows on the dark
   // canvas: Log Today's Triggers (opens the modal sheet) and Body Acne
-  // (expands the zone selector). Both default closed.
-  const [zonesExpanded, setZonesExpanded] = useState(false);
+  // (expands the zone selector). Both default closed — except inside
+  // the Body tracker sheet, where the caller renders it pre-expanded
+  // with this second header hidden (forceZonesExpanded/hideZonesHeader),
+  // since the sheet's own title already says "Body".
+  const [zonesExpanded, setZonesExpanded] = useState(forceZonesExpanded);
 
   const { gaps, doubles } = buildBodyShelfAdvice(zones, products, activeMap);
 
@@ -1339,6 +1342,7 @@ function BodyAcneTracker({ products: productsProp = [], activeMap, user = {}, on
       {/* Row 2 — BODY ACNE. Tap toggles the zone selector and the rest of
           the section. Shares its top hairline with Row 1 above via
           marginTop: -1. */}
+      {!hideZonesHeader && (
       <button onClick={() => setZonesExpanded(o => !o)}
         aria-expanded={zonesExpanded}
         style={{
@@ -1362,6 +1366,7 @@ function BodyAcneTracker({ products: productsProp = [], activeMap, user = {}, on
           <Icon name="chevron" size={13} />
         </span>
       </button>
+      )}
 
       {zonesExpanded && (
       <div style={{ paddingTop: "var(--space-4)" }}>
@@ -1904,290 +1909,6 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
         <TrackerGrid attention={trackerAttention} onOpen={setOpenSheet} introduceDimmed={introduceDimmed} />
       </div>
 
-      {/* -- Skin Journal ------------------------------------------------------ */}
-      <SectionShell text="Your Journal" tone="dark">
-      {(() => {
-        const today = localDateKey();
-        const todayEntry = journals.find(j => j.date === today);
-        const pastEntries = [...journals].filter(j => j.date !== today).sort((a, b) => b.date.localeCompare(a.date));
-        const visiblePast = pastEntries.slice(0, 3);
-        const cond = todayEntry ? SKIN_CONDITIONS.find(c => c.key === todayEntry.condition) : null;
-        return (
-          <div>
-            {/* Today's featured card */}
-            {!todayEntry ? (
-              <button onClick={() => setShowJournal(true)}
-                style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "var(--space-4) var(--space-5)", background: "rgba(var(--rgb-moss), 0.08)", border: "1px solid rgba(var(--rgb-moss), 0.16)", borderRadius: "var(--radius)", cursor: "pointer" }}>
-                <div style={{ textAlign: "left" }}>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 var(--space-1)" }}>Skin Journal</p>
-                  <p style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-md)", fontWeight: 400, letterSpacing: "var(--tracking-label)", color: "var(--parchment)", margin: 0 }}>How is your skin today?</p>
-                </div>
-                <span aria-hidden="true" style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 400, color: "var(--color-ivory, #faf9f4)", lineHeight: 1 }}>→</span>
-              </button>
-            ) : (
-              <div onClick={() => setShowJournal(true)}
-                style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "var(--space-3) var(--space-5)", background: "var(--color-ivory-shadow)", border: "none", borderRadius: "var(--radius)", cursor: "pointer" }}>
-                <div>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 var(--space-1)" }}>Today</p>
-                  <p style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-md)", fontWeight: 400, letterSpacing: "var(--tracking-label)", color: cond ? cond.color : "var(--parchment)", margin: 0 }}>{cond ? cond.label : todayEntry.condition}</p>
-                </div>
-                <div style={{ display: "flex", gap: "var(--space-2)" }}>
-                  {todayEntry.sleep && <span style={{ fontSize: "var(--text-xs)", fontFamily: "var(--font-body)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--clay)", background: "var(--ink)", padding: "var(--space-1) var(--space-2)", borderRadius: "var(--radius-pill)" }}>Sleep {todayEntry.sleep}</span>}
-                  {todayEntry.stress && <span style={{ fontSize: "var(--text-xs)", fontFamily: "var(--font-body)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--clay)", background: "var(--ink)", padding: "var(--space-1) var(--space-2)", borderRadius: "var(--radius-pill)" }}>Stress {todayEntry.stress}</span>}
-                </div>
-              </div>
-            )}
-
-            {/* Previous entries (max 3) */}
-            {visiblePast.length > 0 && (
-              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)", margin: "var(--space-4) 0 var(--space-2)", opacity: 0.7 }}>Previous entries</p>
-            )}
-            {visiblePast.map(j => {
-              const c = SKIN_CONDITIONS.find(x => x.key === j.condition);
-              const d = new Date(j.date + "T12:00:00");
-              const label = d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
-              return (
-                <div key={j.date} style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", padding: "var(--space-3) var(--space-5)", background: "var(--color-ivory-shadow)", border: "none", marginTop: -1, borderRadius: 0 }}>
-                  <div style={{ width: 7, height: 7, borderRadius: "50%", background: c ? c.color : "var(--clay)", flexShrink: 0 }} />
-                  <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", flex: 1 }}>{label}</span>
-                  <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: c ? c.color : "var(--parchment)", fontWeight: 400 }}>{c ? c.label : j.condition}</span>
-                  {j.notes && <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", opacity: 0.5, maxWidth: 80, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{j.notes}</span>}
-                </div>
-              );
-            })}
-
-            {/* View all link — arrow-only affordance, text left, arrow flush right */}
-            {pastEntries.length > 0 && (
-              <button onClick={() => setJournalFullView(true)}
-                style={{ width: "100%", padding: "var(--space-3) var(--space-5)", background: "var(--color-ivory-shadow)", border: "none", borderTop: "none", marginTop: -1, borderRadius: "0 0 var(--radius) var(--radius)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)" }}>
-                <span>All {journals.length} entries</span>
-                <span aria-hidden="true" style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 400, lineHeight: 1 }}>→</span>
-              </button>
-            )}
-          </div>
-        );
-      })()}
-      </SectionShell>
-
-      {/* -- Ritual Check-in ---------------------------------------------------- */}
-      <SectionShell text="Ritual Check-in" tone="ivory" showRule={false}>
-      {/* Editorial line-item treatment — no bordered box; content sits
-          above a single closing hair rule, matching the dashboard's
-          Ask Cygne row. Divider color inverts the home page's
-          ivory-alpha 25% to ink-alpha 25% for readable contrast on the
-          ivory band. No leading rule / eyebrow label here — the
-          SectionShell header directly above already says "Ritual
-          Check-in"; repeating it as a smaller label with its own rule
-          between the two was pure duplication. */}
-      {dueCheckin ? (
-        <button onClick={() => setShowCheckIn(true)}
-          style={{
-            width: "100%",
-            display: "flex", alignItems: "center", justifyContent: "space-between",
-            padding: "var(--space-5) 0",
-            background: "transparent",
-            border: "none",
-            borderBottom: "1px solid rgba(var(--rgb-ink), 0.32)",
-            cursor: "pointer", textAlign: "left",
-            WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
-          }}>
-          <div>
-            <p style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-md)", fontWeight: 400, letterSpacing: "var(--tracking-label)", color: "var(--color-ink)", margin: "0 0 var(--space-1)", lineHeight: 1 }}>How did your skin respond?</p>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-stone)", margin: 0 }}>
-              {daysSince === null ? "Log your first check-in to start tracking." : "Last check-in " + daysSince + " day" + (daysSince !== 1 ? "s" : "") + " ago."}
-            </p>
-          </div>
-          <span aria-hidden="true" style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 400, color: "var(--color-ink)", flexShrink: 0, marginLeft: "var(--space-3)", lineHeight: 1 }}>→</span>
-        </button>
-      ) : (
-        <div style={{
-          display: "flex", alignItems: "center", gap: "var(--space-3)",
-          padding: "var(--space-4) 0",
-          background: "transparent",
-          border: "none",
-          borderBottom: "1px solid rgba(var(--rgb-ink), 0.32)",
-        }}>
-          <div style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--color-inky-moss)", flexShrink: 0 }} />
-          <div style={{ flex: 1 }}>
-            <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-ink)" }}>
-              Checked in {daysSince === 0 ? "today" : daysSince + " day" + (daysSince !== 1 ? "s" : "") + " ago"}
-            </span>
-            {lastCheckIn && lastCheckIn.irritation && lastCheckIn.irritation !== "none" && (
-              <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-stone)", marginLeft: "var(--space-2)", opacity: 0.85 }}>{lastCheckIn.irritation} irritation</span>
-            )}
-          </div>
-          <button onClick={() => setShowCheckIn(true)} aria-label="Update check-in" style={{ display: "inline-flex", alignItems: "center", fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 400, color: "var(--color-ink)", background: "none", border: "none", padding: 0, cursor: "pointer", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent", lineHeight: 1 }}>→</button>
-        </div>
-      )}
-      </SectionShell>
-
-      {/* -- Inflammation Heat Map + Hero Consistency Number ---------------- */}
-      <SectionShell text="Inflammation Map" tone="dark" showRule={false}>
-      <div style={{ marginBottom: consistencyPct !== null ? "var(--space-6)" : 0 }}>
-        <FaceHeatMap checkIns={checkIns} onAskCygne={(q, ctx) => setAskCygneQuestion({ q, ctx })} />
-      </div>
-
-      {/* Hero number treatment — centered pull-quote composition
-          matching the home page's seasonal / weekend headline blocks
-          (32px vertical padding, stacked eyebrow-under-headline reading
-          order). The label sits BELOW the numeral in Fungis caps so the
-          numeral carries the moment and "RITUAL HEALTH" identifies it
-          without competing for the horizontal axis. */}
-      {consistencyPct !== null && (
-        <div style={{ padding: "var(--space-8) 0", textAlign: "center" }}>
-          <div style={{
-            fontFamily: "var(--font-display)",
-            fontSize: 112, fontWeight: 700,
-            letterSpacing: "-0.02em",
-            color: "var(--color-ivory, #faf9f4)",
-            lineHeight: 0.92,
-            margin: 0,
-          }}>{consistencyPct}</div>
-          <div style={{
-            fontFamily: "var(--font-display)", fontWeight: 700,
-            fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
-            color: "var(--color-ivory, #faf9f4)", opacity: 0.7,
-            marginTop: "var(--space-5)",
-          }}>Ritual Health</div>
-          <div style={{
-            height: 1, background: "rgba(var(--rgb-ivory), 0.32)",
-            margin: "var(--space-6) auto var(--space-4)",
-            maxWidth: 220,
-            position: "relative",
-          }}>
-            <div style={{
-              width: consistencyPct + "%", height: 1,
-              background: "var(--color-ivory, #faf9f4)",
-              transition: "width 0.6s ease",
-            }} />
-          </div>
-          <div style={{
-            fontFamily: "var(--font-body)", fontSize: "var(--text-xs)",
-            letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
-            color: "var(--color-ivory, #faf9f4)", opacity: 0.6,
-            marginBottom: "var(--space-4)",
-          }}>From {checkIns.length} check-in{checkIns.length !== 1 ? "s" : ""}</div>
-          <p style={{
-            fontFamily: "var(--font-body)", fontSize: "var(--text-xs)",
-            color: "var(--color-ivory, #faf9f4)", opacity: 0.82,
-            margin: "0 auto", lineHeight: 1.65,
-            maxWidth: 320,
-          }}>
-            {consistencyPct >= 85 ? "Strong adherence — your ritual is building compounding benefit." :
-             consistencyPct >= 70 ? "Mostly consistent. Fewer irritation days will improve this score." :
-             "Irregularity detected. Consistent application is what drives visible results."}
-          </p>
-        </div>
-      )}
-      </SectionShell>
-
-      {/* -- Introduce Slowly (hidden during Acute recovery; empty state otherwise) */}
-      {/acute/i.test(pausePhase?.label) ? (
-        <SectionShell text="Introduce Slowly" tone="ivory" showRule={false}>
-          <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", color: "var(--color-stone)", textAlign: "center", margin: "var(--space-4) 0" }}>
-            Paused while you recover.
-          </p>
-        </SectionShell>
-      ) : (
-        <SectionShell text="Introduce Slowly" tone="ivory" showRule={false}>
-          {reintroActives.length > 0 && pauseTreatment && pausePhase && (
-            <div style={{
-              padding: "var(--space-4) 0",
-              borderTop: "1px solid rgba(var(--rgb-ink), 0.32)",
-              borderBottom: "1px solid rgba(var(--rgb-ink), 0.32)",
-              marginBottom: "var(--space-2)",
-            }}>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--color-inky-moss)", margin: "0 0 var(--space-1)" }}>Reintroducing after recovery</p>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-ink)", margin: 0, lineHeight: 1.55 }}>
-                You're in the {pausePhase.label.toLowerCase()} phase. {reintroActives.join(", ")} can return — but build slowly from week 1 to avoid overwhelming skin that's still settling.
-              </p>
-            </div>
-          )}
-          {rampProducts.length > 0 ? (
-            rampProducts.map((p, i) => {
-              const activeKey = p.category === "Toning Pad"
-                ? "toning pad"
-                : RAMP_ACTIVES.find(a => detectActives(p.ingredients || [])[a]);
-              // Concern-aware schedule — sensitivity-tier users get
-              // an extended timeline via getRampSchedule. schedulePaced
-              // tells the card to surface a soft "paced more gradually"
-              // caption so the user understands why the shape differs
-              // from the standard schedule.
-              const schedule = getRampSchedule(activeKey, user?.concerns);
-              if (!schedule) return null;
-              const schedulePaced = isSchedulePaced(user?.concerns);
-              const weekNumber = getRampWeek(p);
-              const checkinDue = weekNumber > (p.lastCheckinWeek || 0);
-              // Derive per-product suggestion signals from the
-              // ramp_checkins history hydrated by App.jsx and merge
-              // with the global cycle-phase signal. Cycle only counts
-              // when there's an active check-in context for this
-              // week — either the check-in is due, or the user
-              // submitted for this exact week already. Both signals
-              // combine into a single message per card via
-              // buildHoldSuggestion.
-              const { suggestHold: checkinSuggestsHold, recentTrend } = deriveRampSignals(rampCheckins, p.id, weekNumber);
-              const activeCheckinContext = checkinDue || (Number(p.lastCheckinWeek) === weekNumber);
-              const holdSuggestion = buildHoldSuggestion({
-                fromCheckin: checkinSuggestsHold,
-                fromCycle: cycleSuggestsHold && activeCheckinContext,
-              });
-              // Single combined card per product — the check-in flow
-              // renders inline inside IntroduceSlowlyCard when checkinDue
-              // is true. Card outer container was removed in the ivory
-              // flattening pass; each product now reads as an editorial
-              // section separated by hair rules from its neighbours.
-              return (
-                // scrollMarginTop clears the sticky header when the Now
-                // card scrolls here.
-                <div key={p.id} id={`ramp-${p.id}`} style={{ scrollMarginTop: "calc(var(--space-16) + var(--space-4))" }}>
-                <IntroduceSlowlyCard
-                  product={p}
-                  schedule={schedule}
-                  weekNumber={weekNumber}
-                  onResetStart={onResetRampStart}
-                  onAdvance={onAdvanceRamp}
-                  onHold={onHoldRamp}
-                  checkinDue={checkinDue}
-                  onCheckinSave={(responseState, note) => onRampCheckinSave(p.id, weekNumber, responseState, note)}
-                  onCheckinDone={() => onRampCheckinDone(p.id, weekNumber)}
-                  isLast={i === rampProducts.length - 1}
-                  holdSuggestion={holdSuggestion}
-                  recentTrend={recentTrend}
-                  schedulePaced={schedulePaced}
-                />
-                </div>
-              );
-            })
-          ) : (
-            <div style={{
-              padding: "var(--space-4) 0",
-              borderTop: "1px solid rgba(var(--rgb-ink), 0.32)",
-              borderBottom: "1px solid rgba(var(--rgb-ink), 0.32)",
-            }}>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-stone)", margin: 0, lineHeight: 1.65 }}>
-                Nothing in ramp-up yet. Add a retinol, AHA, BHA, vitamin C, or toning pad to your vanity and Cygne will walk you through its introduction here.
-              </p>
-            </div>
-          )}
-        </SectionShell>
-      )}
-
-      {/* -- Treatments --------------------------------------------------------- */}
-      <SectionShell text="Treatments" tone="dark">
-        <TreatmentSection treatments={treatments} saveTreatment={saveTreatment} removeTreatment={removeTreatment} updateTreatmentDate={updateTreatmentDate} products={products} activeMap={activeMap} />
-      </SectionShell>
-
-      {/* -- Body Acne — owns its own collapsible header inside the tracker */}
-      <div style={{ marginBottom: "calc(var(--space-1) * 7)" }}>
-        <BodyAcneTracker products={products} activeMap={activeMap} user={user} onUpdateUser={onUpdateUser} triggerLog={triggerLog} setTriggerLog={setTriggerLog} />
-      </div>
-
-      {/* -- Cycle Tracking ---------------------------------------------------- */}
-      <SectionShell text="Cycle Tracking" tone="ivory" bottom="var(--space-5)" showRule={false}>
-        <CycleTracker products={products} activeMap={activeMap} cycleDay={user && user.cycleDay ? user.cycleDay : 14} onSetCycleDay={d => onUpdateUser && onUpdateUser({ ...user, cycleDay: d })} user={user} onUpdateUser={onUpdateUser} />
-      </SectionShell>
-
       {showCheckIn && (
         <CheckInModal
           onSubmit={data => { setCheckIns(p => [...p, data]); setShowCheckIn(false); }}
@@ -2229,13 +1950,292 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
       )}
 
       {/* -- Tracker detail sheets ------------------------------------------ */}
-      {/* Placeholder bodies for now — Phase 3b moves each existing section's
-          real content in here unchanged. */}
+      {/* Each case below is the exact same SectionShell-wrapped JSX that
+          used to render inline on the page — only the wrapper (a sheet
+          instead of a stacked page section) changed. */}
       {openSheet && (
         <DetailSheet title={SHEET_TITLES[openSheet]} onClose={() => setOpenSheet(null)}>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "var(--color-ivory)", opacity: 0.6, margin: "var(--space-6) 0 0" }}>
-            {SHEET_TITLES[openSheet]} content coming here.
-          </p>
+          {openSheet === "journal" && (
+            <>
+              {/* Ritual Check-in sits directly above Your Journal, per spec. */}
+              <SectionShell text="Ritual Check-in" tone="ivory" showRule={false}>
+              {dueCheckin ? (
+                <button onClick={() => setShowCheckIn(true)}
+                  style={{
+                    width: "100%",
+                    display: "flex", alignItems: "center", justifyContent: "space-between",
+                    padding: "var(--space-5) 0",
+                    background: "transparent",
+                    border: "none",
+                    borderBottom: "1px solid rgba(var(--rgb-ink), 0.32)",
+                    cursor: "pointer", textAlign: "left",
+                    WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
+                  }}>
+                  <div>
+                    <p style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-md)", fontWeight: 400, letterSpacing: "var(--tracking-label)", color: "var(--color-ink)", margin: "0 0 var(--space-1)", lineHeight: 1 }}>How did your skin respond?</p>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-stone)", margin: 0 }}>
+                      {daysSince === null ? "Log your first check-in to start tracking." : "Last check-in " + daysSince + " day" + (daysSince !== 1 ? "s" : "") + " ago."}
+                    </p>
+                  </div>
+                  <span aria-hidden="true" style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 400, color: "var(--color-ink)", flexShrink: 0, marginLeft: "var(--space-3)", lineHeight: 1 }}>→</span>
+                </button>
+              ) : (
+                <div style={{
+                  display: "flex", alignItems: "center", gap: "var(--space-3)",
+                  padding: "var(--space-4) 0",
+                  background: "transparent",
+                  border: "none",
+                  borderBottom: "1px solid rgba(var(--rgb-ink), 0.32)",
+                }}>
+                  <div style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--color-inky-moss)", flexShrink: 0 }} />
+                  <div style={{ flex: 1 }}>
+                    <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-ink)" }}>
+                      Checked in {daysSince === 0 ? "today" : daysSince + " day" + (daysSince !== 1 ? "s" : "") + " ago"}
+                    </span>
+                    {lastCheckIn && lastCheckIn.irritation && lastCheckIn.irritation !== "none" && (
+                      <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-stone)", marginLeft: "var(--space-2)", opacity: 0.85 }}>{lastCheckIn.irritation} irritation</span>
+                    )}
+                  </div>
+                  <button onClick={() => setShowCheckIn(true)} aria-label="Update check-in" style={{ display: "inline-flex", alignItems: "center", fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 400, color: "var(--color-ink)", background: "none", border: "none", padding: 0, cursor: "pointer", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent", lineHeight: 1 }}>→</button>
+                </div>
+              )}
+              </SectionShell>
+
+              <SectionShell text="Your Journal" tone="dark">
+              {(() => {
+                const today = localDateKey();
+                const todayEntry = journals.find(j => j.date === today);
+                const pastEntries = [...journals].filter(j => j.date !== today).sort((a, b) => b.date.localeCompare(a.date));
+                const visiblePast = pastEntries.slice(0, 3);
+                const cond = todayEntry ? SKIN_CONDITIONS.find(c => c.key === todayEntry.condition) : null;
+                return (
+                  <div>
+                    {/* Today's featured card */}
+                    {!todayEntry ? (
+                      <button onClick={() => setShowJournal(true)}
+                        style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "var(--space-4) var(--space-5)", background: "rgba(var(--rgb-moss), 0.08)", border: "1px solid rgba(var(--rgb-moss), 0.16)", borderRadius: "var(--radius)", cursor: "pointer" }}>
+                        <div style={{ textAlign: "left" }}>
+                          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 var(--space-1)" }}>Skin Journal</p>
+                          <p style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-md)", fontWeight: 400, letterSpacing: "var(--tracking-label)", color: "var(--parchment)", margin: 0 }}>How is your skin today?</p>
+                        </div>
+                        <span aria-hidden="true" style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 400, color: "var(--color-ivory, #faf9f4)", lineHeight: 1 }}>→</span>
+                      </button>
+                    ) : (
+                      <div onClick={() => setShowJournal(true)}
+                        style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "var(--space-3) var(--space-5)", background: "var(--color-ivory-shadow)", border: "none", borderRadius: "var(--radius)", cursor: "pointer" }}>
+                        <div>
+                          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 var(--space-1)" }}>Today</p>
+                          <p style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-md)", fontWeight: 400, letterSpacing: "var(--tracking-label)", color: cond ? cond.color : "var(--parchment)", margin: 0 }}>{cond ? cond.label : todayEntry.condition}</p>
+                        </div>
+                        <div style={{ display: "flex", gap: "var(--space-2)" }}>
+                          {todayEntry.sleep && <span style={{ fontSize: "var(--text-xs)", fontFamily: "var(--font-body)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--clay)", background: "var(--ink)", padding: "var(--space-1) var(--space-2)", borderRadius: "var(--radius-pill)" }}>Sleep {todayEntry.sleep}</span>}
+                          {todayEntry.stress && <span style={{ fontSize: "var(--text-xs)", fontFamily: "var(--font-body)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--clay)", background: "var(--ink)", padding: "var(--space-1) var(--space-2)", borderRadius: "var(--radius-pill)" }}>Stress {todayEntry.stress}</span>}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Previous entries (max 3) */}
+                    {visiblePast.length > 0 && (
+                      <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)", margin: "var(--space-4) 0 var(--space-2)", opacity: 0.7 }}>Previous entries</p>
+                    )}
+                    {visiblePast.map(j => {
+                      const c = SKIN_CONDITIONS.find(x => x.key === j.condition);
+                      const d = new Date(j.date + "T12:00:00");
+                      const label = d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+                      return (
+                        <div key={j.date} style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", padding: "var(--space-3) var(--space-5)", background: "var(--color-ivory-shadow)", border: "none", marginTop: -1, borderRadius: 0 }}>
+                          <div style={{ width: 7, height: 7, borderRadius: "50%", background: c ? c.color : "var(--clay)", flexShrink: 0 }} />
+                          <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", flex: 1 }}>{label}</span>
+                          <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: c ? c.color : "var(--parchment)", fontWeight: 400 }}>{c ? c.label : j.condition}</span>
+                          {j.notes && <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", opacity: 0.5, maxWidth: 80, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{j.notes}</span>}
+                        </div>
+                      );
+                    })}
+
+                    {/* View all link — arrow-only affordance, text left, arrow flush right */}
+                    {pastEntries.length > 0 && (
+                      <button onClick={() => setJournalFullView(true)}
+                        style={{ width: "100%", padding: "var(--space-3) var(--space-5)", background: "var(--color-ivory-shadow)", border: "none", borderTop: "none", marginTop: -1, borderRadius: "0 0 var(--radius) var(--radius)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)" }}>
+                        <span>All {journals.length} entries</span>
+                        <span aria-hidden="true" style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 400, lineHeight: 1 }}>→</span>
+                      </button>
+                    )}
+                  </div>
+                );
+              })()}
+              </SectionShell>
+            </>
+          )}
+
+          {openSheet === "face" && (
+            <SectionShell text="Inflammation Map" tone="dark" showRule={false}>
+            <div style={{ marginBottom: consistencyPct !== null ? "var(--space-6)" : 0 }}>
+              <FaceHeatMap checkIns={checkIns} onAskCygne={(q, ctx) => setAskCygneQuestion({ q, ctx })} />
+            </div>
+
+            {/* Hero number treatment — centered pull-quote composition
+                matching the home page's seasonal / weekend headline blocks
+                (32px vertical padding, stacked eyebrow-under-headline reading
+                order). The label sits BELOW the numeral in Fungis caps so the
+                numeral carries the moment and "RITUAL HEALTH" identifies it
+                without competing for the horizontal axis. */}
+            {consistencyPct !== null && (
+              <div style={{ padding: "var(--space-8) 0", textAlign: "center" }}>
+                <div style={{
+                  fontFamily: "var(--font-display)",
+                  fontSize: 112, fontWeight: 700,
+                  letterSpacing: "-0.02em",
+                  color: "var(--color-ivory, #faf9f4)",
+                  lineHeight: 0.92,
+                  margin: 0,
+                }}>{consistencyPct}</div>
+                <div style={{
+                  fontFamily: "var(--font-display)", fontWeight: 700,
+                  fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
+                  color: "var(--color-ivory, #faf9f4)", opacity: 0.7,
+                  marginTop: "var(--space-5)",
+                }}>Ritual Health</div>
+                <div style={{
+                  height: 1, background: "rgba(var(--rgb-ivory), 0.32)",
+                  margin: "var(--space-6) auto var(--space-4)",
+                  maxWidth: 220,
+                  position: "relative",
+                }}>
+                  <div style={{
+                    width: consistencyPct + "%", height: 1,
+                    background: "var(--color-ivory, #faf9f4)",
+                    transition: "width 0.6s ease",
+                  }} />
+                </div>
+                <div style={{
+                  fontFamily: "var(--font-body)", fontSize: "var(--text-xs)",
+                  letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
+                  color: "var(--color-ivory, #faf9f4)", opacity: 0.6,
+                  marginBottom: "var(--space-4)",
+                }}>From {checkIns.length} check-in{checkIns.length !== 1 ? "s" : ""}</div>
+                <p style={{
+                  fontFamily: "var(--font-body)", fontSize: "var(--text-xs)",
+                  color: "var(--color-ivory, #faf9f4)", opacity: 0.82,
+                  margin: "0 auto", lineHeight: 1.65,
+                  maxWidth: 320,
+                }}>
+                  {consistencyPct >= 85 ? "Strong adherence — your ritual is building compounding benefit." :
+                   consistencyPct >= 70 ? "Mostly consistent. Fewer irritation days will improve this score." :
+                   "Irregularity detected. Consistent application is what drives visible results."}
+                </p>
+              </div>
+            )}
+            </SectionShell>
+          )}
+
+          {openSheet === "cycle" && (
+            <SectionShell text="Cycle Tracking" tone="ivory" bottom="var(--space-5)" showRule={false}>
+              <CycleTracker products={products} activeMap={activeMap} cycleDay={user && user.cycleDay ? user.cycleDay : 14} onSetCycleDay={d => onUpdateUser && onUpdateUser({ ...user, cycleDay: d })} user={user} onUpdateUser={onUpdateUser} />
+            </SectionShell>
+          )}
+
+          {openSheet === "introduce" && (
+            /acute/i.test(pausePhase?.label) ? (
+              <SectionShell text="Introduce Slowly" tone="ivory" showRule={false}>
+                <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", color: "var(--color-stone)", textAlign: "center", margin: "var(--space-4) 0" }}>
+                  Paused while you recover.
+                </p>
+              </SectionShell>
+            ) : (
+              <SectionShell text="Introduce Slowly" tone="ivory" showRule={false}>
+                {reintroActives.length > 0 && pauseTreatment && pausePhase && (
+                  <div style={{
+                    padding: "var(--space-4) 0",
+                    borderTop: "1px solid rgba(var(--rgb-ink), 0.32)",
+                    borderBottom: "1px solid rgba(var(--rgb-ink), 0.32)",
+                    marginBottom: "var(--space-2)",
+                  }}>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--color-inky-moss)", margin: "0 0 var(--space-1)" }}>Reintroducing after recovery</p>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-ink)", margin: 0, lineHeight: 1.55 }}>
+                      You're in the {pausePhase.label.toLowerCase()} phase. {reintroActives.join(", ")} can return — but build slowly from week 1 to avoid overwhelming skin that's still settling.
+                    </p>
+                  </div>
+                )}
+                {rampProducts.length > 0 ? (
+                  rampProducts.map((p, i) => {
+                    const activeKey = p.category === "Toning Pad"
+                      ? "toning pad"
+                      : RAMP_ACTIVES.find(a => detectActives(p.ingredients || [])[a]);
+                    // Concern-aware schedule — sensitivity-tier users get
+                    // an extended timeline via getRampSchedule. schedulePaced
+                    // tells the card to surface a soft "paced more gradually"
+                    // caption so the user understands why the shape differs
+                    // from the standard schedule.
+                    const schedule = getRampSchedule(activeKey, user?.concerns);
+                    if (!schedule) return null;
+                    const schedulePaced = isSchedulePaced(user?.concerns);
+                    const weekNumber = getRampWeek(p);
+                    const checkinDue = weekNumber > (p.lastCheckinWeek || 0);
+                    // Derive per-product suggestion signals from the
+                    // ramp_checkins history hydrated by App.jsx and merge
+                    // with the global cycle-phase signal. Cycle only counts
+                    // when there's an active check-in context for this
+                    // week — either the check-in is due, or the user
+                    // submitted for this exact week already. Both signals
+                    // combine into a single message per card via
+                    // buildHoldSuggestion.
+                    const { suggestHold: checkinSuggestsHold, recentTrend } = deriveRampSignals(rampCheckins, p.id, weekNumber);
+                    const activeCheckinContext = checkinDue || (Number(p.lastCheckinWeek) === weekNumber);
+                    const holdSuggestion = buildHoldSuggestion({
+                      fromCheckin: checkinSuggestsHold,
+                      fromCycle: cycleSuggestsHold && activeCheckinContext,
+                    });
+                    // Single combined card per product — the check-in flow
+                    // renders inline inside IntroduceSlowlyCard when checkinDue
+                    // is true. Card outer container was removed in the ivory
+                    // flattening pass; each product now reads as an editorial
+                    // section separated by hair rules from its neighbours.
+                    return (
+                      // scrollMarginTop clears the sheet's own header when the
+                      // Now card scrolls here.
+                      <div key={p.id} id={`ramp-${p.id}`} style={{ scrollMarginTop: "var(--space-4)" }}>
+                      <IntroduceSlowlyCard
+                        product={p}
+                        schedule={schedule}
+                        weekNumber={weekNumber}
+                        onResetStart={onResetRampStart}
+                        onAdvance={onAdvanceRamp}
+                        onHold={onHoldRamp}
+                        checkinDue={checkinDue}
+                        onCheckinSave={(responseState, note) => onRampCheckinSave(p.id, weekNumber, responseState, note)}
+                        onCheckinDone={() => onRampCheckinDone(p.id, weekNumber)}
+                        isLast={i === rampProducts.length - 1}
+                        holdSuggestion={holdSuggestion}
+                        recentTrend={recentTrend}
+                        schedulePaced={schedulePaced}
+                      />
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div style={{
+                    padding: "var(--space-4) 0",
+                    borderTop: "1px solid rgba(var(--rgb-ink), 0.32)",
+                    borderBottom: "1px solid rgba(var(--rgb-ink), 0.32)",
+                  }}>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-stone)", margin: 0, lineHeight: 1.65 }}>
+                      Nothing in ramp-up yet. Add a retinol, AHA, BHA, vitamin C, or toning pad to your vanity and Cygne will walk you through its introduction here.
+                    </p>
+                  </div>
+                )}
+              </SectionShell>
+            )
+          )}
+
+          {openSheet === "treatments" && (
+            <SectionShell text="Treatments" tone="dark">
+              <TreatmentSection treatments={treatments} saveTreatment={saveTreatment} removeTreatment={removeTreatment} updateTreatmentDate={updateTreatmentDate} products={products} activeMap={activeMap} />
+            </SectionShell>
+          )}
+
+          {openSheet === "body" && (
+            <BodyAcneTracker products={products} activeMap={activeMap} user={user} onUpdateUser={onUpdateUser} triggerLog={triggerLog} setTriggerLog={setTriggerLog} forceZonesExpanded hideZonesHeader />
+          )}
         </DetailSheet>
       )}
     </div>
