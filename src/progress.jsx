@@ -2129,12 +2129,19 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
           )}
 
           {openSheet === "cycle" && (
+            // POLISH FINDING (not fixed here — would mean editing this
+            // section's own header, which step 3 explicitly keeps
+            // unchanged): the sheet title already says "Cycle"; this
+            // SectionShell's own header repeats it as "Cycle Tracking"
+            // directly beneath. See the Phase 3c report for the full list.
             <SectionShell text="Cycle Tracking" tone="ivory" bottom="var(--space-5)" showRule={false}>
               <CycleTracker products={products} activeMap={activeMap} cycleDay={user && user.cycleDay ? user.cycleDay : 14} onSetCycleDay={d => onUpdateUser && onUpdateUser({ ...user, cycleDay: d })} user={user} onUpdateUser={onUpdateUser} />
             </SectionShell>
           )}
 
           {openSheet === "introduce" && (
+            // POLISH FINDING: same as Cycle above — sheet title "Introduce"
+            // vs. this section's own "Introduce Slowly" header.
             /acute/i.test(pausePhase?.label) ? (
               <SectionShell text="Introduce Slowly" tone="ivory" showRule={false}>
                 <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", color: "var(--color-stone)", textAlign: "center", margin: "var(--space-4) 0" }}>
@@ -2228,6 +2235,9 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
           )}
 
           {openSheet === "treatments" && (
+            // POLISH FINDING: the sheet title and this section's own
+            // header are both literally "Treatments" — the most visible
+            // instance of the Cycle/Introduce pattern noted above.
             <SectionShell text="Treatments" tone="dark">
               <TreatmentSection treatments={treatments} saveTreatment={saveTreatment} removeTreatment={removeTreatment} updateTreatmentDate={updateTreatmentDate} products={products} activeMap={activeMap} />
             </SectionShell>
