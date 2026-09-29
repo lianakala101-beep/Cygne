@@ -76,9 +76,10 @@ export function CycleRing({ journalEntries, cycleStartDate, cycleLength, today }
     || (ring.runningLong ? ring.phases[ring.phases.length - 1] : null);
   const gapAngle = (ARC_WIDTH / 2 + ARC_GAP / 2) / R_ARC;
 
+  const centerText = ring.center.value == null ? `${ring.center.label}.` : `${ring.center.label}: ${ring.center.value}.`;
   const summary = ring.mode === "cycle"
-    ? `Cycle day ${todayDay} of ${ring.cycleLength}${currentPhase ? `, ${currentPhase.name} phase` : ""}. ${ring.center.label}: ${ring.center.value}.`
-    : `Last 28 days. ${ring.center.label}: ${ring.center.value}.`;
+    ? `Cycle day ${todayDay} of ${ring.cycleLength}${currentPhase ? `, ${currentPhase.name} phase` : ""}. ${centerText}`
+    : `Last 28 days. ${centerText}`;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "var(--space-4)" }}>
@@ -129,9 +130,11 @@ export function CycleRing({ journalEntries, cycleStartDate, cycleLength, today }
           position: "absolute", inset: 0, display: "flex", flexDirection: "column",
           alignItems: "center", justifyContent: "center", gap: "var(--space-1)", pointerEvents: "none",
         }}>
-          <span style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-2xl)", fontWeight: 500, color: "var(--color-ivory)", lineHeight: 1 }}>
-            {ring.center.value}
-          </span>
+          {ring.center.value != null && (
+            <span style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-2xl)", fontWeight: 500, color: "var(--color-ivory)", lineHeight: 1 }}>
+              {ring.center.value}
+            </span>
+          )}
           <span style={{
             fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)",
             textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.56)", textAlign: "center",

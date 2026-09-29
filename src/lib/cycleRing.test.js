@@ -232,10 +232,16 @@ describe("journal consistency", () => {
     expect(ring.center.value).toBe("50%");
   });
 
-  it("shows a dash on cycle day 1 before today is logged", () => {
+  it("shows \"New cycle\" with no value on cycle day 1 before today is logged", () => {
     const journalEntries = dailyEntries("2026-09-10", 10);
     const ring = buildCycleRing({ journalEntries, cycleStartDate: TODAY, cycleLength: 28, today: TODAY });
-    expect(ring.center).toEqual({ value: "—", label: "Consistency" });
+    expect(ring.center).toEqual({ value: null, label: "New cycle" });
+  });
+
+  it("switches to consistency once cycle day 1 is logged", () => {
+    const journalEntries = dailyEntries("2026-09-10", 11); // through today
+    const ring = buildCycleRing({ journalEntries, cycleStartDate: TODAY, cycleLength: 28, today: TODAY });
+    expect(ring.center).toEqual({ value: "100%", label: "Consistency" });
   });
 });
 

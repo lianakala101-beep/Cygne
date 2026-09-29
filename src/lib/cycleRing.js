@@ -148,8 +148,10 @@ export function buildCycleRing({ journalEntries = [], cycleStartDate = null, cyc
   }
 
   const consistency = journalConsistency({ windowStart, todayKey, loggedDates });
+  // No elapsed days yet (cycle day 1, today unlogged): nothing to measure,
+  // so the center reads "New cycle" with no value.
   const center = loggedDates.length >= PATTERN_THRESHOLD
-    ? { value: consistency == null ? "—" : `${consistency}%`, label: "Consistency" }
+    ? (consistency == null ? { value: null, label: "New cycle" } : { value: `${consistency}%`, label: "Consistency" })
     : { value: `${loggedDates.length} of ${PATTERN_THRESHOLD}`, label: "Days to your first pattern" };
 
   return {
