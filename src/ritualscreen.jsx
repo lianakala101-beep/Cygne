@@ -13,6 +13,7 @@ import { getSeason } from "./seasonal.jsx";
 import { getRitualPeriod, getRitualTimeLabel } from "./utils/ritualPeriod.js";
 import { isCycleStale, CYCLE_STALE_MESSAGE } from "./utils.jsx";
 import { localDateKey, upsertJournalEntry } from "./lib/journal.js";
+import { ritualCompleteKey, readManualOverride, isManualOverrideStale } from "./lib/ritualKeys.js";
 
 // Actives that are never paused during treatment recovery — same set
 // buildTreatmentRoutineAdvice (src/progress.jsx:804) uses to keep SPF
@@ -236,10 +237,12 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
   const { activeMap } = analyzeShelf(products);
   const [recTab, setRecTab] = useState("additions");
   const now = new Date();
-  const today = now.toISOString().split("T")[0];
+  // The user's LOCAL date — keys the ritual completion state, the manual
+  // override and the journal (see src/lib/journal.js, src/lib/ritualKeys.js).
+  const today = localDateKey(now);
 
   // Check if AM ritual was fully completed today (drives auto-switch to PM).
-  const amKey = `ritual_complete_${today}_AM`;
+  const amKey = ritualCompleteKey(today, "AM");
   const amStepIds = am.map(p => p.id);
   const amCompleted = amStepIds.length > 0 && (() => {
     try { const done = JSON.parse(localStorage.getItem(amKey) || '[]'); return amStepIds.every(id => done.includes(id)); }
@@ -248,12 +251,8 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
 
   // Manual period override — persisted with today's date; cleared at midnight.
   const [manualOverride, setManualOverride] = useState(() => {
-    try {
-      const stored = localStorage.getItem('ritual_manual_override');
-      if (!stored) return null;
-      const data = JSON.parse(stored);
-      return data.date === today ? data.value : null;
-    } catch { return null; }
+    try { return readManualOverride(localStorage.getItem('ritual_manual_override'), today); }
+    catch { return null; }
   });
 
   // Clear stale override at midnight (check every minute).
@@ -261,10 +260,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
     const id = setInterval(() => {
       try {
         const stored = localStorage.getItem('ritual_manual_override');
-        if (!stored) return;
-        const data = JSON.parse(stored);
-        const currentDate = new Date().toISOString().split('T')[0];
-        if (data.date !== currentDate) {
+        if (isManualOverrideStale(stored, localDateKey())) {
           localStorage.removeItem('ritual_manual_override');
           setManualOverride(null);
         }
@@ -283,7 +279,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
     setManualOverride(value);
   };
 
-  const sessionKey = `ritual_complete_${today}_${period}`;
+  const sessionKey = ritualCompleteKey(today, period);
 
   // AM and PM completions live under separate localStorage keys. The useState
   // initializer only runs on first mount, so when the period flips (auto-switch
@@ -314,10 +310,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
   //
   // The weekly check-in flow still exists, but lives in the Progress tab;
   // it is no longer triggered by daily ritual completion.
-  // Journal dates are the user's LOCAL date (see src/lib/journal.js); `today`
-  // above is the UTC key the ritual-completion state uses.
-  const journalToday = localDateKey(now);
-  const todayJournaled = journals.some(j => j?.date === journalToday);
+  const todayJournaled = journals.some(j => j?.date === today);
   const [hintVisible, setHintVisible] = useState(() => !localStorage.getItem("ritual_hint_dismissed"));
 
   const isStepChecked = (id) => completedSteps.includes(id);
@@ -513,7 +506,7 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
 
       {showSkinJournal && (
         <SkinJournalModal
-          existing={journals.find(j => j?.date === journalToday) || null}
+          existing={journals.find(j => j?.date === today) || null}
           onSubmit={data => {
             // De-dupe by date — matches the existing journal flow in
             // progress.jsx so editing today's entry overwrites cleanly.
