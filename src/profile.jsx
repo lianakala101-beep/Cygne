@@ -496,10 +496,13 @@ function SkinProfileEditor({ user, onUpdateUser }) {
                   the first time the user picks a value, then stays
                   hidden after they dismiss it (localStorage flag
                   managed inside the component). Never mounts if the
-                  field is empty. `light` variant tones ink-on-ivory
-                  to sit on the ivory-shadow editor card. */}
+                  field is empty. This editor card is a glass panel on
+                  the dark canvas (post-softening-pass), not an ivory
+                  one, so it uses the same `dark` variant as onboarding
+                  — `light` assumed ink-on-ivory and read as
+                  near-invisible dark text on this background. */}
               {f.key === "fitzpatrick" && draft.fitzpatrick && (
-                <FitzpatrickNote variant="light" />
+                <FitzpatrickNote variant="dark" />
               )}
             </div>
           ))}
