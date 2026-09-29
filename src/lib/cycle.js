@@ -69,6 +69,26 @@ export function computeCycleDay(cycleStartDateIso, cycleLength, eventIso) {
   return day > MAX_CYCLE_DAY ? null : day;
 }
 
+// Cycle day for any past date (e.g. a check-in). On or after the current cycleStartDate this
+// is the app-wide rule (computeCycleDay: no wrapping, null past day 45).
+// Before it, there's no recorded start for the previous cycle, so the day
+// is estimated by counting back in cycleLength steps from the current one.
+//
+// Both inputs are cut to "YYYY-MM-DD": cycleStartDate is stored as a full
+// ISO timestamp when set from the Progress CycleTracker.
+export function estimateCycleDayForDate(dateStr, cycleStartDate, cycleLength = 28) {
+  const startKey = cycleStartDate ? String(cycleStartDate).split("T")[0] : null;
+  const dateKey = dateStr ? String(dateStr).split("T")[0] : null;
+  if (!startKey || !dateKey) return null;
+  const start = new Date(startKey + "T00:00:00").getTime();
+  const target = new Date(dateKey + "T00:00:00").getTime();
+  const diff = Math.floor((target - start) / 86400000);
+  if (Number.isNaN(diff)) return null;
+  if (diff >= 0) return computeCycleDay(startKey, cycleLength, dateKey);
+  const mod = ((diff % cycleLength) + cycleLength) % cycleLength;
+  return mod + 1;
+}
+
 // Convenience: compose computeCycleDay + getCyclePhase. Returns the
 // phase name or null if the inputs were unusable. Used by any caller
 // that needs a phase-per-event mapping (Monthly Recap cycle-pattern

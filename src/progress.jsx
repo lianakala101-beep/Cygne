@@ -8,6 +8,8 @@ import { CYCLE_PHASES as CANONICAL_CYCLE_PHASES, getCyclePhase as getCanonicalCy
 import { FaceHeatMap } from "./components/FaceHeatMap.jsx";
 import { AskCygneModal } from "./components/AskCygneModal.jsx";
 import { CycleRing } from "./components/CycleRing.jsx";
+import { ProgressIndex } from "./components/ProgressIndex.jsx";
+import { buildProgressIndex } from "./lib/progressIndex.js";
 
 
 function computeStabilityScore(products, checkIns, activeMap) {
@@ -1860,12 +1862,29 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
       </div>
 
       {/* -- Cycle Ring -------------------------------------------------------- */}
-      <div style={{ marginBottom: "var(--space-8)" }}>
+      <div style={{ marginBottom: "var(--space-8)", display: "flex", flexDirection: "column", gap: "var(--space-6)" }}>
         <CycleRing
           journalEntries={journals}
           cycleStartDate={user?.cycleTrackingEnabled ? user?.cycleStartDate : null}
           cycleLength={user?.cycleLength}
           today={new Date()}
+        />
+
+        {/* -- Index layer: pills, insights, Now ------------------------------ */}
+        <ProgressIndex
+          index={buildProgressIndex({
+            journalEntries: journals,
+            checkIns,
+            rampProducts,
+            cycleStartDate: user?.cycleStartDate,
+            cycleLength: user?.cycleLength,
+            cycleTrackingOn: !!user?.cycleTrackingEnabled,
+            today: new Date(),
+          })}
+          onNow={(kind) => {
+            if (kind === "journal") setShowJournal(true);
+            else if (kind === "checkin") setShowCheckIn(true);
+          }}
         />
       </div>
 

@@ -23,7 +23,7 @@ const PATTERN_THRESHOLD = 5;
 
 const CONDITION_STATE = { glowing: "glowing", good: "good", okay: "okay", dull: "low", rough: "low" };
 
-const toDateKey = (value) => {
+export const toDateKey = (value) => {
   if (!value) return null;
   if (value instanceof Date) {
     if (Number.isNaN(value.getTime())) return null;
@@ -37,7 +37,7 @@ const toDateKey = (value) => {
 };
 
 // "YYYY-MM-DD" + n days, via UTC so DST never shifts the result.
-const addDays = (dateKey, n) => {
+export const addDays = (dateKey, n) => {
   const [y, m, d] = dateKey.split("-").map(Number);
   return new Date(Date.UTC(y, m - 1, d + n)).toISOString().split("T")[0];
 };
@@ -49,7 +49,7 @@ const entryTime = (entry) => {
 
 // Latest entry per date. An explicit timestamp wins; without one, the
 // later entry in the array wins (new entries are appended).
-function latestEntryByDate(entries) {
+export function latestEntryByDate(entries) {
   const byDate = new Map();
   entries.forEach((entry, index) => {
     const date = toDateKey(entry?.date);
