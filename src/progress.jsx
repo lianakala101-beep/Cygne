@@ -1778,8 +1778,8 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
   const SHEET_TITLES = {
     journal: "Journal",
     face: "Face Map",
-    cycle: "Cycle",
-    introduce: "Introduce",
+    cycle: "Cycle Tracking",
+    introduce: "Introduce Slowly",
     treatments: "Treatments",
     body: "Body",
   };
@@ -1851,7 +1851,7 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
   // Full-bleed section wrapper. Alternates ivory / dark bands down the
   // page so each section reads as its own editorial panel. Uses
   // negative horizontal margin to break the container's 22px inset.
-  const SectionShell = ({ text, tone = "dark", children, bottom = "calc(var(--space-1) * 7)", showRule = true }) => (
+  const SectionShell = ({ text, tone = "dark", children, bottom = "calc(var(--space-1) * 7)", showRule = true, hideHeader = false }) => (
     <div style={{
       marginLeft: "calc(var(--space-6) * -1)", marginRight: "calc(var(--space-6) * -1)",
       padding: "var(--space-6) var(--space-6) var(--space-5)",
@@ -1859,7 +1859,7 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
       background: tone === "ivory" ? "var(--color-ivory, #faf9f4)" : "transparent",
       ...(tone === "ivory" ? IVORY_BAND_TOKENS : null),
     }}>
-      {sectionHeader(text, tone, showRule)}
+      {!hideHeader && sectionHeader(text, tone, showRule)}
       {children}
     </div>
   );
@@ -2129,27 +2129,26 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
           )}
 
           {openSheet === "cycle" && (
-            // POLISH FINDING (not fixed here — would mean editing this
-            // section's own header, which step 3 explicitly keeps
-            // unchanged): the sheet title already says "Cycle"; this
-            // SectionShell's own header repeats it as "Cycle Tracking"
-            // directly beneath. See the Phase 3c report for the full list.
-            <SectionShell text="Cycle Tracking" tone="ivory" bottom="var(--space-5)" showRule={false}>
+            // Sheet title carries the full name ("Cycle Tracking"); this
+            // section's own header is hidden via hideHeader so it isn't
+            // repeated inside the sheet.
+            <SectionShell text="Cycle Tracking" tone="ivory" bottom="var(--space-5)" showRule={false} hideHeader>
               <CycleTracker products={products} activeMap={activeMap} cycleDay={user && user.cycleDay ? user.cycleDay : 14} onSetCycleDay={d => onUpdateUser && onUpdateUser({ ...user, cycleDay: d })} user={user} onUpdateUser={onUpdateUser} />
             </SectionShell>
           )}
 
           {openSheet === "introduce" && (
-            // POLISH FINDING: same as Cycle above — sheet title "Introduce"
-            // vs. this section's own "Introduce Slowly" header.
+            // Sheet title carries the full name ("Introduce Slowly"); this
+            // section's own header is hidden via hideHeader in both
+            // branches so it isn't repeated inside the sheet.
             /acute/i.test(pausePhase?.label) ? (
-              <SectionShell text="Introduce Slowly" tone="ivory" showRule={false}>
+              <SectionShell text="Introduce Slowly" tone="ivory" showRule={false} hideHeader>
                 <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", color: "var(--color-stone)", textAlign: "center", margin: "var(--space-4) 0" }}>
                   Paused while you recover.
                 </p>
               </SectionShell>
             ) : (
-              <SectionShell text="Introduce Slowly" tone="ivory" showRule={false}>
+              <SectionShell text="Introduce Slowly" tone="ivory" showRule={false} hideHeader>
                 {reintroActives.length > 0 && pauseTreatment && pausePhase && (
                   <div style={{
                     padding: "var(--space-4) 0",
@@ -2235,10 +2234,9 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
           )}
 
           {openSheet === "treatments" && (
-            // POLISH FINDING: the sheet title and this section's own
-            // header are both literally "Treatments" — the most visible
-            // instance of the Cycle/Introduce pattern noted above.
-            <SectionShell text="Treatments" tone="dark">
+            // Sheet title carries the name ("Treatments"); this section's
+            // own header is hidden via hideHeader so it isn't repeated.
+            <SectionShell text="Treatments" tone="dark" hideHeader>
               <TreatmentSection treatments={treatments} saveTreatment={saveTreatment} removeTreatment={removeTreatment} updateTreatmentDate={updateTreatmentDate} products={products} activeMap={activeMap} />
             </SectionShell>
           )}
