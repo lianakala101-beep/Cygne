@@ -489,8 +489,8 @@ function IntroduceSlowlyCard({
     // the ivory band.
     <div style={{
       padding: "var(--space-4) 0",
-      borderTop: "1px solid rgba(var(--rgb-ink), 0.32)",
-      borderBottom: isLast ? "1px solid rgba(var(--rgb-ink), 0.32)" : "none",
+      borderTop: "1px solid rgba(var(--rgb-ivory), 0.32)",
+      borderBottom: isLast ? "1px solid rgba(var(--rgb-ivory), 0.32)" : "none",
     }}>
       {/* Header row: WK badge (when check-in due) + expand chevron */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "var(--space-3)", marginBottom: "var(--space-3)" }}>
@@ -642,7 +642,7 @@ function IntroduceSlowlyCard({
 
       {/* Check-in section — inline when a new ramp week is due */}
       {showCheckin && (
-        <div style={{ marginTop: "var(--space-4)", paddingTop: "var(--space-4)", borderTop: "1px solid rgba(var(--rgb-ink), 0.16)" }}>
+        <div style={{ marginTop: "var(--space-4)", paddingTop: "var(--space-4)", borderTop: "1px solid rgba(var(--rgb-ivory), 0.16)" }}>
           <p style={{
             fontFamily: "var(--font-body)", fontSize: "var(--text-xs)",
             color: "var(--clay, var(--color-stone))", margin: "0 0 var(--space-3)",
@@ -757,7 +757,7 @@ function IntroduceSlowlyCard({
       {/* Expanded phase detail — chevron-toggled, so the always-visible
           card stays compact until the user opts in. */}
       {expanded && (
-        <div style={{ marginTop: "var(--space-4)", paddingTop: "var(--space-4)", borderTop: "1px solid rgba(var(--rgb-ink), 0.16)" }}>
+        <div style={{ marginTop: "var(--space-4)", paddingTop: "var(--space-4)", borderTop: "1px solid rgba(var(--rgb-ivory), 0.16)" }}>
           <p style={{
             fontFamily: "var(--font-body)", fontSize: "var(--text-xs)",
             color: "var(--clay)", margin: "0 0 var(--space-4)", lineHeight: 1.7,
@@ -795,7 +795,7 @@ function IntroduceSlowlyCard({
                   display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "var(--space-2)",
                   fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400,
                   letterSpacing: "var(--tracking-label)", textTransform: "uppercase",
-                  color: "var(--color-inky-moss)", cursor: "pointer",
+                  color: "var(--sage, #2d3d2b)", cursor: "pointer",
                   marginBottom: "var(--space-4)",
                   WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
                   transition: "background 0.18s",
@@ -818,7 +818,7 @@ function IntroduceSlowlyCard({
                     display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "var(--space-2)",
                     fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400,
                     letterSpacing: "var(--tracking-label)", textTransform: "uppercase",
-                    color: "var(--color-inky-moss)", cursor: "pointer",
+                    color: "var(--sage, #2d3d2b)", cursor: "pointer",
                     WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
                     transition: "background 0.18s",
                   }}

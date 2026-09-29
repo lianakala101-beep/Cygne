@@ -14,6 +14,7 @@ import { DetailSheet } from "./components/DetailSheet.jsx";
 import { localDateKey, upsertJournalEntry } from "./lib/journal.js";
 import { buildProgressIndex } from "./lib/progressIndex.js";
 import { buildTrackerAttention } from "./lib/trackerAttention.js";
+import { glassCard } from "./lib/ui.js";
 
 
 function computeStabilityScore(products, checkIns, activeMap) {
@@ -477,8 +478,8 @@ function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycled
     return (
       <div style={{
         padding: "var(--space-5) 0",
-        borderTop: "1px solid rgba(var(--rgb-ink), 0.32)",
-        borderBottom: "1px solid rgba(var(--rgb-ink), 0.32)",
+        borderTop: "1px solid rgba(var(--rgb-ivory), 0.32)",
+        borderBottom: "1px solid rgba(var(--rgb-ivory), 0.32)",
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", marginBottom: "var(--space-3)" }}>
           <span style={{ color: "var(--clay)", display: "inline-flex" }}><Icon name="moon" size={14} /></span>
@@ -489,8 +490,8 @@ function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycled
           Your hormones shift every week. Your ritual should too. Enable this to receive phase-aware nudges drawn from what's already on your vanity.
         </p>
         <button onClick={() => onUpdateUser({ ...user, cycleTrackingEnabled: true })}
-          style={{ padding: "var(--space-3) var(--space-5)", background: "transparent", border: "1px solid var(--color-ink)", borderRadius: "var(--radius)", fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ink)", cursor: "pointer", transition: "all 0.2s" }}
-          onMouseEnter={e => { e.currentTarget.style.background = "rgba(var(--rgb-ink), 0.08)"; }}
+          style={{ padding: "var(--space-3) var(--space-5)", background: "transparent", border: "1px solid var(--color-ivory, #faf9f4)", borderRadius: "var(--radius)", fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-ivory, #faf9f4)", cursor: "pointer", transition: "all 0.2s" }}
+          onMouseEnter={e => { e.currentTarget.style.background = "rgba(var(--rgb-ivory), 0.08)"; }}
           onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
           Enable
         </button>
@@ -501,8 +502,8 @@ function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycled
   return (
     <div style={{
       padding: "var(--space-5) 0 var(--space-1)",
-      borderTop: "1px solid rgba(var(--rgb-ink), 0.32)",
-      borderBottom: "1px solid rgba(var(--rgb-ink), 0.32)",
+      borderTop: "1px solid rgba(var(--rgb-ivory), 0.32)",
+      borderBottom: "1px solid rgba(var(--rgb-ivory), 0.32)",
     }}>
       {/* Phase block — editorial flat treatment. No bordered card, no
           decorative arc; the phase-dot bullet + name + Phase caption
@@ -533,54 +534,54 @@ function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycled
                   value={inputVal}
                   onChange={e => setInputVal(e.target.value)}
                   onKeyDown={e => e.key === "Enter" && handleSetDay()}
-                  style={{ width: 48, padding: "var(--space-1) var(--space-2)", background: "transparent", border: "1px solid rgba(var(--rgb-ink), 0.32)", borderRadius: "var(--radius-pill)", color: "var(--color-ink)", fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", textAlign: "center", outline: "none" }}
+                  style={{ width: 48, padding: "var(--space-1) var(--space-2)", background: "transparent", border: "1px solid rgba(var(--rgb-ivory), 0.32)", borderRadius: "var(--radius-pill)", color: "var(--color-ivory, #faf9f4)", fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", textAlign: "center", outline: "none" }}
                   autoFocus
                 />
-                <button onClick={handleSetDay} style={{ padding: "var(--space-1) var(--space-3)", background: "transparent", border: "1px solid var(--color-ink)", borderRadius: "var(--radius-pill)", color: "var(--color-ink)", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-xs)", cursor: "pointer", letterSpacing: "var(--tracking-display)", textTransform: "uppercase" }}>Set</button>
+                <button onClick={handleSetDay} style={{ padding: "var(--space-1) var(--space-3)", background: "transparent", border: "1px solid var(--color-ivory, #faf9f4)", borderRadius: "var(--radius-pill)", color: "var(--color-ivory, #faf9f4)", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-xs)", cursor: "pointer", letterSpacing: "var(--tracking-display)", textTransform: "uppercase" }}>Set</button>
               </div>
             ) : (
               <button onClick={() => { setInputVal(String(cycleDay ?? 1)); setEditing(true); }}
-                style={{ background: "transparent", border: "1px solid rgba(var(--rgb-ink), 0.32)", borderRadius: "var(--radius-pill)", padding: "var(--space-1) var(--space-3)", cursor: "pointer", display: "flex", alignItems: "center", gap: "var(--space-1)" }}>
-                <span style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: "var(--text-sm)", letterSpacing: "var(--tracking-label)", color: "var(--color-ink)", lineHeight: 1.6, whiteSpace: "nowrap" }}>{phase ? `Day ${cycleDay}` : "Set day"}</span>
+                style={{ background: "transparent", border: "1px solid rgba(var(--rgb-ivory), 0.32)", borderRadius: "var(--radius-pill)", padding: "var(--space-1) var(--space-3)", cursor: "pointer", display: "flex", alignItems: "center", gap: "var(--space-1)" }}>
+                <span style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: "var(--text-sm)", letterSpacing: "var(--tracking-label)", color: "var(--color-ivory, #faf9f4)", lineHeight: 1.6, whiteSpace: "nowrap" }}>{phase ? `Day ${cycleDay}` : "Set day"}</span>
               </button>
             )}
             {phase && (
-              <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ink), 0.56)", opacity: 0.85, letterSpacing: "0.04em" }}>{daysUntilNext}d in phase</span>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ivory), 0.56)", opacity: 0.85, letterSpacing: "0.04em" }}>{daysUntilNext}d in phase</span>
             )}
           </div>
         </div>
 
         {/* Phase description */}
         {phase && (
-          <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: "var(--text-sm)", letterSpacing: "0.02em", color: "var(--color-ink)", margin: "0 0 var(--space-3)", lineHeight: 1.6 }}>{phase.description}</p>
+          <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: "var(--text-sm)", letterSpacing: "0.02em", color: "var(--color-ivory, #faf9f4)", margin: "0 0 var(--space-3)", lineHeight: 1.6 }}>{phase.description}</p>
         )}
 
         {/* Quiet "running long" note — italic, no chip */}
         {runningLong && (
-          <p style={{ fontFamily: "var(--font-body)", fontStyle: "italic", fontSize: "var(--text-xs)", letterSpacing: "0.02em", color: "rgba(var(--rgb-ink), 0.56)", margin: "0 0 var(--space-3)", lineHeight: 1.55 }}>
+          <p style={{ fontFamily: "var(--font-body)", fontStyle: "italic", fontSize: "var(--text-xs)", letterSpacing: "0.02em", color: "rgba(var(--rgb-ivory), 0.56)", margin: "0 0 var(--space-3)", lineHeight: 1.55 }}>
             Your cycle is running long — this is normal.
           </p>
         )}
 
         {/* Nudge — plain body copy, no box. */}
         {phase && (
-          <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: "var(--text-sm)", letterSpacing: "0.02em", color: "var(--color-ink)", margin: 0, lineHeight: 1.6 }}>{phase.nudge}</p>
+          <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: "var(--text-sm)", letterSpacing: "0.02em", color: "var(--color-ivory, #faf9f4)", margin: 0, lineHeight: 1.6 }}>{phase.nudge}</p>
         )}
       </div>
 
       {/* Shelf-specific advice — separated from the phase block by a soft
           rule. Container is flat; the eyebrow carries the section title. */}
-      <div style={{ paddingTop: "var(--space-4)", borderTop: "1px solid rgba(var(--rgb-ink), 0.16)" }}>
+      <div style={{ paddingTop: "var(--space-4)", borderTop: "1px solid rgba(var(--rgb-ivory), 0.16)" }}>
         {advice && (
           <>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(var(--rgb-ink), 0.56)", margin: "0 0 var(--space-2)" }}>Your Vanity This Week</p>
-            <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: "var(--text-sm)", letterSpacing: "0.02em", color: "var(--color-ink)", margin: "0 0 var(--space-3)", lineHeight: 1.6 }}>{advice}</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.56)", margin: "0 0 var(--space-2)" }}>Your Vanity This Week</p>
+            <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: "var(--text-sm)", letterSpacing: "0.02em", color: "var(--color-ivory, #faf9f4)", margin: "0 0 var(--space-3)", lineHeight: 1.6 }}>{advice}</p>
           </>
         )}
 
         {/* Cycle length setting — accepts 21–45 days. */}
         <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", marginBottom: "var(--space-3)" }}>
-          <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "rgba(var(--rgb-ink), 0.56)" }}>Cycle length</span>
+          <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.56)" }}>Cycle length</span>
           {editingLength ? (
             <>
               <input
@@ -588,14 +589,14 @@ function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycled
                 value={lengthInputVal}
                 onChange={e => setLengthInputVal(e.target.value)}
                 onKeyDown={e => e.key === "Enter" && handleSetLength()}
-                style={{ width: 52, padding: "var(--space-1) var(--space-2)", background: "transparent", border: "1px solid rgba(var(--rgb-ink), 0.32)", borderRadius: "var(--radius-pill)", color: "var(--color-ink)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", textAlign: "center", outline: "none" }}
+                style={{ width: 52, padding: "var(--space-1) var(--space-2)", background: "transparent", border: "1px solid rgba(var(--rgb-ivory), 0.32)", borderRadius: "var(--radius-pill)", color: "var(--color-ivory, #faf9f4)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", textAlign: "center", outline: "none" }}
                 autoFocus
               />
-              <button onClick={handleSetLength} style={{ padding: "var(--space-1) var(--space-3)", background: "transparent", border: "1px solid var(--color-ink)", borderRadius: "var(--radius-pill)", color: "var(--color-ink)", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-xs)", cursor: "pointer", letterSpacing: "var(--tracking-display)", textTransform: "uppercase" }}>Set</button>
+              <button onClick={handleSetLength} style={{ padding: "var(--space-1) var(--space-3)", background: "transparent", border: "1px solid var(--color-ivory, #faf9f4)", borderRadius: "var(--radius-pill)", color: "var(--color-ivory, #faf9f4)", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-xs)", cursor: "pointer", letterSpacing: "var(--tracking-display)", textTransform: "uppercase" }}>Set</button>
             </>
           ) : (
             <button onClick={() => { setLengthInputVal(String(cycleLen)); setEditingLength(true); }}
-              style={{ background: "none", border: "none", padding: 0, cursor: "pointer", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "0.04em", color: "var(--color-ink)", textDecoration: "underline", textDecorationColor: "rgba(var(--rgb-ink), 0.32)", textUnderlineOffset: 3 }}>
+              style={{ background: "none", border: "none", padding: 0, cursor: "pointer", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "0.04em", color: "var(--color-ivory, #faf9f4)", textDecoration: "underline", textDecorationColor: "rgba(var(--rgb-ivory), 0.32)", textUnderlineOffset: 3 }}>
               {cycleLen} days
             </button>
           )}
@@ -615,7 +616,7 @@ function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycled
           const isActive = phase?.name === p.name;
           const width = ((p.days[1] - p.days[0] + 1) / 35) * 100;
           return (
-            <div key={i} style={{ flex: p.days[1] - p.days[0] + 1, height: 3, borderRadius: "var(--radius-pill)", background: isActive ? p.dot : "rgba(var(--rgb-ink), 0.08)", transition: "background 0.3s" }} />
+            <div key={i} style={{ flex: p.days[1] - p.days[0] + 1, height: 3, borderRadius: "var(--radius-pill)", background: isActive ? p.dot : "rgba(var(--rgb-ivory), 0.08)", transition: "background 0.3s" }} />
           );
         })}
       </div>
@@ -1811,9 +1812,12 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
   // sections that don't have that issue (Your Journal, Treatments)
   // keep their existing look.
   const sectionHeader = (text, tone = "dark", showRule = true) => {
-    const isDarkBg = tone === "dark";
-    const color = isDarkBg ? "var(--color-ivory, #faf9f4)" : "var(--color-ink)";
-    const ruleColor = isDarkBg ? "rgba(var(--rgb-ivory), 0.16)" : "rgba(var(--rgb-ink), 0.16)";
+    // Both tones render on the dark canvas now (tone="ivory" is a glass
+    // card, not a solid ivory band), so the header is light-on-dark
+    // either way — tone is kept as a param only because SectionShell
+    // still passes it through.
+    const color = "var(--color-ivory, #faf9f4)";
+    const ruleColor = "rgba(var(--rgb-ivory), 0.16)";
     // Font sizing mirrors the home page's editorial section labels
     // ("Ask Cygne" / "Begin Your Ritual" at src/dashboard.jsx:247,297):
     // 16px Fungis Heavy, 0.22em tracking, uppercase.
@@ -1829,35 +1833,26 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
     );
   };
 
-  // On ivory bands every legacy design token (--clay, --parchment,
-  // --sage, --border, etc.) resolves to ivory or ivory-alpha via the
-  // dark-canvas overrides in App.jsx — so any inline style using
-  // var(--clay) etc. paints ivory-on-ivory. We shadow those tokens for
-  // the ivory subtree so all downstream var() references flip to
-  // dark-on-ivory values without touching every text node.
-  const IVORY_BAND_TOKENS = {
-    "--parchment":          "var(--color-ink)",
-    "--clay":               "rgba(var(--rgb-ink), 0.56)",
-    "--sage":               "var(--color-inky-moss)",
-    "--muted":              "rgba(var(--rgb-ink), 0.56)",
-    "--taupe":              "rgba(var(--rgb-ink), 0.56)",
-    "--border":             "rgba(var(--rgb-ink), 0.16)",
-    "--surface":            "rgba(var(--rgb-ink), 0.08)",
-    "--color-ivory-shadow": "rgba(var(--rgb-ink), 0.08)",
-    "--cta":                "rgba(var(--rgb-ink), 0.08)",
-    "--overlay":            "rgba(var(--rgb-ink), 0.56)",
-  };
-
-  // Full-bleed section wrapper. Alternates ivory / dark bands down the
-  // page so each section reads as its own editorial panel. Uses
-  // negative horizontal margin to break the container's 22px inset.
+  // Full-bleed dark band, or an inset glass card for ivory. tone="dark"
+  // is unchanged: negative horizontal margin breaks the container's
+  // inset so it reads as its own full-width editorial panel. tone="ivory"
+  // no longer does that — it's a bounded glassCard sitting inside the
+  // normal content padding, one of many glass panels on the canvas
+  // rather than a solid full-bleed band. IVORY_BAND_TOKENS (the ink-on-
+  // ivory variable overrides the old solid band needed) is gone with it:
+  // a glass card sits on the same dark canvas as everything else, so its
+  // children should read the ordinary light-on-dark tokens, same as
+  // every other glass panel in the app.
   const SectionShell = ({ text, tone = "dark", children, bottom = "calc(var(--space-1) * 7)", showRule = true, hideHeader = false }) => (
-    <div style={{
+    <div style={tone === "ivory" ? {
+      ...glassCard,
+      padding: "var(--space-4)",
+      marginBottom: "var(--space-4)",
+    } : {
       marginLeft: "calc(var(--space-6) * -1)", marginRight: "calc(var(--space-6) * -1)",
       padding: "var(--space-6) var(--space-6) var(--space-5)",
       marginBottom: bottom,
-      background: tone === "ivory" ? "var(--color-ivory, #faf9f4)" : "transparent",
-      ...(tone === "ivory" ? IVORY_BAND_TOKENS : null),
+      background: "transparent",
     }}>
       {!hideHeader && sectionHeader(text, tone, showRule)}
       {children}
@@ -1967,17 +1962,17 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
                     padding: "var(--space-5) 0",
                     background: "transparent",
                     border: "none",
-                    borderBottom: "1px solid rgba(var(--rgb-ink), 0.32)",
+                    borderBottom: "1px solid rgba(var(--rgb-ivory), 0.32)",
                     cursor: "pointer", textAlign: "left",
                     WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
                   }}>
                   <div>
-                    <p style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-md)", fontWeight: 400, letterSpacing: "var(--tracking-label)", color: "var(--color-ink)", margin: "0 0 var(--space-1)", lineHeight: 1 }}>How did your skin respond?</p>
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-stone)", margin: 0 }}>
+                    <p style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-md)", fontWeight: 400, letterSpacing: "var(--tracking-label)", color: "var(--color-ivory, #faf9f4)", margin: "0 0 var(--space-1)", lineHeight: 1 }}>How did your skin respond?</p>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ivory), 0.7)", margin: 0 }}>
                       {daysSince === null ? "Log your first check-in to start tracking." : "Last check-in " + daysSince + " day" + (daysSince !== 1 ? "s" : "") + " ago."}
                     </p>
                   </div>
-                  <span aria-hidden="true" style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 400, color: "var(--color-ink)", flexShrink: 0, marginLeft: "var(--space-3)", lineHeight: 1 }}>→</span>
+                  <span aria-hidden="true" style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 400, color: "var(--color-ivory, #faf9f4)", flexShrink: 0, marginLeft: "var(--space-3)", lineHeight: 1 }}>→</span>
                 </button>
               ) : (
                 <div style={{
@@ -1985,18 +1980,18 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
                   padding: "var(--space-4) 0",
                   background: "transparent",
                   border: "none",
-                  borderBottom: "1px solid rgba(var(--rgb-ink), 0.32)",
+                  borderBottom: "1px solid rgba(var(--rgb-ivory), 0.32)",
                 }}>
-                  <div style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--color-inky-moss)", flexShrink: 0 }} />
+                  <div style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--color-sage)", flexShrink: 0 }} />
                   <div style={{ flex: 1 }}>
-                    <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-ink)" }}>
+                    <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-ivory, #faf9f4)" }}>
                       Checked in {daysSince === 0 ? "today" : daysSince + " day" + (daysSince !== 1 ? "s" : "") + " ago"}
                     </span>
                     {lastCheckIn && lastCheckIn.irritation && lastCheckIn.irritation !== "none" && (
-                      <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-stone)", marginLeft: "var(--space-2)", opacity: 0.85 }}>{lastCheckIn.irritation} irritation</span>
+                      <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ivory), 0.7)", marginLeft: "var(--space-2)", opacity: 0.85 }}>{lastCheckIn.irritation} irritation</span>
                     )}
                   </div>
-                  <button onClick={() => setShowCheckIn(true)} aria-label="Update check-in" style={{ display: "inline-flex", alignItems: "center", fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 400, color: "var(--color-ink)", background: "none", border: "none", padding: 0, cursor: "pointer", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent", lineHeight: 1 }}>→</button>
+                  <button onClick={() => setShowCheckIn(true)} aria-label="Update check-in" style={{ display: "inline-flex", alignItems: "center", fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 400, color: "var(--color-ivory, #faf9f4)", background: "none", border: "none", padding: 0, cursor: "pointer", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent", lineHeight: 1 }}>→</button>
                 </div>
               )}
               </SectionShell>
@@ -2143,7 +2138,7 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
             // branches so it isn't repeated inside the sheet.
             /acute/i.test(pausePhase?.label) ? (
               <SectionShell text="Introduce Slowly" tone="ivory" showRule={false} hideHeader>
-                <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", color: "var(--color-stone)", textAlign: "center", margin: "var(--space-4) 0" }}>
+                <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", color: "rgba(var(--rgb-ivory), 0.7)", textAlign: "center", margin: "var(--space-4) 0" }}>
                   Paused while you recover.
                 </p>
               </SectionShell>
@@ -2152,12 +2147,12 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
                 {reintroActives.length > 0 && pauseTreatment && pausePhase && (
                   <div style={{
                     padding: "var(--space-4) 0",
-                    borderTop: "1px solid rgba(var(--rgb-ink), 0.32)",
-                    borderBottom: "1px solid rgba(var(--rgb-ink), 0.32)",
+                    borderTop: "1px solid rgba(var(--rgb-ivory), 0.32)",
+                    borderBottom: "1px solid rgba(var(--rgb-ivory), 0.32)",
                     marginBottom: "var(--space-2)",
                   }}>
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--color-inky-moss)", margin: "0 0 var(--space-1)" }}>Reintroducing after recovery</p>
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-ink)", margin: 0, lineHeight: 1.55 }}>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--color-gold)", margin: "0 0 var(--space-1)" }}>Reintroducing after recovery</p>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-ivory, #faf9f4)", margin: 0, lineHeight: 1.55 }}>
                       You're in the {pausePhase.label.toLowerCase()} phase. {reintroActives.join(", ")} can return — but build slowly from week 1 to avoid overwhelming skin that's still settling.
                     </p>
                   </div>
@@ -2221,10 +2216,10 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
                 ) : (
                   <div style={{
                     padding: "var(--space-4) 0",
-                    borderTop: "1px solid rgba(var(--rgb-ink), 0.32)",
-                    borderBottom: "1px solid rgba(var(--rgb-ink), 0.32)",
+                    borderTop: "1px solid rgba(var(--rgb-ivory), 0.32)",
+                    borderBottom: "1px solid rgba(var(--rgb-ivory), 0.32)",
                   }}>
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-stone)", margin: 0, lineHeight: 1.65 }}>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ivory), 0.7)", margin: 0, lineHeight: 1.65 }}>
                       Nothing in ramp-up yet. Add a retinol, AHA, BHA, vitamin C, or toning pad to your vanity and Cygne will walk you through its introduction here.
                     </p>
                   </div>
