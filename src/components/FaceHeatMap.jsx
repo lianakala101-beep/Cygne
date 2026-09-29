@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { FACE_ZONES, FACE_ZONE_LABELS, FACE_ZONE_IDS } from "./FaceZoneSelector.jsx";
 import { AskCygneModal } from "./AskCygneModal.jsx";
 import { getAskCygneAccess } from "../utils.jsx";
-import { getCyclePhase } from "../lib/cycle.js";
+import { getCyclePhase, computeCycleDay } from "../lib/cycle.js";
 
 const PERIODS = [
   { key: 7,  label: "7 DAYS"   },
@@ -60,12 +60,22 @@ function fillForScore(s) {
   return "rgba(var(--rgb-moss), 0.56)";
 }
 
-function cycleDayForDate(dateStr, cycleStartDate, cycleLength = 28) {
-  if (!cycleStartDate) return null;
-  const start = new Date(cycleStartDate + "T00:00:00").getTime();
-  const target = new Date(dateStr + "T00:00:00").getTime();
+// Cycle day for a flare date. On or after the current cycleStartDate this
+// is the app-wide rule (computeCycleDay: no wrapping, null past day 45).
+// Before it, there's no recorded start for the previous cycle, so the day
+// is estimated by counting back in cycleLength steps from the current one.
+//
+// Both inputs are cut to "YYYY-MM-DD": cycleStartDate is stored as a full
+// ISO timestamp when set from the Progress CycleTracker.
+export function cycleDayForDate(dateStr, cycleStartDate, cycleLength = 28) {
+  const startKey = cycleStartDate ? String(cycleStartDate).split("T")[0] : null;
+  const dateKey = dateStr ? String(dateStr).split("T")[0] : null;
+  if (!startKey || !dateKey) return null;
+  const start = new Date(startKey + "T00:00:00").getTime();
+  const target = new Date(dateKey + "T00:00:00").getTime();
   const diff = Math.floor((target - start) / 86400000);
   if (Number.isNaN(diff)) return null;
+  if (diff >= 0) return computeCycleDay(startKey, cycleLength, dateKey);
   const mod = ((diff % cycleLength) + cycleLength) % cycleLength;
   return mod + 1;
 }
