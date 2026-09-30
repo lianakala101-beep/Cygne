@@ -24,8 +24,8 @@ const BREAKOUT_MIN = 3;
 const PHASE_SHARE = 0.6;
 const ZONE_SHARE = 0.5;
 
-// Keeps "<name> has been calm for a week. Ready to advance." within ~70 characters.
-const MAX_PRODUCT_NAME = 26;
+// Keeps "<name> has been calm for a week — ready for the next step." within ~70 characters.
+const MAX_PRODUCT_NAME = 18;
 
 const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -114,7 +114,7 @@ function breakoutPatternInsight({ checkIns, todayKey, cycleStartKey, cycleLength
   const zoneCounts = [...tally(breakouts.flatMap(b => b.zones))].sort((a, b) => b[1] - a[1]);
   const topZone = zoneCounts[0] && zoneCounts[0][1] / breakouts.length >= ZONE_SHARE ? zoneCounts[0][0] : null;
   const subject = topZone ? `${topZone} breakouts` : "Breakouts";
-  return `${subject} clustered in your ${topPhase.toLowerCase()} phase lately.`;
+  return `${subject} have clustered in your ${topPhase.toLowerCase()} phase lately.`;
 }
 
 // --- Ramp readiness ----------------------------------------------------------
@@ -170,7 +170,7 @@ export function buildProgressIndex({
   const now = !loggedToday
     ? { kind: "journal", text: "Log today's skin" }
     : checkInDue
-      ? { kind: "checkin", text: "Weekly check-in due" }
+      ? { kind: "checkin", text: "Your weekly check-in is ready" }
       : readyProduct
         ? { kind: "ramp", productId: readyProduct.id, text: `${shortName(readyProduct.name)} is ready to advance` }
         : null;
@@ -187,7 +187,7 @@ export function buildProgressIndex({
   // The ramp insight is dropped when the Now card already says it.
   const insights = [
     cycleDay != null ? breakoutPatternInsight({ checkIns: checks, todayKey, cycleStartKey, cycleLength: len, phases }) : null,
-    readyProduct && now?.kind !== "ramp" ? `${shortName(readyProduct.name)} has been calm for a week. Ready to advance.` : null,
+    readyProduct && now?.kind !== "ramp" ? `${shortName(readyProduct.name)} has been calm for a week — ready for the next step.` : null,
   ].filter(Boolean);
 
   return { pills, insights, now };

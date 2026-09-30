@@ -130,13 +130,28 @@ describe("buildMonthlyDataCards", () => {
       const cards = buildMonthlyDataCards({ checkIns, year: YEAR, month: MONTH });
       const card = cards.find(c => c.key === "checkInClarity");
       expect(card).toBeDefined();
-      expect(card.body).toBe("2 of 3 check-ins this month reported no irritation.");
+      expect(card.body).toBe("No irritation at 2 of your 3 check-ins this month.");
     });
 
-    it("is absent with fewer than 2 check-ins", () => {
+    it("is absent with no check-ins", () => {
+      const cards = buildMonthlyDataCards({ checkIns: [], year: YEAR, month: MONTH });
+      expect(cards.find(c => c.key === "checkInClarity")).toBeUndefined();
+    });
+
+    it("handles a single check-in with sensible singular phrasing", () => {
       const checkIns = [{ date: "2026-01-05T00:00:00Z", irritation: "none" }];
       const cards = buildMonthlyDataCards({ checkIns, year: YEAR, month: MONTH });
-      expect(cards.find(c => c.key === "checkInClarity")).toBeUndefined();
+      const card = cards.find(c => c.key === "checkInClarity");
+      expect(card).toBeDefined();
+      expect(card.body).toBe("No irritation at 1 of your 1 check-in this month.");
+    });
+
+    it("counts irritation correctly when the single check-in wasn't clear", () => {
+      const checkIns = [{ date: "2026-01-05T00:00:00Z", irritation: "mild" }];
+      const cards = buildMonthlyDataCards({ checkIns, year: YEAR, month: MONTH });
+      const card = cards.find(c => c.key === "checkInClarity");
+      expect(card).toBeDefined();
+      expect(card.body).toBe("No irritation at 0 of your 1 check-in this month.");
     });
   });
 
@@ -153,7 +168,7 @@ describe("buildMonthlyDataCards", () => {
       const cards = buildMonthlyDataCards({ journals, year: YEAR, month: MONTH });
       const card = cards.find(c => c.key === "whatChanged");
       expect(card).toBeDefined();
-      expect(card.body).toContain("improved");
+      expect(card.body).toContain("Your skin settled through the month");
     });
 
     it("reports a decline the same way in the other direction", () => {
@@ -168,7 +183,7 @@ describe("buildMonthlyDataCards", () => {
       const cards = buildMonthlyDataCards({ journals, year: YEAR, month: MONTH });
       const card = cards.find(c => c.key === "whatChanged");
       expect(card).toBeDefined();
-      expect(card.body).toContain("declined");
+      expect(card.body).toContain("Your skin had a harder stretch toward the end");
     });
 
     it("is absent when one half has fewer than 3 entries", () => {

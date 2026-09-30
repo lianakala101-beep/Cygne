@@ -71,7 +71,7 @@ function buildBestDaysCard(monthJournals) {
   return {
     key: "bestDays",
     label: "Best Days",
-    body: `${WEEKDAY_NAMES[best.wd]}s were your best skin days this month, trending toward ${scoreToLabel(best.avg)}.`,
+    body: `Your skin was at its best on ${WEEKDAY_NAMES[best.wd]}s this month, trending toward ${scoreToLabel(best.avg)}.`,
   };
 }
 
@@ -106,22 +106,25 @@ function buildWhatsWorkingCard(monthRampCheckins, products) {
   return {
     key: "whatsWorking",
     label: "What's Working",
-    body: `${product.name} had a clean track record this month — ${bestCount} check-in${bestCount !== 1 ? "s" : ""}, no irritation reported.`,
+    body: `${product.name} had a clean month — ${bestCount} check-in${bestCount !== 1 ? "s" : ""}, no irritation.`,
   };
 }
 
 // Check-In Clarity — a plain count from this month's weekly Ritual
 // Check-ins: how many reported no irritation at all, out of however
 // many were logged. Always factual regardless of direction (doesn't
-// spin a rough month positively) — needs at least 2 check-ins to be
-// worth stating as a fraction.
+// spin a rough month positively) — needs at least 1 check-in to be
+// worth stating as a fraction. total === 1 still reads as a fraction
+// ("1 of your 1") rather than switching to a different sentence shape,
+// but "check-in" stays singular so it doesn't read as a typo.
 function buildCheckInClarityCard(monthCheckIns) {
-  if (monthCheckIns.length < 2) return null;
-  const clearCount = monthCheckIns.filter(c => c?.irritation === "none").length;
+  if (monthCheckIns.length < 1) return null;
+  const total = monthCheckIns.length;
+  const clear = monthCheckIns.filter(c => c?.irritation === "none").length;
   return {
     key: "checkInClarity",
     label: "Check-In Clarity",
-    body: `${clearCount} of ${monthCheckIns.length} check-ins this month reported no irritation.`,
+    body: `No irritation at ${clear} of your ${total} check-in${total === 1 ? "" : "s"} this month.`,
   };
 }
 
@@ -152,11 +155,14 @@ function buildWhatChangedCard(monthJournals) {
   const diff = secondAvg - firstAvg;
   if (Math.abs(diff) < 0.75) return null;
 
-  const direction = diff > 0 ? "improved" : "declined";
+  const direction = diff > 0 ? "improving" : "declining";
+  const body = direction === "improving"
+    ? `Your skin settled through the month — mostly ${scoreToLabel(firstAvg)} early on, ${scoreToLabel(secondAvg)} by the end.`
+    : `Your skin had a harder stretch toward the end — from mostly ${scoreToLabel(firstAvg)} early on to ${scoreToLabel(secondAvg)}.`;
   return {
     key: "whatChanged",
     label: "What Changed",
-    body: `Skin condition ${direction} through the month — from mostly ${scoreToLabel(firstAvg)} early on to ${scoreToLabel(secondAvg)} by the end.`,
+    body,
   };
 }
 

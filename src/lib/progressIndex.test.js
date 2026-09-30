@@ -161,12 +161,12 @@ describe("buildProgressIndex", () => {
         ...luteal.slice(0, 3).map((d, i) => checkIn(toOffset(d), { breakout: true, breakoutZones: [["Forehead"], ["Nose"], ["Left cheek"]][i] })),
         checkIn(-3, { breakout: true, breakoutZones: ["Chin"] }),
       ];
-      expect(buildProgressIndex({ ...base, checkIns }).insights).toEqual(["Breakouts clustered in your luteal phase lately."]);
+      expect(buildProgressIndex({ ...base, checkIns }).insights).toEqual(["Breakouts have clustered in your luteal phase lately."]);
     });
 
     it("names the zone when one zone covers 50%+ of those breakouts", () => {
       const checkIns = luteal.map((d, i) => checkIn(toOffset(d), { breakout: true, breakoutZones: i < 2 ? ["Chin", "Chin"] : ["Nose"] }));
-      expect(buildProgressIndex({ ...base, checkIns }).insights).toEqual(["Chin breakouts clustered in your luteal phase lately."]);
+      expect(buildProgressIndex({ ...base, checkIns }).insights).toEqual(["Chin breakouts have clustered in your luteal phase lately."]);
     });
 
     it("stays quiet below the 60% phase share", () => {
@@ -210,7 +210,7 @@ describe("buildProgressIndex", () => {
 
     it("moves to the weekly check-in once today is logged", () => {
       const index = buildProgressIndex({ journalEntries: entries("good", 1, 0), checkIns: [checkIn(-8)], today: TODAY });
-      expect(index.now).toEqual({ kind: "checkin", text: "Weekly check-in due" });
+      expect(index.now).toEqual({ kind: "checkin", text: "Your weekly check-in is ready" });
     });
 
     it("treats no check-in yet as due", () => {
@@ -250,11 +250,11 @@ describe("buildProgressIndex", () => {
     it("shows the insight when something higher-priority holds the Now card", () => {
       const notLogged = buildProgressIndex({ ...upToDate, journalEntries: [], rampProducts: [adapalene], rampCheckins: calm });
       expect(notLogged.now.kind).toBe("journal");
-      expect(notLogged.insights).toEqual(["Adapalene Gel has been calm for a week. Ready to advance."]);
+      expect(notLogged.insights).toEqual(["Adapalene Gel has been calm for a week — ready for the next step."]);
 
       const checkInDue = buildProgressIndex({ ...upToDate, checkIns: [checkIn(-9)], rampProducts: [adapalene], rampCheckins: calm });
       expect(checkInDue.now.kind).toBe("checkin");
-      expect(checkInDue.insights).toEqual(["Adapalene Gel has been calm for a week. Ready to advance."]);
+      expect(checkInDue.insights).toEqual(["Adapalene Gel has been calm for a week — ready for the next step."]);
     });
 
     it("sits below the journal and check-in items in the Now order", () => {
@@ -301,7 +301,7 @@ describe("buildProgressIndex", () => {
       const long = { ...adapalene, name: "The Ordinary Granactive Retinoid 2% in Squalane" };
       const index = buildProgressIndex({ ...upToDate, journalEntries: [], rampProducts: [long], rampCheckins: calm });
       const [sentence] = index.insights;
-      expect(sentence).toMatch(/^The Ordinary Granactive R… has been calm/);
+      expect(sentence).toMatch(/^The Ordinary Gran… has been calm/);
       expect(sentence.length).toBeLessThanOrEqual(70);
     });
 

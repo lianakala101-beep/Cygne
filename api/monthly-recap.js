@@ -260,6 +260,8 @@ WRITE: exactly ONE sentence, roughly 60-110 characters. Editorial, warm, calm. N
 
 Pull a real, specific signal from their context if one stands out — a recurring skin condition, irritation cluster, a product or ramp they're working through, a cycle phase, an upcoming event from skinProfile. If context is thin, write a plain, steady-as-you-go line grounded in something concrete and real about them (a goal, a product in routine, their skin type) rather than a generic platitude — but keep it to one line regardless.
 
+If the month was rough — more irritation or duller skin — say so plainly and kindly. Never reframe it as positive. Don't repeat what the data cards below will say.
+
 VOICE:
 - Warm, observational.
 - "You" not "the user". Past tense for what happened, present for now.
