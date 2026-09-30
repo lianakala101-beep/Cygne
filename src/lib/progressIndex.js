@@ -24,8 +24,10 @@ const BREAKOUT_MIN = 3;
 const PHASE_SHARE = 0.6;
 const ZONE_SHARE = 0.5;
 
-// Keeps "<name> has been calm for a week — ready for the next step." within ~70 characters.
-const MAX_PRODUCT_NAME = 18;
+// Caps how much of a long product name shows in the ramp insight and the
+// Now card, rather than running the whole thing on. Either can wrap to a
+// second line — that's fine.
+const MAX_PRODUCT_NAME = 26;
 
 const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 

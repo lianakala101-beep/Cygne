@@ -297,12 +297,11 @@ describe("buildProgressIndex", () => {
       expect(index.now.productId).toBe("a");
     });
 
-    it("shortens long product names and keeps the sentence under ~70 characters", () => {
+    it("shortens long product names", () => {
       const long = { ...adapalene, name: "The Ordinary Granactive Retinoid 2% in Squalane" };
       const index = buildProgressIndex({ ...upToDate, journalEntries: [], rampProducts: [long], rampCheckins: calm });
       const [sentence] = index.insights;
-      expect(sentence).toMatch(/^The Ordinary Gran… has been calm/);
-      expect(sentence.length).toBeLessThanOrEqual(70);
+      expect(sentence).toMatch(/^The Ordinary Granactive R… has been calm/);
     });
 
     it("falls back to a generic name and tolerates missing ramp data", () => {

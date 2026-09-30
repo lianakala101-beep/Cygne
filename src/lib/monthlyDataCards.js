@@ -113,12 +113,11 @@ function buildWhatsWorkingCard(monthRampCheckins, products) {
 // Check-In Clarity — a plain count from this month's weekly Ritual
 // Check-ins: how many reported no irritation at all, out of however
 // many were logged. Always factual regardless of direction (doesn't
-// spin a rough month positively) — needs at least 1 check-in to be
-// worth stating as a fraction. total === 1 still reads as a fraction
-// ("1 of your 1") rather than switching to a different sentence shape,
-// but "check-in" stays singular so it doesn't read as a typo.
+// spin a rough month positively) — needs at least 2 check-ins to be
+// worth stating as a fraction. (Singular/plural on "check-in" is still
+// handled below in case that gate ever changes.)
 function buildCheckInClarityCard(monthCheckIns) {
-  if (monthCheckIns.length < 1) return null;
+  if (monthCheckIns.length < 2) return null;
   const total = monthCheckIns.length;
   const clear = monthCheckIns.filter(c => c?.irritation === "none").length;
   return {

@@ -138,20 +138,10 @@ describe("buildMonthlyDataCards", () => {
       expect(cards.find(c => c.key === "checkInClarity")).toBeUndefined();
     });
 
-    it("handles a single check-in with sensible singular phrasing", () => {
+    it("is absent with fewer than 2 check-ins", () => {
       const checkIns = [{ date: "2026-01-05T00:00:00Z", irritation: "none" }];
       const cards = buildMonthlyDataCards({ checkIns, year: YEAR, month: MONTH });
-      const card = cards.find(c => c.key === "checkInClarity");
-      expect(card).toBeDefined();
-      expect(card.body).toBe("No irritation at 1 of your 1 check-in this month.");
-    });
-
-    it("counts irritation correctly when the single check-in wasn't clear", () => {
-      const checkIns = [{ date: "2026-01-05T00:00:00Z", irritation: "mild" }];
-      const cards = buildMonthlyDataCards({ checkIns, year: YEAR, month: MONTH });
-      const card = cards.find(c => c.key === "checkInClarity");
-      expect(card).toBeDefined();
-      expect(card.body).toBe("No irritation at 0 of your 1 check-in this month.");
+      expect(cards.find(c => c.key === "checkInClarity")).toBeUndefined();
     });
   });
 
