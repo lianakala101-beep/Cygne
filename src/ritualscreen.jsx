@@ -361,24 +361,31 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
       </div>
 
       {/* -- Ritual Mode Card ---------------------------------------------- */}
+      {/* Was a solid ivory card (ink-on-ivory) — now a glass panel on the
+          dark canvas, so every color below flips to the light-on-dark
+          side: --parchment/--clay/--ink/--border are the app's existing
+          legacy aliases that already resolve to the correct dark-canvas
+          values everywhere else, so this card now matches the paused-
+          recovery banner immediately below it instead of standing out
+          as the one ink-on-light card on the screen. */}
       {ritualMode.name && (
-        <div style={{ background: "rgba(var(--rgb-ivory), 0.82)", border: "1px solid rgba(var(--rgb-ivory), 0.32)", borderRadius: "var(--radius)", padding: "var(--space-5) var(--space-5) var(--space-4)", marginBottom: "var(--space-6)", position: "relative" }}>
+        <div style={{ ...glassCard, padding: "var(--space-5) var(--space-5) var(--space-4)", marginBottom: "var(--space-6)", position: "relative" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", marginBottom: "var(--space-2)" }}>
-            <span style={{ color: "var(--color-stone, #5a5a5a)" }}><Icon name={timeOfDayIcon} size={13} /></span>
-            <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-stone, #5a5a5a)" }}>{timeOfDayLabel.toLowerCase()}</span>
+            <span style={{ color: "var(--clay)" }}><Icon name={timeOfDayIcon} size={13} /></span>
+            <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)" }}>{timeOfDayLabel.toLowerCase()}</span>
             {(cyclePhase || isCycleStale(user)) && (
-              <span style={{ marginLeft: "auto", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--color-stone, #5a5a5a)" }}>{cyclePhase ? `${cyclePhase} phase` : CYCLE_STALE_MESSAGE}</span>
+              <span style={{ marginLeft: "auto", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--clay)" }}>{cyclePhase ? `${cyclePhase} phase` : CYCLE_STALE_MESSAGE}</span>
             )}
           </div>
-          <p style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 700, letterSpacing: "var(--tracking-label)", color: "var(--color-ink)", margin: "0 0 2px" }}>{ritualMode.name}</p>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-stone)", margin: "0 0 var(--space-3)" }}>{ritualMode.tagline}</p>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-ink)", margin: 0, lineHeight: 1.65 }}>{ritualMode.guidance}</p>
+          <p style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 700, letterSpacing: "var(--tracking-label)", color: "var(--parchment)", margin: "0 0 2px" }}>{ritualMode.name}</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: "0 0 var(--space-3)" }}>{ritualMode.tagline}</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--parchment)", margin: 0, lineHeight: 1.65 }}>{ritualMode.guidance}</p>
           {filteredOut.length > 0 && (
-            <div style={{ marginTop: "var(--space-3)", paddingTop: "var(--space-3)", borderTop: "1px solid rgba(var(--rgb-ink), 0.08)" }}>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-stone)", margin: "0 0 var(--space-2)", letterSpacing: "0.06em" }}>{"Paused " + getRitualTimeLabel(amCompleted).toLowerCase()}</p>
+            <div style={{ marginTop: "var(--space-3)", paddingTop: "var(--space-3)", borderTop: "1px solid var(--border)" }}>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: "0 0 var(--space-2)", letterSpacing: "0.06em" }}>{"Paused " + getRitualTimeLabel(amCompleted).toLowerCase()}</p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-1)" }}>
                 {filteredOut.map(p => (
-                  <span key={p.id} style={{ padding: "var(--space-1) var(--space-3)", borderRadius: "var(--radius-pill)", background: "rgba(var(--rgb-ink), 0.08)", border: "1px solid rgba(var(--rgb-ink), 0.08)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-stone)" }}>{p.name}</span>
+                  <span key={p.id} style={{ padding: "var(--space-1) var(--space-3)", borderRadius: "var(--radius-pill)", background: "var(--ink)", border: "1px solid var(--border)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)" }}>{p.name}</span>
                 ))}
               </div>
             </div>
