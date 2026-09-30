@@ -177,8 +177,11 @@ function OnboardingScreen({ onComplete, setLocationData }) {
       </div>
       {skinAge && (
         <div style={{ marginTop: "var(--space-5)", padding: "var(--space-3) var(--space-4)", background: "rgba(var(--rgb-ivory), 0.08)", border: "1px solid rgba(var(--rgb-ivory), 0.32)", borderRadius: "var(--radius)" }}>
-          <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.56)", margin: "0 0 var(--space-1)" }}>{skinAge.bracket}</p>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ivory), 0.56)", margin: 0, lineHeight: 1.65 }}>{skinAge.note}</p>
+          {/* 0.56 measures ~3.98:1 against this glass fill — under 4.5:1.
+              Raised to 0.7 (~5.2:1), matching the softening-pass fix
+              applied to --clay elsewhere. */}
+          <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.7)", margin: "0 0 var(--space-1)" }}>{skinAge.bracket}</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ivory), 0.7)", margin: 0, lineHeight: 1.65 }}>{skinAge.note}</p>
         </div>
       )}
     </div>,
@@ -233,7 +236,7 @@ function OnboardingScreen({ onComplete, setLocationData }) {
               <div style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--color-ivory, #faf9f4)" }} />
               <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "var(--color-ivory, #faf9f4)", margin: 0, fontWeight: 400 }}>Location enabled</p>
             </div>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ivory), 0.56)", margin: "var(--space-2) 0 0" }}>Your environment data will appear on the home screen.</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ivory), 0.7)", margin: "var(--space-2) 0 0" }}>Your environment data will appear on the home screen.</p>
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
@@ -515,8 +518,11 @@ function OnboardingScreen({ onComplete, setLocationData }) {
         <p style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-sm)", fontWeight: 400, letterSpacing: "var(--tracking-label)", color: "rgba(var(--rgb-ivory), 0.56)", margin: "0 0 var(--space-6)" }}>Your ritual begins.</p>
         {skinAge && (
           <div style={{ padding: "var(--space-3) var(--space-4)", background: "rgba(var(--rgb-ivory), 0.08)", border: "1px solid rgba(var(--rgb-ivory), 0.32)", borderRadius: "var(--radius)", marginBottom: "calc(var(--space-1) * 7)", width: "100%" }}>
-            <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.56)", margin: "0 0 var(--space-1)" }}>{skinAge.bracket}</p>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ivory), 0.56)", margin: 0, lineHeight: 1.7 }}>{skinAge.note}</p>
+            {/* 0.56 measures ~3.98:1 against this glass fill — under 4.5:1.
+                Raised to 0.7 (~5.2:1), matching the softening-pass fix
+                applied to --clay elsewhere. */}
+            <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "rgba(var(--rgb-ivory), 0.7)", margin: "0 0 var(--space-1)" }}>{skinAge.bracket}</p>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ivory), 0.7)", margin: 0, lineHeight: 1.7 }}>{skinAge.note}</p>
           </div>
         )}
         <button onClick={handleComplete}
