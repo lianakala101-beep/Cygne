@@ -3,6 +3,7 @@ import { FACE_ZONES, FACE_ZONE_LABELS, FACE_ZONE_IDS } from "./FaceZoneSelector.
 import { AskCygneModal } from "./AskCygneModal.jsx";
 import { getAskCygneAccess } from "../utils.jsx";
 import { getCyclePhase, estimateCycleDayForDate } from "../lib/cycle.js";
+import { glassCard } from "../lib/ui.js";
 
 const PERIODS = [
   { key: 7,  label: "7 DAYS"   },
@@ -10,12 +11,16 @@ const PERIODS = [
   { key: 90, label: "3 MONTHS" },
 ];
 
-const PEBBLE = "var(--color-stone, #5a5a5a)";
-const STONE = "var(--color-stone, #5a5a5a)";
-const INK = "var(--color-ink, #1c1c1a)";
-const INKY = "var(--color-inky-moss, #2d3d2b)";
-const IVORY = "var(--color-ivory, #faf9f4)";
-const STROKE_DEFAULT = INKY;
+// Both the card and the drawer were solid ivory (ink-on-ivory); now
+// glass panels on the dark canvas, so these all flip to the app's
+// existing light-on-dark aliases. STROKE_DEFAULT keeps the outline in
+// the same green hue family it always used, just lightened from the
+// near-black inky-moss to sage so it actually shows up against a dark
+// card instead of blending into it.
+const PEBBLE = "var(--clay)";
+const STONE = "var(--clay)";
+const INK = "var(--parchment)";
+const STROKE_DEFAULT = "var(--color-sage)";
 
 // Check-ins store breakout locations as free-text labels (see CheckInModal in
 // progress.jsx), but this map renders 7 fixed SVG zones keyed by id. Translate
@@ -52,12 +57,18 @@ function daysAgoIso(n) {
   return d.toISOString().split("T")[0];
 }
 
+// Heat scale used to run moss darkening against an ivory card — dark-on-
+// light. On the glass card the ground itself is already dark, so darkening
+// further with moss (nearly the same hue as the canvas) would disappear.
+// Same hue family (green), inverted to a light-on-dark ramp instead: sage
+// at rising opacity, which lightens as inflammation increases and reads
+// clearly against the dark glass.
 function fillForScore(s) {
   if (s <= 0) return "none";
-  if (s <= 0.25) return "rgba(var(--rgb-ivory), 0.08)";
-  if (s <= 0.50) return "rgba(var(--rgb-moss), 0.16)";
-  if (s <= 0.75) return "rgba(var(--rgb-moss), 0.32)";
-  return "rgba(var(--rgb-moss), 0.56)";
+  if (s <= 0.25) return "rgba(var(--rgb-sage), 0.16)";
+  if (s <= 0.50) return "rgba(var(--rgb-sage), 0.32)";
+  if (s <= 0.75) return "rgba(var(--rgb-sage), 0.56)";
+  return "rgba(var(--rgb-sage), 0.82)";
 }
 
 // Cycle day for a flare date — see estimateCycleDayForDate in
@@ -104,10 +115,8 @@ export function FaceHeatMap({ checkIns = [], products = [], user = {} }) {
 
   return (
     <div style={{
-      background: "rgba(var(--rgb-ivory), 0.94)",
-      borderRadius: "var(--radius)",
+      ...glassCard,
       padding: "var(--space-6) var(--space-5) calc(var(--space-1) * 7)",
-      border: "1px solid rgba(var(--rgb-ivory), 0.32)",
     }}>
       {/* Time filter */}
       <div style={{ display: "flex", justifyContent: "center", gap: 0, marginBottom: "var(--space-5)" }}>
@@ -153,9 +162,9 @@ export function FaceHeatMap({ checkIns = [], products = [], user = {} }) {
               key={z.id}
               d={z.d}
               fill={fill}
-              stroke={isActive ? "rgba(var(--rgb-moss), 0.82)" : STROKE_DEFAULT}
+              stroke={STROKE_DEFAULT}
               strokeOpacity={isActive ? 1 : 0.55}
-              strokeWidth="1.4"
+              strokeWidth={isActive ? 2 : 1.4}
               onClick={isEmpty ? undefined : () => setActiveZone(z.id)}
               style={{
                 cursor: isEmpty ? "default" : "pointer",
@@ -278,7 +287,7 @@ function ZoneInsightDrawer({ zoneId, checkIns, products, user, onClose, onAskCyg
         onClick={e => e.stopPropagation()}
         style={{
           width: "100%", maxWidth: 520,
-          background: IVORY,
+          ...glassCard,
           borderRadius: "var(--radius-sheet)",
           padding: "var(--space-6) var(--space-6) var(--space-8)",
           maxHeight: "85vh", overflowY: "auto",
@@ -334,7 +343,7 @@ function ZoneInsightDrawer({ zoneId, checkIns, products, user, onClose, onAskCyg
           {topProducts.length === 0 ? (
             <p style={{
               fontFamily: "var(--font-body, 'Fungis Normal', 'Fungis Normal', sans-serif)",
-              fontSize: "var(--text-xs)", color: PEBBLE, opacity: 0.75, margin: 0,
+              fontSize: "var(--text-xs)", color: PEBBLE, margin: 0,
             }}>
               Not enough data yet.
             </p>
@@ -347,7 +356,7 @@ function ZoneInsightDrawer({ zoneId, checkIns, products, user, onClose, onAskCyg
                     fontFamily: "var(--font-body, 'Fungis Normal', 'Fungis Normal', sans-serif)",
                     fontSize: "var(--text-sm)", color: INK,
                     padding: "var(--space-2) 0",
-                    borderBottom: "1px solid rgba(var(--rgb-ink), 0.08)",
+                    borderBottom: "1px solid var(--border)",
                   }}
                 >
                   {p.name || "(unnamed)"}{p.brand ? <span style={{ color: PEBBLE }}> · {p.brand}</span> : null}
@@ -363,7 +372,7 @@ function ZoneInsightDrawer({ zoneId, checkIns, products, user, onClose, onAskCyg
           style={{
             width: "100%", padding: "var(--space-4) 0",
             background: "transparent",
-            border: "1px solid rgba(var(--rgb-ink), 0.32)",
+            border: "1px solid rgba(var(--rgb-ivory), 0.32)",
             color: INK,
             borderRadius: "var(--radius)",
             fontFamily: "var(--font-display, 'Fungis Heavy', sans-serif)",
