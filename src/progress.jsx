@@ -1975,13 +1975,17 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
                   <span aria-hidden="true" style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 400, color: "var(--color-ivory, #faf9f4)", flexShrink: 0, marginLeft: "var(--space-3)", lineHeight: 1 }}>→</span>
                 </button>
               ) : (
-                <div style={{
-                  display: "flex", alignItems: "center", gap: "var(--space-3)",
-                  padding: "var(--space-4) 0",
-                  background: "transparent",
-                  border: "none",
-                  borderBottom: "1px solid rgba(var(--rgb-ivory), 0.32)",
-                }}>
+                <button onClick={() => setShowCheckIn(true)} aria-label="Update check-in"
+                  style={{
+                    width: "100%",
+                    display: "flex", alignItems: "center", gap: "var(--space-3)",
+                    padding: "var(--space-4) 0",
+                    background: "transparent",
+                    border: "none",
+                    borderBottom: "1px solid rgba(var(--rgb-ivory), 0.32)",
+                    cursor: "pointer", textAlign: "left",
+                    WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
+                  }}>
                   <div style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--color-sage)", flexShrink: 0 }} />
                   <div style={{ flex: 1 }}>
                     <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-ivory, #faf9f4)" }}>
@@ -1991,8 +1995,8 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
                       <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ivory), 0.7)", marginLeft: "var(--space-2)", opacity: 0.85 }}>{lastCheckIn.irritation} irritation</span>
                     )}
                   </div>
-                  <button onClick={() => setShowCheckIn(true)} aria-label="Update check-in" style={{ display: "inline-flex", alignItems: "center", fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 400, color: "var(--color-ivory, #faf9f4)", background: "none", border: "none", padding: 0, cursor: "pointer", WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent", lineHeight: 1 }}>→</button>
-                </div>
+                  <span aria-hidden="true" style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 400, color: "var(--color-ivory, #faf9f4)", flexShrink: 0, marginLeft: "var(--space-3)", lineHeight: 1 }}>→</span>
+                </button>
               )}
               </SectionShell>
 

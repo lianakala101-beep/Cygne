@@ -459,7 +459,6 @@ function IntroduceSlowlyCard({
 
   const saving = checkinStatus === "saving";
   const saved  = checkinStatus === "saved";
-  const weekPad = String(weekNumber).padStart(2, "0");
   const showCheckin = checkinDue;
 
   const submitCheckin = async () => {
@@ -492,7 +491,7 @@ function IntroduceSlowlyCard({
       borderTop: "1px solid rgba(var(--rgb-ivory), 0.32)",
       borderBottom: isLast ? "1px solid rgba(var(--rgb-ivory), 0.32)" : "none",
     }}>
-      {/* Header row: WK badge (when check-in due) + expand chevron */}
+      {/* Header row: week badge (when check-in due) + expand chevron */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "var(--space-3)", marginBottom: "var(--space-3)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", minWidth: 0, flexWrap: "wrap" }}>
           {showCheckin ? (
@@ -506,7 +505,7 @@ function IntroduceSlowlyCard({
                 fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)",
                 color: "var(--sage, #2d3d2b)",
                 whiteSpace: "nowrap", lineHeight: 1,
-              }}>( WK {weekPad} )</span>
+              }}>Week {weekNumber}</span>
               <span style={{
                 fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 700,
                 letterSpacing: "var(--tracking-display)", textTransform: "uppercase",

@@ -184,7 +184,7 @@ function ScanModal({ products, onAddToShelf, onClose }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "var(--space-5)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
             {mode !== "choose" && (
-              <button onClick={reset} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: "0 var(--space-2) 0 0", opacity: 0.6, display: "inline-flex" }}><Icon name="arrow-left" size={16} /></button>
+              <button onClick={reset} aria-label="Back" style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: "0 var(--space-2) 0 0", opacity: 0.6, display: "inline-flex" }}><Icon name="arrow-left" size={16} /></button>
             )}
             <div>
               <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 var(--space-1)" }}>Shop Scan</p>

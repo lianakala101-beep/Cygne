@@ -270,7 +270,7 @@ function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }
   // Damp-skin tip only applies to leave-on humectant layers, not cleansers.
   const dampEligible = step.category === "Serum" || step.category === "Essence";
   const damp = dampEligible && isDampSkinProduct(step);
-  const stepNum = String(index + 1).padStart(2, "0");
+  const stepNum = index + 1;
   const verb = STEP_VERBS[step.category] || (step.category || "").toUpperCase();
   const sessionTag = step.session === "am" ? "AM"
     : step.session === "pm" ? "PM"
@@ -294,20 +294,23 @@ function RoutineStep({ step, index, isLast, checked, onCheck, scheduled = true }
         WebkitTapHighlightColor: "transparent",
       }}
     >
-      {/* Bracketed number badge — thin outlined pill, ivory glyph on the
-          dark ritual canvas. Replaces the previous "Step 01" eyebrow so
-          the number itself becomes the anchor of the row. */}
+      {/* Number circle — plain numeral in a thin outlined circle, ivory
+          glyph on the dark ritual canvas. Replaces the previous
+          "( 01 )" bracketed pill so the number itself becomes the
+          anchor of the row without a typed ornament around it. Fixed
+          28px circle with no letter-spacing so two-digit step numbers
+          (10+) still center cleanly. */}
       <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", margin: "0 0 var(--space-2)" }}>
         <span style={{
-          display: "inline-flex", alignItems: "center",
-          padding: "var(--space-1) var(--space-3)",
+          display: "inline-flex", alignItems: "center", justifyContent: "center",
+          width: 28, height: 28, flexShrink: 0,
           border: "1px solid rgba(var(--rgb-ivory), 0.32)",
-          borderRadius: "var(--radius-pill)",
+          borderRadius: "50%",
           fontFamily: "var(--font-display)",
-          fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)",
+          fontSize: "var(--text-xs)", fontWeight: 700,
           color: "var(--color-ivory, #faf9f4)",
           whiteSpace: "nowrap", lineHeight: 1,
-        }}>( {stepNum} )</span>
+        }}>{stepNum}</span>
         {!scheduled && (
           <span style={{
             fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400,

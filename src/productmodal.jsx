@@ -492,7 +492,7 @@ function ProductModal({ product, onSave, onClose, user }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-6)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
             {modalStep === "form" && !(product && product.id) && (
-              <button onClick={() => setModalStep("choose")} style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: "0 var(--space-2) 0 0", opacity: 0.6, display: "inline-flex" }}><Icon name="arrow-left" size={16} /></button>
+              <button onClick={() => setModalStep("choose")} aria-label="Back" style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: "0 var(--space-2) 0 0", opacity: 0.6, display: "inline-flex" }}><Icon name="arrow-left" size={16} /></button>
             )}
             <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--parchment)", margin: 0 }}>
               {product && product.id ? "Edit Product" : modalStep === "choose" ? "Add a Product" : "Product Details"}

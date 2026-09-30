@@ -113,9 +113,9 @@ export function RampCheckinCard({ productName, weekNumber, onSave, onDone, onDis
       marginBottom: "var(--space-3)",
       padding: "var(--space-4) var(--space-4) var(--space-4)",
     }}>
-      {/* Header — bracketed week number badge replaces the "Week N
-          check-in" eyebrow. The pill IS the eyebrow; the descriptor
-          "check-in" sits alongside as a small caps label. */}
+      {/* Header — week number badge replaces the "Week N check-in"
+          eyebrow. The pill IS the eyebrow; the descriptor "check-in"
+          sits alongside as a small caps label. */}
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: "var(--space-3)", marginBottom: "var(--space-3)" }}>
         <div style={{ minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", margin: "0 0 var(--space-2)" }}>
@@ -128,7 +128,7 @@ export function RampCheckinCard({ productName, weekNumber, onSave, onDone, onDis
               fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "var(--tracking-display)",
               color: "var(--sage, #2d3d2b)",
               whiteSpace: "nowrap", lineHeight: 1,
-            }}>( WK {String(weekNumber).padStart(2, "0")} )</span>
+            }}>Week {weekNumber}</span>
             <span style={{
               fontFamily: "var(--font-display)", fontSize: "var(--text-xs)", fontWeight: 700,
               letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
