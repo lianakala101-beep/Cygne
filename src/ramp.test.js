@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { getRampWeek, getRampPhase, RAMP_SCHEDULES, RAMP_ACTIVES, getRampSchedule, isSchedulePaced, getRampDaysAtWeek, isReadyToAdvance, deriveRampSignals } from "./ramp.jsx";
+import { getRampWeek, getRampPhase, RAMP_SCHEDULES, RAMP_ACTIVES, getRampSchedule, isSchedulePaced, isHighStrengthAzelaic, getRampDaysAtWeek, isReadyToAdvance, deriveRampSignals } from "./ramp.jsx";
 
 // Force "today" to a fixed local date so daysBetweenLocal is deterministic.
 function setToday(year, monthIndex, day) {
@@ -151,6 +151,46 @@ describe("getRampSchedule / sensitivity pacing", () => {
 
   it("regression: an unpaced retinol schedule is still returned by reference", () => {
     expect(getRampSchedule("retinol", [])).toBe(RAMP_SCHEDULES.retinol);
+  });
+});
+
+describe("isHighStrengthAzelaic", () => {
+  it("returns true for 15% azelaic acid", () => {
+    expect(isHighStrengthAzelaic(["Azelaic Acid 15%", "glycerin"])).toBe(true);
+  });
+
+  it("returns true for 20% azelaic acid", () => {
+    expect(isHighStrengthAzelaic(["azelaic acid 20%"])).toBe(true);
+  });
+
+  it("returns false for 10% azelaic acid", () => {
+    expect(isHighStrengthAzelaic(["azelaic acid 10%"])).toBe(false);
+  });
+
+  it("returns false for a strength that isn't 15 or 20 (e.g. a compounded 18%)", () => {
+    expect(isHighStrengthAzelaic(["azelaic acid 18%"])).toBe(false);
+  });
+
+  it("returns false when no percentage is listed", () => {
+    expect(isHighStrengthAzelaic(["azelaic acid"])).toBe(false);
+  });
+
+  it("returns false for a product with no azelaic acid at all", () => {
+    expect(isHighStrengthAzelaic(["niacinamide 10%", "retinol"])).toBe(false);
+  });
+
+  it("returns false for null/undefined/empty ingredients", () => {
+    expect(isHighStrengthAzelaic(null)).toBe(false);
+    expect(isHighStrengthAzelaic(undefined)).toBe(false);
+    expect(isHighStrengthAzelaic([])).toBe(false);
+  });
+
+  it("accepts a comma-separated string as well as an array", () => {
+    expect(isHighStrengthAzelaic("Azelaic Acid 15%, Niacinamide 10%")).toBe(true);
+  });
+
+  it("is case-insensitive", () => {
+    expect(isHighStrengthAzelaic(["AZELAIC ACID 20%"])).toBe(true);
   });
 });
 

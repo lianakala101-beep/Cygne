@@ -178,15 +178,15 @@ const RAMP_SCHEDULES = {
         name: "Patch",
         weeks: [1],
         frequency: "1× this week",
-        instruction: "Apply a small amount to your jawline or behind one ear for 2 nights. Azelaic acid is generally gentle, but check your baseline before going all over.",
-        onTrack: "No reaction — you're clear to begin.",
-        backOff: "Stinging, tingling, or flushing — wait another week before starting.",
+        instruction: "Apply a small amount to your jawline or behind one ear for 2 nights. Mild tingling that fades within a minute is common.",
+        onTrack: "No reaction beyond brief tingling — you're clear to begin.",
+        backOff: "Burning or flushing that lingers — wait another week before starting. Hives or swelling — stop and check with a doctor.",
       },
       {
         name: "Introduce",
         weeks: [2, 3],
         frequency: "Every other evening",
-        instruction: "Apply every other evening on clean, dry skin. A light tingle in the first minute is normal — it should fade quickly.",
+        instruction: "Apply every other evening on clean, dry skin. A light tingle or itch in the first minute is common and should fade quickly.",
         onTrack: "Mild, short-lived tingling is normal. Stay the course.",
         backOff: "Tingling that lingers or visible redness — drop back to twice a week for another week.",
       },
@@ -194,16 +194,16 @@ const RAMP_SCHEDULES = {
         name: "Build",
         weeks: [4, 5, 6],
         frequency: "Nightly",
-        instruction: "Increase to every evening. Azelaic acid layers well under moisturizer and pairs easily with the rest of your ritual.",
-        onTrack: "Skin is tolerating well. Tone and texture start evening out around now.",
+        instruction: "Increase to every evening, after cleansing and before moisturizer. If you also use an AHA or BHA, keep them on separate nights for now.",
+        onTrack: "Skin is tolerating well. Results from azelaic acid are gradual — think weeks, not days.",
         backOff: "Persistent irritation — return to Introduce phase for 1–2 weeks.",
       },
       {
         name: "Maintain",
         weeks: [7, 8, 9, 10, 11, 12],
         frequency: "Nightly or AM+PM if tolerated",
-        instruction: "Most people settle at nightly use. If your skin handles it well, azelaic acid is gentle enough for some to use morning and night.",
-        onTrack: "Full tolerance reached. Redness and texture improvements continue to build over months.",
+        instruction: "Most people settle at nightly use. If your skin handles it well, you can add a morning application, following your product's directions and finishing with SPF.",
+        onTrack: "Full tolerance reached. Benefits build gradually with consistent use.",
         backOff: "If skin flares with weather changes or other actives, back off to nightly only and hold.",
       },
     ],
@@ -302,6 +302,21 @@ function getRampSchedule(activeKey, concerns) {
 // to compare the schedule object to the base itself.
 function isSchedulePaced(concerns) {
   return isSensitivityConcern(concerns);
+}
+
+// True when the product's ingredient list specifies 15% or 20% azelaic
+// acid — the higher-strength end (10% and below are the common gentler
+// OTC concentrations; 15%/20% formulas like Finacea/Azelex are typically
+// prescribed). This only drives a one-line reminder on the card — the
+// prescribed strength still follows the same Introduce Slowly pacing;
+// the note just points the user to their prescriber's own directions
+// when they conflict with the in-app schedule.
+function isHighStrengthAzelaic(ingredients) {
+  const ing = Array.isArray(ingredients) ? ingredients.join(" ") : String(ingredients || "");
+  const match = ing.toLowerCase().match(/azelaic acid\s*(\d+(?:\.\d+)?)\s*%/);
+  if (!match) return false;
+  const pct = parseFloat(match[1]);
+  return pct === 15 || pct === 20;
 }
 
 function getRampPhase(schedule, week) {
@@ -501,6 +516,10 @@ function IntroduceSlowlyCard({
   const clampedPhaseIndex = Math.min(phaseIndex, schedule.phases.length - 1);
   const startedLabel = formatStartedLabel(product.routineStartDate);
   const maxWeek = Math.max(...schedule.phases[schedule.phases.length - 1].weeks);
+  // schedule.label survives the sensitivity-pacing transform unchanged
+  // (paceScheduleForSensitivity only rewrites phases), so this check
+  // holds for both the base and paced azelaic acid schedule.
+  const showHighStrengthNote = schedule.label === "Azelaic Acid" && isHighStrengthAzelaic(product.ingredients);
 
   const saving = checkinStatus === "saving";
   const saved  = checkinStatus === "saved";
@@ -626,6 +645,15 @@ function IntroduceSlowlyCard({
           margin: "var(--space-2) 0 0", letterSpacing: "0.02em", lineHeight: 1.5,
         }}>
           Paced more gradually based on your skin profile.
+        </p>
+      )}
+      {showHighStrengthNote && (
+        <p style={{
+          fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontStyle: "italic",
+          color: "var(--clay)", opacity: 0.75,
+          margin: "var(--space-2) 0 0", letterSpacing: "0.02em", lineHeight: 1.5,
+        }}>
+          If this was prescribed, follow your prescriber's directions first.
         </p>
       )}
 
@@ -1191,4 +1219,4 @@ function WeeklyRitualCalendar({ rampProducts, products }) {
 
 // --- PROGRESS ----------------------------------------------------------------
 
-export { RAMP_SCHEDULES, RAMP_ACTIVES, IntroduceSlowlyCard, WeeklyRitualCalendar, getRampWeek, getRampPhase, getRampSchedule, isSchedulePaced, deriveRampSignals, getRampDaysAtWeek, isReadyToAdvance };
+export { RAMP_SCHEDULES, RAMP_ACTIVES, IntroduceSlowlyCard, WeeklyRitualCalendar, getRampWeek, getRampPhase, getRampSchedule, isSchedulePaced, isHighStrengthAzelaic, deriveRampSignals, getRampDaysAtWeek, isReadyToAdvance };
