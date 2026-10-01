@@ -8,6 +8,7 @@ import { MyRoutine } from "./ritualscreen.jsx";
 import { Shelf } from "./vanity.jsx";
 import { Progress, FirstCheckInPrompt } from "./progress.jsx";
 import { upsertJournalEntry } from "./lib/journal.js";
+import { shouldOfferFirstCheckIn } from "./lib/firstCheckIn.js";
 import { SwanWelcomeScreen, useLocalStorage, getCurrentCycleDay, daysBetweenLocal, toLocalMidnight, isoWeekNumber, isoWeekYear } from "./utils.jsx";
 import { getCyclePhase, parseCycleLength } from "./lib/cycle.js";
 import { WeekendNudgeCard } from "./weekend.jsx";
@@ -210,9 +211,15 @@ export default function App() {
   const [firstRun, setFirstRun] = useLocalStorage("cygne_firstrun", false);
   // One-tap "how does your skin feel" prompt fired the moment a brand-new
   // user lands on the dashboard — before they've added any products.
-  // Plain useState (not persisted): it only ever needs to fire once, right
-  // after SwanWelcomeScreen's onDone, and should never reappear on reload.
+  // showFirstCheckIn (plain useState) is just "render it right now, this
+  // session". firstCheckInOffered is the persisted at-most-once guard —
+  // set the instant we decide to show it (see shouldOfferFirstCheckIn),
+  // not when the user acts on it, so a reload between the offer and the
+  // tap can't cause a second offer. Reset for each new signup in
+  // handleOnboardingComplete so a different account on the same device
+  // still gets its own one-time offer.
   const [showFirstCheckIn, setShowFirstCheckIn] = useState(false);
+  const [firstCheckInOffered, setFirstCheckInOffered] = useLocalStorage("cygne_first_checkin_offered", false);
   const [notifPermission, setNotifPermission] = useState("default");
   const [notifDismissed, setNotifDismissed] = useLocalStorage("cygne_notifdismissed", false);
   const [tab, setTab] = useState("dashboard");
@@ -648,6 +655,10 @@ export default function App() {
         // consistency, routine philosophy, climate, environment, travel,
         // fragrance sensitivity, ingredients to avoid)
         skinProfile: meta.skinProfile || null,
+        // Funnel-event guard (see saveProduct) — must round-trip through
+        // metadata or a reload/re-auth would forget it fired and let
+        // first_product_added refire for the same account.
+        firstProductAddedLogged: meta.firstProductAddedLogged || false,
         // Overwrite lastActiveDate with today so the NEXT session sees
         // this session's opening as the reference point. The stored
         // value is read into daysSinceLastActive below BEFORE we
@@ -1402,6 +1413,9 @@ export default function App() {
     setUser(profileWithEmail);
     setProducts([]);
     setFirstRun(true);
+    // Fresh account gets its own one-time first-check-in offer, even if a
+    // previous account on this same device already used theirs up.
+    setFirstCheckInOffered(false);
     setNeedsOnboarding(false);
     // Flip the load gates for a first-session new user. loadUserProfile is
     // never called on this path (handleAuth branched to setNeedsOnboarding
@@ -1445,14 +1459,18 @@ export default function App() {
   ];
 
   const saveProduct = (p) => {
-    setProducts(prev => {
-      const isNew = !prev.find(x => x.id === p.id);
-      // Funnel event — fires once, the moment a brand-new user's vanity
-      // goes from empty to non-empty. No product name/category/ingredients
-      // in the payload, just the milestone.
-      if (isNew && prev.length === 0) logDebugEvent("first_product_added");
-      return isNew ? [...prev, p] : prev.map(x => x.id === p.id ? p : x);
-    });
+    // Funnel event — fires once per ACCOUNT, not once per time the vanity
+    // happens to go from empty to non-empty (deleting everything and
+    // re-adding a product later must not refire it). Guarded by a flag
+    // on `user` so it round-trips through Supabase user_metadata (see
+    // loadUserProfile's initialUserData) rather than resetting on every
+    // device/reinstall. No product name/category/ingredients in the
+    // payload, just the milestone.
+    if (!user?.firstProductAddedLogged && products.length === 0 && !products.find(x => x.id === p.id)) {
+      logDebugEvent("first_product_added");
+      setUser(u => ({ ...(u || {}), firstProductAddedLogged: true }));
+    }
+    setProducts(prev => prev.find(x => x.id === p.id) ? prev.map(x => x.id === p.id ? p : x) : [...prev, p]);
     setModal(null);
   };
 
@@ -1865,7 +1883,14 @@ export default function App() {
   }
 
   // -- First run welcome (just completed onboarding) --------------------------
-  if (firstRun) return <SwanWelcomeScreen user={user} onDone={() => { setFirstRun(false); setTab("dashboard"); setShowFirstCheckIn(true); }} />;
+  if (firstRun) return <SwanWelcomeScreen user={user} onDone={() => {
+    setFirstRun(false);
+    setTab("dashboard");
+    if (shouldOfferFirstCheckIn({ journals, offered: firstCheckInOffered })) {
+      setFirstCheckInOffered(true);
+      setShowFirstCheckIn(true);
+    }
+  }} />;
 
   // -- Cycle-phase pacing suggestion signal -----------------------------------
   // Global (per-user, not per-product) flag used by Introduce Slowly to
