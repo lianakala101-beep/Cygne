@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { getRampWeek, getRampPhase, RAMP_SCHEDULES, getRampDaysAtWeek, isReadyToAdvance, deriveRampSignals } from "./ramp.jsx";
+import { getRampWeek, getRampPhase, RAMP_SCHEDULES, RAMP_ACTIVES, getRampSchedule, isSchedulePaced, getRampDaysAtWeek, isReadyToAdvance, deriveRampSignals } from "./ramp.jsx";
 
 // Force "today" to a fixed local date so daysBetweenLocal is deterministic.
 function setToday(year, monthIndex, day) {
@@ -71,6 +71,86 @@ describe("getRampPhase", () => {
 
   it("clamps weeks beyond the schedule to the final phase (Maintain forever)", () => {
     expect(getRampPhase(retinol, 99).name).toBe("Maintain");
+  });
+});
+
+describe("RAMP_ACTIVES", () => {
+  it("includes azelaic acid alongside the original four actives", () => {
+    expect(RAMP_ACTIVES).toEqual(expect.arrayContaining(["retinol", "AHA", "BHA", "vitamin C", "azelaic acid"]));
+    expect(RAMP_ACTIVES.length).toBe(5);
+  });
+});
+
+describe("RAMP_SCHEDULES azelaic acid", () => {
+  const azelaic = RAMP_SCHEDULES["azelaic acid"];
+
+  it("exists and has the same 4-phase shape as the other schedules", () => {
+    expect(azelaic).toBeDefined();
+    expect(azelaic.phases.map(p => p.name)).toEqual(["Patch", "Introduce", "Build", "Maintain"]);
+  });
+
+  it("every phase has frequency, instruction, onTrack, and backOff copy", () => {
+    azelaic.phases.forEach(phase => {
+      expect(typeof phase.frequency).toBe("string");
+      expect(phase.frequency.length).toBeGreaterThan(0);
+      expect(typeof phase.instruction).toBe("string");
+      expect(phase.instruction.length).toBeGreaterThan(0);
+      expect(typeof phase.onTrack).toBe("string");
+      expect(phase.onTrack.length).toBeGreaterThan(0);
+      expect(typeof phase.backOff).toBe("string");
+      expect(phase.backOff.length).toBeGreaterThan(0);
+    });
+  });
+
+  it("maps weeks to phases per the spec: Patch wk1, Introduce wk2-3, Build wk4-6, Maintain wk7-12", () => {
+    expect(getRampPhase(azelaic, 1).name).toBe("Patch");
+    [2, 3].forEach(w => expect(getRampPhase(azelaic, w).name).toBe("Introduce"));
+    [4, 5, 6].forEach(w => expect(getRampPhase(azelaic, w).name).toBe("Build"));
+    [7, 8, 9, 10, 11, 12].forEach(w => expect(getRampPhase(azelaic, w).name).toBe("Maintain"));
+  });
+
+  it("clamps weeks beyond the schedule to Maintain forever, same as every other active", () => {
+    expect(getRampPhase(azelaic, 99).name).toBe("Maintain");
+  });
+});
+
+describe("getRampSchedule / sensitivity pacing", () => {
+  it("returns the base azelaic acid schedule unchanged with no sensitivity concern", () => {
+    const schedule = getRampSchedule("azelaic acid", []);
+    expect(schedule).toBe(RAMP_SCHEDULES["azelaic acid"]);
+    expect(isSchedulePaced([])).toBe(false);
+  });
+
+  it("paces azelaic acid for Rosacea: Patch/Introduce each grow a week, Maintain caps at Nightly", () => {
+    const base = RAMP_SCHEDULES["azelaic acid"];
+    const paced = getRampSchedule("azelaic acid", ["Rosacea"]);
+    expect(isSchedulePaced(["Rosacea"])).toBe(true);
+    expect(paced).not.toBe(base);
+
+    const patch = paced.phases.find(p => p.name === "Patch");
+    const introduce = paced.phases.find(p => p.name === "Introduce");
+    const build = paced.phases.find(p => p.name === "Build");
+    const maintain = paced.phases.find(p => p.name === "Maintain");
+
+    expect(patch.weeks).toEqual([1, 2]);
+    expect(introduce.weeks).toEqual([3, 4, 5]);
+    expect(build.weeks).toEqual([6, 7, 8]);
+    expect(maintain.weeks).toEqual([9, 10, 11, 12, 13, 14]);
+    expect(maintain.frequency).toBe("Nightly");
+  });
+
+  it("paces azelaic acid for Cystic/hormonal acne the same way as Rosacea", () => {
+    const paced = getRampSchedule("azelaic acid", ["Cystic/hormonal acne"]);
+    expect(paced.phases.find(p => p.name === "Maintain").frequency).toBe("Nightly");
+  });
+
+  it("regression: retinol pacing is unaffected by azelaic acid's addition", () => {
+    const paced = getRampSchedule("retinol", ["Rosacea"]);
+    expect(paced.phases.find(p => p.name === "Maintain").frequency).toBe("3× per week");
+  });
+
+  it("regression: an unpaced retinol schedule is still returned by reference", () => {
+    expect(getRampSchedule("retinol", [])).toBe(RAMP_SCHEDULES.retinol);
   });
 });
 

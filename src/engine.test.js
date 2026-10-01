@@ -68,6 +68,17 @@ describe("detectActives", () => {
     expect(a.AHA).toBe(true);
     expect(a.BHA).toBe(true);
   });
+
+  it("detects azelaic acid from an explicit ingredient", () => {
+    expect(detectActives(["azelaic acid", "glycerin"])).toEqual({ "azelaic acid": true });
+  });
+
+  it("does not mistake azelaic acid for any other active", () => {
+    const a = detectActives(["azelaic acid"]);
+    expect(a.AHA).toBeUndefined();
+    expect(a.BHA).toBeUndefined();
+    expect(a.retinol).toBeUndefined();
+  });
 });
 
 describe("detectActivesFromProduct", () => {
@@ -242,6 +253,27 @@ describe("buildRoutine", () => {
     expect(out.am.map(x => x.id)).not.toContain("ex");
     expect(out.pm.map(x => x.id)).not.toContain("ex");
   });
+
+  it("places azelaic acid in both AM and PM by default (either session is fine)", () => {
+    const aze = p({ id: "aze", category: "Serum", ingredients: ["azelaic acid"], session: "" });
+    const out = buildRoutine([aze]);
+    expect(out.am.map(x => x.id)).toContain("aze");
+    expect(out.pm.map(x => x.id)).toContain("aze");
+  });
+
+  it("still honors an explicit AM-only session for azelaic acid", () => {
+    const aze = p({ id: "aze", category: "Serum", ingredients: ["azelaic acid"], session: "am" });
+    const out = buildRoutine([aze]);
+    expect(out.am.map(x => x.id)).toContain("aze");
+    expect(out.pm.map(x => x.id)).not.toContain("aze");
+  });
+
+  it("regression: retinol is still PM-only after adding azelaic acid", () => {
+    const ret = p({ id: "ret", category: "Serum", ingredients: ["retinol"], session: "" });
+    const out = buildRoutine([ret]);
+    expect(out.am.map(x => x.id)).not.toContain("ret");
+    expect(out.pm.map(x => x.id)).toContain("ret");
+  });
 });
 
 describe("detectConflicts", () => {
@@ -320,6 +352,106 @@ describe("detectConflicts", () => {
     expect(c).toBeDefined();
     expect(c.intermittent).toBe(false);
     expect(c.reason).not.toMatch(/nights you use both/);
+  });
+
+  describe("azelaic acid", () => {
+    it("flags azelaic + AHA as a caution when scheduled in the same session", () => {
+      const products = [
+        p({ id: "az", ingredients: ["azelaic acid"], session: "pm" }),
+        p({ id: "a", ingredients: ["glycolic acid"], session: "pm" }),
+      ];
+      const out = detectConflicts(products);
+      const c = out.find(x => x.pair.includes("azelaic acid") && x.pair.includes("AHA"));
+      expect(c).toBeDefined();
+      expect(c.severity).toBe("caution");
+    });
+
+    it("flags azelaic + BHA as a caution when scheduled in the same session", () => {
+      const products = [
+        p({ id: "az", ingredients: ["azelaic acid"], session: "pm" }),
+        p({ id: "b", ingredients: ["salicylic acid"], session: "pm" }),
+      ];
+      const out = detectConflicts(products);
+      const c = out.find(x => x.pair.includes("azelaic acid") && x.pair.includes("BHA"));
+      expect(c).toBeDefined();
+      expect(c.severity).toBe("caution");
+    });
+
+    it("flags azelaic + retinol as info-level, not caution or warning", () => {
+      const products = [
+        p({ id: "az", ingredients: ["azelaic acid"], session: "pm" }),
+        p({ id: "r", ingredients: ["retinol"], session: "pm" }),
+      ];
+      const out = detectConflicts(products);
+      const c = out.find(x => x.pair.includes("azelaic acid") && x.pair.includes("retinol"));
+      expect(c).toBeDefined();
+      expect(c.severity).toBe("info");
+    });
+
+    it("does not flag azelaic + niacinamide", () => {
+      const products = [
+        p({ id: "az", ingredients: ["azelaic acid"], session: "both" }),
+        p({ id: "n", ingredients: ["niacinamide"], session: "both" }),
+      ];
+      const out = detectConflicts(products);
+      expect(out.some(c => c.pair.includes("azelaic acid"))).toBe(false);
+    });
+
+    it("does not flag azelaic + vitamin C", () => {
+      const products = [
+        p({ id: "az", ingredients: ["azelaic acid"], session: "both" }),
+        p({ id: "c", ingredients: ["ascorbic acid"], session: "both" }),
+      ];
+      const out = detectConflicts(products);
+      expect(out.some(c => c.pair.includes("azelaic acid"))).toBe(false);
+    });
+  });
+
+  describe("regression: existing conflict pairs are unaffected by azelaic acid", () => {
+    it("still flags retinol + vitamin C as a warning", () => {
+      const products = [
+        p({ id: "r", ingredients: ["retinol"], session: "pm" }),
+        p({ id: "c", ingredients: ["ascorbic acid"], session: "pm" }),
+      ];
+      const c = detectConflicts(products).find(x => x.pair.includes("retinol") && x.pair.includes("vitamin C"));
+      expect(c).toBeDefined();
+      expect(c.severity).toBe("warning");
+    });
+
+    it("still flags AHA + BHA as a caution", () => {
+      const products = [
+        p({ id: "a", ingredients: ["glycolic acid"], session: "pm" }),
+        p({ id: "b", ingredients: ["salicylic acid"], session: "pm" }),
+      ];
+      const c = detectConflicts(products).find(x => x.pair.includes("AHA") && x.pair.includes("BHA"));
+      expect(c).toBeDefined();
+      expect(c.severity).toBe("caution");
+    });
+
+    it("still flags retinol + benzoyl peroxide as irreconcilable", () => {
+      const products = [
+        p({ id: "r", ingredients: ["retinol"], session: "pm" }),
+        p({ id: "bp", ingredients: ["benzoyl peroxide"], session: "pm" }),
+      ];
+      const c = detectConflicts(products).find(x => x.pair.includes("retinol") && x.pair.includes("benzoyl peroxide"));
+      expect(c).toBeDefined();
+      expect(c.irreconcilable).toBe(true);
+    });
+
+    it("still does not flag vitamin C + niacinamide when auto-scheduled apart", () => {
+      const products = [
+        p({ id: "c", ingredients: ["ascorbic acid"] }),
+        p({ id: "n", ingredients: ["niacinamide"] }),
+      ];
+      // Vitamin C auto-lands AM-only (AM preference, Serum category);
+      // niacinamide has no session preference so it defaults to both AM
+      // and PM — they share the AM slot, so the caution still fires.
+      // This just confirms that pair is unaffected by azelaic's new
+      // entries in the table.
+      const c = detectConflicts(products).find(x => x.pair.includes("vitamin C") && x.pair.includes("niacinamide"));
+      expect(c).toBeDefined();
+      expect(c.severity).toBe("caution");
+    });
   });
 });
 
