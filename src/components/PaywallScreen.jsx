@@ -75,6 +75,12 @@ export function PaywallScreen({ trialExpired, onUnlock, onSignOut }) {
   const [busy, setBusy] = useState(false); // true while purchase/restore in flight
   const [error, setError] = useState(null);
 
+  // Funnel event — fires once per mount, i.e. once per time the gate
+  // actually shows. No pricing/offering details in the payload.
+  useEffect(() => {
+    logDebugEvent("paywall_viewed");
+  }, []);
+
   // Fetch offerings on mount. RC's Capacitor plugin returns
   //   { current: Offering | null, all: { [name]: Offering } }
   // Offering has .availablePackages[] + convenience accessors like
@@ -179,6 +185,9 @@ export function PaywallScreen({ trialExpired, onUnlock, onSignOut }) {
     if (!selectedId) return;
     const pkg = packages.find(p => p.identifier === selectedId);
     if (!pkg) return;
+    // Funnel event — fires on tap, before the native purchase sheet
+    // resolves. No price or product identifier in the payload.
+    logDebugEvent("purchase_started");
     setBusy(true);
     setError(null);
     try {
@@ -440,7 +449,7 @@ export function PaywallScreen({ trialExpired, onUnlock, onSignOut }) {
         </p>
         {onSignOut && (
           <button
-            onClick={onSignOut}
+            onClick={() => { logDebugEvent("paywall_dismissed"); onSignOut(); }}
             disabled={busy}
             style={{
               background: "none", border: "none",

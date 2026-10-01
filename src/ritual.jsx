@@ -452,7 +452,7 @@ function genericFallbackLine() {
   return GENERIC_FALLBACK_LINES[doy % GENERIC_FALLBACK_LINES.length];
 }
 
-function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = {}, predictions = [], dailyLine = null, dailyLoading = false, dailyFailed = false, variant = "default" }) {
+function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = {}, predictions = [], dailyLine = null, dailyLoading = false, dailyFailed = false, variant = "default", hasProducts = true, noProductsLine = null }) {
   const now = new Date();
   // Local guard against double-taps on the ivory-flat share icon
   // while the canvas render + native share sheet are in flight. Only
@@ -483,10 +483,15 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
   //   birthday → birthday line
   //   LLM line landed → LLM line
   //   loading + no LLM line yet → em dash (subtle placeholder, no spinner)
-  //   LLM call failed and no rule-based prediction → generic editorial line
-  //   else → rule-based prediction or "no data yet"
+  //   LLM call failed and no rule-based prediction → no-products line (zero
+  //     products) or generic editorial line
+  //   else → rule-based prediction, the no-products line, or "no data yet"
   // The LLM line takes priority over the rule-based prediction once it lands;
   // we keep the rule engine running underneath so popup detail still renders.
+  // noProductsLine only ever applies once every higher-precedence source
+  // (LLM line, meaningful rule-based prediction) has nothing to say — it's
+  // the cycle/season floor for a zero-product user, not a replacement for
+  // a real prediction.
   const line = isBirthday
     ? BIRTHDAY_LINES[now.getFullYear() % BIRTHDAY_LINES.length]
     : trimmedDaily
@@ -494,10 +499,10 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
       : dailyLoading
         ? "—"
         : dailyFailed && !hasMeaningful
-          ? genericFallbackLine()
+          ? (!hasProducts && noProductsLine) || genericFallbackLine()
           : hasMeaningful
             ? meaningfulPredictions[0].headline
-            : NO_DATA_LINE;
+            : (!hasProducts && noProductsLine) || NO_DATA_LINE;
 
   const grain ="url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E\")";
 

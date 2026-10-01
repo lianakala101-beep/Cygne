@@ -359,6 +359,45 @@ function SkinJournalModal({ onSubmit, onClose, existing = null }) {
   );
 }
 
+// Skippable, one-tap prompt shown immediately after onboarding finishes —
+// picking a condition saves the entry instantly (no separate Save step),
+// the fastest path to a first journal entry and the first ring fill.
+// Deliberately lighter than SkinJournalModal: condition only, no
+// sleep/stress/notes, so sleep/stress land as null on the saved entry
+// (the same shape SkinJournalModal already produces when those are
+// skipped).
+function FirstCheckInPrompt({ onSubmit, onSkip }) {
+  const today = localDateKey();
+  return (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(var(--rgb-ink), 0.82)", backdropFilter: "blur(12px)", zIndex: 300, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+      <div style={{ background: "var(--ink)", width: "100%", maxWidth: 520, borderRadius: "var(--radius-sheet)", padding: "calc(var(--space-1) * 7) var(--space-6) var(--space-10)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "var(--space-2)" }}>
+          <div>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)", margin: "0 0 var(--space-1)" }}>SKIN JOURNAL</p>
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-lg)", fontWeight: 700, letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--parchment)", margin: 0 }}>How does your skin feel today?</h2>
+          </div>
+          <button onClick={onSkip} aria-label="Skip" style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", padding: "var(--space-1)" }}>
+            <Icon name="x" size={16} />
+          </button>
+        </div>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", margin: "0 0 calc(var(--space-1) * 7)", opacity: 0.7 }}>One tap — this starts your ring.</p>
+        <div style={{ display: "flex", gap: "var(--space-2)", marginBottom: "var(--space-5)" }}>
+          {SKIN_CONDITIONS.map(c => (
+            <button key={c.key}
+              onClick={() => onSubmit({ date: today, condition: c.key, sleep: null, stress: null, notes: "" })}
+              style={{ flex: 1, padding: "var(--space-3) 0", borderRadius: "var(--radius)", border: `1px solid ${c.border}`, background: "transparent", color: c.color, fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: 400, letterSpacing: "0.04em", cursor: "pointer" }}>
+              {c.label}
+            </button>
+          ))}
+        </div>
+        <button onClick={onSkip} style={{ width: "100%", padding: "var(--space-3) 0", background: "none", border: "none", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--clay)", opacity: 0.6, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", cursor: "pointer" }}>
+          Skip for now
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // --- HORMONE CYCLE TRACKER ---------------------------------------------------
 
 // Presentation metadata for each cycle phase — keyed by the phase
@@ -2335,4 +2374,4 @@ function Progress(props) {
   );
 }
 
-export { Progress, CheckInModal, SkinJournalModal, LocationManager, getTreatmentPhase, TreatmentRecoveryCard, getCyclePhase, getActivePauseState };
+export { Progress, CheckInModal, SkinJournalModal, FirstCheckInPrompt, LocationManager, getTreatmentPhase, TreatmentRecoveryCard, getCyclePhase, getActivePauseState };

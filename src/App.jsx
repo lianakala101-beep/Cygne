@@ -6,7 +6,8 @@ import { PreAuthScreen } from "./splash.jsx";
 import { Dashboard } from "./dashboard.jsx";
 import { MyRoutine } from "./ritualscreen.jsx";
 import { Shelf } from "./vanity.jsx";
-import { Progress } from "./progress.jsx";
+import { Progress, FirstCheckInPrompt } from "./progress.jsx";
+import { upsertJournalEntry } from "./lib/journal.js";
 import { SwanWelcomeScreen, useLocalStorage, getCurrentCycleDay, daysBetweenLocal, toLocalMidnight, isoWeekNumber, isoWeekYear } from "./utils.jsx";
 import { getCyclePhase, parseCycleLength } from "./lib/cycle.js";
 import { WeekendNudgeCard } from "./weekend.jsx";
@@ -207,6 +208,11 @@ export default function App() {
 
   const [user, setUser] = useLocalStorage("cygne_user", null);
   const [firstRun, setFirstRun] = useLocalStorage("cygne_firstrun", false);
+  // One-tap "how does your skin feel" prompt fired the moment a brand-new
+  // user lands on the dashboard — before they've added any products.
+  // Plain useState (not persisted): it only ever needs to fire once, right
+  // after SwanWelcomeScreen's onDone, and should never reappear on reload.
+  const [showFirstCheckIn, setShowFirstCheckIn] = useState(false);
   const [notifPermission, setNotifPermission] = useState("default");
   const [notifDismissed, setNotifDismissed] = useLocalStorage("cygne_notifdismissed", false);
   const [tab, setTab] = useState("dashboard");
@@ -1439,7 +1445,14 @@ export default function App() {
   ];
 
   const saveProduct = (p) => {
-    setProducts(prev => prev.find(x => x.id === p.id) ? prev.map(x => x.id === p.id ? p : x) : [...prev, p]);
+    setProducts(prev => {
+      const isNew = !prev.find(x => x.id === p.id);
+      // Funnel event — fires once, the moment a brand-new user's vanity
+      // goes from empty to non-empty. No product name/category/ingredients
+      // in the payload, just the milestone.
+      if (isNew && prev.length === 0) logDebugEvent("first_product_added");
+      return isNew ? [...prev, p] : prev.map(x => x.id === p.id ? p : x);
+    });
     setModal(null);
   };
 
@@ -1852,7 +1865,7 @@ export default function App() {
   }
 
   // -- First run welcome (just completed onboarding) --------------------------
-  if (firstRun) return <SwanWelcomeScreen user={user} onDone={() => { setFirstRun(false); setTab("dashboard"); }} />;
+  if (firstRun) return <SwanWelcomeScreen user={user} onDone={() => { setFirstRun(false); setTab("dashboard"); setShowFirstCheckIn(true); }} />;
 
   // -- Cycle-phase pacing suggestion signal -----------------------------------
   // Global (per-user, not per-product) flag used by Introduce Slowly to
@@ -2041,7 +2054,7 @@ export default function App() {
                 onDismiss={dismissReflectionPrompt}
               />
             )}
-            <Dashboard products={products} setTab={setTab} checkIns={checkIns} swanPopupDismissed={swanPopupDismissed} onDismissSwanPopup={dismissSwanPopup} treatments={treatments} updateTreatmentDate={updateTreatmentDate} locationData={locationData} user={{ ...(user || {}), id: authSession?.user?.id }} notifPermission={notifPermission} onRequestNotif={requestNotifications} notifDismissed={notifDismissed} onDismissNotif={() => setNotifDismissed(true)} journals={journals} setCheckIns={setCheckIns} triggerLog={triggerLog} daysSinceLastActive={daysSinceLastActive} skinGoals={skinGoals} onMarkSkinGoalMet={markSkinGoalMet} onAddSkinGoal={addSkinGoal} onRemoveSkinGoal={removeSkinGoal} reflections={reflections} />
+            <Dashboard products={products} setTab={setTab} checkIns={checkIns} swanPopupDismissed={swanPopupDismissed} onDismissSwanPopup={dismissSwanPopup} treatments={treatments} updateTreatmentDate={updateTreatmentDate} locationData={locationData} user={{ ...(user || {}), id: authSession?.user?.id }} notifPermission={notifPermission} onRequestNotif={requestNotifications} notifDismissed={notifDismissed} onDismissNotif={() => setNotifDismissed(true)} journals={journals} setJournals={setJournals} setCheckIns={setCheckIns} triggerLog={triggerLog} daysSinceLastActive={daysSinceLastActive} skinGoals={skinGoals} onMarkSkinGoalMet={markSkinGoalMet} onAddSkinGoal={addSkinGoal} onRemoveSkinGoal={removeSkinGoal} reflections={reflections} />
           </>
         )}
         {tab === "routine"   && <MyRoutine
@@ -2141,6 +2154,15 @@ export default function App() {
       </div>
 
       <Suspense fallback={null}>
+        {showFirstCheckIn && (
+          <FirstCheckInPrompt
+            onSubmit={data => {
+              setJournals(prev => upsertJournalEntry(prev, data));
+              setShowFirstCheckIn(false);
+            }}
+            onSkip={() => setShowFirstCheckIn(false)}
+          />
+        )}
         {modal && <ProductModal product={modal === "add" ? null : modal} onSave={saveProduct} onClose={() => setModal(null)} user={user} />}
         {profileOpen && <ProfileSheet user={user} products={products} locationData={locationData} setLocationData={setLocationData} locationDenied={locationDenied} setLocationDenied={setLocationDenied} onUpdateUser={updateUser} onLogout={handleLogout} onClose={() => setProfileOpen(false)} />}
         {fitSheet && (

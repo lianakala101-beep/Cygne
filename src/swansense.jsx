@@ -6,6 +6,41 @@ import { getCurrentCycleDay, isCycleStale, CYCLE_STALE_MESSAGE } from "./utils.j
 
 // --- SWAN SENSE — PREDICTIVE SKIN ENGINE -------------------------------------
 
+// Cycle-phase lines for users with no products yet, in Swan Sense's own
+// prediction voice (factual, present-tense). Deliberately NOT sourced from
+// progress.jsx's PHASE_META — that's UI/ritual copy for a different
+// surface; this is short-form prediction copy, same separation the file
+// header in src/lib/cycle.js calls for.
+const NO_PRODUCTS_PHASE_LINES = {
+  Menstrual: "Estrogen and progesterone are both low this week — your barrier runs more reactive than usual.",
+  Follicular: "Estrogen is climbing. Turnover speeds up and your skin gets more resilient by the day.",
+  Ovulatory: "Estrogen peaks around now — skin tends to look and feel its best this week.",
+  Luteal: "Progesterone is rising. Expect more sebum and a higher chance of congestion.",
+};
+
+// Season fallback when cycle tracking isn't on. Mirrors the tone of the
+// baseline_season prediction below but written as a standalone headline.
+const NO_PRODUCTS_SEASON_LINES = {
+  winter: "Winter is tough on skin barriers — cold air and heating pull moisture fast.",
+  spring: "UV is climbing as skin recovers from winter. Barrier support matters more than usual.",
+  summer: "Heat and humidity are rising, and sebum production tends to follow.",
+  fall: "Skin is shifting back toward dry as the season turns.",
+};
+
+// Rule-based Swan Sense line for a zero-product user — cycle phase is the
+// more specific signal so it takes priority over season, same precedence
+// the baseline_cycle/baseline_season predictions below use. Returns null
+// when neither resolves (caller falls back to its own no-data copy).
+function buildNoProductsSwanLine({ cyclePhaseName = null, season = null } = {}) {
+  if (cyclePhaseName && NO_PRODUCTS_PHASE_LINES[cyclePhaseName]) {
+    return NO_PRODUCTS_PHASE_LINES[cyclePhaseName];
+  }
+  if (season && NO_PRODUCTS_SEASON_LINES[season]) {
+    return NO_PRODUCTS_SEASON_LINES[season];
+  }
+  return null;
+}
+
 function getSwanSensePredictions(products, checkIns = [], user = {}, locationData = null, journals = []) {
   const predictions = [];
   const season = getSeason();
@@ -516,4 +551,4 @@ function SwanSenseCard({ products, checkIns = [], user = {}, locationData = null
     </div>
   );
 }
-export { getSwanSensePredictions, SwanSenseCard };
+export { getSwanSensePredictions, SwanSenseCard, buildNoProductsSwanLine };

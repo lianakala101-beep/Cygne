@@ -1,14 +1,15 @@
 import { lazy, Suspense, useState, useEffect } from "react";
 import { Icon, Section } from "./components.jsx";
 import { analyzeShelf, detectConflicts, buildRoutine, calcSpending, getCurrentSession } from "./engine.js";
-import { getSwanSensePredictions } from "./swansense.jsx";
+import { getSwanSensePredictions, buildNoProductsSwanLine } from "./swansense.jsx";
 import { SwanSongCard, FlightModeModal } from "./ritual.jsx";
 import { ShopScanModal } from "./shopscan.jsx";
 import { useWeather } from "./environment.jsx";
 import { WeekendNudgeCard } from "./weekend.jsx";
-import { SeasonalNudgeCard } from "./seasonal.jsx";
-import { getTreatmentPhase, TreatmentRecoveryCard, getCyclePhase } from "./progress.jsx";
+import { SeasonalNudgeCard, getSeasonForUser } from "./seasonal.jsx";
+import { getTreatmentPhase, TreatmentRecoveryCard, getCyclePhase, SkinJournalModal } from "./progress.jsx";
 import { getCurrentCycleDay, isCycleStale, CYCLE_STALE_MESSAGE, daysBetweenLocal, getAskCygneAccess } from "./utils.jsx";
+import { localDateKey, upsertJournalEntry } from "./lib/journal.js";
 import { AskCygneButton } from "./AskCygne.jsx";
 import { useSwanSenseDaily } from "./hooks/useSwanSenseDaily.js";
 import { DailySkinIndexCard } from "./components/DailySkinIndexCard.jsx";
@@ -21,7 +22,8 @@ const MonthlyRecap  = lazy(() => import("./components/MonthlyRecap.jsx").then(m 
 
 const RECAP_MONTH_NAMES = ["january","february","march","april","may","june","july","august","september","october","november","december"];
 
-function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSwanPopup, treatments, updateTreatmentDate, locationData, user, notifPermission, onRequestNotif, notifDismissed, onDismissNotif, journals, setCheckIns, triggerLog = [], daysSinceLastActive = null, skinGoals = [], onMarkSkinGoalMet, onAddSkinGoal, onRemoveSkinGoal, reflections = [] }) {
+function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSwanPopup, treatments, updateTreatmentDate, locationData, user, notifPermission, onRequestNotif, notifDismissed, onDismissNotif, journals, setJournals, setCheckIns, triggerLog = [], daysSinceLastActive = null, skinGoals = [], onMarkSkinGoalMet, onAddSkinGoal, onRemoveSkinGoal, reflections = [] }) {
+  const [showJournal, setShowJournal] = useState(false);
   const conflicts = detectConflicts(products);
   // Surface only irreconcilable conflicts (the molecule-level deactivation
   // pairs flagged in constants.js). Everything else is handled silently
@@ -67,6 +69,12 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
   // fallback assumption when tracking isn't enabled or the day can't
   // be computed. Feeds the Daily Skin Index card's sebum-trend item.
   const cyclePhase = user?.cycleTrackingEnabled && currentCycleDay ? getCyclePhase(currentCycleDay) : null;
+  // Rule-based floor for zero-product users — cycle phase + season, in
+  // Swan Sense's voice. Only ever used by SwanSongCard when there's no
+  // LLM line and no meaningful rule-based prediction (see its own
+  // precedence comment), so computing it unconditionally here is harmless
+  // for users who already have products.
+  const noProductsLine = buildNoProductsSwanLine({ cyclePhaseName: cyclePhase?.name || null, season: getSeasonForUser(locationData) });
 
   // LLM-generated daily Swan Sense line — fetched once per (user, day), cached
   // in localStorage + the server-side ask_cygne_cache table. Falls back to the
@@ -132,9 +140,9 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
       {/* -- Empty state ------------------------------------------------- */}
       {products.length === 0 && (() => {
         const emptySteps = [
-          { label: "Add your products", sub: "Search by name or scan a photo - Cygne builds your ritual from what you already have.", action: () => setTab("shelf"), cta: "Go to Vanity" },
+          { label: "Log how your skin feels today", sub: "Sleep, stress, skin condition — takes about 10 seconds.", action: () => setShowJournal(true), cta: "Log now" },
+          { label: "Add your first three products", sub: "Start with a cleanser, moisturizer and SPF. Add the rest anytime.", action: () => setTab("shelf"), cta: "Go to Vanity" },
           { label: "Swan Sense wakes up", sub: "Once your vanity is set, Cygne starts predicting - cycle windows, active streaks, barrier warnings.", action: null, cta: null },
-          { label: "Log your first journal entry", sub: "Sleep, stress, skin condition. Takes 10 seconds and makes every prediction smarter.", action: () => setTab("progress"), cta: "Go to Progress" },
         ];
         return (
           <div>
@@ -174,9 +182,32 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
                 </div>
               ))}
             </div>
+
+            {/* Swan Sense + Daily Skin Index — both are product-independent
+                (cycle phase / season / weather only), so a zero-product user
+                gets a real reading instead of staring at an empty screen
+                until their vanity is built. SwanSongCard's noProductsLine
+                prop gates it to the rule-based cycle/season floor here —
+                see its own precedence comment. */}
+            <div style={{ height: 1, background: "rgba(var(--rgb-ivory), 0.16)", marginBottom: "var(--space-5)" }} />
+            <div style={{ marginBottom: "var(--space-5)" }}>
+              <SwanSongCard currentSession={currentSession} asPopup={false} user={user} predictions={swanSensePredictions} dailyLine={swanDailyLine} dailyLoading={swanLoading} dailyFailed={swanFailed} variant="ivory-flat" hasProducts={false} noProductsLine={noProductsLine} />
+            </div>
+            <DailySkinIndexCard cyclePhaseName={cyclePhase?.name || null} cycleDay={currentCycleDay} cycleStale={cycleStale} weather={weather} locationData={locationData} />
           </div>
         );
       })()}
+
+      {showJournal && (
+        <SkinJournalModal
+          existing={(journals || []).find(j => j.date === localDateKey()) || null}
+          onSubmit={data => {
+            setJournals?.(prev => upsertJournalEntry(prev, data));
+            setShowJournal(false);
+          }}
+          onClose={() => setShowJournal(false)}
+        />
+      )}
 
       {/* -- Products present -------------------------------------------- */}
       {products.length > 0 && (
