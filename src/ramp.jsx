@@ -222,7 +222,7 @@ const RAMP_SCHEDULES = {
   }
 };
 
-const RAMP_ACTIVES = ["retinol", "AHA", "BHA", "vitamin C"];
+const RAMP_ACTIVES = ["retinol", "AHA", "BHA", "vitamin C", "azelaic acid"];
 
 // Concern-aware pacing. Users who state Rosacea or Cystic/hormonal
 // acne in their skin profile get a more conservative Introduce Slowly

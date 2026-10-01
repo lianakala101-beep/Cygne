@@ -226,6 +226,14 @@ function getSuggestedFrequency(product, user = {}) {
     return { id: "2-3x", reason: "Start at 2-3x per week — daily BHA is safe once tolerated but can dry unacclimated skin." };
   }
 
+  // --- Azelaic acid ---
+  // Matches the Introduce-phase cadence from its Introduce Slowly
+  // schedule ("every other evening"), same as retinol/AHA/BHA's
+  // suggested default roughly tracking their own Introduce phase
+  // rather than the eventual Maintain cadence.
+  if (actives.includes("azelaic acid"))
+    return { id: "alternating", reason: "Start every other evening and build up — azelaic acid is gentle but still benefits from a slow introduction." };
+
   // --- Benzoyl peroxide ---
   if (actives.includes("benzoyl peroxide"))
     return { id: "daily", reason: "Daily use is standard — apply PM, and always follow with moisturizer." };

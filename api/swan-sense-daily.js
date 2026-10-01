@@ -195,11 +195,12 @@ const RAMP_MAX_WEEKS = {
   "AHA": 12,
   "BHA": 12,
   "vitamin C": 12,
+  "azelaic acid": 12,
   "toning pad": 7,
 };
 
 // Lightweight client-of-engine.detectActives — substring match on ingredients
-// plus the Toning Pad category. Mirrors the four RAMP_ACTIVES the UI uses to
+// plus the Toning Pad category. Mirrors the five RAMP_ACTIVES the UI uses to
 // decide whether to surface IntroduceSlowlyCard for a product.
 function detectRampActive(product) {
   if (!product) return null;
@@ -212,6 +213,7 @@ function detectRampActive(product) {
   if (/glycolic|lactic|mandelic|\baha\b/.test(ing)) return "AHA";
   if (/salicylic|\bbha\b/.test(ing)) return "BHA";
   if (/ascorbic|\bvitamin\s*c\b|ascorbyl/.test(ing)) return "vitamin C";
+  if (/azelaic/.test(ing)) return "azelaic acid";
   return null;
 }
 
