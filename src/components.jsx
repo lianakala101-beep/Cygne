@@ -89,6 +89,7 @@ function FlagCard({ f }) {
     caution: "Caution",
     medium:  "Caution",
     missing: "Note",
+    info:    "Note",
   };
   const SEVERITY_TONE = {
     warning: { color: "var(--color-bronze)", bg: "rgba(var(--rgb-bronze), 0.08)" },
@@ -96,6 +97,11 @@ function FlagCard({ f }) {
     caution: { color: "var(--color-bronze)", bg: "rgba(var(--rgb-bronze), 0.08)" },
     medium:  { color: "var(--color-bronze)", bg: "rgba(var(--rgb-bronze), 0.08)" },
     missing: { color: "var(--color-ivory, #faf9f4)", bg: "rgba(var(--rgb-moss), 0.08)" },
+    // Neutral, non-alarming tone for an FYI-level pairing (e.g. azelaic
+    // acid + retinol) — distinct from caution/warning's bronze "this
+    // needs attention" tone. Reuses the same neutral treatment as
+    // "missing" rather than inventing a third visual tone.
+    info:    { color: "var(--color-ivory, #faf9f4)", bg: "rgba(var(--rgb-moss), 0.08)" },
   };
   const label = SEVERITY_LABEL[f.severity] || "Note";
   const tone = SEVERITY_TONE[f.severity] || SEVERITY_TONE.caution;

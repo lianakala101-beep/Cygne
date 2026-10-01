@@ -79,11 +79,20 @@ const ACTIVE_RULES = {
   "benzoyl peroxide":{ keywords: ["benzoyl peroxide"], pmOnly: false },
   SPF:               { keywords: ["zinc oxide", "titanium dioxide", "avobenzone", "octinoxate", "octocrylene", "uvinul", "tinosorb", "uvasorb"], pmOnly: false },
   ceramides:         { keywords: ["ceramide np", "ceramide ap", "ceramide elp", "ceramide eg"], pmOnly: false },
+  // Unlike retinol/AHA/BHA, azelaic acid isn't photosensitizing and has
+  // no PM-only clinical requirement — either AM or PM is fine. pmOnly
+  // stays false and there's no "am" entry in ACTIVE_SESSION below, so
+  // buildRoutine/getProductSessions fall through to their "both"
+  // default the same way niacinamide/ceramides already do. If a user
+  // manually locks it to AM, the app's existing generic SPF-coverage
+  // nudge still applies unchanged — nothing active-specific gates it.
+  "azelaic acid":    { keywords: ["azelaic acid"], pmOnly: false },
 };
 
 const ACTIVE_SESSION = {
   retinol: "pm", AHA: "pm", BHA: "pm", "vitamin C": "am", SPF: "am",
   niacinamide: "both", "hyaluronic acid": "both", peptides: "pm", ceramides: "both",
+  "azelaic acid": "both",
 };
 
 // `irreconcilable: true` flags pairs that can't be safely scheduled around —
@@ -110,6 +119,17 @@ const CONFLICT_RULES = [
   { pair: ["BHA", "PHA"],                   severity: "caution", reason: "Layering PHA on top of BHA compounds exfoliation. Use one per session." },
   { pair: ["retinol", "benzoyl peroxide"],  severity: "warning", irreconcilable: true, reason: "Benzoyl peroxide oxidizes and deactivates retinol. Keep these in entirely separate rituals." },
   { pair: ["vitamin C", "benzoyl peroxide"],severity: "warning", irreconcilable: true, reason: "Benzoyl peroxide oxidizes Vitamin C and degrades both. Use in separate sessions — Vitamin C AM, BP at a different time." },
+  // Azelaic acid is well-tolerated alongside most actives — niacinamide
+  // and vitamin C need no entry here at all, same as every other
+  // non-conflicting pair in this table (absence already reads as
+  // "fine"). AHA/BHA get a caution (both exfoliate; stacking daily risks
+  // over-exfoliation) and retinol gets "info" rather than "caution" —
+  // azelaic doesn't meaningfully compound retinol's irritation the way
+  // AHA/BHA do, but first-time users combining the two are still worth a
+  // heads-up in the first few weeks.
+  { pair: ["azelaic acid", "AHA"],          severity: "caution", reason: "Both exfoliate the skin's surface — stacking daily risks over-exfoliation. Alternate nights while introducing azelaic acid." },
+  { pair: ["azelaic acid", "BHA"],          severity: "caution", reason: "Both exfoliate the skin's surface — stacking daily risks over-exfoliation. Alternate nights while introducing azelaic acid." },
+  { pair: ["azelaic acid", "retinol"],      severity: "info", reason: "Generally fine together, but if your skin is sensitive, alternate nights for the first few weeks while you gauge tolerance." },
 ];
 
 export { CATEGORIES, FREQUENCIES, LAYER_ORDER, layerIndex, ACTIVE_RULES, ACTIVE_SESSION, CONFLICT_RULES, isScheduledToday, getNextUseLabel };

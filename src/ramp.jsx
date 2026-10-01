@@ -231,8 +231,8 @@ const RAMP_ACTIVES = ["retinol", "AHA", "BHA", "vitamin C"];
 // capped one step lower than the default cadence. Everyone else gets
 // the standard schedule unchanged.
 //
-// Applied per schedule type (retinol / AHA / BHA / vitamin C / toning
-// pad) — never a blanket app-wide change. When concerns is empty or
+// Applied per schedule type (retinol / AHA / BHA / vitamin C / azelaic
+// acid / toning pad) — never a blanket app-wide change. When concerns is empty or
 // undefined we return the base schedule reference, so downstream
 // referential-equality checks stay identity-stable for standard-pace
 // users.
@@ -244,6 +244,11 @@ const SENSITIVE_MAINTAIN_FREQUENCY = {
   BHA:          "3–4× per week",
   "vitamin C":  "Every other morning",
   "toning pad": "Daily — PM only",
+  // One notch down from the default Maintain frequency ("Nightly or
+  // AM+PM if tolerated"), same pattern every other active uses — drops
+  // the AM+PM escalation rather than reducing below nightly, since
+  // azelaic acid is already one of the gentler Maintain-phase cadences.
+  "azelaic acid": "Nightly",
 };
 
 function isSensitivityConcern(concerns) {
