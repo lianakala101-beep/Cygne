@@ -163,12 +163,25 @@ describe("isHighStrengthAzelaic", () => {
     expect(isHighStrengthAzelaic(["azelaic acid 20%"])).toBe(true);
   });
 
-  it("returns false for 10% azelaic acid", () => {
+  it("returns false for 10% azelaic acid (the common OTC ceiling)", () => {
     expect(isHighStrengthAzelaic(["azelaic acid 10%"])).toBe(false);
   });
 
-  it("returns false for a strength that isn't 15 or 20 (e.g. a compounded 18%)", () => {
-    expect(isHighStrengthAzelaic(["azelaic acid 18%"])).toBe(false);
+  it("returns false for anything at or below 10%", () => {
+    expect(isHighStrengthAzelaic(["azelaic acid 5%"])).toBe(false);
+    expect(isHighStrengthAzelaic(["azelaic acid 9.5%"])).toBe(false);
+  });
+
+  it("returns true for an in-between compounded strength like 14.5%", () => {
+    expect(isHighStrengthAzelaic(["azelaic acid 14.5%"])).toBe(true);
+  });
+
+  it("returns true for a compounded 18%", () => {
+    expect(isHighStrengthAzelaic(["azelaic acid 18%"])).toBe(true);
+  });
+
+  it("returns true for anything just above 10%", () => {
+    expect(isHighStrengthAzelaic(["azelaic acid 10.5%"])).toBe(true);
   });
 
   it("returns false when no percentage is listed", () => {

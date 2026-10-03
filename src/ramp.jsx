@@ -304,19 +304,20 @@ function isSchedulePaced(concerns) {
   return isSensitivityConcern(concerns);
 }
 
-// True when the product's ingredient list specifies 15% or 20% azelaic
-// acid — the higher-strength end (10% and below are the common gentler
-// OTC concentrations; 15%/20% formulas like Finacea/Azelex are typically
-// prescribed). This only drives a one-line reminder on the card — the
-// prescribed strength still follows the same Introduce Slowly pacing;
-// the note just points the user to their prescriber's own directions
-// when they conflict with the in-app schedule.
+// True when the product's ingredient list specifies azelaic acid above
+// 10% — 10% and below are the common gentler OTC concentrations;
+// anything stronger (15%, 20%, or an in-between compounded strength
+// like 14.5% or 18%) is typically prescribed. This only drives a
+// one-line reminder on the card — the prescribed strength still
+// follows the same Introduce Slowly pacing; the note just points the
+// user to their prescriber's own directions when they conflict with
+// the in-app schedule.
 function isHighStrengthAzelaic(ingredients) {
   const ing = Array.isArray(ingredients) ? ingredients.join(" ") : String(ingredients || "");
   const match = ing.toLowerCase().match(/azelaic acid\s*(\d+(?:\.\d+)?)\s*%/);
   if (!match) return false;
   const pct = parseFloat(match[1]);
-  return pct === 15 || pct === 20;
+  return pct > 10;
 }
 
 function getRampPhase(schedule, week) {
