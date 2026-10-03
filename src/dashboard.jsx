@@ -2,7 +2,7 @@ import { lazy, Suspense, useState, useEffect } from "react";
 import { Icon, Section } from "./components.jsx";
 import { analyzeShelf, detectConflicts, buildRoutine, calcSpending, getCurrentSession } from "./engine.js";
 import { getSwanSensePredictions, buildNoProductsSwanLine } from "./swansense.jsx";
-import { SwanSongCard, FlightModeModal } from "./ritual.jsx";
+import { FlightModeModal, getSwanSenseLine, renderInsightLines } from "./ritual.jsx";
 import { ShopScanModal } from "./shopscan.jsx";
 import { useWeather } from "./environment.jsx";
 import { WeekendNudgeCard } from "./weekend.jsx";
@@ -12,7 +12,7 @@ import { getCurrentCycleDay, isCycleStale, CYCLE_STALE_MESSAGE, daysBetweenLocal
 import { localDateKey, upsertJournalEntry } from "./lib/journal.js";
 import { AskCygneButton } from "./AskCygne.jsx";
 import { useSwanSenseDaily } from "./hooks/useSwanSenseDaily.js";
-import { DailySkinIndexCard } from "./components/DailySkinIndexCard.jsx";
+import { buildSkinIndex } from "./lib/skinIndex.js";
 import { glassCard } from "./lib/ui.js";
 
 // Code-split: both overlays only render on user action, so let Vite ship them
@@ -22,8 +22,149 @@ const MonthlyRecap  = lazy(() => import("./components/MonthlyRecap.jsx").then(m 
 
 const RECAP_MONTH_NAMES = ["january","february","march","april","may","june","july","august","september","october","november","december"];
 
+// Shared "Swan Sense" eyebrow spec — same values as ritual.jsx's
+// ivory-flat variant used before this card replaced it, and the same
+// spec DailySkinIndexCard's own header already matched. Reused for
+// both the Swan Sense eyebrow and the Daily Skin Index label so the
+// two section headers inside the card read as one family.
+const TODAY_EYEBROW_STYLE = {
+  fontFamily: "var(--font-display)",
+  fontSize: "var(--text-xs)", fontWeight: 700,
+  letterSpacing: "var(--tracking-display)", textTransform: "uppercase",
+  color: "var(--color-ivory, #faf9f4)",
+  opacity: 0.75,
+  margin: 0,
+};
+
+// Tone → chip background tint. Border stays a fixed ivory/0.32 on every
+// chip (the card's own spec), so tone comes through as a subtle fill
+// instead — label/value text stays uniform ivory for contrast, the same
+// choice DailySkinIndexCard's own tone system already settled on (see
+// that file's TONE_STYLES comment) rather than tinting small text at
+// --text-xs size.
+const TODAY_CHIP_TONE_BG = {
+  caution: "rgba(var(--rgb-bronze), 0.08)",
+  positive: "rgba(var(--rgb-sage), 0.08)",
+  neutral: "rgba(var(--rgb-ivory), 0.08)",
+};
+
+// One glassCard combining the Swan Sense line, the Daily Skin Index
+// readout, and a collapsed tips row — replaces the separate SwanSongCard
+// (ivory-flat) + DailySkinIndexCard that used to stack here. Derivation
+// logic is untouched: getSwanSenseLine is the exact same precedence
+// SwanSongCard uses, buildSkinIndex is the exact same function
+// DailySkinIndexCard calls — only the presentation is new.
+function TodayCard({ user, predictions, dailyLine, dailyLoading, dailyFailed, hasProducts, noProductsLine, cyclePhaseName, weather, tipsExpanded, onToggleTips }) {
+  const { line } = getSwanSenseLine({ user, predictions, dailyLine, dailyLoading, dailyFailed, hasProducts, noProductsLine });
+  const hasSwanLine = !!(line && String(line).trim());
+  const { items, actions } = buildSkinIndex({ cyclePhaseName, weather });
+
+  if (!hasSwanLine && items.length === 0) return null;
+
+  return (
+    <div style={{ ...glassCard, padding: "var(--space-4)", marginBottom: "var(--space-5)" }}>
+      {hasSwanLine && (
+        <div>
+          <p style={TODAY_EYEBROW_STYLE}>Swan Sense</p>
+          <p style={{
+            fontFamily: "var(--font-body)",
+            fontSize: "var(--text-md)", fontWeight: 400,
+            lineHeight: 1.5, letterSpacing: "0.01em",
+            color: "var(--color-ivory, #faf9f4)",
+            margin: "var(--space-3) 0 0",
+          }}>
+            {renderInsightLines(line)}
+          </p>
+        </div>
+      )}
+
+      {items.length > 0 && (
+        <div style={{ marginTop: hasSwanLine ? "var(--space-4)" : 0 }}>
+          {hasSwanLine && (
+            <div style={{ height: 1, background: "rgba(var(--rgb-ivory), 0.16)", marginBottom: "var(--space-4)" }} />
+          )}
+          <p style={{ ...TODAY_EYEBROW_STYLE, margin: "0 0 var(--space-3)" }}>Daily Skin Index</p>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-2)" }}>
+            {items.map((item, i) => {
+              const tone = TODAY_CHIP_TONE_BG[item.tone] || TODAY_CHIP_TONE_BG.neutral;
+              // An unpaired trailing chip (odd item count) spans both
+              // columns and centers itself, rather than sitting flush
+              // left in its own half-empty row.
+              const isTrailingOdd = items.length % 2 === 1 && i === items.length - 1;
+              const chip = (
+                <div style={{
+                  display: "flex", alignItems: "center", justifyContent: "space-between", gap: "var(--space-2)",
+                  padding: "var(--space-2)",
+                  background: tone,
+                  border: "1px solid rgba(var(--rgb-ivory), 0.32)",
+                  borderRadius: "var(--radius-pill)",
+                  width: isTrailingOdd ? "auto" : "100%",
+                  minWidth: isTrailingOdd ? 160 : undefined,
+                }}>
+                  <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", textTransform: "uppercase", letterSpacing: "var(--tracking-label)", color: "rgba(var(--rgb-ivory), 0.6)" }}>{item.label}</span>
+                  <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", textTransform: "uppercase", letterSpacing: "var(--tracking-label)", color: "var(--color-ivory, #faf9f4)" }}>{item.value}</span>
+                </div>
+              );
+              return isTrailingOdd ? (
+                <div key={item.key} style={{ gridColumn: "1 / -1", display: "flex", justifyContent: "center" }}>
+                  {chip}
+                </div>
+              ) : (
+                <div key={item.key}>{chip}</div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {actions.length > 0 && (
+        <div style={{ marginTop: "var(--space-4)" }}>
+          <div style={{ height: 1, background: "rgba(var(--rgb-ivory), 0.16)", marginBottom: "var(--space-3)" }} />
+          <button
+            type="button"
+            onClick={onToggleTips}
+            aria-expanded={tipsExpanded}
+            style={{
+              display: "flex", width: "100%", alignItems: tipsExpanded ? "flex-start" : "center",
+              justifyContent: "space-between", gap: "var(--space-3)",
+              background: "none", border: "none", padding: 0, cursor: "pointer", textAlign: "left",
+              WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
+            }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              {tipsExpanded ? (
+                <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
+                  {actions.map((action, i) => (
+                    <p key={i} style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ivory), 0.85)", lineHeight: 1.55, margin: 0 }}>{action}</p>
+                  ))}
+                </div>
+              ) : (
+                <p style={{
+                  fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ivory), 0.85)",
+                  lineHeight: 1.55, margin: 0,
+                  whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+                }}>{actions[0]}</p>
+              )}
+            </div>
+            <span style={{
+              color: "rgba(var(--rgb-ivory), 0.56)", flexShrink: 0, marginTop: tipsExpanded ? 2 : 0,
+              transform: tipsExpanded ? "rotate(90deg)" : "none",
+              transition: "transform 0.18s", display: "inline-flex",
+            }}>
+              <Icon name="chevron" size={11} />
+            </span>
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSwanPopup, treatments, updateTreatmentDate, locationData, user, notifPermission, onRequestNotif, notifDismissed, onDismissNotif, journals, setJournals, setCheckIns, triggerLog = [], daysSinceLastActive = null, skinGoals = [], onMarkSkinGoalMet, onAddSkinGoal, onRemoveSkinGoal, reflections = [] }) {
   const [showJournal, setShowJournal] = useState(false);
+  // Today card's tips row — collapsed by default, remembered only for
+  // this Dashboard mount (not persisted), shared by whichever branch
+  // (zero-products or has-products) renders the card.
+  const [tipsExpanded, setTipsExpanded] = useState(false);
   const conflicts = detectConflicts(products);
   // Surface only irreconcilable conflicts (the molecule-level deactivation
   // pairs flagged in constants.js). Everything else is handled silently
@@ -183,17 +324,21 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
               ))}
             </div>
 
-            {/* Swan Sense + Daily Skin Index — both are product-independent
-                (cycle phase / season / weather only), so a zero-product user
-                gets a real reading instead of staring at an empty screen
-                until their vanity is built. SwanSongCard's noProductsLine
-                prop gates it to the rule-based cycle/season floor here —
-                see its own precedence comment. */}
+            {/* Today card — both Swan Sense and the Daily Skin Index are
+                product-independent (cycle phase / season / weather only),
+                so a zero-product user gets a real reading instead of
+                staring at an empty screen until their vanity is built.
+                hasProducts=false gates the line to the rule-based
+                cycle/season floor — see getSwanSenseLine's precedence
+                comment in ritual.jsx. */}
             <div style={{ height: 1, background: "rgba(var(--rgb-ivory), 0.16)", marginBottom: "var(--space-5)" }} />
-            <div style={{ marginBottom: "var(--space-5)" }}>
-              <SwanSongCard currentSession={currentSession} asPopup={false} user={user} predictions={swanSensePredictions} dailyLine={swanDailyLine} dailyLoading={swanLoading} dailyFailed={swanFailed} variant="ivory-flat" hasProducts={false} noProductsLine={noProductsLine} />
-            </div>
-            <DailySkinIndexCard cyclePhaseName={cyclePhase?.name || null} cycleDay={currentCycleDay} cycleStale={cycleStale} weather={weather} locationData={locationData} />
+            <TodayCard
+              user={user} predictions={swanSensePredictions}
+              dailyLine={swanDailyLine} dailyLoading={swanLoading} dailyFailed={swanFailed}
+              hasProducts={false} noProductsLine={noProductsLine}
+              cyclePhaseName={cyclePhase?.name || null} weather={weather}
+              tipsExpanded={tipsExpanded} onToggleTips={() => setTipsExpanded(e => !e)}
+            />
           </div>
         );
       })()}
@@ -212,64 +357,39 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
       {/* -- Products present -------------------------------------------- */}
       {products.length > 0 && (
         <div>
-        {/* Setup strip - shown until user has products + check-in */}
-        {products.length > 0 && (() => {
-          const hasProducts = products.length > 0;
-          const hasCheckin = checkIns.length > 0;
-          const allDone = hasProducts && hasCheckin;
-          if (allDone) return null;
-          const steps = [
-            { label: "Add your products", done: hasProducts, action: () => setTab("shelf"), cta: "Vanity" },
-            { label: "Log a check-in", done: hasCheckin, action: () => setTab("progress"), cta: "Progress" },
-            { label: "Swan Sense activates", done: hasProducts && hasCheckin, action: null, cta: null },
-          ];
-          return (
-            <div style={{ marginBottom: "var(--space-6)", ...glassCard, padding: "var(--space-4) var(--space-5)" }}>
-              <div style={{ marginBottom: "var(--space-4)" }}>
-                <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)", margin: 0 }}>Getting started</p>
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
-                {steps.map((s, i) => (
-                  <div key={i} style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}
-                    onClick={s.action || undefined}>
-                    <div style={{ width: 20, height: 20, borderRadius: "50%", flexShrink: 0, background: s.done ? "var(--color-sage)" : "var(--ink)", border: "1px solid " + (s.done ? "var(--color-sage)" : "var(--border)"), display: "flex", alignItems: "center", justifyContent: "center", color: s.done ? "var(--ink)" : "var(--clay)" }}>
-                      {s.done && <Icon name="check" size={10} />}
-                      {!s.done && <span style={{ fontSize: "var(--text-xs)", opacity: 0.5 }}>{i + 1}</span>}
-                    </div>
-                    <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: s.done ? "var(--clay)" : "var(--parchment)", margin: 0, flex: 1, textDecoration: s.done ? "line-through" : "none", opacity: s.done ? 0.5 : 1 }}>{s.label}</p>
-                    {!s.done && s.cta && (
-                      <button onClick={e => { e.stopPropagation(); s.action(); }}
-                        style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-1)", fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, color: "var(--color-sage)", background: "rgba(var(--rgb-sage), 0.08)", border: "1px solid rgba(var(--rgb-sage), 0.32)", borderRadius: "var(--radius-pill)", padding: "var(--space-1) var(--space-3)", cursor: "pointer", whiteSpace: "nowrap" }}>
-                        {s.cta} <Icon name="arrow-right" size={10} />
-                      </button>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        })()}
+        {/* Action first: Begin Your Ritual is the very next thing after
+            the greeting — no divider between them, a solid button reads
+            as its own distinct block without a hairline rule competing
+            for attention right above it. */}
+        <button
+          onClick={() => setTab("routine")}
+          style={{
+            display: "flex", width: "100%", alignItems: "center", justifyContent: "space-between",
+            padding: "var(--space-5) var(--space-6)", marginBottom: "var(--space-5)",
+            background: "var(--color-ivory, #faf9f4)", border: "none",
+            borderRadius: "var(--radius)",
+            cursor: "pointer",
+            WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
+          }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-3)", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-md)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)" }}>
+            <Icon name={currentSession === "am" ? "sun" : "moon"} size={14} />
+            Begin Your Ritual
+          </span>
+          <span style={{ color: "var(--color-inky-moss, #2d3d2b)", display: "inline-flex" }}>
+            <Icon name="arrow-right" size={16} />
+          </span>
+        </button>
 
-        {/* Editorial canvas — sections separated by thin ivory rules rather
-            than card containers. Action items use Fungis Heavy uppercase
-            with an arrow; the swan video bg + dark canvas make this read
-            like the interior of a magazine. */}
-
-        {/* Swan Sense — fully transparent, divides greeting from action list */}
-        <div style={{ height: 1, background: "rgba(var(--rgb-ivory), 0.16)", marginBottom: "var(--space-5)" }} />
-        <div style={{ marginBottom: "var(--space-5)" }}>
-          <SwanSongCard currentSession={currentSession} asPopup={false} user={user} predictions={swanSensePredictions} dailyLine={swanDailyLine} dailyLoading={swanLoading} dailyFailed={swanFailed} variant="ivory-flat" />
-        </div>
-
-        {/* Daily Skin Index — glanceable data readout synthesized from
-            cycle phase + local weather. Sits directly under Swan
-            Sense but is deliberately a bordered flat card (not a
-            borderless editorial line) so it reads as a distinct
-            data-index format next to Swan Sense's written sentence.
-            Renders nothing (no wrapper margin either — the component
-            owns its own spacing) when neither cycle phase nor
-            weather resolves — see DailySkinIndexCard. */}
-        <DailySkinIndexCard cyclePhaseName={cyclePhase?.name || null} cycleDay={currentCycleDay} cycleStale={cycleStale} weather={weather} locationData={locationData} />
+        {/* Today card — Swan Sense line + Daily Skin Index + tips,
+            replacing the separate SwanSongCard (ivory-flat) +
+            DailySkinIndexCard that used to stack here. */}
+        <TodayCard
+          user={user} predictions={swanSensePredictions}
+          dailyLine={swanDailyLine} dailyLoading={swanLoading} dailyFailed={swanFailed}
+          hasProducts={true} noProductsLine={noProductsLine}
+          cyclePhaseName={cyclePhase?.name || null} weather={weather}
+          tipsExpanded={tipsExpanded} onToggleTips={() => setTipsExpanded(e => !e)}
+        />
 
         {_now.getDate() >= 14 && (
           <div style={{ textAlign: "right", marginBottom: "var(--space-6)" }}>
@@ -289,36 +409,11 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
           </div>
         )}
 
-        {/* Begin Your Ritual — primary action, inverted from the rest of
-            the dark canvas: solid ivory block, inky-moss text, filled
-            corners. Reads as the clear "do this" on the screen without
-            adding a new color to the system (both tokens already used
-            elsewhere on ivory-shadow cards and edge fills). */}
-        <button
-          onClick={() => setTab("routine")}
-          style={{
-            display: "flex", width: "100%", alignItems: "center", justifyContent: "space-between",
-            padding: "var(--space-5) var(--space-6)", marginBottom: "var(--space-3)",
-            background: "var(--color-ivory, #faf9f4)", border: "none",
-            borderRadius: "var(--radius)",
-            cursor: "pointer",
-            WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
-          }}>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-3)", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-md)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--color-inky-moss, #2d3d2b)" }}>
-            <Icon name={currentSession === "am" ? "sun" : "moon"} size={14} />
-            Begin Your Ritual
-          </span>
-          <span style={{ color: "var(--color-inky-moss, #2d3d2b)", display: "inline-flex" }}>
-            <Icon name="arrow-right" size={16} />
-          </span>
-        </button>
-
-        {/* Ask Cygne — second editorial line item, stacks directly under
-            Begin Your Ritual sharing its bottom rule. Age-gated: hidden
-            for under-17 (see utils.jsx:getAskCygneAccess); shows a
-            "fill in your birth year" prompt when birthYear is missing.
-            The conservative-estimate fallback (Jan 1 if no month/day)
-            and the dynamic recompute on every render are both in the
+        {/* Ask Cygne — editorial line item. Age-gated: hidden for
+            under-17 (see utils.jsx:getAskCygneAccess); shows a "fill in
+            your birth year" prompt when birthYear is missing. The
+            conservative-estimate fallback (Jan 1 if no month/day) and
+            the dynamic recompute on every render are both in the
             helper, so this site is just a switch on the returned
             state. */}
         {(() => {
@@ -361,6 +456,46 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
                 <Icon name="arrow-right" size={16} />
               </span>
             </button>
+          );
+        })()}
+
+        {/* Setup strip - shown until user has products + check-in. Moved
+            here (was above Begin Your Ritual) so the primary action is
+            the first thing after the greeting — "action first." */}
+        {products.length > 0 && (() => {
+          const hasProducts = products.length > 0;
+          const hasCheckin = checkIns.length > 0;
+          const allDone = hasProducts && hasCheckin;
+          if (allDone) return null;
+          const steps = [
+            { label: "Add your products", done: hasProducts, action: () => setTab("shelf"), cta: "Vanity" },
+            { label: "Log a check-in", done: hasCheckin, action: () => setTab("progress"), cta: "Progress" },
+            { label: "Swan Sense activates", done: hasProducts && hasCheckin, action: null, cta: null },
+          ];
+          return (
+            <div style={{ marginBottom: "var(--space-6)", ...glassCard, padding: "var(--space-4) var(--space-5)" }}>
+              <div style={{ marginBottom: "var(--space-4)" }}>
+                <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-display)", textTransform: "uppercase", color: "var(--clay)", margin: 0 }}>Getting started</p>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+                {steps.map((s, i) => (
+                  <div key={i} style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}
+                    onClick={s.action || undefined}>
+                    <div style={{ width: 20, height: 20, borderRadius: "50%", flexShrink: 0, background: s.done ? "var(--color-sage)" : "var(--ink)", border: "1px solid " + (s.done ? "var(--color-sage)" : "var(--border)"), display: "flex", alignItems: "center", justifyContent: "center", color: s.done ? "var(--ink)" : "var(--clay)" }}>
+                      {s.done && <Icon name="check" size={10} />}
+                      {!s.done && <span style={{ fontSize: "var(--text-xs)", opacity: 0.5 }}>{i + 1}</span>}
+                    </div>
+                    <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: s.done ? "var(--clay)" : "var(--parchment)", margin: 0, flex: 1, textDecoration: s.done ? "line-through" : "none", opacity: s.done ? 0.5 : 1 }}>{s.label}</p>
+                    {!s.done && s.cta && (
+                      <button onClick={e => { e.stopPropagation(); s.action(); }}
+                        style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-1)", fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, color: "var(--color-sage)", background: "rgba(var(--rgb-sage), 0.08)", border: "1px solid rgba(var(--rgb-sage), 0.32)", borderRadius: "var(--radius-pill)", padding: "var(--space-1) var(--space-3)", cursor: "pointer", whiteSpace: "nowrap" }}>
+                        {s.cta} <Icon name="arrow-right" size={10} />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
           );
         })()}
 

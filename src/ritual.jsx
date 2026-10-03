@@ -452,24 +452,35 @@ function genericFallbackLine() {
   return GENERIC_FALLBACK_LINES[doy % GENERIC_FALLBACK_LINES.length];
 }
 
-function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = {}, predictions = [], dailyLine = null, dailyLoading = false, dailyFailed = false, variant = "default", hasProducts = true, noProductsLine = null }) {
+// Plain and concrete, matching Swan Sense's tightened daily-line voice —
+// no vague sensory descriptors like "radiant" standing in for a fact.
+const BIRTHDAY_LINES = [
+  "Another year of taking care of yourself.",
+  "Another year around the sun. Your ritual continues.",
+  "Happy birthday. One more year of consistent care.",
+];
+
+// The Swan Sense line-precedence logic, extracted so any surface that
+// wants "the Swan Sense line" (not the whole SwanSongCard chrome) can
+// get the exact same sentence without duplicating this ternary.
+// Precedence:
+//   birthday → birthday line
+//   LLM line landed → LLM line
+//   loading + no LLM line yet → em dash (subtle placeholder, no spinner)
+//   LLM call failed and no rule-based prediction → no-products line (zero
+//     products) or generic editorial line
+//   else → rule-based prediction, the no-products line, or "no data yet"
+// The LLM line takes priority over the rule-based prediction once it lands;
+// we keep the rule engine running underneath so popup detail still renders.
+// noProductsLine only ever applies once every higher-precedence source
+// (LLM line, meaningful rule-based prediction) has nothing to say — it's
+// the cycle/season floor for a zero-product user, not a replacement for
+// a real prediction.
+function getSwanSenseLine({ user = {}, predictions = [], dailyLine = null, dailyLoading = false, dailyFailed = false, hasProducts = true, noProductsLine = null } = {}) {
   const now = new Date();
-  // Local guard against double-taps on the ivory-flat share icon
-  // while the canvas render + native share sheet are in flight. Only
-  // used inside the ivory-flat branch; harmless in the other
-  // variants since the button never renders there.
-  const [sharingCycle, setSharingCycle] = useState(false);
   const isBirthday = user.birthMonth && user.birthDay &&
     (now.getMonth() + 1) === parseInt(user.birthMonth) &&
     now.getDate() === parseInt(user.birthDay);
-
-  // Plain and concrete, matching Swan Sense's tightened daily-line voice —
-  // no vague sensory descriptors like "radiant" standing in for a fact.
-  const BIRTHDAY_LINES = [
-    "Another year of taking care of yourself.",
-    "Another year around the sun. Your ritual continues.",
-    "Happy birthday. One more year of consistent care.",
-  ];
 
   // Separate meaningful predictions from baseline fallbacks
   const meaningfulPredictions = predictions.filter(p => {
@@ -479,19 +490,6 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
   const hasMeaningful = meaningfulPredictions.length > 0;
   const trimmedDaily = dailyLine && dailyLine.trim();
 
-  // Line precedence:
-  //   birthday → birthday line
-  //   LLM line landed → LLM line
-  //   loading + no LLM line yet → em dash (subtle placeholder, no spinner)
-  //   LLM call failed and no rule-based prediction → no-products line (zero
-  //     products) or generic editorial line
-  //   else → rule-based prediction, the no-products line, or "no data yet"
-  // The LLM line takes priority over the rule-based prediction once it lands;
-  // we keep the rule engine running underneath so popup detail still renders.
-  // noProductsLine only ever applies once every higher-precedence source
-  // (LLM line, meaningful rule-based prediction) has nothing to say — it's
-  // the cycle/season floor for a zero-product user, not a replacement for
-  // a real prediction.
   const line = isBirthday
     ? BIRTHDAY_LINES[now.getFullYear() % BIRTHDAY_LINES.length]
     : trimmedDaily
@@ -503,6 +501,17 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
           : hasMeaningful
             ? meaningfulPredictions[0].headline
             : (!hasProducts && noProductsLine) || NO_DATA_LINE;
+
+  return { line, isBirthday, hasMeaningful, meaningfulPredictions, trimmedDaily };
+}
+
+function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = {}, predictions = [], dailyLine = null, dailyLoading = false, dailyFailed = false, variant = "default", hasProducts = true, noProductsLine = null }) {
+  // Local guard against double-taps on the ivory-flat share icon
+  // while the canvas render + native share sheet are in flight. Only
+  // used inside the ivory-flat branch; harmless in the other
+  // variants since the button never renders there.
+  const [sharingCycle, setSharingCycle] = useState(false);
+  const { line, isBirthday, hasMeaningful, meaningfulPredictions, trimmedDaily } = getSwanSenseLine({ user, predictions, dailyLine, dailyLoading, dailyFailed, hasProducts, noProductsLine });
 
   const grain ="url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E\")";
 
@@ -962,4 +971,4 @@ function FlightModeModal({ products, activeMap, onClose }) {
 // --- SHOP SCAN ----------------------------------------------------------------
 
 
-export { ProductCard, SessionPicker, RoutineStep, SwanSongCard, FlightModeModal };
+export { ProductCard, SessionPicker, RoutineStep, SwanSongCard, FlightModeModal, getSwanSenseLine, renderInsightLines };
