@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Icon, CardNote } from "./components.jsx";
-import { detectActives, isTretinoin } from "./engine.js";
+import { detectActives, isTretinoin, hasTrueRetinoid } from "./engine.js";
 import { daysBetweenLocal, toLocalMidnight } from "./utils.jsx";
 
 
@@ -521,13 +521,16 @@ function IntroduceSlowlyCard({
   // (paceScheduleForSensitivity only rewrites phases), so this check
   // holds for both the base and paced azelaic acid schedule.
   const showHighStrengthNote = schedule.label === "Azelaic Acid" && isHighStrengthAzelaic(product.ingredients);
-  // The "retinol" active key covers retinol, tretinoin, and adapalene
-  // (see ACTIVE_RULES in constants.js) — the pregnancy/breastfeeding
-  // caution applies to the whole key, not just true retinoids, so it
-  // also surfaces for a bakuchiol-only product bucketed under the same
-  // schedule. No pregnancy status is asked or stored anywhere; this is
-  // a static informational line shown unconditionally for the active.
-  const showRetinoidPregnancyNote = schedule.label === "Retinol";
+  // The "retinol" active key covers retinol, tretinoin, adapalene, and
+  // bakuchiol (see ACTIVE_RULES in constants.js) — but the pregnancy/
+  // breastfeeding caution is clinically about true vitamin-A retinoids,
+  // not bakuchiol (a plant-based alternative with a different safety
+  // profile), so hasTrueRetinoid narrows it to products that actually
+  // contain one. Bakuchiol keeps its conservative scheduling under the
+  // same "retinol" key unchanged — only this caution's visibility is
+  // narrower. No pregnancy status is asked or stored anywhere; this is
+  // a static informational line shown unconditionally for a true retinoid.
+  const showRetinoidPregnancyNote = schedule.label === "Retinol" && hasTrueRetinoid(product.ingredients);
   const showTretinoinPrescriberNote = showRetinoidPregnancyNote && isTretinoin(product);
 
   const saving = checkinStatus === "saving";

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Icon, Section, CardNote } from "./components.jsx";
-import { detectActives, analyzeShelf, isTretinoin } from "./engine.js";
+import { detectActives, analyzeShelf, isTretinoin, hasTrueRetinoid } from "./engine.js";
 import { CATEGORIES, FREQUENCIES } from "./constants.js";
 import { DEFER_TAG_CONFIG } from "./modals.jsx";
 import { compressImage } from "./utils.jsx";
@@ -361,13 +361,14 @@ function ProductModal({ product, onSave, onClose, user }) {
 
   const overuseWarning = getOveruseWarning(form.frequency || "daily", freqSuggestion, form);
 
-  // Shown once in the add/edit form when a retinoid is detected — the
-  // "retinol" active key covers retinol, tretinoin, and adapalene (see
-  // ACTIVE_RULES in constants.js), same gate the Introduce Slowly card
-  // uses. No pregnancy status is asked or stored; this is a static
-  // informational line.
+  // Shown once in the add/edit form when a TRUE retinoid is detected —
+  // the "retinol" active key also covers bakuchiol (see ACTIVE_RULES in
+  // constants.js), but hasTrueRetinoid narrows the caution to products
+  // that actually contain a vitamin-A derivative, same gate the
+  // Introduce Slowly card uses. No pregnancy status is asked or stored;
+  // this is a static informational line.
   const formActives = Object.keys(detectActives(form.ingredients || []));
-  const showRetinoidPregnancyNote = formActives.includes("retinol");
+  const showRetinoidPregnancyNote = formActives.includes("retinol") && hasTrueRetinoid(form.ingredients);
   const showTretinoinPrescriberNote = showRetinoidPregnancyNote && isTretinoin(form);
 
   const [searchQuery, setSearchQuery] = useState("");

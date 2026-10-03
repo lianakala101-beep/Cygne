@@ -12,6 +12,7 @@ import {
   isDampSkinProduct,
   hasSPFCoverage,
   isTretinoin,
+  hasTrueRetinoid,
 } from "./engine.js";
 
 // Build a minimal product shape with sensible defaults so individual tests
@@ -150,6 +151,51 @@ describe("isTretinoin", () => {
 
   it("accepts a comma-separated ingredient string as well as an array", () => {
     expect(isTretinoin(p({ ingredients: "Tretinoin 0.05%, Glycerin" }))).toBe(true);
+  });
+});
+
+describe("hasTrueRetinoid", () => {
+  it("returns false for a bakuchiol-only product (the pregnancy caution carve-out)", () => {
+    expect(hasTrueRetinoid(["bakuchiol", "glycerin"])).toBe(false);
+  });
+
+  it("returns true when bakuchiol is combined with an actual retinoid", () => {
+    expect(hasTrueRetinoid(["bakuchiol", "retinol"])).toBe(true);
+  });
+
+  it("returns true for plain retinol", () => {
+    expect(hasTrueRetinoid(["retinol"])).toBe(true);
+  });
+
+  it("returns true for retinal", () => {
+    expect(hasTrueRetinoid(["retinal"])).toBe(true);
+  });
+
+  it("returns true for a retinyl ester", () => {
+    expect(hasTrueRetinoid(["retinyl palmitate"])).toBe(true);
+  });
+
+  it("returns true for tretinoin", () => {
+    expect(hasTrueRetinoid(["tretinoin"])).toBe(true);
+  });
+
+  it("returns true for adapalene", () => {
+    expect(hasTrueRetinoid(["adapalene"])).toBe(true);
+  });
+
+  it("returns false for a product with no retinoid at all", () => {
+    expect(hasTrueRetinoid(["niacinamide", "glycerin"])).toBe(false);
+  });
+
+  it("returns false for null/undefined/empty ingredients", () => {
+    expect(hasTrueRetinoid(null)).toBe(false);
+    expect(hasTrueRetinoid(undefined)).toBe(false);
+    expect(hasTrueRetinoid([])).toBe(false);
+  });
+
+  it("accepts a comma-separated ingredient string as well as an array", () => {
+    expect(hasTrueRetinoid("Bakuchiol, Niacinamide")).toBe(false);
+    expect(hasTrueRetinoid("Retinol 0.5%, Glycerin")).toBe(true);
   });
 });
 

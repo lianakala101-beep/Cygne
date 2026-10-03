@@ -117,6 +117,26 @@ export function isTretinoin(product) {
   return /tretinoin|retin-a/i.test(ing) || /tretinoin|retin-a/i.test(name);
 }
 
+// True when the ingredient list contains an actual vitamin-A-derivative
+// retinoid (retinol, retinal, a retinyl ester, retinoic acid/tretinoin,
+// adapalene, or one of the newer retinoid esters) — every ACTIVE_RULES
+// retinol keyword EXCEPT bakuchiol. Bakuchiol is a plant-based retinol
+// alternative bucketed under the same "retinol" active key purely for
+// conservative scheduling (see ACTIVE_RULES.retinol's comment in
+// constants.js) — it isn't a vitamin-A derivative, so it doesn't carry
+// a true retinoid's photosensitivity/pregnancy profile. Used to gate
+// copy that's specifically about that profile (the pregnancy/
+// breastfeeding caution) without touching the active key or scheduling
+// itself, which stay keyed to the full "retinol" list including
+// bakuchiol.
+export function hasTrueRetinoid(ingredients) {
+  const ing = Array.isArray(ingredients) ? ingredients.join(" ") : String(ingredients || "");
+  const lower = ing.toLowerCase();
+  return ACTIVE_RULES.retinol.keywords
+    .filter(k => k !== "bakuchiol")
+    .some(k => lower.includes(k));
+}
+
 // Returns the sessions a product is scheduled into. Mirrors buildRoutine's
 // daily auto-assignment so periodic products (exfoliants/masks) and shelf
 // products without an explicit session still resolve to the slot they'd
