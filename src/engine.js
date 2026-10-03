@@ -102,6 +102,21 @@ export function detectActivesFromProduct(product) {
   return actives;
 }
 
+// True when a product specifically names tretinoin (or its brand name,
+// Retin-A) — prescription-only in the US, unlike the mostly-OTC
+// retinol/retinal/adapalene that share the same "retinol" active key
+// for scheduling purposes. Checks both ingredients and name, same
+// two-source pattern detectActivesFromProduct uses for retinol
+// detection (a product entered as "Retin-A 0.025%" may not list
+// "tretinoin" in its ingredient field). Mirrors the onTretinoin
+// detection already used in swansense.jsx for prescription history.
+export function isTretinoin(product) {
+  if (!product) return false;
+  const ing = Array.isArray(product.ingredients) ? product.ingredients.join(" ") : String(product.ingredients || "");
+  const name = product.name || "";
+  return /tretinoin|retin-a/i.test(ing) || /tretinoin|retin-a/i.test(name);
+}
+
 // Returns the sessions a product is scheduled into. Mirrors buildRoutine's
 // daily auto-assignment so periodic products (exfoliants/masks) and shelf
 // products without an explicit session still resolve to the slot they'd

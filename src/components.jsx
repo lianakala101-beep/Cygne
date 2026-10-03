@@ -78,6 +78,24 @@ function Section({ title, icon, children }) {
   );
 }
 
+// Small italic reminder caption — originated as the Introduce Slowly
+// card's "paced more gradually" / prescriber-strength notes
+// (src/ramp.jsx) and reused wherever a card or form needs the same
+// low-emphasis, non-alarming aside: not a warning (that's FlagCard's
+// job), just a quiet note underneath the main content.
+function CardNote({ children, style }) {
+  return (
+    <p style={{
+      fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontStyle: "italic",
+      color: "var(--clay)", opacity: 0.75,
+      margin: "var(--space-2) 0 0", letterSpacing: "0.02em", lineHeight: 1.5,
+      ...style,
+    }}>
+      {children}
+    </p>
+  );
+}
+
 // Collapsed by default — just severity label + title in one row, with a
 // subtle chevron when there's detail or product context to expand into.
 // Tap to expand reveals f.detail and any conflict-side product pills.
@@ -290,4 +308,4 @@ class ErrorBoundary extends Component {
 }
 
 
-export { Icon, Pill, Section, FlagCard, SwanIcon, ErrorBoundary };
+export { Icon, Pill, Section, FlagCard, SwanIcon, ErrorBoundary, CardNote };

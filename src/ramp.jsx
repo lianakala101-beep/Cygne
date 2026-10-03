@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { Icon } from "./components.jsx";
-import { detectActives } from "./engine.js";
+import { Icon, CardNote } from "./components.jsx";
+import { detectActives, isTretinoin } from "./engine.js";
 import { daysBetweenLocal, toLocalMidnight } from "./utils.jsx";
 
 
@@ -521,6 +521,14 @@ function IntroduceSlowlyCard({
   // (paceScheduleForSensitivity only rewrites phases), so this check
   // holds for both the base and paced azelaic acid schedule.
   const showHighStrengthNote = schedule.label === "Azelaic Acid" && isHighStrengthAzelaic(product.ingredients);
+  // The "retinol" active key covers retinol, tretinoin, and adapalene
+  // (see ACTIVE_RULES in constants.js) — the pregnancy/breastfeeding
+  // caution applies to the whole key, not just true retinoids, so it
+  // also surfaces for a bakuchiol-only product bucketed under the same
+  // schedule. No pregnancy status is asked or stored anywhere; this is
+  // a static informational line shown unconditionally for the active.
+  const showRetinoidPregnancyNote = schedule.label === "Retinol";
+  const showTretinoinPrescriberNote = showRetinoidPregnancyNote && isTretinoin(product);
 
   const saving = checkinStatus === "saving";
   const saved  = checkinStatus === "saved";
@@ -640,22 +648,16 @@ function IntroduceSlowlyCard({
         }}>{startedLabel}</p>
       )}
       {schedulePaced && (
-        <p style={{
-          fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontStyle: "italic",
-          color: "var(--clay)", opacity: 0.75,
-          margin: "var(--space-2) 0 0", letterSpacing: "0.02em", lineHeight: 1.5,
-        }}>
-          Paced more gradually based on your skin profile.
-        </p>
+        <CardNote>Paced more gradually based on your skin profile.</CardNote>
       )}
       {showHighStrengthNote && (
-        <p style={{
-          fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontStyle: "italic",
-          color: "var(--clay)", opacity: 0.75,
-          margin: "var(--space-2) 0 0", letterSpacing: "0.02em", lineHeight: 1.5,
-        }}>
-          If this was prescribed, follow your prescriber's directions first.
-        </p>
+        <CardNote>If this was prescribed, follow your prescriber's directions first.</CardNote>
+      )}
+      {showRetinoidPregnancyNote && (
+        <CardNote>Retinoids are generally avoided during pregnancy and breastfeeding. If that applies to you, check with your doctor before using one.</CardNote>
+      )}
+      {showTretinoinPrescriberNote && (
+        <CardNote>If this was prescribed, follow your prescriber's directions first.</CardNote>
       )}
 
       {/* Phase progress dots — small horizontal strip, one per phase */}

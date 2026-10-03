@@ -11,6 +11,7 @@ import {
   isExfoliantLike,
   isDampSkinProduct,
   hasSPFCoverage,
+  isTretinoin,
 } from "./engine.js";
 
 // Build a minimal product shape with sensible defaults so individual tests
@@ -79,6 +80,14 @@ describe("detectActives", () => {
     expect(a.BHA).toBeUndefined();
     expect(a.retinol).toBeUndefined();
   });
+
+  it("detects tretinoin and adapalene as the retinol active key", () => {
+    // ACTIVE_RULES.retinol.keywords includes both by name — this is the
+    // exact lookup the product-add flow's retinoid pregnancy caution
+    // gate relies on (formActives.includes("retinol")).
+    expect(detectActives(["tretinoin"]).retinol).toBe(true);
+    expect(detectActives(["adapalene"]).retinol).toBe(true);
+  });
 });
 
 describe("detectActivesFromProduct", () => {
@@ -94,6 +103,53 @@ describe("detectActivesFromProduct", () => {
 
   it("returns empty object for nullish product", () => {
     expect(detectActivesFromProduct(null)).toEqual({});
+  });
+
+  it("maps tretinoin and adapalene ingredients to the retinol active key", () => {
+    // Both share ACTIVE_RULES.retinol's keyword list, so anything gated
+    // on the "retinol" active (e.g. the pregnancy caution) covers them.
+    expect(detectActivesFromProduct(p({ ingredients: ["tretinoin"] })).retinol).toBe(true);
+    expect(detectActivesFromProduct(p({ ingredients: ["adapalene"] })).retinol).toBe(true);
+  });
+});
+
+describe("isTretinoin", () => {
+  it("detects tretinoin from the ingredient list", () => {
+    expect(isTretinoin(p({ ingredients: ["tretinoin"] }))).toBe(true);
+  });
+
+  it("detects the Retin-A brand name from the ingredient list", () => {
+    expect(isTretinoin(p({ ingredients: ["Retin-A 0.025%"] }))).toBe(true);
+  });
+
+  it("falls back to the product name when ingredients don't mention it", () => {
+    expect(isTretinoin(p({ name: "Retin-A Micro", ingredients: [] }))).toBe(true);
+    expect(isTretinoin(p({ name: "Generic Tretinoin Cream", ingredients: [] }))).toBe(true);
+  });
+
+  it("is case-insensitive", () => {
+    expect(isTretinoin(p({ ingredients: ["TRETINOIN"] }))).toBe(true);
+  });
+
+  it("returns false for plain retinol (not tretinoin)", () => {
+    expect(isTretinoin(p({ ingredients: ["retinol"] }))).toBe(false);
+  });
+
+  it("returns false for adapalene (not tretinoin)", () => {
+    expect(isTretinoin(p({ ingredients: ["adapalene"] }))).toBe(false);
+  });
+
+  it("returns false for a product with no retinoid at all", () => {
+    expect(isTretinoin(p({ ingredients: ["niacinamide"] }))).toBe(false);
+  });
+
+  it("returns false for null/undefined product", () => {
+    expect(isTretinoin(null)).toBe(false);
+    expect(isTretinoin(undefined)).toBe(false);
+  });
+
+  it("accepts a comma-separated ingredient string as well as an array", () => {
+    expect(isTretinoin(p({ ingredients: "Tretinoin 0.05%, Glycerin" }))).toBe(true);
   });
 });
 

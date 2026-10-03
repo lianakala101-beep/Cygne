@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-import { Icon, Section } from "./components.jsx";
-import { detectActives, analyzeShelf } from "./engine.js";
+import { Icon, Section, CardNote } from "./components.jsx";
+import { detectActives, analyzeShelf, isTretinoin } from "./engine.js";
 import { CATEGORIES, FREQUENCIES } from "./constants.js";
 import { DEFER_TAG_CONFIG } from "./modals.jsx";
 import { compressImage } from "./utils.jsx";
@@ -361,6 +361,15 @@ function ProductModal({ product, onSave, onClose, user }) {
 
   const overuseWarning = getOveruseWarning(form.frequency || "daily", freqSuggestion, form);
 
+  // Shown once in the add/edit form when a retinoid is detected — the
+  // "retinol" active key covers retinol, tretinoin, and adapalene (see
+  // ACTIVE_RULES in constants.js), same gate the Introduce Slowly card
+  // uses. No pregnancy status is asked or stored; this is a static
+  // informational line.
+  const formActives = Object.keys(detectActives(form.ingredients || []));
+  const showRetinoidPregnancyNote = formActives.includes("retinol");
+  const showTretinoinPrescriberNote = showRetinoidPregnancyNote && isTretinoin(form);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
@@ -708,6 +717,12 @@ function ProductModal({ product, onSave, onClose, user }) {
                   <span style={{ color: "var(--color-bronze)", flexShrink: 0, marginTop: 1, display: "inline-flex" }}><Icon name="warning" size={13} /></span>
                   <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "var(--color-bronze)", margin: 0, lineHeight: 1.6 }}>{overuseWarning}</p>
                 </div>
+              )}
+              {showRetinoidPregnancyNote && (
+                <CardNote>Retinoids are generally avoided during pregnancy and breastfeeding. If that applies to you, check with your doctor before using one.</CardNote>
+              )}
+              {showTretinoinPrescriberNote && (
+                <CardNote>If this was prescribed, follow your prescriber's directions first.</CardNote>
               )}
             </div>
 

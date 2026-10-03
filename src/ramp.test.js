@@ -81,6 +81,16 @@ describe("RAMP_ACTIVES", () => {
   });
 });
 
+describe("RAMP_SCHEDULES retinol label", () => {
+  // IntroduceSlowlyCard gates the retinoid pregnancy/prescriber notes on
+  // schedule.label === "Retinol" — this guards that string against a
+  // silent rename that would otherwise break the gate without any test
+  // failing elsewhere.
+  it("is exactly \"Retinol\"", () => {
+    expect(RAMP_SCHEDULES.retinol.label).toBe("Retinol");
+  });
+});
+
 describe("RAMP_SCHEDULES azelaic acid", () => {
   const azelaic = RAMP_SCHEDULES["azelaic acid"];
 
