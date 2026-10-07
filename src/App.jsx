@@ -18,6 +18,7 @@ import { API_BASE_URL } from "./config.js";
 import { Capacitor } from "@capacitor/core";
 import { Purchases, LOG_LEVEL } from "@revenuecat/purchases-capacitor";
 import { PushNotifications } from "@capacitor/push-notifications";
+import { StatusBar, Style } from "@capacitor/status-bar";
 import { RC_KEY_LOOKS_VALID, rcKeyInvalidReason, usePremiumStatus, shouldShowPaywall, markRcReady } from "./hooks/useSubscription.js";
 import { PaywallScreen } from "./components/PaywallScreen.jsx";
 import { RampCheckinModal } from "./components/RampCheckinModal.jsx";
@@ -49,6 +50,12 @@ function rcAvailable() {
 // sites is safe. registerPushRef gates it to one call per app mount so we
 // don't retry against a rejected permission every render.
 function pushAvailable() {
+  return Capacitor.isNativePlatform() && Capacitor.getPlatform() !== "web";
+}
+
+// Same web-vs-native gate as the two helpers above — same shape so the
+// web/Vercel build (no native bridge) never calls into the plugin.
+function statusBarAvailable() {
   return Capacitor.isNativePlatform() && Capacitor.getPlatform() !== "web";
 }
 
@@ -388,6 +395,24 @@ export default function App() {
         // getCustomerInfo will still throw and be caught → source:"error".
         // But the awaiter unblocks in <5s instead of timing out.
         markRcReady();
+      }
+    })();
+  }, []);
+
+  // -- Status bar style (mount once) -------------------------------------------
+  // Light text for the dark moss background. The declarative config in
+  // capacitor.config.ts (plugins.StatusBar) sets the same style + overlay
+  // at native launch, before this JS runs — this call is the belt to
+  // that suspenders, and is what actually takes effect if either value
+  // is ever changed at runtime later. No-ops on the web/Vercel build.
+  useEffect(() => {
+    if (!statusBarAvailable()) return;
+    (async () => {
+      try {
+        await StatusBar.setStyle({ style: Style.Dark });
+        await StatusBar.setOverlaysWebView({ overlay: true });
+      } catch (e) {
+        console.error("[Cygne] StatusBar setup failed:", e?.message ?? e);
       }
     })();
   }, []);
@@ -1921,7 +1946,7 @@ export default function App() {
 
   // -- Main app ---------------------------------------------------------------
   return (
-    <div style={{ minHeight: "100vh", background: "var(--color-inky-moss, #2d3d2b)", paddingBottom: 88 }}>
+    <div style={{ minHeight: "100vh", background: "var(--color-inky-moss, #2d3d2b)", paddingBottom: "calc(88px + env(safe-area-inset-bottom))" }}>
       <style>{`
         /* Fonts are declared once in src/index.css. Everything below is
            the runtime token sheet — colors and aliases the legacy inline
@@ -2016,13 +2041,17 @@ export default function App() {
         .modal-bg { background: rgba(var(--rgb-ivory), 0.56); }
       `}</style>
 
-      {/* Header — dark across every tab */}
+      {/* Header — dark across every tab. paddingTop extends the header's
+          own background up through the status bar/notch now that
+          capacitor.config.ts's ios.contentInset: 'never' lets the page
+          draw there — env() resolves to 0 on web/Android (no-op) and to
+          the real inset on iOS once viewport-fit=cover is set. */}
       <div style={{
         position: "sticky", top: 0, zIndex: 50,
         background: "rgba(var(--rgb-moss), 0.94)",
         backdropFilter: "blur(16px)",
         borderBottom: "1px solid rgba(var(--rgb-ivory), 0.08)",
-        padding: "0 var(--space-6)",
+        padding: "env(safe-area-inset-top) var(--space-6) 0",
       }}>
         <div style={{ position: "relative", maxWidth: 600, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "flex-end", height: 76 }}>
           <img
@@ -2164,8 +2193,13 @@ export default function App() {
         {tab === "progress"  && <Progress products={products} checkIns={checkIns} setCheckIns={setCheckIns} treatments={treatments} setTreatments={setTreatments} saveTreatment={saveTreatment} removeTreatment={removeTreatment} updateTreatmentDate={updateTreatmentDate} user={user} onAdvanceRamp={advanceRamp} onHoldRamp={holdRamp} onResetRampStart={resetRampStartDate} onRampCheckinSave={saveRampCheckin} onRampCheckinDone={dismissRampCheckin} rampCheckins={rampCheckins} cycleSuggestsHold={cycleSuggestsHold} journals={journals} setJournals={setJournals} onUpdateUser={updateUser} reflections={reflections} triggerLog={triggerLog} setTriggerLog={setTriggerLog} />}
       </div>
 
-      {/* Bottom nav — dark across every tab */}
-      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "rgba(var(--rgb-moss), 0.94)", backdropFilter: "blur(16px)", borderTop: "1px solid rgba(var(--rgb-ivory), 0.08)", zIndex: 50 }}>
+      {/* Bottom nav — dark across every tab. paddingBottom extends the
+          nav's own background down through the home-indicator area
+          (see the header comment above for why) while the tab buttons'
+          own padding keeps their tap targets clear of it. The outer
+          App div's paddingBottom accounts for this extra height so
+          scrolled content never ends up hidden behind the taller nav. */}
+      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "rgba(var(--rgb-moss), 0.94)", backdropFilter: "blur(16px)", borderTop: "1px solid rgba(var(--rgb-ivory), 0.08)", paddingBottom: "env(safe-area-inset-bottom)", zIndex: 50 }}>
         <div style={{ maxWidth: 600, margin: "0 auto", display: "flex" }}>
           {tabs.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}

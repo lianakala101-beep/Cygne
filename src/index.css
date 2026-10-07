@@ -125,12 +125,15 @@
 }
 
 /* Base
- * html + body both painted inky-moss so the strip iOS exposes during
- * a rubber-band overscroll bounce shows the app's dark canvas
- * instead of a default-white / ivory flash. Every screen renders
- * inside an App-level `var(--color-inky-moss)` div, so this color
- * is invisible in the normal viewport — it only matters when the
- * WebView pulls past a scroll boundary and reveals the underlayer.
+ * html + body + #root all painted inky-moss so there's no gap where a
+ * default-white / ivory flash could show through — a rubber-band
+ * overscroll bounce, the native WebView's own first-paint color
+ * before this stylesheet loads (also set via capacitor.config.ts'
+ * `backgroundColor`, which covers the native layer this CSS can't
+ * reach), or the brief window before App.jsx's own root div mounts.
+ * Every screen renders inside that App-level `var(--color-inky-moss)`
+ * div too, so this color is invisible in the normal viewport — it only
+ * matters at these edges.
  *
  * overscroll-behavior-y: contain prevents scroll chaining and keeps
  * the elastic bounce inside the app's own scroller. `contain` (not
@@ -139,7 +142,8 @@
  * reveals the same dark color rather than an unstyled surface. No
  * pull-to-refresh depends on chaining, so nothing regresses here. */
 html,
-body {
+body,
+#root {
   background-color: var(--color-inky-moss);
   overscroll-behavior-y: contain;
 }

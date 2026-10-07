@@ -25,14 +25,45 @@ const config: CapacitorConfig = {
   appName: 'Cygne',
   webDir: 'dist',
 
+  // Background color of the native WebView itself (not CSS) — paints
+  // instantly on native launch, before the page's own stylesheet loads,
+  // and is what shows through in any native-chrome gap CSS can't reach
+  // (e.g. a UIScrollView's resting contentInset gap). Matches
+  // --color-inky-moss so there's no white flash/gap anywhere.
+  backgroundColor: '#2d3d2b',
+
   ios: {
-    // Prefer the iPad layout on tablets — the app is built mobile-first
-    // and reads better at phone widths.
-    contentInset: 'always',
+    // 'never': the WKWebView draws fully edge-to-edge (status bar +
+    // home indicator included) instead of iOS auto-inserting a content
+    // inset for the safe areas. Was 'always', which kept the page
+    // itself from ever extending into the notch/home-indicator strip —
+    // at rest (scroll position 0) that reserved strip showed the
+    // WebView's own native background (white, since nothing set it)
+    // instead of the page; once scrolled, the page's own moss
+    // background happened to slide into that same screen position,
+    // which is why the gap "turned moss" only after scrolling. Now the
+    // page handles the safe areas itself via env(safe-area-inset-*)
+    // padding on the header/bottom nav (see src/App.jsx), so the fix
+    // doesn't depend on scroll position at all.
+    contentInset: 'never',
     // Allow the WKWebView to scroll its own content (default true) so the
     // various scrollable surfaces (Reflection gallery, Progress, Monthly
     // Recap) feel native.
     scrollEnabled: true,
+  },
+
+  plugins: {
+    StatusBar: {
+      // Transparent status bar over the WebView (the default, set
+      // explicitly here) — pairs with contentInset: 'never' so the page
+      // itself is what's visible behind the status bar text.
+      overlaysWebView: true,
+      // Light status bar text (clock/battery/signal) for our dark moss
+      // background. Nothing in this project ever set a style before —
+      // Capacitor's own default is '.default' (dark text), which reads
+      // as invisible against a dark background.
+      style: 'DARK',
+    },
   },
 };
 
