@@ -281,8 +281,11 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
       {/* -- Empty state ------------------------------------------------- */}
       {products.length === 0 && (() => {
         const emptySteps = [
-          { label: "Log how your skin feels today", sub: "Sleep, stress, skin condition — takes about 10 seconds.", action: () => setShowJournal(true), cta: "Log now" },
-          { label: "Add your first three products", sub: "Start with a cleanser, moisturizer and SPF. Add the rest anytime.", action: () => setTab("shelf"), cta: "Go to Vanity" },
+          // Primary: the one thing to do right now (10 seconds, no setup
+          // required) — solid ivory/moss, same treatment as Begin Your
+          // Ritual, so it reads as THE action on first run.
+          { label: "Log how your skin feels today", sub: "Sleep, stress, skin condition — takes about 10 seconds.", action: () => setShowJournal(true), cta: "Log now", ctaVariant: "primary" },
+          { label: "Add your first three products", sub: "Start with a cleanser, moisturizer and SPF. Add the rest anytime.", action: () => setTab("shelf"), cta: "Go to Vanity", ctaVariant: "secondary" },
           { label: "Swan Sense wakes up", sub: "Once your vanity is set, Cygne starts predicting - cycle windows, active streaks, barrier warnings.", action: null, cta: null },
         ];
         return (
@@ -315,7 +318,14 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
                     <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-sm)", fontWeight: 400, color: "var(--color-ivory)", margin: "0 0 var(--space-1)", lineHeight: 1.3 }}>{s.label}</p>
                     <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--color-ivory)", opacity: 0.75, margin: s.cta ? "0 0 var(--space-3)" : 0, lineHeight: 1.6 }}>{s.sub}</p>
                     {s.cta && (
-                      <button onClick={s.action} style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-2)", fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400, color: "var(--color-sage)", background: "rgba(var(--rgb-sage), 0.08)", border: "1px solid rgba(var(--rgb-sage), 0.32)", borderRadius: "var(--radius-pill)", padding: "var(--space-2) var(--space-4)", cursor: "pointer" }}>
+                      <button onClick={s.action} style={{
+                        display: "inline-flex", alignItems: "center", gap: "var(--space-2)",
+                        fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400,
+                        borderRadius: "var(--radius-pill)", padding: "var(--space-2) var(--space-4)", cursor: "pointer",
+                        ...(s.ctaVariant === "primary"
+                          ? { color: "var(--color-inky-moss, #2d3d2b)", background: "var(--color-ivory, #faf9f4)", border: "none" }
+                          : { color: "rgba(var(--rgb-ivory), 0.9)", background: "rgba(var(--rgb-ivory), 0.08)", border: "1px solid rgba(var(--rgb-ivory), 0.32)" }),
+                      }}>
                         {s.cta} <Icon name="arrow-right" size={11} />
                       </button>
                     )}
