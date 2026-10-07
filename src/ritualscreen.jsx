@@ -5,7 +5,7 @@ import { FREQUENCIES } from "./constants.js";
 import { buildRecommendations, buildRefinements } from "./intelligence.jsx";
 import { RoutineStep } from "./ritual.jsx";
 import { getSuggestedFrequency } from "./productmodal.jsx";
-import { RecommendationCard } from "./intelligence.jsx";
+import { SuggestionRows } from "./intelligence.jsx";
 import { SkinJournalModal } from "./progress.jsx";
 import { getCyclePhase, getActivePauseState } from "./progress.jsx";
 import { getNextUseLabel } from "./constants.js";
@@ -629,9 +629,9 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
           </div>
 
           <div>
-            {recTab === "additions"  && additions.map((r, i) => <RecommendationCard key={i} rec={r} onAdd={onAddProduct} onEdit={onEditProduct} />)}
-            {recTab === "swaps"      && swaps.map((r, i) => <RecommendationCard key={i} rec={r} onAdd={onAddProduct} onEdit={onEditProduct} />)}
-            {recTab === "simplify"   && simplifications.map((r, i) => <RecommendationCard key={i} rec={r} onAdd={onAddProduct} onEdit={onEditProduct} />)}
+            {recTab === "additions"  && <SuggestionRows recs={additions} onAdd={onAddProduct} onEdit={onEditProduct} />}
+            {recTab === "swaps"      && <SuggestionRows recs={swaps} onAdd={onAddProduct} onEdit={onEditProduct} />}
+            {recTab === "simplify"   && <SuggestionRows recs={simplifications} onAdd={onAddProduct} onEdit={onEditProduct} />}
             {recTab === "refine"     && refinements.map((r, i) => {
               const targets = (r.productIds || [])
                 .map(id => products.find(p => p.id === id))

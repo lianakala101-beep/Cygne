@@ -13,7 +13,7 @@ import { localDateKey, upsertJournalEntry } from "./lib/journal.js";
 import { AskCygneButton } from "./AskCygne.jsx";
 import { useSwanSenseDaily } from "./hooks/useSwanSenseDaily.js";
 import { buildSkinIndex } from "./lib/skinIndex.js";
-import { glassCard } from "./lib/ui.js";
+import { glassCard, buttonPrimary } from "./lib/ui.js";
 
 // Code-split: both overlays only render on user action, so let Vite ship them
 // in their own chunks instead of in the dashboard's initial paint bundle.
@@ -280,14 +280,22 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
 
       {/* -- Empty state ------------------------------------------------- */}
       {products.length === 0 && (() => {
-        const emptySteps = [
-          // Primary: the one thing to do right now (10 seconds, no setup
-          // required) — solid ivory/moss, same treatment as Begin Your
-          // Ritual, so it reads as THE action on first run.
-          { label: "Log how your skin feels today", sub: "Sleep, stress, skin condition — takes about 10 seconds.", action: () => setShowJournal(true), cta: "Log now", ctaVariant: "primary" },
-          { label: "Add your first three products", sub: "Start with a cleanser, moisturizer and SPF. Add the rest anytime.", action: () => setTab("shelf"), cta: "Go to Vanity", ctaVariant: "secondary" },
-          { label: "Swan Sense wakes up", sub: "Once your vanity is set, Cygne starts predicting - cycle windows, active streaks, barrier warnings.", action: null, cta: null },
+        // Only step 1 can show as "done" while this view is showing at
+        // all — completing step 2 (adding a product) unmounts this whole
+        // branch (products.length becomes > 0), and step 3 has no
+        // separate completion state of its own. Derived from the same
+        // `journals` data already used for the SkinJournalModal
+        // `existing` lookup below — no new state, no persisted flag.
+        const step1Done = (journals || []).some(j => j.date === localDateKey());
+        const steps = [
+          { label: "Log how your skin feels today", sub: "Sleep, stress, skin condition — takes about 10 seconds.", action: () => setShowJournal(true), cta: "Log now →", done: step1Done },
+          { label: "Add your first three products", sub: "Start with a cleanser, moisturizer and SPF. Add the rest anytime.", action: () => setTab("shelf"), cta: "Go to Vanity →", done: false },
+          { label: "Swan Sense wakes up", sub: "Once your vanity is set, Cygne starts predicting - cycle windows, active streaks, barrier warnings.", action: () => setTab("routine"), cta: "Ritual →", done: false },
         ];
+        // The first not-done step gets the solid-ivory "primary" treatment;
+        // everything after it is a dimmed, outlined "secondary" step.
+        const primaryIndex = steps.findIndex(s => !s.done);
+
         return (
           <div>
             <div style={{ marginBottom: "calc(var(--space-1) * 7)" }}>
@@ -295,43 +303,78 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
                 Your ritual lives here. Let's build it around you.
               </p>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)", marginBottom: "calc(var(--space-1) * 7)" }}>
-              {emptySteps.map((s, i) => (
-                <div key={i} style={{ display: "flex", gap: "var(--space-4)", padding: "var(--space-4) var(--space-5)", ...glassCard }}>
-                  {/* Step numeral sits where the icon used to be. Fungis
-                      Heavy, helper-alpha ivory — large enough to read as
-                      structural numbering without competing with the
-                      step label for emphasis. */}
-                  <span style={{
-                    fontFamily: "var(--font-display)",
-                    fontSize: "var(--text-xl)", fontWeight: 700, letterSpacing: "0.04em",
-                    color: "rgba(var(--rgb-ivory), 0.32)",
-                    lineHeight: 1,
-                    flexShrink: 0,
-                    minWidth: 36,
-                    alignSelf: "flex-start",
-                    marginTop: 2,
-                  }}>
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <div style={{ flex: 1 }}>
-                    <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-sm)", fontWeight: 400, color: "var(--color-ivory)", margin: "0 0 var(--space-1)", lineHeight: 1.3 }}>{s.label}</p>
-                    <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--color-ivory)", opacity: 0.75, margin: s.cta ? "0 0 var(--space-3)" : 0, lineHeight: 1.6 }}>{s.sub}</p>
-                    {s.cta && (
-                      <button onClick={s.action} style={{
-                        display: "inline-flex", alignItems: "center", gap: "var(--space-2)",
-                        fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400,
-                        borderRadius: "var(--radius-pill)", padding: "var(--space-2) var(--space-4)", cursor: "pointer",
-                        ...(s.ctaVariant === "primary"
-                          ? { color: "var(--color-inky-moss, #2d3d2b)", background: "var(--color-ivory, #faf9f4)", border: "none" }
-                          : { color: "rgba(var(--rgb-ivory), 0.9)", background: "rgba(var(--rgb-ivory), 0.08)", border: "1px solid rgba(var(--rgb-ivory), 0.32)" }),
+            {/* Vertical path: a numbered circle per step joined by a
+                hairline, open on the canvas — no card chrome. One hero
+                step (solid ivory) at a time; everything else is quiet. */}
+            <div style={{ marginBottom: "calc(var(--space-1) * 7)" }}>
+              {steps.map((s, i) => {
+                const isLastRow = i === steps.length - 1;
+                const role = s.done ? "done" : i === primaryIndex ? "primary" : "secondary";
+                const isSolid = role === "primary" || role === "done";
+                return (
+                  <div key={i} style={{ display: "flex", gap: "var(--space-4)" }}>
+                    {/* Left rail: circle + connecting hairline down to the
+                        next circle. The hairline is flex:1 so it always
+                        matches however tall this step's content ends up
+                        being, with no separate height bookkeeping. */}
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0 }}>
+                      <div style={{
+                        width: 30, height: 30, borderRadius: "50%", flexShrink: 0,
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        ...(isSolid
+                          ? { background: "var(--color-ivory, #faf9f4)", border: "none" }
+                          : { background: "transparent", border: "1px solid rgba(var(--rgb-ivory), 0.32)" }),
                       }}>
-                        {s.cta} <Icon name="arrow-right" size={11} />
-                      </button>
-                    )}
+                        {role === "done" ? (
+                          <span style={{ color: "var(--color-inky-moss, #2d3d2b)", display: "inline-flex" }}>
+                            <Icon name="check" size={14} />
+                          </span>
+                        ) : (
+                          <span style={{
+                            fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-sm)",
+                            color: role === "primary" ? "var(--color-inky-moss, #2d3d2b)" : "rgba(var(--rgb-ivory), 0.82)",
+                            lineHeight: 1,
+                          }}>{i + 1}</span>
+                        )}
+                      </div>
+                      {!isLastRow && (
+                        <div style={{ width: 1, flex: 1, minHeight: "var(--space-8)", background: "rgba(var(--rgb-ivory), 0.16)" }} />
+                      )}
+                    </div>
+
+                    <div style={{ flex: 1, paddingBottom: isLastRow ? 0 : "var(--space-5)" }}>
+                      <p style={{
+                        fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-sm)", fontWeight: 400,
+                        color: "var(--color-ivory)", margin: "0 0 var(--space-1)", lineHeight: 1.3,
+                        opacity: role === "primary" ? 1 : 0.82,
+                        textDecoration: role === "done" ? "line-through" : "none",
+                      }}>{s.label}</p>
+                      <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", color: "var(--color-ivory)", opacity: 0.75, margin: "0 0 var(--space-3)", lineHeight: 1.6 }}>{s.sub}</p>
+                      {role === "primary" && (
+                        <button onClick={s.action} style={{
+                          ...buttonPrimary,
+                          minHeight: 44, display: "inline-flex", alignItems: "center",
+                          padding: "0 var(--space-5)",
+                        }}>
+                          {s.cta}
+                        </button>
+                      )}
+                      {role === "secondary" && (
+                        <button onClick={s.action} style={{
+                          minHeight: 44, display: "inline-flex", alignItems: "center",
+                          background: "none", border: "none", padding: 0, margin: 0, cursor: "pointer",
+                          fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)", fontWeight: 400,
+                          color: "rgba(var(--rgb-ivory), 0.9)",
+                          textDecoration: "underline", textUnderlineOffset: "3px",
+                          WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
+                        }}>
+                          {s.cta}
+                        </button>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Today card — both Swan Sense and the Daily Skin Index are

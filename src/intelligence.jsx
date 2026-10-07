@@ -326,16 +326,18 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
 
 // --- MY ROUTINE ---------------------------------------------------------------
 
-function RecommendationCard({ rec, onAdd, onDismiss }) {
+function RecommendationCard({ rec, onAdd, onDismiss, isLast = false }) {
   const [expanded, setExpanded] = useState(false);
   const typeIcon = { addition: "plus", swap: "layers", simplify: "drop" };
   const typeLabelMap = { addition: "Add", swap: "Swap", simplify: "Simplify" };
 
   return (
     <div onClick={() => setExpanded(e => !e)}
-      style={{ ...glassCard, padding: "var(--space-4) var(--space-4)", marginBottom: "var(--space-2)", cursor: "pointer", transition: "border-color 0.2s" }}
-      onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(var(--rgb-sage), 0.32)"}
-      onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}>
+      style={{
+        padding: "var(--space-4) 0",
+        borderBottom: isLast ? "none" : "1px solid rgba(var(--rgb-ivory), 0.16)",
+        cursor: "pointer",
+      }}>
       <div style={{ display: "flex", alignItems: "flex-start", gap: "var(--space-3)" }}>
         <div style={{ width: 26, height: 26, borderRadius: "50%", background: "rgba(var(--rgb-sage), 0.08)", border: "1px solid rgba(var(--rgb-sage), 0.16)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "var(--color-sage)", marginTop: 1 }}>
           <Icon name={typeIcon[rec.type]} size={12} />
@@ -384,6 +386,43 @@ function RecommendationCard({ rec, onAdd, onDismiss }) {
             </button>
           )}
         </div>
+      )}
+    </div>
+  );
+}
+
+// Open-row list of RecommendationCards: "Essential"-tagged recs sort to
+// the front (stable sort — everything else keeps its original relative
+// order), the first three render immediately, and anything beyond that
+// collapses behind a single "N more suggestions" row until tapped.
+// Three or fewer total skips the expander entirely — nothing to hide.
+// Collapsed by default; expanded state is plain per-mount useState, not
+// persisted, so switching tabs/screens resets it.
+function SuggestionRows({ recs, onAdd, onEdit }) {
+  const [showMore, setShowMore] = useState(false);
+  const sorted = [...recs].sort((a, b) => (a.tag === "Essential" ? 0 : 1) - (b.tag === "Essential" ? 0 : 1));
+  const hidden = sorted.slice(3);
+  const visible = showMore ? sorted : sorted.slice(0, 3);
+
+  return (
+    <div>
+      {visible.map((r, i) => (
+        <RecommendationCard key={i} rec={r} onAdd={onAdd} onEdit={onEdit} isLast={i === visible.length - 1 && (showMore || hidden.length === 0)} />
+      ))}
+      {hidden.length > 0 && !showMore && (
+        <button
+          type="button"
+          onClick={() => setShowMore(true)}
+          style={{
+            display: "flex", width: "100%", minHeight: 44, alignItems: "center",
+            background: "none", border: "none", padding: 0, margin: 0, cursor: "pointer", textAlign: "left",
+            fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)",
+            letterSpacing: "var(--tracking-label)", textTransform: "uppercase",
+            color: "rgba(var(--rgb-ivory), 0.56)",
+            WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
+          }}>
+          {hidden.length} more suggestion{hidden.length === 1 ? "" : "s"} →
+        </button>
       )}
     </div>
   );
@@ -711,4 +750,4 @@ function RefinementItem({ r, vs, onEdit, onDismiss }) {
 // --- RITUAL GUIDANCE ENGINE ---------------------------------------------------
 
 
-export { buildRecommendations, RecommendationCard, buildRefinements, RefinementsCard, RefinementItem };
+export { buildRecommendations, RecommendationCard, SuggestionRows, buildRefinements, RefinementsCard, RefinementItem };
