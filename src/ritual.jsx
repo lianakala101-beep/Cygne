@@ -490,17 +490,32 @@ function getSwanSenseLine({ user = {}, predictions = [], dailyLine = null, daily
   const hasMeaningful = meaningfulPredictions.length > 0;
   const trimmedDaily = dailyLine && dailyLine.trim();
 
-  const line = isBirthday
-    ? BIRTHDAY_LINES[now.getFullYear() % BIRTHDAY_LINES.length]
-    : trimmedDaily
-      ? trimmedDaily
-      : dailyLoading
-        ? "—"
-        : dailyFailed && !hasMeaningful
-          ? (!hasProducts && noProductsLine) || genericFallbackLine()
-          : hasMeaningful
-            ? meaningfulPredictions[0].headline
-            : (!hasProducts && noProductsLine) || NO_DATA_LINE;
+  // Zero-product users never see the LLM line. The server prompt has no
+  // season signal and nothing product-specific to ground a line in, so
+  // its best case there is a generic filler and its worst case is the
+  // kind of hallucinated-routine line this skip exists to prevent
+  // (api/swan-sense-daily.js got a products-empty guard too, but this
+  // client-side skip is the belt to that server-side suspenders).
+  // Rule-based predictions still take priority — several don't need
+  // products (journal/sleep/stress-based ones) — the cycle/season floor
+  // (noProductsLine) only applies once those have nothing to say either.
+  const line = !hasProducts
+    ? (isBirthday
+        ? BIRTHDAY_LINES[now.getFullYear() % BIRTHDAY_LINES.length]
+        : hasMeaningful
+          ? meaningfulPredictions[0].headline
+          : noProductsLine || NO_DATA_LINE)
+    : isBirthday
+      ? BIRTHDAY_LINES[now.getFullYear() % BIRTHDAY_LINES.length]
+      : trimmedDaily
+        ? trimmedDaily
+        : dailyLoading
+          ? "—"
+          : dailyFailed && !hasMeaningful
+            ? genericFallbackLine()
+            : hasMeaningful
+              ? meaningfulPredictions[0].headline
+              : NO_DATA_LINE;
 
   return { line, isBirthday, hasMeaningful, meaningfulPredictions, trimmedDaily };
 }

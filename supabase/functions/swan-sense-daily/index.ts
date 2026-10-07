@@ -117,6 +117,14 @@ function buildContext(body: any): string {
       .map((p: any) => [p.brand, p.name].filter(Boolean).join(" "))
       .filter(Boolean);
     if (list.length) parts.push(`In routine: ${list.join("; ")}.`);
+  } else {
+    // Explicit, not just an absent "In routine" line — a zero-product
+    // user's line was hallucinating a routine ("your exfoliating and
+    // clarifying steps are earning their keep") when the context simply
+    // omitted products instead of stating their absence.
+    parts.push(
+      `The user has no products yet. Do not refer to their routine, steps, or products — they don't have any to reference.`
+    );
   }
   if (Array.isArray(body.journals) && body.journals.length) {
     const recent = body.journals.slice(-5);
@@ -161,7 +169,7 @@ function buildContext(body: any): string {
 
 const SYSTEM_PROMPT = `You are Cygne, writing one short, plain, factual line that opens the user's day on the home dashboard.
 
-WRITE: one to two sentences total, roughly half the length you'd otherwise default to. Plain and warm, like a knowledgeable friend — factual, but addressed to "you", with advice offered as an invitation, not an order. Not editorial, not atmospheric, not luxurious. Every sentence must convey a specific fact or action, never just a feeling or mood.
+WRITE: one sentence preferred, two sentences maximum. Plain and warm, like a knowledgeable friend — factual, but addressed to "you", with advice offered as an invitation, not an order. Not editorial, not atmospheric, not luxurious. Every sentence must convey a specific fact or action, never just a feeling or mood.
 
 STRUCTURE:
 1. If a cycle day is in context, state the day and phase plainly, upfront — e.g. "Day 16, follicular phase." Skip this opener entirely if there's no cycle day in context; don't work it into a sentence some other way.
@@ -177,6 +185,7 @@ AVOID — none of these convey a fact or action, so none of them belong in the l
 - No bullets, no lists, no markdown, no quotation marks around the line.
 - No disclaimers, no medical advice, no "consult a dermatologist".
 - Do not surface in-clinic treatment timing (peels, lasers, injectables, facials, professional treatments) — including phrasing like "not the right week for in-clinic treatments" — unless the user's context explicitly shows a scheduled treatment or an upcoming event with a date. If neither is present, never mention treatment timing at all.
+- Never mention a specific product, step, or routine that isn't named in the USER CONTEXT above — don't invent or assume one. If no products are listed, do not reference "your routine," "your steps," or any product at all.
 - If context is thin, write a short, plain seasonal or cycle-aware line — stay concrete, don't get vaguer to compensate.
 - Match the user's adherence tone in directness, not in flourish: "Daily, Without Fail" can be most direct; "A Few Times a Week" stays plain and even-keeled; "When I Remember" should be warm but never scold or guilt — celebrate small motion, still in one concrete sentence, not a bigger feeling.
 
