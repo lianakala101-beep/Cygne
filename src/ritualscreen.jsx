@@ -620,7 +620,21 @@ function MyRoutine({ products, user = {}, cycleDay = null, isFlightMode = false,
               { id: "refine",    label: "Refine",   count: refinements.length,    icon: "sparkle" },
             ].filter(t => t.count > 0).map(t => (
               <button key={t.id} onClick={() => setRecTab(t.id)}
-                style={{ display: "flex", alignItems: "center", gap: "var(--space-1)", padding: "var(--space-2) var(--space-3)", borderRadius: "var(--radius-pill)", border: `1px solid ${recTab === t.id ? "var(--color-inky-moss)" : "var(--border)"}`, background: recTab === t.id ? "rgba(var(--rgb-moss), 0.08)" : "transparent", color: recTab === t.id ? "var(--color-inky-moss)" : "var(--clay)", fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: recTab === t.id ? 700 : 400, cursor: "pointer", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", transition: "all 0.16s" }}>
+                style={{
+                  display: "flex", alignItems: "center", gap: "var(--space-1)", padding: "var(--space-2) var(--space-3)",
+                  borderRadius: "var(--radius-pill)",
+                  // Selected = solid ivory fill + moss text, matching
+                  // every other selected pill in the app (buttonPrimary,
+                  // Begin Your Ritual, the Home checklist's primary
+                  // step) — was moss-on-moss here (text, border, and
+                  // fill all keyed to --color-inky-moss/rgb-moss),
+                  // unreadable against this dark canvas. Unselected is
+                  // unchanged: outlined, ivory text.
+                  border: recTab === t.id ? "none" : "1px solid var(--border)",
+                  background: recTab === t.id ? "var(--color-ivory, #faf9f4)" : "transparent",
+                  color: recTab === t.id ? "var(--color-inky-moss, #2d3d2b)" : "var(--clay)",
+                  fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", fontWeight: recTab === t.id ? 700 : 400, cursor: "pointer", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", transition: "all 0.16s",
+                }}>
                 <Icon name={t.icon} size={11} />
                 {t.label}
                 <span style={{ fontSize: "var(--text-xs)", background: recTab === t.id ? "rgba(var(--rgb-moss), 0.16)" : "rgba(var(--rgb-ivory), 0.08)", borderRadius: "var(--radius-pill)", padding: "1px var(--space-1)" }}>{t.count}</span>
