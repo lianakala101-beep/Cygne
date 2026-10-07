@@ -329,27 +329,26 @@ function buildRecommendations(products, activeMap, conflicts, user = {}) {
 function RecommendationCard({ rec, onAdd, onDismiss, isLast = false }) {
   const [expanded, setExpanded] = useState(false);
   const typeIcon = { addition: "plus", swap: "layers", simplify: "drop" };
-  const typeLabelMap = { addition: "Add", swap: "Swap", simplify: "Simplify" };
 
   return (
     <div onClick={() => setExpanded(e => !e)}
       style={{
-        padding: "var(--space-4) 0",
-        borderBottom: isLast ? "none" : "1px solid rgba(var(--rgb-ivory), 0.16)",
+        display: "flex", flexDirection: "column", justifyContent: "center", minHeight: 56,
+        padding: "var(--space-5) 0",
+        borderBottom: isLast ? "none" : "1px solid rgba(var(--rgb-ivory), 0.32)",
         cursor: "pointer",
       }}>
       <div style={{ display: "flex", alignItems: "flex-start", gap: "var(--space-3)" }}>
-        <div style={{ width: 26, height: 26, borderRadius: "50%", background: "rgba(var(--rgb-sage), 0.08)", border: "1px solid rgba(var(--rgb-sage), 0.16)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "var(--color-sage)", marginTop: 1 }}>
+        <div style={{ width: 26, height: 26, borderRadius: "50%", background: "transparent", border: "1px solid rgba(var(--rgb-ivory), 0.56)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "rgba(var(--rgb-ivory), 0.94)", marginTop: 1 }}>
           <Icon name={typeIcon[rec.type]} size={12} />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", marginBottom: "var(--space-1)", flexWrap: "wrap" }}>
             <span style={{ fontSize: "var(--text-xs)", fontFamily: "var(--font-body), sans-serif", fontWeight: 400, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: rec.tagColor, background: `${rec.tagColor}18`, padding: "2px var(--space-2)", borderRadius: "var(--radius-pill)" }}>{rec.tag}</span>
-            <span style={{ fontSize: "var(--text-xs)", fontFamily: "var(--font-body), sans-serif", letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--clay)", opacity: 0.55 }}>{typeLabelMap[rec.type]}</span>
           </div>
-          <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-sm)", color: "var(--parchment)", margin: 0, fontWeight: 400, lineHeight: 1.35 }}>{rec.title}</p>
+          <p style={{ fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-md)", color: "var(--color-ivory)", margin: 0, fontWeight: 400, lineHeight: 1.35 }}>{rec.title}</p>
         </div>
-        <span style={{ color: "var(--clay)", opacity: 0.35, flexShrink: 0, marginTop: "var(--space-1)", display: "inline-block", transform: expanded ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>
+        <span style={{ color: "rgba(var(--rgb-ivory), 0.56)", flexShrink: 0, marginTop: "var(--space-1)", display: "inline-block", transform: expanded ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>
           <Icon name="chevron" size={13} />
         </span>
         {onDismiss && (
@@ -414,9 +413,9 @@ function SuggestionRows({ recs, onAdd, onEdit }) {
           type="button"
           onClick={() => setShowMore(true)}
           style={{
-            display: "flex", width: "100%", minHeight: 44, alignItems: "center",
+            display: "flex", width: "100%", minHeight: 56, alignItems: "center",
             background: "none", border: "none", padding: 0, margin: 0, cursor: "pointer", textAlign: "left",
-            fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-xs)",
+            fontFamily: "var(--font-body), sans-serif", fontSize: "var(--text-sm)",
             letterSpacing: "var(--tracking-label)", textTransform: "uppercase",
             color: "rgba(var(--rgb-ivory), 0.56)",
             WebkitAppearance: "none", appearance: "none", WebkitTapHighlightColor: "transparent",
