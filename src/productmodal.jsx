@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Icon, Section, CardNote } from "./components.jsx";
 import { detectActives, analyzeShelf, isTretinoin, hasTrueRetinoid } from "./engine.js";
 import { CATEGORIES, FREQUENCIES } from "./constants.js";
+import { RAMP_ACTIVES } from "./ramp.jsx";
 import { DEFER_TAG_CONFIG } from "./modals.jsx";
 import { compressImage } from "./utils.jsx";
 import { supabase, invokeEdgeFunction } from "./supabase.js";
@@ -251,6 +252,54 @@ function getSuggestedFrequency(product, user = {}) {
   return { id: "daily", reason: null };
 }
 
+// --- RAMPED ACTIVES (add/edit form) --------------------------------------------
+// A product with a ramped active gets an Introduce Slowly schedule that
+// starts in the evening ("every other evening"), so the form's Session
+// default and hints must match it rather than a hydrating or category
+// rule. Only the form uses these; saved products and the ramp
+// schedules are untouched.
+
+// The ramp this product gets — same lookup as App.jsx and ramp.jsx:
+// Toning Pad category first, then the first RAMP_ACTIVES match.
+function getRampKey(product) {
+  if (product.category === "Toning Pad") return "toning pad";
+  const actives = detectActives(product.ingredients || []);
+  return RAMP_ACTIVES.find(a => actives[a]) || null;
+}
+
+// Vitamin C's ramp runs in the morning, so it keeps its AM defaults.
+const EVENING_RAMPS = new Set(["retinol", "AHA", "BHA", "azelaic acid", "toning pad"]);
+
+// Evening ramp key for this product, or null. Sunscreens stay AM.
+function getEveningRamp(product) {
+  const cat = product.category || "Serum";
+  if (cat === "SPF" || cat === "SPF Moisturizer") return null;
+  const key = getRampKey(product);
+  return key && EVENING_RAMPS.has(key) ? key : null;
+}
+
+const RAMP_SESSION = { session: "pm", reason: "Start with one evening session while your skin adjusts." };
+
+// Session lock + soft default for the form. An unlocked product with an
+// evening ramp defaults to PM with a ramp hint, ahead of the hydrating,
+// humectant and category rules in getAutoSession. Locks still win
+// (retinol/AHA/BHA already lock to PM).
+function getFormSession(product) {
+  const locked = getLockedSession(product);
+  const auto = !locked && getEveningRamp(product) ? RAMP_SESSION : getAutoSession(product);
+  return { locked, auto };
+}
+
+// Frequency suggestion for the form. The cleanser rule ("use morning
+// and night", daily) would contradict an evening ramp, so a cleanser
+// with a ramped active starts every other evening instead.
+function getFormFrequency(product, user = {}) {
+  const base = getSuggestedFrequency(product, user);
+  if (base.id === "daily" && product.category === "Cleanser" && getEveningRamp(product))
+    return { id: "alternating", reason: "Start every other evening and build up while your skin adjusts." };
+  return base;
+}
+
 // Frequency ordering for overuse comparison (lower = less frequent)
 const FREQ_RANK = { "weekly": 1, "as-needed": 1, "2-3x": 2, "alternating": 3, "daily": 4 };
 
@@ -325,12 +374,11 @@ function ProductModal({ product, onSave, onClose, user }) {
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   // Frequency suggestion based on category + ingredients + user profile
-  const freqSuggestion = getSuggestedFrequency(form, user);
+  const freqSuggestion = getFormFrequency(form, user);
   const prevSuggestionRef = useRef(freqSuggestion.id);
 
   // Session auto-assignment based on category + ingredients
-  const locked = getLockedSession({ ...form, id: product ? product.id : null });
-  const autoSession = getAutoSession(form);
+  const { locked, auto: autoSession } = getFormSession({ ...form, id: product ? product.id : null });
   // Resolve current effective session: locked > explicit user pick > auto
   const effectiveSession = locked ? locked.session : (form.session && form.session !== "auto") ? form.session : autoSession.session;
   const prevAutoRef = useRef(autoSession.session);
@@ -776,4 +824,4 @@ function ProductModal({ product, onSave, onClose, user }) {
 
 // --- SESSION LOCKED BY INGREDIENTS -------------------------------------------
 
-export { RoutineFitSheet, ProductModal, ShelfLifeSection, getLockedSession, getAutoSession, getSuggestedFrequency };
+export { RoutineFitSheet, ProductModal, ShelfLifeSection, getLockedSession, getAutoSession, getSuggestedFrequency, getFormSession, getFormFrequency };
