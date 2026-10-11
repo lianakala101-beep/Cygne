@@ -209,7 +209,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
   // screen (the context footer below, the expanded cycle modal) — no
   // fallback assumption when tracking isn't enabled or the day can't
   // be computed. Feeds the Daily Skin Index card's sebum-trend item.
-  const cyclePhase = user?.cycleTrackingEnabled && currentCycleDay ? getCyclePhase(currentCycleDay) : null;
+  const cyclePhase = user?.cycleTrackingEnabled && currentCycleDay ? getCyclePhase(currentCycleDay, user?.cycleLength) : null;
   // Rule-based floor for zero-product users — cycle phase + season, in
   // Swan Sense's voice. Only ever used by SwanSongCard when there's no
   // LLM line and no meaningful rule-based prediction (see its own
@@ -665,7 +665,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
             local weather sit in a single ivory-shadow strip so they read
             as a quiet data footer instead of three competing pills. */}
         {(() => {
-          const phase = user?.cycleTrackingEnabled && currentCycleDay ? getCyclePhase(currentCycleDay) : null;
+          const phase = user?.cycleTrackingEnabled && currentCycleDay ? getCyclePhase(currentCycleDay, user?.cycleLength) : null;
           const last = checkIns.length ? checkIns.reduce((a, b) => new Date(a.date) > new Date(b.date) ? a : b) : null;
           const daysSince = last ? daysBetweenLocal(last.date) : null;
           const checkInMsg = daysSince === null
@@ -723,7 +723,7 @@ function Dashboard({ products, setTab, checkIns, swanPopupDismissed, onDismissSw
 
         {/* Cycle phase expanded modal — fixed overlay, position-independent */}
         {cycleExpanded && user?.cycleTrackingEnabled && currentCycleDay && (() => {
-          const phase = getCyclePhase(currentCycleDay);
+          const phase = getCyclePhase(currentCycleDay, user?.cycleLength);
           return (
             <div onClick={() => setCycleExpanded(false)}
               style={{ position: "fixed", inset: 0, background: "var(--overlay)", backdropFilter: "blur(6px)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: "var(--space-6)" }}>

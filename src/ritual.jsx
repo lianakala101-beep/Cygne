@@ -3,7 +3,7 @@ import { Icon, Section } from "./components.jsx";
 import { detectActives, analyzeShelf, buildRoutine, isDampSkinProduct, hasSPFCoverage } from "./engine.js";
 import { FREQUENCIES } from "./constants.js";
 import { getLockedSession, getAutoSession } from "./productmodal.jsx";
-import { getCyclePhase } from "./lib/cycle.js";
+import { getPhaseForDay } from "./lib/cycle.js";
 import { getCurrentCycleDay, isCycleStale, CYCLE_STALE_MESSAGE } from "./utils.jsx";
 import { shareCycleCard } from "./lib/cycleShare.js";
 import { glassCard } from "./lib/ui.js";
@@ -604,7 +604,7 @@ function SwanSongCard({ currentSession, asPopup = false, onDismissPopup, user = 
     // fallback assumption, matches the pattern used elsewhere for
     // optional cycle data. Format: "FOLLICULAR · DAY 7".
     const cycleDay = user?.cycleTrackingEnabled ? getCurrentCycleDay(user) : null;
-    const cyclePhaseName = cycleDay ? getCyclePhase(cycleDay)?.name : null;
+    const cyclePhaseName = cycleDay ? getPhaseForDay(cycleDay, user?.cycleLength).name : null;
     const cyclePhaseLabel = cyclePhaseName && cycleDay
       ? `${String(cyclePhaseName).toUpperCase()} · DAY ${cycleDay}`
       : null;

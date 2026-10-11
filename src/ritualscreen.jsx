@@ -150,7 +150,7 @@ function getRitualMode(products, checkIns = [], user = {}, cycleDay = null, isFl
   let cycleMode = null;
   let cyclePhaseName = null;
   if (cycleDay) {
-    const phase = getCyclePhase(cycleDay);
+    const phase = getCyclePhase(cycleDay, user?.cycleLength);
     cyclePhaseName = phase.name;
     if (phase.name === "Menstrual") cycleMode = "menstrual";
     else if (phase.name === "Luteal") cycleMode = "luteal";

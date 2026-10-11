@@ -10,7 +10,7 @@ import { Progress, FirstCheckInPrompt } from "./progress.jsx";
 import { upsertJournalEntry } from "./lib/journal.js";
 import { shouldOfferFirstCheckIn } from "./lib/firstCheckIn.js";
 import { SwanWelcomeScreen, useLocalStorage, getCurrentCycleDay, daysBetweenLocal, toLocalMidnight, isoWeekNumber, isoWeekYear } from "./utils.jsx";
-import { getCyclePhase, parseCycleLength } from "./lib/cycle.js";
+import { getPhaseForDay, parseCycleLength } from "./lib/cycle.js";
 import { WeekendNudgeCard } from "./weekend.jsx";
 import { SeasonalNudgeCard } from "./seasonal.jsx";
 import { supabase, logDebugEvent } from "./supabase.js";
@@ -1927,9 +1927,10 @@ export default function App() {
   //
   // Gated on cycleTrackingEnabled + a usable cycleStartDate — if the
   // user hasn't opted in, we skip the signal entirely rather than
-  // guessing. "Entering luteal" = days 15–16 (the last two Ovulatory
-  // days before the boundary at day 17 in the canonical schedule at
-  // src/lib/cycle.js). Currently in Luteal is anything at that phase.
+  // guessing. "Entering luteal" = the last two days before Luteal starts
+  // (days 15–16 of a 28-day cycle; the windows scale with cycle length
+  // via getPhaseForDay in src/lib/cycle.js). Currently in Luteal is
+  // anything at that phase.
   //
   // Kept purely suggestive: no auto-hold; the user still confirms via
   // the manual Hold button. Progress combines this with the per-
@@ -1938,9 +1939,9 @@ export default function App() {
     if (!user?.cycleTrackingEnabled) return false;
     const day = getCurrentCycleDay(user);
     if (!day) return false;
-    const phaseName = getCyclePhase(day)?.name;
-    if (phaseName === "Luteal") return true;
-    if (phaseName === "Ovulatory" && (day === 15 || day === 16)) return true;
+    const phase = getPhaseForDay(day, user.cycleLength);
+    if (phase.name === "Luteal") return true;
+    if (phase.name === "Ovulatory" && day >= phase.endDay - 1) return true;
     return false;
   })();
 

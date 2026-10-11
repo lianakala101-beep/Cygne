@@ -27,7 +27,7 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { sendApnsBatch, isDeadToken, type ApnsPayload } from "../_shared/apns.ts";
-import { getCyclePhase, computeCycleDay } from "../_shared/cycle.ts";
+import { getPhaseForDay, computeCycleDay } from "../_shared/cycle.ts";
 
 interface DeviceTokenRow {
   id: number;
@@ -150,7 +150,7 @@ Deno.serve(async (req) => {
   for (const [userId, inputs] of cycleInputsByUser) {
     const day = computeCycleDay(inputs.start, inputs.length);
     if (day == null) continue;
-    const phase = getCyclePhase(day);
+    const phase = getPhaseForDay(day, inputs.length);
     const known = knownPhaseByUser.get(userId);
 
     // First observation: prime the row, don't push.

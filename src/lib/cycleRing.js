@@ -15,7 +15,7 @@
 // The center shows journal consistency (see journalConsistency) once
 // the user has 5 logged days, and "N of 5" before that.
 
-import { CYCLE_PHASES, MAX_CYCLE_DAY, computeCycleDay } from "./cycle.js";
+import { MAX_CYCLE_DAY, computeCycleDay, scalePhases } from "./cycle.js";
 import { withLegacyTodayTolerance } from "./journal.js";
 
 const CALENDAR_DAYS = 28;
@@ -64,24 +64,9 @@ export function latestEntryByDate(entries) {
   return new Map([...byDate].map(([date, { entry }]) => [date, entry]));
 }
 
-// CYCLE_PHASES describes a 28-day cycle (Luteal's 35 is the long-cycle
-// fallback). Scale each phase end proportionally to the user's length,
-// keeping phases contiguous, at least one day each, and ending exactly
-// on cycleLength.
-export function scalePhases(cycleLength) {
-  const len = Math.max(21, Math.min(MAX_CYCLE_DAY, cycleLength || BASE_CYCLE_LENGTH));
-  let start = 1;
-  return CYCLE_PHASES.map((phase, i) => {
-    const isLast = i === CYCLE_PHASES.length - 1;
-    const remaining = CYCLE_PHASES.length - 1 - i;
-    const baseEnd = Math.min(phase.days[1], BASE_CYCLE_LENGTH);
-    const scaledEnd = isLast ? len : Math.round((baseEnd / BASE_CYCLE_LENGTH) * len);
-    const endDay = Math.min(Math.max(scaledEnd, start), len - remaining);
-    const out = { name: phase.name, startDay: start, endDay };
-    start = endDay + 1;
-    return out;
-  });
-}
+// Phase windows live in cycle.js (getPhaseForDay uses the same ones);
+// re-exported here for existing importers.
+export { scalePhases };
 
 function stateFor(date, { todayKey, firstEntryDate, byDate }) {
   const entry = byDate.get(date);

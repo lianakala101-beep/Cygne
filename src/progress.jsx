@@ -4,7 +4,7 @@ import { detectActives, detectActivesFromProduct, analyzeShelf, detectConflicts,
 import { getAutoSession } from "./productmodal.jsx";
 import { RAMP_ACTIVES, IntroduceSlowlyCard, getRampWeek, getRampSchedule, isSchedulePaced, deriveRampSignals } from "./ramp.jsx";
 import { getCurrentCycleDay, isCycleStale, CYCLE_STALE_MESSAGE, getTreatmentElapsed, daysBetweenLocal } from "./utils.jsx";
-import { CYCLE_PHASES as CANONICAL_CYCLE_PHASES, getCyclePhase as getCanonicalCyclePhase } from "./lib/cycle.js";
+import { getPhaseForDay, scalePhases, normalizeCycleLength } from "./lib/cycle.js";
 import { FaceHeatMap } from "./components/FaceHeatMap.jsx";
 import { AskCygneModal } from "./components/AskCygneModal.jsx";
 import { CycleRing } from "./components/CycleRing.jsx";
@@ -401,7 +401,7 @@ function FirstCheckInPrompt({ onSubmit, onSkip }) {
 // --- HORMONE CYCLE TRACKER ---------------------------------------------------
 
 // Presentation metadata for each cycle phase — keyed by the phase
-// name that comes back from getCyclePhase. Split from the canonical
+// name that comes back from getPhaseForDay. Split from the canonical
 // name+days list (src/lib/cycle.js) so the edge function
 // cycle-phase-alert can share the phase math without dragging in
 // UI copy.
@@ -460,14 +460,11 @@ const PHASE_META = {
   },
 };
 
-// Compose the canonical phase list with local presentation metadata
-// so downstream render code can iterate a single decorated array as
-// it did before the extraction. Phase math (name + days + getCyclePhase)
-// is the single source of truth in src/lib/cycle.js.
-const CYCLE_PHASES = CANONICAL_CYCLE_PHASES.map(p => ({ ...p, ...PHASE_META[p.name] }));
-
-function getCyclePhase(day) {
-  const base = getCanonicalCyclePhase(day);
+// Phase for a cycle day, decorated with presentation metadata. Phase
+// math (scaled windows: name + startDay + endDay) is the single source
+// of truth in src/lib/cycle.js getPhaseForDay; cycleLength defaults to 28.
+function getCyclePhase(day, cycleLength) {
+  const base = getPhaseForDay(day, cycleLength);
   return { ...base, ...PHASE_META[base.name] };
 }
 
@@ -480,7 +477,7 @@ function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycled
   const stale = isCycleStale(user);
   const computedDay = stale ? null : (getCurrentCycleDay(user) || cycledayProp || 14);
   const cycleDay = computedDay;
-  const cycleLen = Math.max(21, Math.min(45, parseInt(user.cycleLength, 10) || 28));
+  const cycleLen = normalizeCycleLength(user.cycleLength);
   // Period is "running long" once the day count passes the user's chosen
   // cycle length — we show a quiet normalizing note in that case rather
   // than capping or auto-wrapping the day display.
@@ -494,8 +491,10 @@ function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycled
   const hasAHA = !!(activeMap["AHA"]?.length);
   const hasBHA = !!(activeMap["BHA"]?.length);
 
-  const phase = stale ? null : getCyclePhase(cycleDay);
-  const daysUntilNext = phase ? phase.days[1] - cycleDay + 1 : null;
+  const phase = stale ? null : getCyclePhase(cycleDay, cycleLen);
+  // Days left in the current phase. Hidden when running long: the last
+  // phase has already ended at cycleLen, and the running-long note says so.
+  const daysUntilNext = phase && !runningLong ? phase.endDay - cycleDay + 1 : null;
   const advice = phase ? phase.activeAdvice(hasRetinol, hasAHA, hasBHA) : null;
 
   const handleSetDay = () => {
@@ -584,7 +583,7 @@ function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycled
                 <span style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: "var(--text-sm)", letterSpacing: "var(--tracking-label)", color: "var(--color-ivory, #faf9f4)", lineHeight: 1.6, whiteSpace: "nowrap" }}>{phase ? `Day ${cycleDay}` : "Set day"}</span>
               </button>
             )}
-            {phase && (
+            {daysUntilNext != null && (
               <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", color: "rgba(var(--rgb-ivory), 0.7)", letterSpacing: "0.04em" }}>{daysUntilNext}d in phase</span>
             )}
           </div>
@@ -651,16 +650,15 @@ function CycleTracker({ products: productsProp = [], activeMap, cycleDay: cycled
 
       {/* Compact cycle arc */}
       <div style={{ display: "flex", gap: "var(--space-1)", marginTop: "var(--space-3)" }}>
-        {CYCLE_PHASES.map((p, i) => {
+        {scalePhases(cycleLen).map((p, i) => {
           const isActive = phase?.name === p.name;
-          const width = ((p.days[1] - p.days[0] + 1) / 35) * 100;
           return (
-            <div key={i} style={{ flex: p.days[1] - p.days[0] + 1, height: 3, borderRadius: "var(--radius-pill)", background: isActive ? p.dot : "rgba(var(--rgb-ivory), 0.08)", transition: "background 0.3s" }} />
+            <div key={i} style={{ flex: p.endDay - p.startDay + 1, height: 3, borderRadius: "var(--radius-pill)", background: isActive ? PHASE_META[p.name].dot : "rgba(var(--rgb-ivory), 0.08)", transition: "background 0.3s" }} />
           );
         })}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", marginTop: "var(--space-1)" }}>
-        {CYCLE_PHASES.map((p, i) => (
+        {scalePhases(cycleLen).map((p, i) => (
           <span key={i} style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-xs)", letterSpacing: "var(--tracking-label)", color: phase?.name === p.name ? "var(--parchment)" : "var(--clay)", opacity: phase?.name === p.name ? 1 : 0.4 }}>{p.name.slice(0, 3).toUpperCase()}</span>
         ))}
       </div>
@@ -1330,7 +1328,7 @@ function BodyAcneTracker({ products: productsProp = [], activeMap, user = {}, on
 
   const setEnabled = (val) => onUpdateUser({ ...user, bodyAcneEnabled: val });
   const _cd = getCurrentCycleDay(user);
-  const isLuteal = _cd ? getCyclePhase(_cd).name === "Luteal" : false;
+  const isLuteal = _cd ? getCyclePhase(_cd, user.cycleLength).name === "Luteal" : false;
 
   const toggleZone = (id) => {
     const updated = zones.includes(id) ? zones.filter(x => x !== id) : [...zones, id];

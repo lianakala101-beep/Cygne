@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { FACE_ZONES, FACE_ZONE_LABELS, FACE_ZONE_IDS } from "./FaceZoneSelector.jsx";
 import { AskCygneModal } from "./AskCygneModal.jsx";
 import { getAskCygneAccess } from "../utils.jsx";
-import { getCyclePhase, estimateCycleDayForDate } from "../lib/cycle.js";
+import { getPhaseForDay, estimateCycleDayForDate, normalizeCycleLength } from "../lib/cycle.js";
 import { glassCard } from "../lib/ui.js";
 
 const PERIODS = [
@@ -75,9 +75,9 @@ function fillForScore(s) {
 // src/lib/cycle.js (shared with the Progress index layer).
 export const cycleDayForDate = estimateCycleDayForDate;
 
-function phaseForDay(day) {
+function phaseForDay(day, cycleLength) {
   if (day == null) return null;
-  return getCyclePhase(day).name;
+  return getPhaseForDay(day, cycleLength).name;
 }
 
 function zoneLabelDisplay(id) {
@@ -247,9 +247,10 @@ function ZoneInsightDrawer({ zoneId, checkIns, products, user, onClose, onAskCyg
   const cycleStart = user?.cycleStartDate;
   const phaseTally = {};
   if (cycleStart) {
+    const cycleLength = normalizeCycleLength(user?.cycleLength);
     for (const f of flareEntries) {
-      const day = cycleDayForDate(f.date.split("T")[0], cycleStart, user?.cycleLength || 28);
-      const phase = phaseForDay(day);
+      const day = cycleDayForDate(f.date.split("T")[0], cycleStart, cycleLength);
+      const phase = phaseForDay(day, cycleLength);
       if (phase) phaseTally[phase] = (phaseTally[phase] || 0) + 1;
     }
   }

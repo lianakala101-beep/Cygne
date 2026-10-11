@@ -3,6 +3,7 @@ import { Icon, SwanIcon } from "./components.jsx";
 import { analyzeShelf } from "./engine.js";
 import { getSeason } from "./seasonal.jsx";
 import { getCurrentCycleDay, isCycleStale, CYCLE_STALE_MESSAGE } from "./utils.jsx";
+import { scalePhases, normalizeCycleLength } from "./lib/cycle.js";
 
 // --- SWAN SENSE — PREDICTIVE SKIN ENGINE -------------------------------------
 
@@ -45,6 +46,12 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
   const predictions = [];
   const season = getSeason();
   const cycleDay = getCurrentCycleDay(user);
+  // Phase windows scaled to the user's cycle length (28 when unset) —
+  // the same windows as getPhaseForDay and the Cycle Ring. Every day
+  // threshold below is written against these, and reduces to the old
+  // fixed numbers for a 28-day cycle.
+  const cycleLen = normalizeCycleLength(user?.cycleLength);
+  const [menstrual, follicular, , luteal] = scalePhases(cycleLen);
   const activeMap = analyzeShelf(products).activeMap;
 
   // Onboarding-derived context
@@ -149,15 +156,18 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
   // -- Cycle predictions -------------------------------------------------------
   if (cycleDay) {
     const daysUntilLuteal = (() => {
-      // Luteal: days 15–28
-      if (cycleDay < 15) return 15 - cycleDay;
-      if (cycleDay <= 28) return 0; // currently in luteal
+      // Oil-surge window: the last two days before Luteal through the
+      // end of the cycle (days 15–28 of a 28-day cycle).
+      const surgeStart = luteal.startDay - 2;
+      if (cycleDay < surgeStart) return surgeStart - cycleDay;
+      if (cycleDay <= cycleLen) return 0; // currently in luteal
       return null;
     })();
     const daysUntilMenstrual = (() => {
-      // Menstrual: days 1–5 (or 27–35 approaching next cycle)
-      if (cycleDay >= 27) return Math.max(0, 29 - cycleDay);
-      if (cycleDay <= 5) return 0;
+      // Menstrual phase, or the last two days before the next period
+      // (days 1–5 and 27–28 of a 28-day cycle).
+      if (cycleDay >= cycleLen - 1) return Math.max(0, cycleLen + 1 - cycleDay);
+      if (cycleDay <= menstrual.endDay) return 0;
       return null;
     })();
 
@@ -171,7 +181,7 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
         bg: "rgba(var(--rgb-bronze), 0.08)",
         border: "rgba(var(--rgb-bronze), 0.16)",
       });
-    } else if (daysUntilMenstrual === 0 && cycleDay <= 5) {
+    } else if (daysUntilMenstrual === 0 && cycleDay <= menstrual.endDay) {
       predictions.push({
         id: "cycle_menstrual_now",
         headline: "Elevated skin sensitivity right now.",
@@ -195,7 +205,7 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
       });
     }
 
-    if (daysUntilLuteal === null && cycleDay >= 20 && cycleDay <= 28) {
+    if (daysUntilLuteal === null && cycleDay >= cycleLen - 8 && cycleDay <= cycleLen) {
       const hasRecentBreakout = recent.some(c => c.breakout);
       if (hasRecentBreakout) {
         predictions.push({
@@ -213,8 +223,8 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
     if ((hasRetinol || hasAHA) && !onTretinoin) {
       // Follicular window opening
       const daysUntilFollicular = (() => {
-        if (cycleDay >= 6 && cycleDay <= 13) return 0; // in follicular
-        if (cycleDay < 6) return 6 - cycleDay;
+        if (cycleDay >= follicular.startDay && cycleDay <= follicular.endDay) return 0; // in follicular
+        if (cycleDay < follicular.startDay) return follicular.startDay - cycleDay;
         return null;
       })();
       if (daysUntilFollicular !== null && daysUntilFollicular > 0 && daysUntilFollicular <= 2) {
@@ -321,8 +331,9 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
   const recentIrritation = checkIns.slice(-6).filter(c => c.irritation !== "none").length;
   const persistentCongestion = checkIns.slice(-8).filter(c => c.breakout).length >= 4;
   const persistentDullness = recentJournals.filter(j => j.condition === "dull" || j.condition === "rough").length >= 3;
-  const inGoodWindow = cycleDay && (cycleDay >= 6 && cycleDay <= 13); // follicular
-  const inBadWindow = cycleDay && (cycleDay >= 24 || cycleDay <= 5);  // late luteal or menstrual
+  const inGoodWindow = cycleDay && (cycleDay >= follicular.startDay && cycleDay <= follicular.endDay); // follicular
+  const inBadWindow = cycleDay && (cycleDay >= cycleLen - 4 || cycleDay <= menstrual.endDay);  // last five days (late luteal) or menstrual
+  const follicularDays = `${follicular.startDay}–${follicular.endDay}`;
 
   // Chemical peel readiness
   if (onRetinoid && retinoidWeeks !== null && retinoidWeeks >= 10 && recentIrritation <= 1) {
@@ -338,7 +349,7 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
         type: "peel_readiness",
         level: "positive",
         headline: "Your skin is building peel readiness",
-        detail: retinoidWeeks + " weeks of consistent retinoid use suggests your skin cell turnover is primed. When your follicular phase opens (around day 6–13), that's your optimal window for a light chemical peel consultation.",
+        detail: retinoidWeeks + " weeks of consistent retinoid use suggests your skin cell turnover is primed. When your follicular phase opens (around day " + follicularDays + "), that's your optimal window for a light chemical peel consultation.",
       });
     }
   }
@@ -392,7 +403,7 @@ function getSwanSensePredictions(products, checkIns = [], user = {}, locationDat
       type: "treatment_timing_caution",
       level: "caution",
       headline: "Not the right week for in-clinic treatments",
-      detail: "Your skin is more reactive and slower to heal in the late luteal and menstrual phases. If you have a peel or microneedling appointment coming up, consider rescheduling to your follicular phase (days 6–13) for better results and less downtime.",
+      detail: `Your skin is more reactive and slower to heal in the late luteal and menstrual phases. If you have a peel or microneedling appointment coming up, consider rescheduling to your follicular phase (days ${follicularDays}) for better results and less downtime.`,
     });
   }
 

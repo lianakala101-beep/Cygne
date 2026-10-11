@@ -4,7 +4,7 @@ import { supabase } from "./supabase.js";
 import { API_BASE_URL } from "./config.js";
 import { getSwanSensePredictions } from "./swansense.jsx";
 import { compressImageBlob, isoWeekNumber, isoWeekYear, getCurrentCycleDay } from "./utils.jsx";
-import { getCyclePhase } from "./lib/cycle.js";
+import { getPhaseForDay } from "./lib/cycle.js";
 import { shareCycleCard } from "./lib/cycleShare.js";
 
 // ---------------------------------------------------------------------------
@@ -745,7 +745,7 @@ function Reflection({ reflections = [], onAddReflection, onReplaceReflections, p
   // be computed.
   const [sharingSkinStatus, setSharingSkinStatus] = useState(false);
   const skinStatusCycleDay = user?.cycleTrackingEnabled ? getCurrentCycleDay(user) : null;
-  const skinStatusPhaseName = skinStatusCycleDay ? getCyclePhase(skinStatusCycleDay)?.name : null;
+  const skinStatusPhaseName = skinStatusCycleDay ? getPhaseForDay(skinStatusCycleDay, user?.cycleLength).name : null;
   const skinStatusShareEnabled = !!(skinStatusPhaseName && skinStatusCycleDay);
   const handleShareSkinStatus = async () => {
     if (!skinStatusShareEnabled || sharingSkinStatus) return;
