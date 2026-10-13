@@ -237,19 +237,50 @@ const RAMP_NAME_PATTERNS = {
   "azelaic acid": /azelaic/i,
 };
 
+// The name fallback only applies to products created at or after this
+// cutoff (2026-10-13T19:00:00Z, when it shipped), so existing products
+// keep ingredients-only detection and aren't newly enrolled or
+// graduated. A product's creation time is its id: the add-product form
+// assigns Date.now().toString(). Ids that aren't a millisecond
+// timestamp read as created before the cutoff.
+const RAMP_NAME_FALLBACK_CUTOFF_MS = 1791918000000;
+
+function productCreatedAtMs(product) {
+  const id = String(product?.id ?? "");
+  return /^\d{13}$/.test(id) ? Number(id) : null;
+}
+
+function usesRampNameFallback(product) {
+  const created = productCreatedAtMs(product);
+  return created != null && created >= RAMP_NAME_FALLBACK_CUTOFF_MS;
+}
+
 // The Introduce Slowly ramp a product gets: "toning pad" for the Toning
 // Pad category, else the first RAMP_ACTIVES match in its ingredients,
-// else the first match in its name. null when none match. Every ramp
-// consumer (card list, enrolment, graduation, ramp actions, calendar)
-// goes through this.
+// else (products created after the cutoff only) the first match in its
+// name. null when none match. Every ramp consumer (card list,
+// enrolment, graduation, ramp actions, calendar) goes through this.
 function getRampActiveKey(product) {
   if (!product) return null;
   if (product.category === "Toning Pad") return "toning pad";
   const actives = detectActives(product.ingredients || []);
   const fromIngredients = RAMP_ACTIVES.find(a => actives[a]);
   if (fromIngredients) return fromIngredients;
+  if (!usesRampNameFallback(product)) return null;
   const name = String(product.name || "");
   return RAMP_ACTIVES.find(a => RAMP_NAME_PATTERNS[a].test(name)) || null;
+}
+
+// The three entry checks for the Introduce Slowly card list (Progress
+// primaryRamp): in the ritual, has a start date, has a ramp.
+function isOnRampList(product) {
+  return !!product && product.inRoutine !== false && !!product.routineStartDate && getRampActiveKey(product) != null;
+}
+
+// Whether App's automatic enrolment should give this product a start
+// date: in the ritual, no start date yet, has a ramp.
+function needsRampEnrolment(product) {
+  return !!product && product.inRoutine !== false && !product.routineStartDate && getRampActiveKey(product) != null;
 }
 
 // Concern-aware pacing. Users who state Rosacea or Cystic/hormonal
@@ -1249,4 +1280,4 @@ function WeeklyRitualCalendar({ rampProducts, products }) {
 
 // --- PROGRESS ----------------------------------------------------------------
 
-export { RAMP_SCHEDULES, RAMP_ACTIVES, getRampActiveKey, IntroduceSlowlyCard, WeeklyRitualCalendar, getRampWeek, getRampPhase, getRampSchedule, isSchedulePaced, isHighStrengthAzelaic, deriveRampSignals, getRampDaysAtWeek, isReadyToAdvance };
+export { RAMP_SCHEDULES, RAMP_ACTIVES, RAMP_NAME_FALLBACK_CUTOFF_MS, getRampActiveKey, isOnRampList, needsRampEnrolment, IntroduceSlowlyCard, WeeklyRitualCalendar, getRampWeek, getRampPhase, getRampSchedule, isSchedulePaced, isHighStrengthAzelaic, deriveRampSignals, getRampDaysAtWeek, isReadyToAdvance };

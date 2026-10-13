@@ -1,7 +1,7 @@
 import { lazy, Suspense, useState, useRef, useEffect } from "react";
 import { Icon } from "./components.jsx";
 import { analyzeShelf, detectConflicts, buildRoutine } from "./engine.js";
-import { getRampActiveKey, getRampWeek, getRampSchedule } from "./ramp.jsx";
+import { getRampActiveKey, needsRampEnrolment, getRampWeek, getRampSchedule } from "./ramp.jsx";
 import { PreAuthScreen } from "./splash.jsx";
 import { Dashboard } from "./dashboard.jsx";
 import { MyRoutine } from "./ritualscreen.jsx";
@@ -1735,8 +1735,9 @@ export default function App() {
   // -- Introduce Slowly: auto-enrollment backfill ----------------------------
   // A product enters the Introduce Slowly list only when it's `inRoutine` AND
   // has a `routineStartDate` AND matches a ramp-eligible active (Toning Pad
-  // category, or a RAMP_ACTIVES match in its ingredients or, failing that,
-  // its name — see getRampActiveKey in ramp.jsx and the primaryRamp filter
+  // category, or a RAMP_ACTIVES match in its ingredients or, failing that
+  // and only for products created after RAMP_NAME_FALLBACK_CUTOFF_MS, its
+  // name — see getRampActiveKey in ramp.jsx and the primaryRamp filter
   // in progress.jsx). `toggleRoutine` sets routineStartDate when turning a
   // product ON, but products that became inRoutine via other paths (vanity
   // bulk-add, onboarding, modal save with inRoutine preset, or just predating
@@ -1760,13 +1761,9 @@ export default function App() {
     let changed = false;
 
     const updatedProducts = products.map(p => {
-      if (!p) return p;
-      if (p.inRoutine === false) return p;
-      if (p.routineStartDate) return p;
-      // Same activeKey detection used everywhere else (recordRampAction,
-      // auto-graduate, primaryRamp): getRampActiveKey in ramp.jsx.
-      const activeKey = getRampActiveKey(p);
-      if (!activeKey) return p;
+      // In the ritual, no start date, and a ramp — same detection used
+      // everywhere else (getRampActiveKey in ramp.jsx).
+      if (!needsRampEnrolment(p)) return p;
       changed = true;
       newEntries.push({
         userId,

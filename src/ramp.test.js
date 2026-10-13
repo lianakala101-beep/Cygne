@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { getRampWeek, getRampPhase, RAMP_SCHEDULES, RAMP_ACTIVES, getRampActiveKey, getRampSchedule, isSchedulePaced, isHighStrengthAzelaic, getRampDaysAtWeek, isReadyToAdvance, deriveRampSignals } from "./ramp.jsx";
+import { getRampWeek, getRampPhase, RAMP_SCHEDULES, RAMP_ACTIVES, RAMP_NAME_FALLBACK_CUTOFF_MS, getRampActiveKey, isOnRampList, needsRampEnrolment, getRampSchedule, isSchedulePaced, isHighStrengthAzelaic, getRampDaysAtWeek, isReadyToAdvance, deriveRampSignals } from "./ramp.jsx";
 
 // Force "today" to a fixed local date so daysBetweenLocal is deterministic.
 function setToday(year, monthIndex, day) {
@@ -313,34 +313,81 @@ describe("isReadyToAdvance", () => {
   });
 });
 
+// Ids are Date.now() strings from the add-product form; the name
+// fallback only applies at or after the cutoff.
+const OLD_ID = String(RAMP_NAME_FALLBACK_CUTOFF_MS - 86400000); // a day before
+const NEW_ID = String(RAMP_NAME_FALLBACK_CUTOFF_MS + 60000);    // a minute after
+
 describe("getRampActiveKey", () => {
   it("uses the ingredient list first", () => {
-    expect(getRampActiveKey({ category: "Serum", name: "Night Serum", ingredients: ["aqua", "azelaic acid"] })).toBe("azelaic acid");
+    expect(getRampActiveKey({ id: NEW_ID, category: "Serum", name: "Night Serum", ingredients: ["aqua", "azelaic acid"] })).toBe("azelaic acid");
     // Ingredients name BHA; the name says retinol — ingredients win.
-    expect(getRampActiveKey({ category: "Serum", name: "Retinol Clarifying Serum", ingredients: ["aqua", "salicylic acid"] })).toBe("BHA");
+    expect(getRampActiveKey({ id: NEW_ID, category: "Serum", name: "Retinol Clarifying Serum", ingredients: ["aqua", "salicylic acid"] })).toBe("BHA");
   });
 
-  it("falls back to the name when the ingredient list is empty", () => {
-    expect(getRampActiveKey({ category: "Serum", name: "Azelaic Acid 10 Hyaluron Redness Soothing Serum", ingredients: [] })).toBe("azelaic acid");
-    expect(getRampActiveKey({ category: "Serum", name: "Granactive Retinoid 2% Emulsion" })).toBe("retinol");
-    expect(getRampActiveKey({ category: "Exfoliant", name: "Skin Perfecting 2% BHA Liquid", ingredients: "" })).toBe("BHA");
-    expect(getRampActiveKey({ category: "Cleanser", name: "Salicylic Acid Cleanser", ingredients: [] })).toBe("BHA");
-    expect(getRampActiveKey({ category: "Toner", name: "Glycolic Acid 7% Toning Solution", ingredients: [] })).toBe("AHA");
-    expect(getRampActiveKey({ category: "Serum", name: "C-Firma Vitamin C Day Serum", ingredients: [] })).toBe("vitamin C");
+  it("falls back to the name when the ingredient list is empty (new products)", () => {
+    expect(getRampActiveKey({ id: NEW_ID, category: "Serum", name: "Azelaic Acid 10 Hyaluron Redness Soothing Serum", ingredients: [] })).toBe("azelaic acid");
+    expect(getRampActiveKey({ id: NEW_ID, category: "Serum", name: "Granactive Retinoid 2% Emulsion" })).toBe("retinol");
+    expect(getRampActiveKey({ id: NEW_ID, category: "Exfoliant", name: "Skin Perfecting 2% BHA Liquid", ingredients: "" })).toBe("BHA");
+    expect(getRampActiveKey({ id: NEW_ID, category: "Cleanser", name: "Salicylic Acid Cleanser", ingredients: [] })).toBe("BHA");
+    expect(getRampActiveKey({ id: NEW_ID, category: "Toner", name: "Glycolic Acid 7% Toning Solution", ingredients: [] })).toBe("AHA");
+    expect(getRampActiveKey({ id: NEW_ID, category: "Serum", name: "C-Firma Vitamin C Day Serum", ingredients: [] })).toBe("vitamin C");
   });
 
-  it("falls back to the name when the ingredients name no ramped active", () => {
-    expect(getRampActiveKey({ category: "Serum", name: "Azelaic Acid Booster", ingredients: ["aqua", "glycerin", "sodium hyaluronate"] })).toBe("azelaic acid");
+  it("falls back to the name when the ingredients name no ramped active (new products)", () => {
+    expect(getRampActiveKey({ id: NEW_ID, category: "Serum", name: "Azelaic Acid Booster", ingredients: ["aqua", "glycerin", "sodium hyaluronate"] })).toBe("azelaic acid");
   });
 
   it("returns null when neither ingredients nor name match", () => {
-    expect(getRampActiveKey({ category: "Moisturizer", name: "Bahama Butter Cream", ingredients: ["shea butter"] })).toBeNull();
-    expect(getRampActiveKey({ category: "Serum", name: "Hyaluronic Acid 2% + B5", ingredients: [] })).toBeNull();
-    expect(getRampActiveKey({ category: "Serum" })).toBeNull();
+    expect(getRampActiveKey({ id: NEW_ID, category: "Moisturizer", name: "Bahama Butter Cream", ingredients: ["shea butter"] })).toBeNull();
+    expect(getRampActiveKey({ id: NEW_ID, category: "Serum", name: "Hyaluronic Acid 2% + B5", ingredients: [] })).toBeNull();
+    expect(getRampActiveKey({ id: NEW_ID, category: "Serum" })).toBeNull();
     expect(getRampActiveKey(null)).toBeNull();
   });
 
   it("keeps Toning Pad as its own ramp", () => {
     expect(getRampActiveKey({ category: "Toning Pad", name: "Glycolic Pads", ingredients: ["glycolic acid"] })).toBe("toning pad");
+  });
+});
+
+describe("name fallback cutoff", () => {
+  const blank = (id) => ({ id, category: "Serum", name: "Azelaic Acid 10 Hyaluron Redness Soothing Serum", ingredients: [] });
+
+  it("is 2026-10-13T19:00:00Z", () => {
+    expect(new Date(RAMP_NAME_FALLBACK_CUTOFF_MS).toISOString()).toBe("2026-10-13T19:00:00.000Z");
+  });
+
+  it("an older product with blank ingredients and \"Azelaic\" in the name gets no enrolment and no card", () => {
+    const p = blank(OLD_ID);
+    expect(getRampActiveKey(p)).toBeNull();
+    expect(needsRampEnrolment(p)).toBe(false);
+    // Even with a start date (e.g. set by "Add to ritual"), it stays off the card list.
+    expect(isOnRampList({ ...p, routineStartDate: "2026-10-01" })).toBe(false);
+  });
+
+  it("a newer product with blank ingredients and \"Azelaic\" in the name is enrolled and gets a card", () => {
+    const p = blank(NEW_ID);
+    expect(getRampActiveKey(p)).toBe("azelaic acid");
+    expect(needsRampEnrolment(p)).toBe(true);
+    expect(isOnRampList({ ...p, routineStartDate: "2026-10-13" })).toBe(true);
+  });
+
+  it("treats the cutoff itself as new, and non-timestamp ids as old", () => {
+    expect(getRampActiveKey(blank(String(RAMP_NAME_FALLBACK_CUTOFF_MS)))).toBe("azelaic acid");
+    expect(getRampActiveKey(blank("legacy-7"))).toBeNull();
+    expect(getRampActiveKey(blank(undefined))).toBeNull();
+  });
+
+  it("leaves ingredient detection unchanged for older products", () => {
+    const old = { id: OLD_ID, category: "Serum", name: "Night Serum", ingredients: ["aqua", "azelaic acid"] };
+    expect(getRampActiveKey(old)).toBe("azelaic acid");
+    expect(needsRampEnrolment(old)).toBe(true);
+    expect(isOnRampList({ ...old, routineStartDate: "2026-10-01" })).toBe(true);
+  });
+
+  it("keeps products out of the ritual off the list and out of enrolment", () => {
+    const p = { ...blank(NEW_ID), inRoutine: false };
+    expect(needsRampEnrolment(p)).toBe(false);
+    expect(isOnRampList({ ...p, routineStartDate: "2026-10-13" })).toBe(false);
   });
 });

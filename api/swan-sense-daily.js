@@ -223,8 +223,11 @@ function detectRampActive(product) {
     if (/ascorbic|\bvitamin\s*c\b|ascorbyl/.test(ing)) return "vitamin C";
     if (/azelaic/.test(ing)) return "azelaic acid";
   }
-  // Name fallback when the ingredients name no ramped active — mirrors
-  // RAMP_NAME_PATTERNS / getRampActiveKey in src/ramp.jsx.
+  // Name fallback when the ingredients name no ramped active, for
+  // products created at or after the cutoff only — mirrors
+  // RAMP_NAME_FALLBACK_CUTOFF_MS / getRampActiveKey in src/ramp.jsx.
+  const id = String(product.id ?? "");
+  if (!/^\d{13}$/.test(id) || Number(id) < 1791918000000) return null;
   const name = String(product.name || "");
   if (/retin(ol|al|oid|yl|oic)|retin-a|tretinoin|adapalene|granactive|hydroxypinacolone|bakuchiol/i.test(name)) return "retinol";
   if (/\baha\b|glycolic|lactic|mandelic/i.test(name)) return "AHA";

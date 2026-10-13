@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Icon, Section, ErrorBoundary } from "./components.jsx";
 import { detectActives, detectActivesFromProduct, analyzeShelf, detectConflicts, buildRoutine, hasSPFCoverage } from "./engine.js";
 import { getAutoSession } from "./productmodal.jsx";
-import { getRampActiveKey, IntroduceSlowlyCard, getRampWeek, getRampSchedule, isSchedulePaced, deriveRampSignals } from "./ramp.jsx";
+import { getRampActiveKey, isOnRampList, IntroduceSlowlyCard, getRampWeek, getRampSchedule, isSchedulePaced, deriveRampSignals } from "./ramp.jsx";
 import { getCurrentCycleDay, isCycleStale, CYCLE_STALE_MESSAGE, getTreatmentElapsed, daysBetweenLocal } from "./utils.jsx";
 import { getPhaseForDay, scalePhases, normalizeCycleLength } from "./lib/cycle.js";
 import { FaceHeatMap } from "./components/FaceHeatMap.jsx";
@@ -1776,11 +1776,7 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
   const { pausedActives, reintroActives, treatment: pauseTreatment, phase: pausePhase } = getActivePauseState(treatments, products);
 
   // Core ramp list: products the user has actively been building up.
-  const primaryRamp = products.filter(p =>
-    p.inRoutine !== false &&
-    p.routineStartDate &&
-    getRampActiveKey(p) != null
-  );
+  const primaryRamp = products.filter(isOnRampList);
 
   // Reintroduction list: products whose active is resuming after a treatment
   // but which aren't already in the primary ramp. We reset them to week 1
