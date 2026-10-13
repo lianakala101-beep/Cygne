@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { getSuggestedFrequency, getAutoSession, getFormSession, getFormFrequency } from "./productmodal.jsx";
+import { getSuggestedFrequency, getAutoSession, getFormSession, getFormFrequency, findRitualDuplicate } from "./productmodal.jsx";
 import { CATEGORIES } from "./constants.js";
 
 describe("getSuggestedFrequency", () => {
@@ -129,5 +129,29 @@ describe("form defaults for ramped actives", () => {
     const cleanser = { category: "Cleanser", ingredients: ["Aqua", "Glycerin"] };
     expect(getFormSession(cleanser).auto).toEqual(getAutoSession(cleanser));
     expect(getFormFrequency(cleanser)).toEqual(getSuggestedFrequency(cleanser));
+  });
+});
+
+describe("findRitualDuplicate", () => {
+  const existing = { id: "1", name: "Azelaic Acid 10 Hyaluron Redness Soothing Serum", inRoutine: true };
+
+  it("finds a ritual product with the same name, ignoring case and spacing", () => {
+    expect(findRitualDuplicate({ name: "azelaic acid 10  hyaluron redness soothing serum " }, [existing])).toBe(existing);
+  });
+
+  it("treats a product with inRoutine unset as in the ritual", () => {
+    const unset = { id: "2", name: "BHA Liquid" };
+    expect(findRitualDuplicate({ name: "BHA Liquid" }, [unset])).toBe(unset);
+  });
+
+  it("ignores products removed from the ritual", () => {
+    expect(findRitualDuplicate({ name: existing.name }, [{ ...existing, inRoutine: false }])).toBeNull();
+  });
+
+  it("ignores different names, the product itself, and empty input", () => {
+    expect(findRitualDuplicate({ name: "Azelaic Acid 15" }, [existing])).toBeNull();
+    expect(findRitualDuplicate({ id: "1", name: existing.name }, [existing])).toBeNull();
+    expect(findRitualDuplicate({ name: "" }, [existing])).toBeNull();
+    expect(findRitualDuplicate({ name: existing.name }, undefined)).toBeNull();
   });
 });

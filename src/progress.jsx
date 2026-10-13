@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Icon, Section, ErrorBoundary } from "./components.jsx";
 import { detectActives, detectActivesFromProduct, analyzeShelf, detectConflicts, buildRoutine, hasSPFCoverage } from "./engine.js";
 import { getAutoSession } from "./productmodal.jsx";
-import { RAMP_ACTIVES, IntroduceSlowlyCard, getRampWeek, getRampSchedule, isSchedulePaced, deriveRampSignals } from "./ramp.jsx";
+import { getRampActiveKey, IntroduceSlowlyCard, getRampWeek, getRampSchedule, isSchedulePaced, deriveRampSignals } from "./ramp.jsx";
 import { getCurrentCycleDay, isCycleStale, CYCLE_STALE_MESSAGE, getTreatmentElapsed, daysBetweenLocal } from "./utils.jsx";
 import { getPhaseForDay, scalePhases, normalizeCycleLength } from "./lib/cycle.js";
 import { FaceHeatMap } from "./components/FaceHeatMap.jsx";
@@ -1779,7 +1779,7 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
   const primaryRamp = products.filter(p =>
     p.inRoutine !== false &&
     p.routineStartDate &&
-    (p.category === "Toning Pad" || RAMP_ACTIVES.some(a => detectActives(p.ingredients || [])[a]))
+    getRampActiveKey(p) != null
   );
 
   // Reintroduction list: products whose active is resuming after a treatment
@@ -2200,9 +2200,7 @@ function ProgressInner({ products: productsProp, checkIns: checkInsProp, setChec
                 )}
                 {rampProducts.length > 0 ? (
                   rampProducts.map((p, i) => {
-                    const activeKey = p.category === "Toning Pad"
-                      ? "toning pad"
-                      : RAMP_ACTIVES.find(a => detectActives(p.ingredients || [])[a]);
+                    const activeKey = getRampActiveKey(p);
                     // Concern-aware schedule — sensitivity-tier users get
                     // an extended timeline via getRampSchedule. schedulePaced
                     // tells the card to surface a soft "paced more gradually"

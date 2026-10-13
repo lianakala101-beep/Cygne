@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { getRampWeek, getRampPhase, RAMP_SCHEDULES, RAMP_ACTIVES, getRampSchedule, isSchedulePaced, isHighStrengthAzelaic, getRampDaysAtWeek, isReadyToAdvance, deriveRampSignals } from "./ramp.jsx";
+import { getRampWeek, getRampPhase, RAMP_SCHEDULES, RAMP_ACTIVES, getRampActiveKey, getRampSchedule, isSchedulePaced, isHighStrengthAzelaic, getRampDaysAtWeek, isReadyToAdvance, deriveRampSignals } from "./ramp.jsx";
 
 // Force "today" to a fixed local date so daysBetweenLocal is deterministic.
 function setToday(year, monthIndex, day) {
@@ -310,5 +310,37 @@ describe("isReadyToAdvance", () => {
     const justBefore = { ...checkIn("no_reaction", "2026-09-13"), created_at: at("2026-09-13", 23, 30) };
     expect(isReadyToAdvance(product, [justAfter], TODAY)).toBe(true);
     expect(isReadyToAdvance(product, [justBefore], TODAY)).toBe(false);
+  });
+});
+
+describe("getRampActiveKey", () => {
+  it("uses the ingredient list first", () => {
+    expect(getRampActiveKey({ category: "Serum", name: "Night Serum", ingredients: ["aqua", "azelaic acid"] })).toBe("azelaic acid");
+    // Ingredients name BHA; the name says retinol — ingredients win.
+    expect(getRampActiveKey({ category: "Serum", name: "Retinol Clarifying Serum", ingredients: ["aqua", "salicylic acid"] })).toBe("BHA");
+  });
+
+  it("falls back to the name when the ingredient list is empty", () => {
+    expect(getRampActiveKey({ category: "Serum", name: "Azelaic Acid 10 Hyaluron Redness Soothing Serum", ingredients: [] })).toBe("azelaic acid");
+    expect(getRampActiveKey({ category: "Serum", name: "Granactive Retinoid 2% Emulsion" })).toBe("retinol");
+    expect(getRampActiveKey({ category: "Exfoliant", name: "Skin Perfecting 2% BHA Liquid", ingredients: "" })).toBe("BHA");
+    expect(getRampActiveKey({ category: "Cleanser", name: "Salicylic Acid Cleanser", ingredients: [] })).toBe("BHA");
+    expect(getRampActiveKey({ category: "Toner", name: "Glycolic Acid 7% Toning Solution", ingredients: [] })).toBe("AHA");
+    expect(getRampActiveKey({ category: "Serum", name: "C-Firma Vitamin C Day Serum", ingredients: [] })).toBe("vitamin C");
+  });
+
+  it("falls back to the name when the ingredients name no ramped active", () => {
+    expect(getRampActiveKey({ category: "Serum", name: "Azelaic Acid Booster", ingredients: ["aqua", "glycerin", "sodium hyaluronate"] })).toBe("azelaic acid");
+  });
+
+  it("returns null when neither ingredients nor name match", () => {
+    expect(getRampActiveKey({ category: "Moisturizer", name: "Bahama Butter Cream", ingredients: ["shea butter"] })).toBeNull();
+    expect(getRampActiveKey({ category: "Serum", name: "Hyaluronic Acid 2% + B5", ingredients: [] })).toBeNull();
+    expect(getRampActiveKey({ category: "Serum" })).toBeNull();
+    expect(getRampActiveKey(null)).toBeNull();
+  });
+
+  it("keeps Toning Pad as its own ramp", () => {
+    expect(getRampActiveKey({ category: "Toning Pad", name: "Glycolic Pads", ingredients: ["glycolic acid"] })).toBe("toning pad");
   });
 });

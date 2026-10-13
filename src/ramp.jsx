@@ -224,6 +224,34 @@ const RAMP_SCHEDULES = {
 
 const RAMP_ACTIVES = ["retinol", "AHA", "BHA", "vitamin C", "azelaic acid"];
 
+// Name fallback for ramp detection, checked only when the ingredient list
+// is empty or names no ramped active (ingredients stay the primary
+// signal). Same order as RAMP_ACTIVES. Patterns follow the name fallback
+// in engine.js detectActivesFromProduct; short acronyms need word
+// boundaries so e.g. "Bahama Butter" doesn't read as BHA.
+const RAMP_NAME_PATTERNS = {
+  retinol: /retin(ol|al|oid|yl|oic)|retin-a|tretinoin|adapalene|granactive|hydroxypinacolone|bakuchiol/i,
+  AHA: /\baha\b|glycolic|lactic|mandelic/i,
+  BHA: /\bbha\b|salicylic/i,
+  "vitamin C": /\bvitamin\s*c\b|ascorbic|ascorbyl/i,
+  "azelaic acid": /azelaic/i,
+};
+
+// The Introduce Slowly ramp a product gets: "toning pad" for the Toning
+// Pad category, else the first RAMP_ACTIVES match in its ingredients,
+// else the first match in its name. null when none match. Every ramp
+// consumer (card list, enrolment, graduation, ramp actions, calendar)
+// goes through this.
+function getRampActiveKey(product) {
+  if (!product) return null;
+  if (product.category === "Toning Pad") return "toning pad";
+  const actives = detectActives(product.ingredients || []);
+  const fromIngredients = RAMP_ACTIVES.find(a => actives[a]);
+  if (fromIngredients) return fromIngredients;
+  const name = String(product.name || "");
+  return RAMP_ACTIVES.find(a => RAMP_NAME_PATTERNS[a].test(name)) || null;
+}
+
 // Concern-aware pacing. Users who state Rosacea or Cystic/hormonal
 // acne in their skin profile get a more conservative Introduce Slowly
 // schedule: Patch and Introduce each run one week longer, everything
@@ -1040,9 +1068,7 @@ function WeeklyRitualCalendar({ rampProducts, products }) {
 
   // Get color for a product (from RAMP_SCHEDULES if available, else sage)
   const getColor = (product) => {
-    const activeKey = product.category === "Toning Pad"
-      ? "toning pad"
-      : RAMP_ACTIVES.find(a => detectActives(product.ingredients || [])[a]);
+    const activeKey = getRampActiveKey(product);
     return RAMP_SCHEDULES[activeKey]?.color || "var(--sage)";
   };
 
@@ -1193,9 +1219,7 @@ function WeeklyRitualCalendar({ rampProducts, products }) {
                     </p>
                     {slotProducts.map((p, i) => {
                       const color = getColor(p);
-                      const activeKey = p.category === "Toning Pad"
-                        ? "toning pad"
-                        : RAMP_ACTIVES.find(a => detectActives(p.ingredients || [])[a]);
+                      const activeKey = getRampActiveKey(p);
                       const schedule = RAMP_SCHEDULES[activeKey];
                       const phase = schedule ? getRampPhase(schedule, getRampWeek(p)) : null;
                       return (
@@ -1225,4 +1249,4 @@ function WeeklyRitualCalendar({ rampProducts, products }) {
 
 // --- PROGRESS ----------------------------------------------------------------
 
-export { RAMP_SCHEDULES, RAMP_ACTIVES, IntroduceSlowlyCard, WeeklyRitualCalendar, getRampWeek, getRampPhase, getRampSchedule, isSchedulePaced, isHighStrengthAzelaic, deriveRampSignals, getRampDaysAtWeek, isReadyToAdvance };
+export { RAMP_SCHEDULES, RAMP_ACTIVES, getRampActiveKey, IntroduceSlowlyCard, WeeklyRitualCalendar, getRampWeek, getRampPhase, getRampSchedule, isSchedulePaced, isHighStrengthAzelaic, deriveRampSignals, getRampDaysAtWeek, isReadyToAdvance };

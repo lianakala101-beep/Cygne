@@ -208,7 +208,7 @@ const RAMP_MAX_WEEKS = {
 };
 
 // Lightweight client-of-engine.detectActives — substring match on ingredients
-// plus the Toning Pad category. Mirrors the five RAMP_ACTIVES the UI uses to
+// (then the product name) plus the Toning Pad category. Mirrors the five RAMP_ACTIVES the UI uses to
 // decide whether to surface IntroduceSlowlyCard for a product.
 function detectRampActive(product) {
   if (!product) return null;
@@ -216,12 +216,21 @@ function detectRampActive(product) {
   const ing = Array.isArray(product.ingredients)
     ? product.ingredients.join(" ").toLowerCase()
     : String(product.ingredients || "").toLowerCase();
-  if (!ing) return null;
-  if (/retin(ol|oid|al|yl)|tretinoin|adapalene/.test(ing)) return "retinol";
-  if (/glycolic|lactic|mandelic|\baha\b/.test(ing)) return "AHA";
-  if (/salicylic|\bbha\b/.test(ing)) return "BHA";
-  if (/ascorbic|\bvitamin\s*c\b|ascorbyl/.test(ing)) return "vitamin C";
-  if (/azelaic/.test(ing)) return "azelaic acid";
+  if (ing) {
+    if (/retin(ol|oid|al|yl)|tretinoin|adapalene/.test(ing)) return "retinol";
+    if (/glycolic|lactic|mandelic|\baha\b/.test(ing)) return "AHA";
+    if (/salicylic|\bbha\b/.test(ing)) return "BHA";
+    if (/ascorbic|\bvitamin\s*c\b|ascorbyl/.test(ing)) return "vitamin C";
+    if (/azelaic/.test(ing)) return "azelaic acid";
+  }
+  // Name fallback when the ingredients name no ramped active — mirrors
+  // RAMP_NAME_PATTERNS / getRampActiveKey in src/ramp.jsx.
+  const name = String(product.name || "");
+  if (/retin(ol|al|oid|yl|oic)|retin-a|tretinoin|adapalene|granactive|hydroxypinacolone|bakuchiol/i.test(name)) return "retinol";
+  if (/\baha\b|glycolic|lactic|mandelic/i.test(name)) return "AHA";
+  if (/\bbha\b|salicylic/i.test(name)) return "BHA";
+  if (/\bvitamin\s*c\b|ascorbic|ascorbyl/i.test(name)) return "vitamin C";
+  if (/azelaic/i.test(name)) return "azelaic acid";
   return null;
 }
 

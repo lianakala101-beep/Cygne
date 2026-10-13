@@ -300,6 +300,18 @@ function getFormFrequency(product, user = {}) {
   return base;
 }
 
+// --- DUPLICATE CHECK ------------------------------------------------------------
+// An existing ritual product (inRoutine not false) with the same name as
+// the one being added, ignoring case and extra spaces — or null. Used to
+// confirm before saving a second copy, which would get its own ramp card.
+const normalizeName = (name) => String(name || "").trim().replace(/\s+/g, " ").toLowerCase();
+
+function findRitualDuplicate(product, products = []) {
+  const name = normalizeName(product?.name);
+  if (!name || !Array.isArray(products)) return null;
+  return products.find(p => p && p.id !== product.id && p.inRoutine !== false && normalizeName(p.name) === name) || null;
+}
+
 // Frequency ordering for overuse comparison (lower = less frequent)
 const FREQ_RANK = { "weekly": 1, "as-needed": 1, "2-3x": 2, "alternating": 3, "daily": 4 };
 
@@ -362,7 +374,7 @@ function ShelfLifeSection({ form, set }) {
   );
 }
 
-function ProductModal({ product, onSave, onClose, user }) {
+function ProductModal({ product, onSave, onClose, user, products = [] }) {
   const [form, setForm] = useState(product || { brand: "", name: "", category: "Serum", price: "", ingredients: "" });
   const [analyzing, setAnalyzing] = useState(false);
   const [scanError, setScanError] = useState(null);
@@ -542,8 +554,17 @@ function ProductModal({ product, onSave, onClose, user }) {
     setAnalyzing(false);
   };
 
-  const save = () => {
+  // New products only: ask before adding a second copy of something
+  // already in the ritual. Editing the name clears the prompt.
+  const [duplicateOf, setDuplicateOf] = useState(null);
+  useEffect(() => { setDuplicateOf(null); }, [form.name]);
+
+  const save = ({ confirmedDuplicate = false } = {}) => {
     if (!form.brand || !form.name) return;
+    if (!isEdit && !confirmedDuplicate) {
+      const dup = findRitualDuplicate({ name: form.name, id: product?.id }, products);
+      if (dup) { setDuplicateOf(dup); return; }
+    }
     const ingArr = typeof form.ingredients === "string" ? form.ingredients.split(",").map(s => s.trim().toLowerCase()).filter(Boolean) : (form.ingredients || []);
     onSave({ ...form, id: product && product.id ? product.id : Date.now().toString(), ingredients: ingArr, price: parseFloat(form.price) || 0 });
   };
@@ -809,10 +830,28 @@ function ProductModal({ product, onSave, onClose, user }) {
               <ShelfLifeSection form={form} set={set} />
             </div>
 
-            <button onClick={save}
-              style={{ width: "100%", padding: "var(--space-4) 0", background: "var(--sage)", border: "none", borderRadius: "var(--radius)", fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", fontWeight: 400, color: "var(--ink)", cursor: "pointer", opacity: (!form.brand || !form.name) ? 0.4 : 1 }}>
-              Save to Vanity
-            </button>
+            {duplicateOf ? (
+              <div role="alertdialog" aria-label="Duplicate product">
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "var(--parchment)", margin: "0 0 var(--space-3)", lineHeight: 1.5, textAlign: "center" }}>
+                  You already have this in your ritual. Add another copy?
+                </p>
+                <div style={{ display: "flex", gap: "var(--space-2)" }}>
+                  <button onClick={() => setDuplicateOf(null)}
+                    style={{ flex: 1, padding: "var(--space-4) 0", background: "transparent", border: "1px solid var(--border)", borderRadius: "var(--radius)", fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", fontWeight: 400, color: "var(--parchment)", cursor: "pointer" }}>
+                    Cancel
+                  </button>
+                  <button onClick={() => save({ confirmedDuplicate: true })}
+                    style={{ flex: 1, padding: "var(--space-4) 0", background: "var(--sage)", border: "none", borderRadius: "var(--radius)", fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", fontWeight: 400, color: "var(--ink)", cursor: "pointer" }}>
+                    Add another copy
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button onClick={() => save()}
+                style={{ width: "100%", padding: "var(--space-4) 0", background: "var(--sage)", border: "none", borderRadius: "var(--radius)", fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", fontWeight: 400, color: "var(--ink)", cursor: "pointer", opacity: (!form.brand || !form.name) ? 0.4 : 1 }}>
+                Save to Vanity
+              </button>
+            )}
           </div>
         )}
 
@@ -824,4 +863,4 @@ function ProductModal({ product, onSave, onClose, user }) {
 
 // --- SESSION LOCKED BY INGREDIENTS -------------------------------------------
 
-export { RoutineFitSheet, ProductModal, ShelfLifeSection, getLockedSession, getAutoSession, getSuggestedFrequency, getFormSession, getFormFrequency };
+export { RoutineFitSheet, ProductModal, ShelfLifeSection, getLockedSession, getAutoSession, getSuggestedFrequency, getFormSession, getFormFrequency, findRitualDuplicate };

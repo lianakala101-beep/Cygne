@@ -1,7 +1,7 @@
 import { lazy, Suspense, useState, useRef, useEffect } from "react";
 import { Icon } from "./components.jsx";
-import { analyzeShelf, detectConflicts, buildRoutine, detectActives } from "./engine.js";
-import { RAMP_ACTIVES, getRampWeek, getRampSchedule } from "./ramp.jsx";
+import { analyzeShelf, detectConflicts, buildRoutine } from "./engine.js";
+import { getRampActiveKey, getRampWeek, getRampSchedule } from "./ramp.jsx";
 import { PreAuthScreen } from "./splash.jsx";
 import { Dashboard } from "./dashboard.jsx";
 import { MyRoutine } from "./ritualscreen.jsx";
@@ -1531,9 +1531,7 @@ export default function App() {
     }
     const product = products.find(p => p.id === id);
     if (!product) return;
-    const activeKey = product.category === "Toning Pad"
-      ? "toning pad"
-      : RAMP_ACTIVES.find(a => detectActives(product.ingredients || [])[a]);
+    const activeKey = getRampActiveKey(product);
     // Concern-aware schedule — sensitivity-tier users (Rosacea /
     // Cystic-hormonal acne) get an extended timeline with a lower
     // Maintain cadence. Without a sensitivity concern this returns
@@ -1737,7 +1735,8 @@ export default function App() {
   // -- Introduce Slowly: auto-enrollment backfill ----------------------------
   // A product enters the Introduce Slowly list only when it's `inRoutine` AND
   // has a `routineStartDate` AND matches a ramp-eligible active (Toning Pad
-  // category, or an ingredient in RAMP_ACTIVES — see the primaryRamp filter
+  // category, or a RAMP_ACTIVES match in its ingredients or, failing that,
+  // its name — see getRampActiveKey in ramp.jsx and the primaryRamp filter
   // in progress.jsx). `toggleRoutine` sets routineStartDate when turning a
   // product ON, but products that became inRoutine via other paths (vanity
   // bulk-add, onboarding, modal save with inRoutine preset, or just predating
@@ -1765,11 +1764,8 @@ export default function App() {
       if (p.inRoutine === false) return p;
       if (p.routineStartDate) return p;
       // Same activeKey detection used everywhere else (recordRampAction,
-      // auto-graduate, primaryRamp). Toning Pad is category-based; everything
-      // else is ingredient-based via detectActives matching RAMP_ACTIVES.
-      const activeKey = p.category === "Toning Pad"
-        ? "toning pad"
-        : RAMP_ACTIVES.find(a => detectActives(p.ingredients || [])[a]);
+      // auto-graduate, primaryRamp): getRampActiveKey in ramp.jsx.
+      const activeKey = getRampActiveKey(p);
       if (!activeKey) return p;
       changed = true;
       newEntries.push({
@@ -1820,9 +1816,7 @@ export default function App() {
 
     const updatedProducts = products.map(p => {
       if (!p || p.inRoutine === false || !p.routineStartDate) return p;
-      const activeKey = p.category === "Toning Pad"
-        ? "toning pad"
-        : RAMP_ACTIVES.find(a => detectActives(p.ingredients || [])[a]);
+      const activeKey = getRampActiveKey(p);
       if (!activeKey) return p;
       // Use the concern-aware schedule so sensitivity-tier users get
       // the longer maxWeek — otherwise auto-graduation would fire at
@@ -2223,7 +2217,7 @@ export default function App() {
             onSkip={() => setShowFirstCheckIn(false)}
           />
         )}
-        {modal && <ProductModal product={modal === "add" ? null : modal} onSave={saveProduct} onClose={() => setModal(null)} user={user} />}
+        {modal && <ProductModal product={modal === "add" ? null : modal} onSave={saveProduct} onClose={() => setModal(null)} user={user} products={products} />}
         {profileOpen && <ProfileSheet user={user} products={products} locationData={locationData} setLocationData={setLocationData} locationDenied={locationDenied} setLocationDenied={setLocationDenied} onUpdateUser={updateUser} onLogout={handleLogout} onClose={() => setProfileOpen(false)} />}
         {fitSheet && (
           <RoutineFitSheet
